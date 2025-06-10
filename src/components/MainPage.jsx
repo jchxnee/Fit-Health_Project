@@ -7,6 +7,8 @@ import AdBanner from "./MainPage/AdBanner.jsx";
 import PopularTrainer from "./MainPage/PopularTrainer.jsx";
 import PopularPosts from "./MainPage/PopularPosts.jsx";
 import SelectGoal from "./MainPage/SelectGoal.jsx";
+import Footer from "./Footer.jsx";
+import GoalVideo from "./MainPage/GoalVideo.jsx";
 
 function MainPage() {
     return(
@@ -17,6 +19,8 @@ function MainPage() {
             <PopularTrainer/>
             <PopularPosts/>
             <SelectGoal/>
+            <GoalVideo/>
+            <Footer/>
         </ThemeProvider>
     )
 }

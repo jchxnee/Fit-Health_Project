@@ -2,27 +2,36 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.section`
-  width: 1008px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 38px 0 24px 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  padding: 130px 0 24px 0;
 `;
+
+const Button = styled.div`
+    width: 1008px;
+    display: flex;
+    
+`
 const List = styled.div`
+    width: 674px;
   display: flex;
-    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: left;
   gap: 16px;
 `;
 const CategoryBtn = styled.button`
   min-width: 74px;
     height: 45px;
+    padding: 10px;
     
   border-radius: 24px;
   border: 1.5px solid #CDCDCD;
   background: ${({ selected }) => (selected ? '#3D6EFF' : 'transparent')};
   color: ${({ selected }) => (selected ? '#fff' : `${({ theme }) => theme.colors.primary }` )};
   font-family: 'SUITE', sans-serif;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
     text-align: center;
   cursor: pointer;
@@ -36,7 +45,7 @@ const CategoryBtn = styled.button`
 `;
 
 const categories = [
-    '체형교정·가벼운운동',
+    '체형교정·가벼운통증',
     '헬스',
     '다이어트',
     '근력향상',
@@ -50,6 +59,7 @@ const SelectExercise = () => {
     const [selected, setSelected] = useState('근력향상');
     return (
         <Wrapper>
+            <Button>
             <List>
                 {categories.map((cat) => (
                     <CategoryBtn
@@ -61,6 +71,7 @@ const SelectExercise = () => {
                     </CategoryBtn>
                 ))}
             </List>
+            </Button>
         </Wrapper>
     );
 };
