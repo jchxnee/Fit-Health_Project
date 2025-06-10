@@ -6,7 +6,6 @@ import { RiKakaoTalkFill } from 'react-icons/ri';
 const FooterContainer = styled.footer`
   background-color: ${({ theme }) => theme.colors.gray[100]};
   color: ${({ theme }) => theme.colors.gray[700]};
-  font-family: Arial, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,7 +22,7 @@ const FooterContainer = styled.footer`
 const FooterContentWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  width: 1200px;
+  width: 1008px;
   margin: 0 auto;
   margin-bottom: ${({ theme }) => theme.spacing[10]};
   flex-wrap: wrap;
@@ -159,7 +158,7 @@ const BusinessHours = styled.p`
 const FooterBottomWrapper = styled.div`
   border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
   padding-top: ${({ theme }) => theme.spacing[1]};
-  width: 1200px;
+  width: 1008px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -195,7 +194,7 @@ const SocialMediaIcons = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing[10]};
   margin-bottom: ${({ theme }) => theme.spacing[5]};
-  margin-right: ${({ theme }) => theme.spacing[40]};
+  justify-content: flex-end;
   margin-top: ${({ theme }) => theme.spacing[4]};
 
   @media (max-width: ${({ theme }) => theme.width.md}) {
@@ -265,7 +264,7 @@ export default function Footer() {
         </ContactSection>
 
         <FooterSection>
-          <div style={{ display: 'flex', gap: '50px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '50px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
             <FooterMenuGroup>
               <li>회사</li>
               <li>

@@ -1,8 +1,13 @@
-import { ThemeProvider } from 'styled-components'
-import './App.css'
-import Footer from './components/Footer'
-import theme from './styles/theme'
-import createGlobalStyle from 'styled-components'
+import { ThemeProvider } from 'styled-components';
+import './App.css';
+import Footer from './components/Footer';
+import theme from './styles/theme';
+import createGlobalStyle from 'styled-components';
+import SelectBar from './components/selectbar/BasicSelectBar';
+import { useState } from 'react';
+import BasicList from './components/list/BasicList';
+import Header from './components/Header';
+import BasicFilter from './components/filter/BasicFilter';
 
 const GlobalStyle = createGlobalStyle`
   html, body, #root {
@@ -24,18 +29,21 @@ const GlobalStyle = createGlobalStyle`
 
   main {
     flex-grow: 1;
-    /* max-width 등을 설정하여 main 콘텐츠도 화면 중앙에 오도록 조정하는 것이 좋습니다. */
   }
 `;
 
 function App() {
-
   return (
     <ThemeProvider theme={theme}>
-      <GlobalStyle/>
-    <Footer/>
+      <GlobalStyle />
+      {/* <BasicFilter filterOptions={filterOptionsConfig} onFilterChange={handleFilterChange} /> */}
+      {/* <Filter /> */}
+      {/* <SelectBar options={categories} onSelect={handleCategorySelect} initialSelected="전체" /> */}
+      <Header />
+      {/* <BasicList posts={dummyPosts} /> */}
+      <Footer />
     </ThemeProvider>
-  )
+  );
 }
 
-export default App
+export default App;
