@@ -5,6 +5,8 @@ import theme from "../styles/theme.js";
 import {ThemeProvider} from "styled-components";
 import AdBanner from "./MainPage/AdBanner.jsx";
 import PopularTrainer from "./MainPage/PopularTrainer.jsx";
+import PopularPosts from "./MainPage/PopularPosts.jsx";
+import SelectGoal from "./MainPage/SelectGoal.jsx";
 
 function MainPage() {
     return(
@@ -13,6 +15,8 @@ function MainPage() {
             <SelectExercise/>
             <AdBanner/>
             <PopularTrainer/>
+            <PopularPosts/>
+            <SelectGoal/>
         </ThemeProvider>
     )
 }

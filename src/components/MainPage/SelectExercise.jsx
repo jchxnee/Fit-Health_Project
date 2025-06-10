@@ -27,8 +27,8 @@ const IconBox = styled.div`
 `;
 const Label = styled.span`
   font-family: 'SUITE', sans-serif;
-  font-size: 14px;
-  color: #3D4149;
+  font-size: ${({ theme }) => theme.fontSizes.sm };
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 const items = [

@@ -1,0 +1,68 @@
+import React, { useState } from 'react';
+import styled from 'styled-components';
+
+const Wrapper = styled.section`
+  width: 1008px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 38px 0 24px 0;
+`;
+const List = styled.div`
+  display: flex;
+    align-items: center;
+  gap: 16px;
+`;
+const CategoryBtn = styled.button`
+  min-width: 74px;
+    height: 45px;
+    
+  border-radius: 24px;
+  border: 1.5px solid #CDCDCD;
+  background: ${({ selected }) => (selected ? '#3D6EFF' : 'transparent')};
+  color: ${({ selected }) => (selected ? '#fff' : `${({ theme }) => theme.colors.primary }` )};
+  font-family: 'SUITE', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+    text-align: center;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  outline: none;
+  box-shadow: none;
+  &:hover {
+    background: #3D6EFF;
+    color: #fff;
+  }
+`;
+
+const categories = [
+    '체형교정·가벼운운동',
+    '헬스',
+    '다이어트',
+    '근력향상',
+    '산전·후운동',
+    '만성통증·재활운동',
+    '요가명상',
+    '근골격계 케어',
+];
+
+const SelectExercise = () => {
+    const [selected, setSelected] = useState('근력향상');
+    return (
+        <Wrapper>
+            <List>
+                {categories.map((cat) => (
+                    <CategoryBtn
+                        key={cat}
+                        selected={selected === cat}
+                        onClick={() => setSelected(cat)}
+                    >
+                        {cat}
+                    </CategoryBtn>
+                ))}
+            </List>
+        </Wrapper>
+    );
+};
+
+export default SelectExercise;
