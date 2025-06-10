@@ -41,13 +41,12 @@ const theme = {
     extrabold: 800,
     black: 900,
   },
-  breakpoints: {
-    xs: '320px',
+  width: {
+    xs: '320px', //모바일
     sm: '576px',
     md: '768px',
-    lg: '992px',
-    xl: '1200px',
-    '2xl': '1400px',
+    lg: '1008px', // 컨텐츠 크기
+    xl: '1920px', // 헤더, 푸터
   },
   spacing: {
     0: '0px',

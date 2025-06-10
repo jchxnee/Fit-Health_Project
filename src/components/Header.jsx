@@ -25,12 +25,11 @@ function Header() {
 const Box = styled.div`
   position: relative;
   width: 100%;
-  height: 88px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #fff;
-  box-shadow: 0 1px 0 #ebebeb;
 `;
 
 const HeaderBg = styled.img`
@@ -70,8 +69,8 @@ const HeaderIcon = styled.img`
 const HeaderNav = styled.nav`
   display: flex;
   gap: 21px;
-  font-size: 19px;
-  color: ${({ theme }) => theme.colors.primary};
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+  color: #3D4149;
   font-weight: 400;
 
   span {
