@@ -22,6 +22,7 @@ const theme = {
     },
   },
   fontSizes: {
+    xxs: '8px',
     xs: '12px',
     sm: '14px',
     base: '16px',
@@ -77,6 +78,7 @@ const theme = {
     base: '4px',
     md: '6px',
     lg: '8px',
+    ten: '10px',
     xl: '12px',
     '2xl': '16px',
     '3xl': '24px',
