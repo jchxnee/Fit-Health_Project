@@ -1,7 +1,8 @@
-import './App.css'
+import { ThemeProvider } from 'styled-components';
+import './App.css';
 import { ThemeProvider } from 'styled-components';
 import theme from './styles/theme';
-import Header from './components/Header'
+import Header from './components/Header';
 import CoachSubBar from './components/CoachSubBar';
 import StatusBadge from './components/StatusBadge';
 import SubTable from './components/SubTable';
@@ -10,16 +11,96 @@ import { useState } from 'react';
 
 function App() {
   const tableData = [
-    { id: 1, name: '전진영', region: '서울시 관악구', status: '승인대기', count: '0회/10회', re_reg: '0번', startDate: '2025/06/04 19:00' },
-    { id: 2, name: '이주찬', region: '경기도 시흥시', status: '진행중', count: '2회/10회', re_reg: '2번', startDate: '2025/06/04 19:00' },
-    { id: 3, name: '황인태', region: '경기도 화성시', status: '진행중', count: '2회/10회', re_reg: '2번', startDate: '2025/06/04 19:00' },
-    { id: 4, name: '김현아', region: '파라디 섬 월마리아', status: '완료됨', count: '2회/10회', re_reg: '3번', startDate: '2025/06/04 19:00' },
-    { id: 5, name: '전진영', region: '서울시 관악구', status: '취소됨', count: '2회/10회', re_reg: '3번', startDate: '2025/06/04 19:00' },
-    { id: 6, name: '이주찬', region: '경기도 시흥시', status: '완료됨', count: '2회/10회', re_reg: '1번', startDate: '2025/06/04 19:00' },
-    { id: 7, name: '전진영', region: '서울시 관악구', status: '완료됨', count: '2회/10회', re_reg: '3번', startDate: '2025/06/04 19:00' },
-    { id: 8, name: '전진영', region: '서울시 관악구', status: '완료됨', count: '2회/10회', re_reg: '2번', startDate: '2025/06/04 19:00' },
-    { id: 9, name: '황인태', region: '경기도 화성시', status: '완료됨', count: '2회/10회', re_reg: '1번', startDate: '2025/06/04 19:00' },
-    { id: 10, name: '전진영', region: '서울시 관악구', status: '완료됨', count: '2회/10회', re_reg: '1번', startDate: '2025/06/04 19:00' },
+    {
+      id: 1,
+      name: '전진영',
+      region: '서울시 관악구',
+      status: '승인대기',
+      count: '0회/10회',
+      re_reg: '0번',
+      startDate: '2025/06/04 19:00',
+    },
+    {
+      id: 2,
+      name: '이주찬',
+      region: '경기도 시흥시',
+      status: '진행중',
+      count: '2회/10회',
+      re_reg: '2번',
+      startDate: '2025/06/04 19:00',
+    },
+    {
+      id: 3,
+      name: '황인태',
+      region: '경기도 화성시',
+      status: '진행중',
+      count: '2회/10회',
+      re_reg: '2번',
+      startDate: '2025/06/04 19:00',
+    },
+    {
+      id: 4,
+      name: '김현아',
+      region: '파라디 섬 월마리아',
+      status: '완료됨',
+      count: '2회/10회',
+      re_reg: '3번',
+      startDate: '2025/06/04 19:00',
+    },
+    {
+      id: 5,
+      name: '전진영',
+      region: '서울시 관악구',
+      status: '취소됨',
+      count: '2회/10회',
+      re_reg: '3번',
+      startDate: '2025/06/04 19:00',
+    },
+    {
+      id: 6,
+      name: '이주찬',
+      region: '경기도 시흥시',
+      status: '완료됨',
+      count: '2회/10회',
+      re_reg: '1번',
+      startDate: '2025/06/04 19:00',
+    },
+    {
+      id: 7,
+      name: '전진영',
+      region: '서울시 관악구',
+      status: '완료됨',
+      count: '2회/10회',
+      re_reg: '3번',
+      startDate: '2025/06/04 19:00',
+    },
+    {
+      id: 8,
+      name: '전진영',
+      region: '서울시 관악구',
+      status: '완료됨',
+      count: '2회/10회',
+      re_reg: '2번',
+      startDate: '2025/06/04 19:00',
+    },
+    {
+      id: 9,
+      name: '황인태',
+      region: '경기도 화성시',
+      status: '완료됨',
+      count: '2회/10회',
+      re_reg: '1번',
+      startDate: '2025/06/04 19:00',
+    },
+    {
+      id: 10,
+      name: '전진영',
+      region: '서울시 관악구',
+      status: '완료됨',
+      count: '2회/10회',
+      re_reg: '1번',
+      startDate: '2025/06/04 19:00',
+    },
   ];
 
   const tableColumns = [
@@ -43,15 +124,11 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={theme} >
-        <SubTable data={tableData} columns={tableColumns}/>
-        <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
-          />
+    <ThemeProvider theme={theme}>
+      <SubTable data={tableData} columns={tableColumns} />
+      <Pagination totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageChange} />
     </ThemeProvider>
   );
 }
 
-export default App
+export default App;
