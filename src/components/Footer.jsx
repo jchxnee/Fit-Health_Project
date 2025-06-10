@@ -10,21 +10,20 @@ const FooterContainer = styled.footer`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: ${({ theme }) => theme.width.xl}; 
+  width: ${({ theme }) => theme.width.xl};
   margin: 0 auto;
-  padding: ${({ theme }) => theme.spacing[8]} 0; 
+  padding: ${({ theme }) => theme.spacing[8]} 0;
   box-sizing: border-box;
 
   @media (max-width: ${({ theme }) => theme.width.sm}) {
     padding: ${({ theme }) => theme.spacing[6]} 0;
-
   }
 `;
 
 const FooterContentWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  width: 1200px; 
+  width: 1200px;
   margin: 0 auto;
   margin-bottom: ${({ theme }) => theme.spacing[10]};
   flex-wrap: wrap;
@@ -160,11 +159,11 @@ const BusinessHours = styled.p`
 const FooterBottomWrapper = styled.div`
   border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
   padding-top: ${({ theme }) => theme.spacing[1]};
-  width: 1200px; 
+  width: 1200px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start; 
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: ${({ theme }) => theme.spacing[5]};
 
@@ -179,7 +178,7 @@ const FooterBottomWrapper = styled.div`
 const CompanyDetails = styled.div`
   flex-grow: 1;
   text-align: left;
-  
+
   @media (max-width: ${({ theme }) => theme.width.md}) {
     text-align: center;
   }
@@ -196,12 +195,12 @@ const SocialMediaIcons = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing[10]};
   margin-bottom: ${({ theme }) => theme.spacing[5]};
-  margin-right: ${({theme}) => theme.spacing[40]};
-  margin-top : ${({theme}) => theme.spacing[4]};
+  margin-right: ${({ theme }) => theme.spacing[40]};
+  margin-top: ${({ theme }) => theme.spacing[4]};
 
   @media (max-width: ${({ theme }) => theme.width.md}) {
     margin-bottom: ${({ theme }) => theme.spacing[3]};
-    margin-right: 0; 
+    margin-right: 0;
   }
 `;
 
@@ -213,22 +212,22 @@ const IconWrapper = styled.a`
   align-items: center;
   justify-content: center;
   box-shadow: ${({ theme }) => theme.shadows.base};
-  font-size: ${({ theme }) => theme.fontSizes['2xl']}; 
+  font-size: ${({ theme }) => theme.fontSizes['2xl']};
 
   &.instagram-icon {
-    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
     color: white;
   }
 
   &.youtube-icon {
     background-color: ${({ theme }) => theme.colors.white};
-    color: #FF0000;
+    color: #ff0000;
+    font-size: 35px;
   }
 
   &.kakao-icon {
-    background-color: #FFEB00;
+    background-color: #ffeb00;
     color: #191919;
-    border-radius: ${({ theme }) => theme.borderRadius.xl};
     box-shadow: ${({ theme }) => theme.shadows.md};
     cursor: pointer;
     user-select: none;
@@ -244,9 +243,15 @@ export default function Footer() {
             <img src="/public/img/Logo.png" alt="Fit:Health Logo" />
           </FooterLogo>
           <FooterCompanyGroup>
-            <li><a href="#privacy">개인정보처리방침</a></li>
-            <li><a href="#terms">이용약관</a></li>
-            <li><a href="#policy">운영정책</a></li>
+            <li>
+              <a href="#privacy">개인정보처리방침</a>
+            </li>
+            <li>
+              <a href="#terms">이용약관</a>
+            </li>
+            <li>
+              <a href="#policy">운영정책</a>
+            </li>
           </FooterCompanyGroup>
         </CompanyInfoSection>
 
@@ -260,18 +265,26 @@ export default function Footer() {
         </ContactSection>
 
         <FooterSection>
-            <div style={{ display: 'flex', gap: '50px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
-                <FooterMenuGroup>
-                    <li>회사</li>
-                    <li><a href="#customer-instroduce">회사소개</a></li>
-                    <li><a href="#careers">채용안내</a></li>
-                </FooterMenuGroup>
-                <FooterMenuGroup>
-                    <li>고객센터</li>
-                    <li><a href="#board">공지사항</a></li>
-                    <li><a href="#faq">자주묻는 질문</a></li>
-                </FooterMenuGroup>
-            </div>
+          <div style={{ display: 'flex', gap: '50px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+            <FooterMenuGroup>
+              <li>회사</li>
+              <li>
+                <a href="#customer-instroduce">회사소개</a>
+              </li>
+              <li>
+                <a href="#careers">채용안내</a>
+              </li>
+            </FooterMenuGroup>
+            <FooterMenuGroup>
+              <li>고객센터</li>
+              <li>
+                <a href="#board">공지사항</a>
+              </li>
+              <li>
+                <a href="#faq">자주묻는 질문</a>
+              </li>
+            </FooterMenuGroup>
+          </div>
         </FooterSection>
       </FooterContentWrapper>
 
@@ -280,7 +293,10 @@ export default function Footer() {
           <p>(주) Fit - GPT</p>
           <p>대표 김현아 | 사업자 번호 926-91-01283 | 직업정보제공사업 신고번호 J1523S0961029</p>
           <p>통신판매업 신고번호 2023-서울역삼-2091 호스팅 사업자 Amazon Web Service (AWS)</p>
-          <p>주소 서울특별시 서울 강남구 테헤란로 14길 6 참조빌딩 11층 | 전화 1588-1955 | 고객문의 cs@fithealthservice.com</p>
+          <p>
+            주소 서울특별시 서울 강남구 테헤란로 14길 6 참조빌딩 11층 | 전화 1588-1955 | 고객문의
+            cs@fithealthservice.com
+          </p>
         </CompanyDetails>
         <SocialMediaIcons>
           <IconWrapper href="https://www.instagram.com/fit_health_0012/" className="instagram-icon">
