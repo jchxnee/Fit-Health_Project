@@ -15,13 +15,13 @@ function Header() {
             <span>공지사항</span>
           </HeaderNav>
         </HeaderLeft>
+
         <HeaderRight>로그인/회원가입</HeaderRight>
       </Content>
     </Box>
   );
 }
 
-// Styled Components
 const Box = styled.div`
   position: relative;
   width: 100%;
@@ -29,18 +29,8 @@ const Box = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
 `;
 
-const HeaderBg = styled.img`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-`;
 
 const Content = styled.div`
   width: 970px;
@@ -48,17 +38,12 @@ const Content = styled.div`
   justify-content: space-between;
   align-items: center;
   z-index: 1;
-
-  @media (max-width: 900px) {
-    width: 100%;
-    padding: 0 16px;
-  }
 `;
 
 const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap:  ${({ theme }) => theme.spacing[10]};
 `;
 
 const HeaderIcon = styled.img`
@@ -68,10 +53,10 @@ const HeaderIcon = styled.img`
 
 const HeaderNav = styled.nav`
   display: flex;
-  gap: 21px;
+  gap: ${({ theme }) => theme.spacing[5]};
   font-size: ${({ theme }) => theme.fontSizes.lg};
-  color: #3D4149;
-  font-weight: 400;
+  color: ${({ theme }) => theme.colors.primary};
+  font-weight: ${({ theme }) => theme.fontWeights.regular};
 
   span {
     cursor: pointer;
@@ -79,9 +64,10 @@ const HeaderNav = styled.nav`
 `;
 
 const HeaderRight = styled.div`
-  font-size: 19px;
-  color: #3d4149;
-  font-weight: 400;
+  font-size:  ${({ theme }) => theme.fontSizes.lg};
+  color: ${({ theme }) => theme.colors.primary};
+  font-weight: ${({ theme }) => theme.fontWeights.regular};
+  cursor: pointer;
 `;
 
 export default Header;
