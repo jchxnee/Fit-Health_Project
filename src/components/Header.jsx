@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import headerIcon from '../assets/header_icon.png';
-import { FaBell } from "react-icons/fa";
+import betaImg from '../assets/beta_user_img.png';
+import { FaBell } from 'react-icons/fa';
 
 function Header(user) {
   return (
@@ -16,18 +17,18 @@ function Header(user) {
             <span>공지사항</span>
           </HeaderNavLeft>
         </HeaderLeft>
-         {user !== null ? (
-             <HeaderRight>
-              <HeaderNavRight>
-              <FaBell/>
+        {user !== null ? (
+          <HeaderRight>
+            <HeaderNavRight>
+              <FaBell />
               <span>채팅</span>
-              <ProfileImg src={user.img} alt="profileIcon"  />
+              <ProfileImg src={betaImg} alt="profileIcon" />
               <span>{user.name}님</span>
-              </HeaderNavRight>
-             </HeaderRight>
-            ) : (
-               <HeaderRight>로그인/회원가입</HeaderRight>
-            )}
+            </HeaderNavRight>
+          </HeaderRight>
+        ) : (
+          <HeaderRight>로그인/회원가입</HeaderRight>
+        )}
       </Content>
     </Box>
   );
@@ -42,7 +43,6 @@ const Box = styled.div`
   justify-content: center;
 `;
 
-
 const Content = styled.div`
   width: 970px;
   display: flex;
@@ -54,7 +54,7 @@ const Content = styled.div`
 const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
-  gap:  ${({ theme }) => theme.spacing[10]};
+  gap: ${({ theme }) => theme.spacing[10]};
 `;
 
 const HeaderIcon = styled.img`
@@ -81,8 +81,8 @@ const HeaderNavLeft = styled.nav`
 `;
 
 const HeaderRight = styled.div`
-align-items: center; 
-  font-size:  ${({ theme }) => theme.fontSizes.lg};
+  align-items: center;
+  font-size: ${({ theme }) => theme.fontSizes.lg};
   color: ${({ theme }) => theme.colors.primary};
   font-weight: ${({ theme }) => theme.fontWeights.regular};
   cursor: pointer;

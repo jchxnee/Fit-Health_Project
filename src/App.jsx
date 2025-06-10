@@ -1,17 +1,16 @@
-import './App.css'
 import { ThemeProvider } from 'styled-components';
+import './App.css';
+import Footer from './components/Footer';
 import theme from './styles/theme';
-import Header from './components/Header'
-import MainPage from "./components/MainPage.jsx";
+import BasicModal from './components/modal/BasicModal';
+import NotificationList from './components/NotificationList';
 
 function App() {
-
   return (
     <ThemeProvider theme={theme}>
-      <Header/>
-      <MainPage/>
+      <NotificationList />
     </ThemeProvider>
-  )
+  );
 }
 
-export default App
+export default App;

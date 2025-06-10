@@ -1,6 +1,7 @@
 const theme = {
   colors: {
     primary: '#3d4149',
+    secondary: '#535bf2',
     button: '#1A4AA2',
     secondary: '#3A72FF',
     info: '#61dafb',
@@ -22,6 +23,7 @@ const theme = {
     },
   },
   fontSizes: {
+    xxs: '8px',
     xs: '12px',
     sm: '14px',
     base: '16px',
@@ -76,6 +78,7 @@ const theme = {
     base: '4px',
     md: '6px',
     lg: '8px',
+    ten: '10px',
     xl: '12px',
     '2xl': '16px',
     '3xl': '24px',
