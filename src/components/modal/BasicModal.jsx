@@ -1,12 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-function EditDeleteMenu() {
-  const menuItems = [
-    { name: '수정', action: () => console.log('수정 클릭') },
-    { name: '삭제', action: () => console.log('삭제 클릭') },
-  ];
-
+function BasicModal({ menuItems }) {
   return (
     <MenuContainer>
       {menuItems.map((item) => (
@@ -18,7 +13,7 @@ function EditDeleteMenu() {
   );
 }
 
-export default EditDeleteMenu;
+export default BasicModal;
 
 const MenuContainer = styled.div`
   width: 107px;
@@ -37,7 +32,6 @@ const MenuItem = styled.div`
   cursor: pointer;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.primary};
-  padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]};
-  width: 100%;
+  padding: ${({ theme }) => theme.spacing[2]} 0;
   text-align: center;
 `;
