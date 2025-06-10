@@ -9,6 +9,7 @@ import PopularPosts from "./MainPage/PopularPosts.jsx";
 import SelectGoal from "./MainPage/SelectGoal.jsx";
 import Footer from "./Footer.jsx";
 import GoalVideo from "./MainPage/GoalVideo.jsx";
+import ReviewList from "./MainPage/ReviewList.jsx";
 
 function MainPage() {
     return(
@@ -20,6 +21,7 @@ function MainPage() {
             <PopularPosts/>
             <SelectGoal/>
             <GoalVideo/>
+            <ReviewList/>
             <Footer/>
         </ThemeProvider>
     )
