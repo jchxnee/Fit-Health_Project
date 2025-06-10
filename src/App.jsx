@@ -11,6 +11,8 @@ function App() {
       <NotificationList />
     </ThemeProvider>
   );
+  );
 }
 
+export default App;
 export default App;
