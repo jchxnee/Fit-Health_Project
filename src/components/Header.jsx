@@ -1,27 +1,38 @@
 import React from 'react';
 import styled from 'styled-components';
 import headerIcon from '../assets/header_icon.png';
+import { FaBell } from "react-icons/fa";
 
-function Header() {
+function Header(user) {
   return (
     <Box>
       <Content>
         <HeaderLeft>
           <HeaderIcon src={headerIcon} alt="icon" />
-          <HeaderNav>
+          <HeaderNavLeft>
             <span>핏코치 매칭</span>
             <span>추천 운동</span>
             <span>커뮤니티</span>
             <span>공지사항</span>
-          </HeaderNav>
+          </HeaderNavLeft>
         </HeaderLeft>
-        <HeaderRight>로그인/회원가입</HeaderRight>
+         {user !== null ? (
+             <HeaderRight>
+              <HeaderNavRight>
+              <FaBell/>
+              <span>채팅</span>
+              <ProfileImg src={user.img} alt="profileIcon"  />
+              <span>{user.name}님</span>
+              </HeaderNavRight>
+             </HeaderRight>
+            ) : (
+               <HeaderRight>로그인/회원가입</HeaderRight>
+            )}
       </Content>
     </Box>
   );
 }
 
-// Styled Components
 const Box = styled.div`
   position: relative;
   width: 100%;
@@ -29,18 +40,8 @@ const Box = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
 `;
 
-const HeaderBg = styled.img`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-`;
 
 const Content = styled.div`
   width: 970px;
@@ -48,17 +49,12 @@ const Content = styled.div`
   justify-content: space-between;
   align-items: center;
   z-index: 1;
-
-  @media (max-width: 900px) {
-    width: 100%;
-    padding: 0 16px;
-  }
 `;
 
 const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap:  ${({ theme }) => theme.spacing[10]};
 `;
 
 const HeaderIcon = styled.img`
@@ -66,12 +62,18 @@ const HeaderIcon = styled.img`
   height: 24px;
 `;
 
-const HeaderNav = styled.nav`
+const ProfileImg = styled.img`
+  width: 30px;
+  height: 30px;
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+`;
+
+const HeaderNavLeft = styled.nav`
   display: flex;
-  gap: 21px;
+  gap: ${({ theme }) => theme.spacing[5]};
   font-size: ${({ theme }) => theme.fontSizes.lg};
-  color: #3D4149;
-  font-weight: 400;
+  color: ${({ theme }) => theme.colors.primary};
+  font-weight: ${({ theme }) => theme.fontWeights.regular};
 
   span {
     cursor: pointer;
@@ -79,9 +81,23 @@ const HeaderNav = styled.nav`
 `;
 
 const HeaderRight = styled.div`
-  font-size: 19px;
-  color: #3d4149;
-  font-weight: 400;
+align-items: center; 
+  font-size:  ${({ theme }) => theme.fontSizes.lg};
+  color: ${({ theme }) => theme.colors.primary};
+  font-weight: ${({ theme }) => theme.fontWeights.regular};
+  cursor: pointer;
+`;
+
+const HeaderNavRight = styled.nav`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing[5]};
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+  color: ${({ theme }) => theme.colors.primary};
+  font-weight: ${({ theme }) => theme.fontWeights.regular};
+
+  span {
+    cursor: pointer;
+  }
 `;
 
 export default Header;

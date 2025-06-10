@@ -1,6 +1,7 @@
 const theme = {
   colors: {
     primary: '#3d4149',
+    button: '#1A4AA2',
     secondary: '#3A72FF',
     info: '#61dafb',
     success: '#22c55e',
@@ -67,6 +68,7 @@ const theme = {
     48: '192px',
     56: '224px',
     64: '256px',
+    72: '288px',
   },
   borderRadius: {
     none: '0px',
