@@ -164,8 +164,6 @@ function App() {
       <Pagination totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageChange} />
     </ThemeProvider>
   );
-  );
 }
 
-export default App;
 export default App;
