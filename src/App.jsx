@@ -14,13 +14,13 @@ import CommunityPage from './pages/CommunityPage';
 import GlobalStyle from './styles/GlobalStyle';
 import MainPage from './pages/MainPage.jsx';
 import RecommendedExerciseSection from './pages/RecommendExercise.jsx';
+import CoachDetail from './pages/MatchingPage/CoachDetail';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <CoachList />
       <GlobalStyle />
-      <RecommendedExerciseSection />
+      <CoachDetail />
     </ThemeProvider>
   );
 }

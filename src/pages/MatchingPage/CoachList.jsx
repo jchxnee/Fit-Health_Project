@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import Footer from '../../components/Footer';
 import Header from '../../components/Header';
 import BasicFilter from '../../components/filter/BasicFilter';
-import CoachListItem from './CoachListItem';
+import CoachListItem from '../../components/CoachMatching/CoachListItem';
 import theme from '../../styles/theme';
 
 const PageWrapper = styled.div`
