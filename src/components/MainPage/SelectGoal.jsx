@@ -5,7 +5,7 @@ const Wrapper = styled.section`
     width: 100%;
     display: flex;
     justify-content: center;
-  padding: 130px 0 24px 0;
+  padding: 20px 0 24px 0;
 `;
 
 const Button = styled.div`
@@ -23,7 +23,6 @@ const List = styled.div`
 `;
 const CategoryBtn = styled.button`
   min-width: 74px;
-    height: 45px;
     padding: 10px;
     
   border-radius: 24px;
@@ -33,7 +32,6 @@ const CategoryBtn = styled.button`
   font-family: 'SUITE', sans-serif;
   font-size: 18px;
   font-weight: 500;
-    text-align: center;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
   outline: none;

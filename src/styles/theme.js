@@ -49,7 +49,7 @@ const theme = {
     sm: '576px',
     md: '768px',
     lg: '1008px', // 컨텐츠 크기
-    xl: '1920px', // 헤더, 푸터
+    xl: '0 auto', // 헤더, 푸터
   },
   spacing: {
     0: '0px',

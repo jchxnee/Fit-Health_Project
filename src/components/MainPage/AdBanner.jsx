@@ -46,7 +46,6 @@ const AdBanner = () => (
     <BannerWrapper>
         <Banner>
             <LeftArrow>{'<'}</LeftArrow>
-            {/* 배너 이미지/내용 영역 */}
             <RightArrow>{'>'}</RightArrow>
         </Banner>
     </BannerWrapper>

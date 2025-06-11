@@ -8,7 +8,7 @@ const Wrapper = styled.section`
     display: flex;
     justify-content: center;
     background: #fff;
-    margin: 60px 0 0 0;
+    margin: 60px 0 150px 0;
 `;
 const Container = styled.div`
     width: 1008px;
@@ -68,8 +68,9 @@ const MoreInfoBox = styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    justify-content: flex-end;
+    height: 100%;
     gap: 10px;
-    padding: 55px 0 0 0;
 `;
 const MoreText = styled.div`
     font-family: 'SUITE', sans-serif;

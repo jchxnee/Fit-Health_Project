@@ -1,14 +1,12 @@
 import { ThemeProvider } from 'styled-components';
 import './App.css';
-import Footer from './components/Footer';
 import theme from './styles/theme';
-import BasicModal from './components/modal/BasicModal';
-import NotificationList from './components/NotificationList';
+import MainPage from "./pages/MainPage.jsx";
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <NotificationList />
+      <MainPage />
     </ThemeProvider>
   );
 }
