@@ -5,30 +5,30 @@ const BannerWrapper = styled.section`
   width: 100%;
   display: flex;
   justify-content: center;
-  background: #fff;
+  background: ${({ theme }) => theme.colors.white};
 `;
 const Banner = styled.div`
-  width: 1000px;
+  width: ${({ theme }) => theme.width.lg};
   height: 180px;
-  background: #eee;
-  border-radius: 15px;
+  background: ${({ theme }) => theme.colors.gray[200]};
+  border-radius: ${({ theme }) => theme.borderRadius['2xl']};
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: relative;
-  margin: 40px 0;
+  margin: ${({ theme }) => `${theme.spacing[10]} 0`};
 `;
 const Arrow = styled.button`
   width: 54px;
   height: 50px;
-  background: #fff;
+  background: ${({ theme }) => theme.colors.white};
   border-radius: 50%;
   border: none;
-  box-shadow: 0.5px 0.5px 4px rgba(0,0,0,0.25);
+  box-shadow: ${({ theme }) => theme.shadows.md};
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: ${({ theme }) => theme.fontSizes['2xl']};
   cursor: pointer;
   position: absolute;
   top: 50%;

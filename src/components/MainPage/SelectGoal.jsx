@@ -5,41 +5,40 @@ const Wrapper = styled.section`
     width: 100%;
     display: flex;
     justify-content: center;
-  padding: 20px 0 24px 0;
+    padding: ${({ theme }) => `${theme.spacing[5]} 0 ${theme.spacing[6]} 0`};
+    background: ${({ theme }) => theme.colors.white};
 `;
 
 const Button = styled.div`
-    width: 1008px;
+    width: ${({ theme }) => theme.width.lg};
     display: flex;
-    
-`
+`;
 const List = styled.div`
     width: 674px;
-  display: flex;
+    display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: left;
-  gap: 16px;
+    gap: ${({ theme }) => theme.spacing[4]};
 `;
 const CategoryBtn = styled.button`
-  min-width: 74px;
-    padding: 10px;
-    
-  border-radius: 24px;
-  border: 1.5px solid #CDCDCD;
-  background: ${({ selected }) => (selected ? '#3D6EFF' : 'transparent')};
-  color: ${({ selected }) => (selected ? '#fff' : `${({ theme }) => theme.colors.primary }` )};
-  font-family: 'SUITE', sans-serif;
-  font-size: 18px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  outline: none;
-  box-shadow: none;
-  &:hover {
-    background: #3D6EFF;
-    color: #fff;
-  }
+    min-width: 74px;
+    padding: ${({ theme }) => theme.spacing[2]};
+    border-radius: ${({ theme }) => theme.borderRadius['3xl']};
+    border: 1.5px solid ${({ theme }) => theme.colors.gray[300]};
+    background: ${({ selected, theme }) => (selected ? theme.colors.secondary : 'transparent')};
+    color: ${({ selected, theme }) => (selected ? theme.colors.white : theme.colors.primary)};
+    font-family: 'SUITE', sans-serif;
+    font-size: ${({ theme }) => theme.fontSizes.base};
+    font-weight: ${({ theme }) => theme.fontWeights.medium};
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    outline: none;
+    box-shadow: none;
+    &:hover {
+        background: ${({ theme }) => theme.colors.secondary};
+        color: ${({ theme }) => theme.colors.white};
+    }
 `;
 
 const categories = [

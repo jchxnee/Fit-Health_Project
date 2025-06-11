@@ -1,7 +1,5 @@
 import React from 'react';
 
-import theme from "../styles/theme.js";
-import {ThemeProvider} from "styled-components";
 import AdBanner from "../components/MainPage/AdBanner.jsx";
 import SelectExercise from "../components/MainPage/SelectExercise.jsx";
 import PopularTrainer from "../components/MainPage/PopularTrainer.jsx";
@@ -15,7 +13,7 @@ import Header from "../components/Header.jsx";
 
 function MainPage() {
     return(
-        <ThemeProvider theme={theme}>
+        <>
             <Header/>
             <MainTitle/>
             <SelectExercise/>
@@ -26,7 +24,7 @@ function MainPage() {
             <GoalVideo/>
             <ReviewList/>
             <Footer/>
-        </ThemeProvider>
+        </>
     )
 }
 

@@ -1,7 +1,6 @@
 const theme = {
   colors: {
     primary: '#3d4149',
-    secondary: '#535bf2',
     button: '#1A4AA2',
     secondary: '#3A72FF',
     info: '#61dafb',
@@ -75,6 +74,7 @@ const theme = {
   },
   borderRadius: {
     none: '0px',
+    xs: '1.5px',
     sm: '2px',
     base: '4px',
     md: '6px',

@@ -5,12 +5,12 @@ const VideoWrapper = styled.section`
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 0 0 48px 0;
+  padding: 0 0 ${({ theme }) => theme.spacing[12]} 0;
 `;
 const VideoContainer = styled.div`
-  width: 1008px;
+  width: ${({ theme }) => theme.width.lg};
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  box-shadow: ${({ theme }) => theme.shadows.xl};
   display: flex;
   justify-content: center;
 `;

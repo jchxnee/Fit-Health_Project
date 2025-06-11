@@ -9,6 +9,7 @@ const Wrapper = styled.section`
   margin: ${({ theme }) => `${theme.spacing[10]} 0`};
 `;
 const Container = styled.div`
+    
   width: ${({ theme }) => theme.width.lg};
 `;
 const TitleRow = styled.div`
@@ -18,13 +19,11 @@ const TitleRow = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing[6]};
 `;
 const Title = styled.h2`
-  font-family: 'SUITE', sans-serif;
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   font-size: ${({ theme }) => theme.fontSizes['2xl']};
   color: ${({ theme }) => theme.colors.primary};
 `;
 const ViewAll = styled.span`
-  font-family: 'SUITE', sans-serif;
   font-size: ${({ theme }) => theme.fontSizes.lg};
   color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
@@ -40,16 +39,15 @@ const TrainerCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: ${({ theme }) => theme.colors.gray[100]};
   border-radius: ${({ theme }) => theme.borderRadius['2xl']};
   justify-content: center;
+    gap: ${({ theme }) => theme.spacing[2]};
 `;
 const ProfileImg = styled.div`
   width: 100%;
-  height: 80%;
+  height: 100%;
   background: ${({ theme }) => theme.colors.gray[300]};
-  border-radius: ${({ theme }) => `${theme.borderRadius['2xl']} ${theme.borderRadius['2xl']} 0 0`};
-  margin-bottom: ${({ theme }) => theme.spacing[4]};
+  border-radius: ${({ theme }) => `${theme.borderRadius['2xl']}`};
 `;
 const Name = styled.div`
   font-family: 'SUITE', sans-serif;
@@ -63,7 +61,7 @@ const trainers = [
     { name: '고훈 트레이너' },
 ];
 
-const PopularTrainer = () => (
+const Routine = () => (
     <Wrapper>
         <Container>
             <TitleRow>
@@ -82,4 +80,4 @@ const PopularTrainer = () => (
     </Wrapper>
 );
 
-export default PopularTrainer;
+export default Routine;
