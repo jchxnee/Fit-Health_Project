@@ -59,61 +59,82 @@ function CommunityPage() {
   ];
 
   return (
-    <PageContainer>
-      <Header user={user} />
-      <MainContentArea>
-        <SidebarWrapper>
-          <CommunityCategoryMenu /> {/* 이전에 만든 CategoryMenu 컴포넌트 */}
-        </SidebarWrapper>
+    <>
+      <PageContainer>
+        <Header user={user} />
+        <MainContentArea>
+          <SidebarWrapper>
+            <CommunityCategoryMenu /> {/* 이전에 만든 CategoryMenu 컴포넌트 */}
+          </SidebarWrapper>
 
-        <MainContentWrapper>
-          {/* 커뮤니티 타이틀 및 글쓰기 버튼 */}
-          <SectionHeader>
-            <SectionTitle>커뮤니티</SectionTitle>
-            <WriteButton>
-              <FaPencilAlt />
-              글쓰기
-            </WriteButton>
-          </SectionHeader>
+          <MainContentWrapper>
+            {/* 커뮤니티 타이틀 및 글쓰기 버튼 */}
+            <SectionHeader>
+              <SectionTitle>커뮤니티</SectionTitle>
+              <WriteButton>
+                <FaPencilAlt />
+                글쓰기
+              </WriteButton>
+            </SectionHeader>
 
-          {/* 공지사항 섹션 */}
-          <NoticeSection>
-            {notices.map((notice) => (
-              <NoticeItem key={notice.id}>
-                <NoticeLabel>공지</NoticeLabel>
-                <NoticeText>{notice.title}</NoticeText>
-                <NoticeLink href={notice.link}>{notice.icon}</NoticeLink>
-              </NoticeItem>
-            ))}
-          </NoticeSection>
+            {/* 공지사항 섹션 */}
+            <NoticeSection>
+              {notices.map((notice) => (
+                <NoticeItem key={notice.id}>
+                  <NoticeLabel>공지</NoticeLabel>
+                  <NoticeText>{notice.title}</NoticeText>
+                  <NoticeLink href={notice.link}>{notice.icon}</NoticeLink>
+                </NoticeItem>
+              ))}
+            </NoticeSection>
 
-          {/* TOP 5 커뮤니티 글 섹션 */}
-          <SectionTitleSmall>TOP 5 커뮤니티 글🔥</SectionTitleSmall>
-          <TopPostsGrid>
-            {topPosts.map((post) => (
-              <PostCard key={post.id}>
-                <PostCardTitle>{post.title}</PostCardTitle>
-                <PostMeta>
-                  <span>
-                    <FaEye /> {post.views}
-                  </span>
-                  <span>
-                    <RiMessage2Fill /> {post.comments}
-                  </span>
-                </PostMeta>
-              </PostCard>
-            ))}
-          </TopPostsGrid>
+            {/* TOP 5 커뮤니티 글 섹션 */}
+            <SectionTitleSmall>TOP 5 커뮤니티 글🔥</SectionTitleSmall>
+            <TopPostsGrid>
+              {topPosts.map((post) => (
+                <PostCard key={post.id}>
+                  <PostCardTitle>{post.title}</PostCardTitle>
+                  <PostMeta>
+                    <span>
+                      <FaEye /> {post.views}
+                    </span>
+                    <span>
+                      <RiMessage2Fill /> {post.comments}
+                    </span>
+                  </PostMeta>
+                </PostCard>
+              ))}
+            </TopPostsGrid>
 
-          {/* 고객님들의 최신 사진 게시글 섹션 */}
-          <SectionTitleMini>고객님들의 최신 사진 게시글</SectionTitleMini>
-          <PhotoPostsGrid>
-            {photoPosts.map((post) => (
-              <PhotoPostCard key={post.id}>
-                <PhotoPostImage src={post.img} alt={post.title} />
-                <PhotoPostContent>
-                  <PhotoPostTitle>{post.title}</PhotoPostTitle>
-                  <PhotoPostText>{post.content}</PhotoPostText>
+            {/* 고객님들의 최신 사진 게시글 섹션 */}
+            <SectionTitleMini>고객님들의 최신 사진 게시글</SectionTitleMini>
+            <PhotoPostsGrid>
+              {photoPosts.map((post) => (
+                <PhotoPostCard key={post.id}>
+                  <PhotoPostImage src={post.img} alt={post.title} />
+                  <PhotoPostContent>
+                    <PhotoPostTitle>{post.title}</PhotoPostTitle>
+                    <PhotoPostText>{post.content}</PhotoPostText>
+                    <PostMeta>
+                      <span>
+                        {' '}
+                        <FaEye /> {post.views}
+                      </span>
+                      <span>
+                        <RiMessage2Fill /> {post.comments}
+                      </span>
+                    </PostMeta>
+                  </PhotoPostContent>
+                </PhotoPostCard>
+              ))}
+            </PhotoPostsGrid>
+
+            {/* 일반 게시글 목록 */}
+            <GeneralPostsContainer>
+              {generalPosts.map((post) => (
+                <GeneralPostItem key={post.id}>
+                  <GeneralPostTitle>{post.title}</GeneralPostTitle>
+                  <GeneralPostContent>{post.content}</GeneralPostContent>
                   <PostMeta>
                     <span>
                       {' '}
@@ -123,33 +144,14 @@ function CommunityPage() {
                       <RiMessage2Fill /> {post.comments}
                     </span>
                   </PostMeta>
-                </PhotoPostContent>
-              </PhotoPostCard>
-            ))}
-          </PhotoPostsGrid>
-
-          {/* 일반 게시글 목록 */}
-          <GeneralPostsContainer>
-            {generalPosts.map((post) => (
-              <GeneralPostItem key={post.id}>
-                <GeneralPostTitle>{post.title}</GeneralPostTitle>
-                <GeneralPostContent>{post.content}</GeneralPostContent>
-                <PostMeta>
-                  <span>
-                    {' '}
-                    <FaEye /> {post.views}
-                  </span>
-                  <span>
-                    <RiMessage2Fill /> {post.comments}
-                  </span>
-                </PostMeta>
-              </GeneralPostItem>
-            ))}
-          </GeneralPostsContainer>
-        </MainContentWrapper>
-      </MainContentArea>
+                </GeneralPostItem>
+              ))}
+            </GeneralPostsContainer>
+          </MainContentWrapper>
+        </MainContentArea>
+      </PageContainer>
       <Footer />
-    </PageContainer>
+    </>
   );
 }
 
@@ -166,28 +168,25 @@ const PageContainer = styled.div`
   align-items: center; /* 전체 콘텐츠 중앙 정렬 */
 `;
 
-// Header (Placeholder)
-
 // 메인 콘텐츠 영역 (사이드바 + 본문)
 const MainContentArea = styled.div`
-  width: ${({ theme }) => theme.width.lg}; /* 1008px */
+  width: ${({ theme }) => theme.width.lg};
   display: flex;
-  gap: ${({ theme }) => theme.spacing[5]}; /* 사이드바와 메인 콘텐츠 사이 간격 */
-  margin-top: ${({ theme }) => theme.spacing[8]}; /* 헤더 아래 여백 */
-  align-items: flex-start; /* 사이드바와 메인 콘텐츠 상단 정렬 */
+  gap: ${({ theme }) => theme.spacing[5]};
+  margin-top: ${({ theme }) => theme.spacing[8]};
+  align-items: flex-start;
 `;
 
 // 왼쪽 사이드바 Wrapper (CategoryMenu를 감쌈)
 const SidebarWrapper = styled.div`
-  /* CategoryMenu 자체에 너비가 정의되어 있으므로 여기서는 추가 너비 지정 불필요 */
-  flex-shrink: 0; /* 축소되지 않도록 함 */
+  flex-shrink: 0;
 `;
 
 // 메인 콘텐츠 Wrapper
 const MainContentWrapper = styled.div`
   flex-grow: 1; /* 남은 공간을 모두 차지 */
   background-color: ${({ theme }) => theme.colors.white};
-  padding: ${({ theme }) => theme.spacing[8]}; /* 내부 패딩 */
+  padding: ${({ theme }) => theme.spacing[8]};
   border-radius: ${({ theme }) => theme.borderRadius.base};
   box-shadow: ${({ theme }) => theme.shadows.sm};
 `;

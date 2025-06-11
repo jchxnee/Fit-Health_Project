@@ -67,64 +67,66 @@ function CommunityPostCreationPage() {
   }, []);
 
   return (
-    <PageContainer>
-      <Header user={user} />
-      <TitleBar title="커뮤니티 글등록" />
-      <ContentWrapper>
-        <TopSection>
-          <CategorySelect ref={dropdownRef}>
-            <CategoryButton onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-              {selectedCategory}
-              <GoTriangleDown size={26} />
-            </CategoryButton>
-            {isDropdownOpen && (
-              <CategoryDropdown>
-                {categories.map((category) => (
-                  <DropdownItem key={category} onClick={() => handleCategorySelect(category)}>
-                    {category}
-                  </DropdownItem>
-                ))}
-              </CategoryDropdown>
-            )}
-          </CategorySelect>
-          <SubmitButtonWrapper>
-            <SubmitTextButton onClick={handleSubmit} disabled={!isFormValid} $isValid={isFormValid}>
-              등록
-            </SubmitTextButton>
-            {!isFormValid && <Tooltip>제목과 내용을 입력해주세요</Tooltip>}
-          </SubmitButtonWrapper>
-        </TopSection>
+    <>
+      <PageContainer>
+        <Header user={user} />
+        <TitleBar title="커뮤니티 글등록" />
+        <ContentWrapper>
+          <TopSection>
+            <CategorySelect ref={dropdownRef}>
+              <CategoryButton onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+                {selectedCategory}
+                <GoTriangleDown size={26} />
+              </CategoryButton>
+              {isDropdownOpen && (
+                <CategoryDropdown>
+                  {categories.map((category) => (
+                    <DropdownItem key={category} onClick={() => handleCategorySelect(category)}>
+                      {category}
+                    </DropdownItem>
+                  ))}
+                </CategoryDropdown>
+              )}
+            </CategorySelect>
+            <SubmitButtonWrapper>
+              <SubmitTextButton onClick={handleSubmit} disabled={!isFormValid} $isValid={isFormValid}>
+                등록
+              </SubmitTextButton>
+              {!isFormValid && <Tooltip>제목과 내용을 입력해주세요</Tooltip>}
+            </SubmitButtonWrapper>
+          </TopSection>
 
-        <UploadSection>
-          <UploadButton onClick={handleImageUpload}>
-            <FaCamera size={20} />
-          </UploadButton>
-          <ImageCount>{imageCount}/15</ImageCount>
-        </UploadSection>
-        <TitleInput type="text" placeholder="제목을 입력해주세요." value={title} onChange={handleTitleChange} />
-        <ContentTextareaContainer>
-          {content === '' && !isContentFocused && (
-            <OverlayPlaceholder>
-              <p>궁금했던 모든 것을 물어보세요.</p>
-              <p>예) 이런 키트는 어떻게 사용하는 건가요?</p>
-              <p>예) 운동을 하다 무릎이 아팠어요ㅠㅠ 원인이 궁금해요</p>
-              <div className="guidelines">
-                <p>※ 주제에 맞지 않는 글이나 커뮤니티 이용규정에 위배되는 글은 삭제의 대상이 됩니다.</p>
-                <p>※ 일정 수 이상의 신고를 받으면 작성한 글이 숨김 및 삭제될 수 있습니다.</p>
-              </div>
-            </OverlayPlaceholder>
-          )}
-          <ContentTextarea
-            ref={contentTextareaRef}
-            value={content}
-            onChange={handleContentChange}
-            onFocus={() => setIsContentFocused(true)}
-            onBlur={() => setIsContentFocused(false)}
-          />
-        </ContentTextareaContainer>
-      </ContentWrapper>
+          <UploadSection>
+            <UploadButton onClick={handleImageUpload}>
+              <FaCamera size={20} />
+            </UploadButton>
+            <ImageCount>{imageCount}/15</ImageCount>
+          </UploadSection>
+          <TitleInput type="text" placeholder="제목을 입력해주세요." value={title} onChange={handleTitleChange} />
+          <ContentTextareaContainer>
+            {content === '' && !isContentFocused && (
+              <OverlayPlaceholder>
+                <p>궁금했던 모든 것을 물어보세요.</p>
+                <p>예) 이런 키트는 어떻게 사용하는 건가요?</p>
+                <p>예) 운동을 하다 무릎이 아팠어요ㅠㅠ 원인이 궁금해요</p>
+                <div className="guidelines">
+                  <p>※ 주제에 맞지 않는 글이나 커뮤니티 이용규정에 위배되는 글은 삭제의 대상이 됩니다.</p>
+                  <p>※ 일정 수 이상의 신고를 받으면 작성한 글이 숨김 및 삭제될 수 있습니다.</p>
+                </div>
+              </OverlayPlaceholder>
+            )}
+            <ContentTextarea
+              ref={contentTextareaRef}
+              value={content}
+              onChange={handleContentChange}
+              onFocus={() => setIsContentFocused(true)}
+              onBlur={() => setIsContentFocused(false)}
+            />
+          </ContentTextareaContainer>
+        </ContentWrapper>
+      </PageContainer>
       <Footer />
-    </PageContainer>
+    </>
   );
 }
 
