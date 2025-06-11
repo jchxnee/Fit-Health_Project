@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import styled from 'styled-components';
 
 const Pagination = ({ totalPages, currentPage, onPageChange }) => {
@@ -15,11 +15,7 @@ const Pagination = ({ totalPages, currentPage, onPageChange }) => {
       </PageButton>
 
       {pages.map((page) => (
-        <PageButton
-          key={page}
-          onClick={() => onPageChange(page)}
-          isActive={page === currentPage}
-        >
+        <PageButton key={page} onClick={() => onPageChange(page)} isActive={page === currentPage}>
           {page}
         </PageButton>
       ))}
@@ -35,7 +31,7 @@ const Pagination = ({ totalPages, currentPage, onPageChange }) => {
   );
 };
 
-export default Pagination
+export default Pagination;
 
 const PaginationContainer = styled.nav`
   display: flex;
@@ -54,7 +50,9 @@ const PageButton = styled.button`
   padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['3']}; /* 패딩 */
   border-radius: ${({ theme }) => theme.borderRadius.sm}; /* 약간 둥근 모서리 */
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 
   &:hover {
     background-color: ${({ theme }) => theme.colors.gray['100']}; /* 호버 시 배경색 */
@@ -66,14 +64,18 @@ const PageButton = styled.button`
   }
 
   /* 선택된 페이지 스타일 */
-  ${({ isActive, theme }) => isActive && `
+  ${({ isActive, theme }) =>
+    isActive &&
+    `
     color: ${theme.colors.black}; /* 선택된 페이지는 진한 검정색 */
     font-weight: ${theme.fontWeights.bold};
     /* background-color: ${theme.colors.gray['100']}; /* 선택 시 배경색 유지 (선택 사항) */
   `}
 
   /* 이전/다음 버튼 스타일 */
-  ${({ isControl, theme }) => isControl && `
+  ${({ isControl, theme }) =>
+    isControl &&
+    `
     font-size: ${theme.fontSizes.lg}; /* 아이콘은 숫자보다 약간 크게 */
     padding: ${theme.spacing['2']};
     color: ${theme.colors.gray['400']};

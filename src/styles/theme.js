@@ -3,7 +3,6 @@ const theme = {
     primary: '#3d4149',
     secondary: '#535bf2',
     button: '#1A4AA2',
-    secondary: '#3A72FF',
     info: '#61dafb',
     success: '#22c55e',
     warning: '#f59e0b',
@@ -49,7 +48,7 @@ const theme = {
     sm: '576px',
     md: '768px',
     lg: '1008px', // 컨텐츠 크기
-    xl: '1920px', // 헤더, 푸터
+    xl: '100%', // 헤더, 푸터
   },
   spacing: {
     0: '0px',
