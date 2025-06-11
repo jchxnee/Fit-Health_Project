@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaSearch } from 'react-icons/fa';
 
-// 재사용 가능한 필터 버튼 및 드롭다운 컴포넌트
 export const FilterButton = styled.button`
   display: flex;
   align-items: center;
@@ -105,14 +104,13 @@ const SearchFilterContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: ${({ theme }) => theme.width.xs};
-  margin: 0 auto;
+  max-width: ${({ theme }) => theme.width.xs};
   padding: ${({ theme }) => theme.spacing[4]} 0;
   box-sizing: border-box;
   background-color: ${({ theme }) => theme.colors.white};
 
   @media (max-width: ${({ theme }) => theme.width.lg}) {
-    width: 100%;
+    max-width: 100%;
     padding: ${({ theme }) => theme.spacing[3]} 0;
   }
 

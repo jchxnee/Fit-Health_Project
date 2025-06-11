@@ -36,7 +36,7 @@ const MenuItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: ${({ theme }) => theme.spacing[3]} ${({ theme }) => theme.spacing[5]};
+  padding: ${({ theme }) => theme.spacing[4]} ${({ theme }) => theme.spacing[5]};
   font-size: ${({ theme }) => theme.fontSizes.lg};
   border-radius: ${({ theme }) => theme.borderRadius.md};
   color: ${({ theme }) => theme.colors.gray[800]};

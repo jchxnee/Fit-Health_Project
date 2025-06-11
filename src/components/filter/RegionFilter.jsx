@@ -12,11 +12,10 @@ const StyledButton = styled.button`
   font-size: ${theme.fontSizes.base};
   font-weight: ${theme.fontWeights.semibold};
   transition: all 0.2s ease-in-out;
-  box-shadow: ${theme.shadows.base};
 
-  background-color: ${(props) => (props.selected ? theme.colors.secondary : theme.colors.white)};
-  color: ${(props) => (props.selected ? theme.colors.white : theme.colors.black)};
-  border: 1px solid ${(props) => (props.selected ? theme.colors.secondary : theme.colors.gray[300])};
+  background-color: ${(props) => (props.selected ? theme.colors.skyblue : theme.colors.white)};
+  color: ${(props) => (props.selected ? theme.colors.black : theme.colors.black)};
+  border: 1px solid ${(props) => (props.selected ? theme.colors.bl : theme.colors.gray[300])};
 
   &:hover {
     box-shadow: ${theme.shadows.sm};
@@ -34,12 +33,38 @@ const FilterContainer = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  padding: ${theme.spacing[4]};
+  padding: ${theme.spacing[2]};
   background-color: ${theme.colors.white};
   border-radius: ${theme.borderRadius.md};
   max-width: ${theme.width.lg};
-  margin: ${theme.spacing[8]} auto;
-  box-shadow: ${theme.shadows.lg};
+
+  ${StyledButton} {
+    flex-basis: calc(100% / 6 - ${theme.spacing[2]} * 2);
+    max-width: calc(100% / 6 - ${theme.spacing[2]} * 2);
+    min-width: unset;
+
+    &:nth-child(6n) {
+      margin-right: 0;
+    }
+  }
+
+  @media (max-width: ${theme.width.md}) {
+    ${StyledButton} {
+      flex-basis: calc(100% / 3 - ${theme.spacing[2]} * 2);
+      &:nth-child(3n) {
+        margin-right: 0;
+      }
+    }
+  }
+
+  @media (max-width: ${theme.width.sm}) {
+    ${StyledButton} {
+      flex-basis: calc(100% / 2 - ${theme.spacing[2]} * 2);
+      &:nth-child(2n) {
+        margin-right: 0;
+      }
+    }
+  }
 `;
 
 const RegionFilterComponent = () => {

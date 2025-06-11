@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import theme from '../styles/theme'; // 경로 확인: theme.js 파일이 styles 폴더 안에 있다고 가정
+import theme from '../styles/theme';
 
 const PageContainer = styled.div`
   display: flex;
