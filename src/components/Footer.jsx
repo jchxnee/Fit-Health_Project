@@ -158,7 +158,7 @@ const BusinessHours = styled.p`
 const FooterBottomWrapper = styled.div`
   border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
   padding-top: ${({ theme }) => theme.spacing[1]};
-  width: 1008px;
+  width: 0 auto;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
