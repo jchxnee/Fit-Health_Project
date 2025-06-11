@@ -22,7 +22,7 @@ const Container = styled.div`
 `;
 
 const Title = styled.div`
-  text-align: start;
+  text-align: left;
   font-size: ${({ theme }) => theme.fontSizes['3xl']};
   color: ${({ theme }) => theme.colors.primary};
   padding: 0 ${({ theme }) => theme.spacing['3']};
