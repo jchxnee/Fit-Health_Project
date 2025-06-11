@@ -21,6 +21,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <CoachDetail />
+      {/* <CoachList /> */}
     </ThemeProvider>
   );
 }
