@@ -71,6 +71,7 @@ const theme = {
     56: '224px',
     64: '256px',
     72: '288px',
+    80: '430px',
   },
   borderRadius: {
     none: '0px',
