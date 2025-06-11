@@ -5,11 +5,14 @@ import theme from './styles/theme';
 import BasicModal from './components/modal/BasicModal';
 import NotificationList from './components/NotificationList';
 import BasicFilter from './components/filter/BasicFilter';
+import CommunityPage from './pages/CommunityPage';
+import GlobalStyle from './styles/GlobalStyle';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <TitleBar title="추천 운동" />
+      <GlobalStyle />
+      <CommunityPage />
     </ThemeProvider>
   );
 }
