@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
-function TitleBar() {
+function TitleBar({ title }) {
   return (
     <Container>
       <Divider />
-      <Title>운동 추천</Title>
+      <Title>{title}</Title>
     </Container>
   );
 }
@@ -22,7 +22,7 @@ const Container = styled.div`
 `;
 
 const Title = styled.div`
-  text-align: left;
+  text-align: start;
   font-size: ${({ theme }) => theme.fontSizes['3xl']};
   color: ${({ theme }) => theme.colors.gray['700']};
   padding: 0 ${({ theme }) => theme.spacing['3']};

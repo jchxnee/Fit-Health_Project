@@ -3,18 +3,22 @@ import styled from 'styled-components';
 
 const BMICalcWrapper = styled.div`
   width: 100%;
-  max-width: 700px;
-  background: #eee;
+    max-width: 700px;
   border-radius: 10px;
-  padding: 32px 32px 24px 32px;
-  margin: 0 auto 32px auto;
   display: flex;
   flex-direction: column;
   gap: 18px;
+  align-items: center;
+  margin: 0 auto;
 `;
 const Title = styled.div`
-  font-family: 'SUITE', sans-serif;
-  font-size: 22px;
+    background: #eee;
+    width: 100%;
+    max-width: 700px;
+    text-align: left;
+    padding: 15px;
+    border-radius: 6px;
+    font-size: 22px;
   font-weight: 500;
   color: #444;
   margin-bottom: 8px;
@@ -33,7 +37,6 @@ const Input = styled.input`
   outline: none;
 `;
 const Result = styled.div`
-  font-family: 'SUITE', sans-serif;
   font-size: 20px;
   color: #222;
   margin-top: 10px;
