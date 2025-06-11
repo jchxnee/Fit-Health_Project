@@ -37,11 +37,9 @@ const HeaderComponent = styled.header`
   width: 100%;
   height: 60px;
   background-color: ${({ theme }) => theme.colors.white};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: ${({ theme }) => theme.shadows.sm};
   z-index: ${({ theme }) => theme.zIndices.sticky};
   position: sticky;
   top: 0;

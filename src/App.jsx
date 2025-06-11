@@ -7,12 +7,14 @@ import NotificationList from './components/NotificationList';
 import BasicFilter from './components/filter/BasicFilter';
 import CommunityPage from './pages/CommunityPage';
 import GlobalStyle from './styles/GlobalStyle';
+import CommunityPostCreationPage from './pages/CommunityPostCreationPage';
+import CategoryMenu from './components/CategoryMenu';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <CommunityPage />
+      <CommunityPostCreationPage />
     </ThemeProvider>
   );
 }
