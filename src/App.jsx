@@ -9,11 +9,16 @@ import Header from './components/Header';
 import CoachList from './pages/MatchingPage/CoachList';
 import CategoryMenu from './components/CategoryMenu';
 import Footer from './components/Footer';
+import BasicFilter from './components/filter/BasicFilter';
+import CommunityPage from './pages/CommunityPage';
+import GlobalStyle from './styles/GlobalStyle';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CoachList />
+      <GlobalStyle />
+      <CommunityPage />
     </ThemeProvider>
   );
 }
