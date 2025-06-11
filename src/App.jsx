@@ -18,7 +18,6 @@ function App() {
     <ThemeProvider theme={theme}>
       <CoachList />
       <GlobalStyle />
-      <CommunityPage />
     </ThemeProvider>
   );
 }
