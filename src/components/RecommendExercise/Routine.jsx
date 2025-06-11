@@ -23,56 +23,49 @@ const Title = styled.h2`
   font-size: ${({ theme }) => theme.fontSizes['2xl']};
   color: ${({ theme }) => theme.colors.primary};
 `;
-const ViewAll = styled.span`
-  font-size: ${({ theme }) => theme.fontSizes.lg};
-  color: ${({ theme }) => theme.colors.primary};
-  cursor: pointer;
-`;
+
 const List = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing[10]};
   justify-content: center;
 `;
 const TrainerCard = styled.div`
-  width: 250px;
-  height: 250px;
+  height: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: ${({ theme }) => theme.borderRadius['2xl']};
   justify-content: center;
-    gap: ${({ theme }) => theme.spacing[2]};
+    gap: ${({ theme }) => theme.spacing[3]};
 `;
 const ProfileImg = styled.div`
-  width: 100%;
-  height: 100%;
+  width: 160px;
+  height: 160px;
   background: ${({ theme }) => theme.colors.gray[300]};
   border-radius: ${({ theme }) => `${theme.borderRadius['2xl']}`};
 `;
 const Name = styled.div`
-  font-family: 'SUITE', sans-serif;
   font-size: ${({ theme }) => theme.fontSizes.xl};
   color: ${({ theme }) => theme.colors.primary};
 `;
 
 const trainers = [
-    { name: '김순자 트레이너' },
-    { name: '정나미 트레이너' },
-    { name: '고훈 트레이너' },
+    { name: '다이어트' },
+    { name: '근육량 증진', trainer: 'https://d2u3dcdbebyaiu.cloudfront.net/uploads/atch_img/516/1b86bf91cd093359045a07c31fc7f9d9_res.jpeg' },
+    { name: '홈트' },
 ];
 
 const Routine = () => (
     <Wrapper>
         <Container>
             <TitleRow>
-                <Title>이 달의 인기 트레이너</Title>
-                <ViewAll>전체보기</ViewAll>
+                <Title>추천 트레이너</Title>
             </TitleRow>
             <List>
                 {trainers.map((t) => (
                     <TrainerCard key={t.name}>
-                        <ProfileImg />
-                        <Name>{t.name}</Name>
+                        <ProfileImg img={t.trainer}/>
+                        <Name>{t.name} 루틴</Name>
                     </TrainerCard>
                 ))}
             </List>
