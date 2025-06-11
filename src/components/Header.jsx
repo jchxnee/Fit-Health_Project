@@ -1,13 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import headerIcon from '../assets/header_icon.png';
-import betaImg from '../assets/beta_user_img.png';
 import { FaBell } from 'react-icons/fa';
 
 function Header(user) {
   return (
-    <Box>
-      <Content>
+    <HeaderComponent>
+      <HeaderContent>
         <HeaderLeft>
           <HeaderIcon src={headerIcon} alt="icon" />
           <HeaderNavLeft>
@@ -22,33 +21,37 @@ function Header(user) {
             <HeaderNavRight>
               <FaBell />
               <span>채팅</span>
-              <ProfileImg src={betaImg} alt="profileIcon" />
+              <ProfileImg src={user.img} alt="profileIcon" />
               <span>{user.name}님</span>
             </HeaderNavRight>
           </HeaderRight>
         ) : (
           <HeaderRight>로그인/회원가입</HeaderRight>
         )}
-      </Content>
-    </Box>
+      </HeaderContent>
+    </HeaderComponent>
   );
 }
 
-const Box = styled.div`
-  position: relative;
+const HeaderComponent = styled.header`
   width: 100%;
   height: 60px;
+  background-color: ${({ theme }) => theme.colors.white};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: ${({ theme }) => theme.shadows.sm};
+  z-index: ${({ theme }) => theme.zIndices.sticky};
+  position: sticky;
+  top: 0;
 `;
 
-const Content = styled.div`
-  width: 970px;
+const HeaderContent = styled.div`
+  width: ${({ theme }) => theme.width.lg}; /* 1008px */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 1;
 `;
 
 const HeaderLeft = styled.div`
@@ -62,12 +65,6 @@ const HeaderIcon = styled.img`
   height: 24px;
 `;
 
-const ProfileImg = styled.img`
-  width: 30px;
-  height: 30px;
-  border-radius: ${({ theme }) => theme.borderRadius.full};
-`;
-
 const HeaderNavLeft = styled.nav`
   display: flex;
   gap: ${({ theme }) => theme.spacing[5]};
@@ -77,15 +74,21 @@ const HeaderNavLeft = styled.nav`
 
   span {
     cursor: pointer;
+    &:hover {
+      color: ${({ theme }) => theme.colors.button};
+    }
   }
 `;
 
 const HeaderRight = styled.div`
-  align-items: center;
+  text-align: center;
   font-size: ${({ theme }) => theme.fontSizes.lg};
   color: ${({ theme }) => theme.colors.primary};
   font-weight: ${({ theme }) => theme.fontWeights.regular};
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing[5]};
 `;
 
 const HeaderNavRight = styled.nav`
@@ -94,10 +97,20 @@ const HeaderNavRight = styled.nav`
   font-size: ${({ theme }) => theme.fontSizes.lg};
   color: ${({ theme }) => theme.colors.primary};
   font-weight: ${({ theme }) => theme.fontWeights.regular};
+  align-items: center; /* 아이콘 및 텍스트 세로 중앙 정렬 */
 
   span {
     cursor: pointer;
+    &:hover {
+      color: ${({ theme }) => theme.colors.button};
+    }
   }
 `;
 
+const ProfileImg = styled.img`
+  width: 30px;
+  height: 30px;
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  object-fit: cover;
+`;
 export default Header;

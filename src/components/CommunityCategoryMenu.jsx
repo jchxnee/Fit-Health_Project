@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 function CategoryMenu() {
   const [selectedCategory, setSelectedCategory] = useState('헬스');
 
-  const categories = [{ name: '전체' }, { name: '헬스' }, { name: '요가' }, { name: '도수' }, { name: '재활' }];
+  const categories = [{ name: '전체' }, { name: '운동해요!' }, { name: '궁금해요!' }, { name: '소통해요!' }];
 
   return (
     <MenuContainer>
