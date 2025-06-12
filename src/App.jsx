@@ -32,7 +32,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <MyPostsPage />
+      <CommunityPage />
     </ThemeProvider>
   );
 }
