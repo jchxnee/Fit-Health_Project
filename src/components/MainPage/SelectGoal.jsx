@@ -53,7 +53,7 @@ const categories = [
   '근골격계 케어',
 ];
 
-const SelectExercise = () => {
+const SelectGoal = () => {
   const [selected, setSelected] = useState('근력향상');
   return (
     <Wrapper>
@@ -70,4 +70,4 @@ const SelectExercise = () => {
   );
 };
 
-export default SelectExercise;
+export default SelectGoal;
