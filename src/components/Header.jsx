@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import headerIcon from '../assets/header_icon.png';
 import { FaBell } from 'react-icons/fa';
 
-function Header(user) {
+function Header({ user }) {
   return (
     <HeaderComponent>
       <HeaderContent>
@@ -37,11 +37,9 @@ const HeaderComponent = styled.header`
   width: 100%;
   height: 60px;
   background-color: ${({ theme }) => theme.colors.white};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: ${({ theme }) => theme.shadows.sm};
   z-index: ${({ theme }) => theme.zIndices.sticky};
   position: sticky;
   top: 0;
@@ -88,12 +86,11 @@ const HeaderRight = styled.div`
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing[5]};
 `;
 
 const HeaderNavRight = styled.nav`
   display: flex;
-  gap: ${({ theme }) => theme.spacing[5]};
+  gap: ${({ theme }) => theme.spacing[3]};
   font-size: ${({ theme }) => theme.fontSizes.lg};
   color: ${({ theme }) => theme.colors.primary};
   font-weight: ${({ theme }) => theme.fontWeights.regular};

@@ -48,7 +48,6 @@ const GlobalStyle = createGlobalStyle`
 
   /* 입력 필드 스타일 초기화 */
   input, textarea {
-    font: inherit;
     border: none;
     outline: none;
   }
