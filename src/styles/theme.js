@@ -6,6 +6,7 @@ const theme = {
     info: '#61dafb',
     success: '#22c55e',
     warning: '#f59e0b',
+    star: '#F9D926',
     danger: '#ef4444',
     white: '#ffffff',
     black: '#000000',

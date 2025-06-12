@@ -21,19 +21,19 @@ function CommunityPostDetailPage() {
     category: '운동해요!',
     title: '이거 어떻게 쓰는거에요?',
     author: '김현아',
-    authorProfileImg: betaImg, // 글쓴이 프로필 이미지 추가
-    authorRegion: '서울', // 글쓴이 지역 정보 추가 (글 제목 밑에 표시)
+    authorProfileImg: betaImg,
+    authorRegion: '서울',
     authorRegionDetail: '강남구',
-    timeAgo: '1시간 전', // 이미지에 맞춰 1시간 전으로 변경
-    views: 12, // 이미지에 맞춰 조회수 12로 변경
+    timeAgo: '1시간 전',
+    views: 12,
     content: `아니 바 사니까 이것도 같이 딸려오는데 이게 뭔가요 악력 키우기인가요? 혹시 사용법 아시는 분 알려주시면 감사하겠습니다.`,
-    images: [betaImg, betaImg], // 현재는 로컬 이미지로 대체
+    images: [betaImg, betaImg],
     comments: [
       {
         id: 1,
         author: '이우진',
         authorType: '핏코치',
-        authorRegion: '서울', // 글쓴이 지역 정보 추가 (글 제목 밑에 표시)
+        authorRegion: '서울',
         authorRegionDetail: '강남구',
         timeAgo: '5분 전',
         text: '데드리프트 할 때 등 고정하는 악력 키우는 데 도움이 됩니다.',
@@ -43,7 +43,7 @@ function CommunityPostDetailPage() {
         id: 2,
         author: '최현우',
         authorType: '일반사용자',
-        authorRegion: '서울', // 글쓴이 지역 정보 추가 (글 제목 밑에 표시)
+        authorRegion: '서울',
         authorRegionDetail: '강남구',
         timeAgo: '4분 전',
         text: '와~ 저는 저거 뭔지도 몰랐네요! 신기하다 ㅎㅎㅎ',
@@ -51,13 +51,13 @@ function CommunityPostDetailPage() {
       },
       {
         id: 3,
-        author: '김현아', // 본인 댓글 예시
+        author: '김현아',
         authorType: '일반사용자',
-        authorRegion: '서울', // 글쓴이 지역 정보 추가 (글 제목 밑에 표시)
+        authorRegion: '서울',
         authorRegionDetail: '강남구',
         timeAgo: '2분 전',
         text: '네 맞아요! 저도 잘 모르고 샀는데 쓸만하더라고요~',
-        profileImg: betaImg, // 본인 프로필 이미지
+        profileImg: betaImg,
       },
     ],
   };
@@ -181,8 +181,8 @@ function CommunityPostDetailPage() {
             </CommentList>
           </CommentSection>
         </MainContentWrapper>
-        <Footer />
       </PageContainer>
+      <Footer />
     </>
   );
 }
@@ -352,10 +352,9 @@ const PostContent = styled.div`
   line-height: 1.6;
   color: ${({ theme }) => theme.colors.gray['800']};
   font-size: ${({ theme }) => theme.fontSizes.base};
-  margin-bottom: ${({ theme }) => theme.spacing['6']};
 
   p {
-    margin-bottom: ${({ theme }) => theme.spacing['4']};
+    margin-bottom: ${({ theme }) => theme.spacing['6']};
   }
 `;
 
@@ -377,7 +376,7 @@ const ImageItem = styled.img`
   width: 200px; /* 이미지 너비 고정 */
   height: 200px; /* 이미지 높이 고정 */
   object-fit: cover;
-  border-radius: ${({ theme }) => theme.borderRadius.base};
+  border-radius: ${({ theme }) => theme.borderRadius.ten};
   flex-shrink: 0; /* 이미지들이 축소되지 않도록 */
 `;
 
@@ -420,7 +419,6 @@ const CommentCount = styled.div`
 const CommentSection = styled.div`
   border-top: 1px solid ${({ theme }) => theme.colors.gray['200']};
   padding-top: ${({ theme }) => theme.spacing['6']};
-  margin-top: ${({ theme }) => theme.spacing['6']};
 `;
 
 const CommentInputContainer = styled.form`
@@ -485,7 +483,7 @@ const CommentItem = styled.div`
 const CommentAuthorInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing['2']};
+  gap: ${({ theme }) => theme.spacing['3']};
   margin-bottom: ${({ theme }) => theme.spacing['1']};
 `;
 
@@ -499,17 +497,16 @@ const ProfileImage = styled.img`
 
 const AuthorDetails = styled.div`
   display: flex;
-  justify-content: start;
+  align-items: start;
   flex-direction: column; /* 이름과 유형을 한 줄로 */
   gap: ${({ theme }) => theme.spacing['2']};
-  align-items: center;
 `;
 
 const AuthorDetailsSmall = styled.div`
   display: flex;
   flex-direction: row; /* 이름과 유형을 한 줄로 */
   align-items: center;
-  gap: ${({ theme }) => theme.spacing['2']};
+  gap: ${({ theme }) => theme.spacing['1']};
 `;
 
 const CommentText = styled.p`
@@ -539,6 +536,4 @@ const AuthorType = styled.span`
 const CommentAuthorRegion = styled.span`
   font-size: ${({ theme }) => theme.fontSizes.xs};
   color: ${({ theme }) => theme.colors.gray['500']};
-  margin-left: ${({ theme }) => theme.spacing['1']}; /* 유형과 간격 */
-  align-items: flex-start;
 `;

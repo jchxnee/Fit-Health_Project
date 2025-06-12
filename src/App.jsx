@@ -7,14 +7,14 @@ import NotificationList from './components/NotificationList';
 import BasicFilter from './components/filter/BasicFilter';
 import CommunityPage from './pages/CommunityPage';
 import GlobalStyle from './styles/GlobalStyle';
-import CommunityPostCreationPage from './pages/CommunityPostCreationPage';
-import CommunityPostDetailPage from './pages/CommunityPostDetailPage';
+import ReviewCreationPage from './pages/ReviewCreationPage';
+import CoachReview from './pages/CoachReview';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <CommunityPostDetailPage />
+      <ReviewCreationPage />
     </ThemeProvider>
   );
 }
