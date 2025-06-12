@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import RegionSelect from "../RegionSelect.jsx";
 
 const Section = styled.section`
   width: 100%;
@@ -20,16 +21,12 @@ const Row = styled.div`
   align-items: center;
 `;
 
-
-
 function RegionSection() {
-  const [city, setCity] = useState("서울시");
-  const [district, setDistrict] = useState("강남구");
   return (
     <Section>
       <Label>희망지역</Label>
       <Row>
-
+        <RegionSelect classname="Select"/>
       </Row>
     </Section>
   );

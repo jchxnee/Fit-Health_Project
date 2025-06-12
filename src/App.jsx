@@ -16,6 +16,7 @@ import RecommendedExerciseSection from './pages/RecommendExercise.jsx';
 import CoachDetail from './pages/MatchingPage/CoachDetail';
 import RecommendExercise from "./pages/RecommendExercise.jsx";
 import CoachRegister from "./pages/CoachRegister.jsx";
+import RegionSelect from "./components/RegionSelect.jsx";
 
 function App() {
   return (
