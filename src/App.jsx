@@ -13,15 +13,16 @@ import CoachDetail from './pages/MatchingPage/CoachDetail';
 import CoachMatching from './pages/MatchingPage/CoachMatching';
 import CommunityPostCreationPage from './pages/CommunityPostCreationPage';
 import CommunityPostDetailPage from './pages/CommunityPostDetailPage';
+import ReviewCreationPage from './pages/ReviewCreationPage';
+import CoachReview from './pages/CoachReview';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      {/* <CoachDetail /> */}
-      {/* <CoachList /> */}
-      {/* <CoachMatching /> */}
       <CommunityPostDetailPage />
+      <CoachMatching />
+      <ReviewCreationPage />
     </ThemeProvider>
   );
 }

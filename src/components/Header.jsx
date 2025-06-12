@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import headerIcon from '../assets/header_icon.png';
 import { FaBell } from 'react-icons/fa';
-
 function Header({ user }) {
   return (
     <HeaderComponent>
