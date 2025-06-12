@@ -226,6 +226,7 @@ const ThreeDotsMenu = styled.button`
   height: 100%;
   position: relative; /* 팝업 메뉴의 기준점 */
   z-index: 1; /* 다른 요소 위에 팝업이 뜨도록 */
+  outline: none;
 `;
 
 // 새로 추가된 Styled-components
@@ -248,6 +249,7 @@ const PopupMenu = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden; /* border-radius 적용을 위해 */
+  outline: none;
 `;
 
 const PopupMenuItem = styled.button`
@@ -260,7 +262,7 @@ const PopupMenuItem = styled.button`
   color: ${({ theme, $isDelete }) => ($isDelete ? theme.colors.danger : theme.colors.gray['800'])};
   cursor: pointer;
   white-space: nowrap; /* 텍스트 줄바꿈 방지 */
-
+  outline: none;
   &:hover {
     background-color: ${theme.colors.gray['100']};
   }
