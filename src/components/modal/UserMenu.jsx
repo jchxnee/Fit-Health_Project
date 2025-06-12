@@ -35,7 +35,7 @@ const StyledFaSyncAlt = styled(FaSyncAlt)`
 `;
 
 const MenuContainer = styled.div`
-  width: 173px;
+  width: 150px;
   padding: ${({ theme }) => theme.spacing[4]} 0;
   background-color: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
