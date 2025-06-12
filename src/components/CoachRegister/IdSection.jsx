@@ -5,6 +5,7 @@ import { RiKakaoTalkFill } from 'react-icons/ri';
 
 const Section = styled.section`
     width: 100%;
+    padding: 0 12px;
 `;
 const Row = styled.div`
     display: flex;

@@ -225,10 +225,10 @@ const regions = {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   box-sizing: border-box;
   width: 100%;
-  font-family: 'Noto Sans KR', sans-serif;
+    
 `;
 
 const InputGroup = styled.div`
