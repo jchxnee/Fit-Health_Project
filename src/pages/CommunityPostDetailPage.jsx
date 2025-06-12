@@ -99,7 +99,6 @@ function CommunityPostDetailPage() {
             <PostAuthorRegion>
               {post.authorRegion} {post.authorRegionDetail}
             </PostAuthorRegion>{' '}
-            {/* 글 제목 밑에 글쓴이 지역 추가 */}
             <PostInfo>
               <AuthorInfo>
                 <ProfileImage src={post.authorProfileImg || betaImg} alt={post.author} />
@@ -389,7 +388,6 @@ const InteractionStats = styled.div`
   gap: ${({ theme }) => theme.spacing['4']};
   margin-top: ${({ theme }) => theme.spacing['4']};
   padding-top: ${({ theme }) => theme.spacing['4']};
-  border-top: 1px solid ${({ theme }) => theme.colors.gray['100']}; /* 이미지 아래 구분선 */
 `;
 
 const LikeButton = styled.button`

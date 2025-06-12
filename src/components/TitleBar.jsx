@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-function RecommendedExerciseSection({ title }) {
+function TitleBar({ title }) {
   return (
     <Container>
       <Title>{title}</Title>
@@ -9,7 +9,7 @@ function RecommendedExerciseSection({ title }) {
   );
 }
 
-export default RecommendedExerciseSection;
+export default TitleBar;
 
 const Container = styled.div`
   width: 1008px;
