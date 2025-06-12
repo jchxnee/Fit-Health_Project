@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import CommunityCategoryMenu from '../components/CommunityCategoryMenu';
+import CommunityCategoryMenu from '../components/CustomCategoryMenu';
 import { FaPencilAlt, FaEye } from 'react-icons/fa'; // '글쓰기' 아이콘
 import Header from '../components/Header';
 import Footer from '../components/Footer';

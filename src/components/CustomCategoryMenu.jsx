@@ -1,18 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
-function CategoryMenu() {
-  const [selectedCategory, setSelectedCategory] = useState('헬스');
-
-  const categories = [{ name: '전체' }, { name: '운동해요!' }, { name: '궁금해요!' }, { name: '소통해요!' }];
-
+// CommunityCategoryMenu 컴포넌트 정의
+function CustomCategoryMenu({ selectedCategory, onSelectCategory, categories }) {
   return (
     <MenuContainer>
       {categories.map((category) => (
         <MenuItem
           key={category.name}
           isSelected={selectedCategory === category.name}
-          onClick={() => setSelectedCategory(category.name)}
+          onClick={() => onSelectCategory(category.name)}
         >
           {category.name}
         </MenuItem>
@@ -21,8 +18,9 @@ function CategoryMenu() {
   );
 }
 
-export default CategoryMenu;
+export default CustomCategoryMenu;
 
+// 스타일 컴포넌트 정의
 const MenuContainer = styled.div`
   width: 220px;
   box-sizing: border-box;
