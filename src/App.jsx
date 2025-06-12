@@ -12,14 +12,15 @@ import Footer from './components/Footer';
 import MemberInfoPage from './pages/MemberInfoPage';
 import CustomInfoPage from './pages/CustomInfoPage';
 import DeleteMemberPage from './pages/DeleteMemberPage';
+import PaymentPage from './pages/PaymentPage';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <Header />
-      <MemberInfoPage />
+      <PaymentPage />
+      <SignUpPage />
       <CustomInfoPage />
-      <DeleteMemberPage />
       <Footer />
     </ThemeProvider>
   );

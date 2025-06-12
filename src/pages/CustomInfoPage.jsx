@@ -419,7 +419,7 @@ const CustomInfoContainer = styled.div`
 const CustomInfoForm = styled.form`
   background-color: ${({ theme }) => theme.colors.white};
   padding: ${({ theme }) => theme.spacing['10']} ${({ theme }) => theme.spacing['20']};
-  border-radius: 10px;
+  border-radius: ${({ theme }) => theme.borderRadius.ten};
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   width: 100%;
   max-width: 700px;
@@ -474,7 +474,7 @@ const StyledInput = styled.input`
   }
 `;
 
-const GenderSelection = styled.div`
+export const GenderSelection = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing['2']};
   width: 100%;
@@ -482,20 +482,30 @@ const GenderSelection = styled.div`
   margin-top: ${({ theme }) => theme.spacing['2']};
 `;
 
-const GenderButton = styled.button`
+export const GenderButton = styled.button`
   flex: 1;
-  padding: ${({ theme }) => theme.spacing['2']};
-  border: 1px solid ${({ theme }) => theme.colors.gray['300']};
-  /* border-radius를 크게 주어 둥근 느낌으로 변경 */
-  border-radius: ${({ theme }) => theme.borderRadius.full}; /* 혹은 20px 등 큰 값 */
-  background-color: ${({ theme, $isSelected }) => ($isSelected ? theme.colors.button : theme.colors.white)};
-  color: ${({ theme, $isSelected }) => ($isSelected ? theme.colors.white : theme.colors.primary)};
-  font-size: ${({ theme }) => theme.fontSizes.base};
+  /* Use the same padding and border-radius as Item for consistency */
+  padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['3']};
+  border-radius: 24px; /* Consistent with Item's border-radius */
+  border: 1.5px solid #cdcdcd; /* Consistent with Item's border */
+
+  /* Apply background and color based on $isSelected, similar to Item's 'selected' prop */
+  background: ${({ $isSelected, theme }) => ($isSelected ? theme.colors.button : 'transparent')};
+  color: ${({ $isSelected, theme }) => ($isSelected ? '#fff' : theme.colors.primary)};
+
+  font-size: ${({ theme }) => theme.fontSizes.sm}; /* Consistent font-size, or base if preferred for buttons */
+  font-weight: 500; /* Consistent font-weight */
+  text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    background 0.2s,
+    color 0.2s; /* Consistent transition */
+  outline: none;
+  box-shadow: none;
 
   &:hover {
-    border-color: ${({ theme }) => theme.colors.gray['400']};
+    background: ${({ theme }) => theme.colors.button}; /* Consistent hover effect */
+    color: #fff; /* Consistent hover effect */
   }
 `;
 

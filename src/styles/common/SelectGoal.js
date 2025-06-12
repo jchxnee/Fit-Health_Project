@@ -1,5 +1,3 @@
-// ../styles/common/SelectGoal.js
-
 import styled from 'styled-components';
 
 export const Wrapper = styled.section`
@@ -26,7 +24,6 @@ export const List = styled.div`
 `;
 
 export const Item = styled.button`
-  /* CategoryBtn을 Item으로 변경 (이름 통일) */
   min-width: auto;
   height: auto;
   padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['3']};
@@ -34,7 +31,6 @@ export const Item = styled.button`
   border: 1.5px solid #cdcdcd;
   background: ${({ selected, theme }) => (selected ? theme.colors.button : 'transparent')};
   color: ${({ selected, theme }) => (selected ? '#fff' : theme.colors.primary)};
-  font-family: 'SUITE', sans-serif;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: 500;
   text-align: center;

@@ -92,17 +92,15 @@ const PersonalInfoContainer = styled.div`
   min-height: calc(100vh - 60px); /* Adjust for header height if it's 60px */
   box-sizing: border-box;
   width: 100%;
-  font-family: 'Noto Sans KR', sans-serif;
 `;
 
 const PersonalInfoForm = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
-  padding: ${({ theme }) => theme.spacing['10']}; /* 40px */
-  border-radius: 10px;
+  padding: ${({ theme }) => theme.spacing[10]}; /* 40px */
+  border-radius: ${({ theme }) => theme.borderRadius.ten};
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   width: 100%;
   max-width: 700px; /* Consistent with other forms */
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;

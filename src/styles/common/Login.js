@@ -22,7 +22,7 @@ export const LoginTitle = styled.h1`
 export const LoginFormBox = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   padding: ${({ theme }) => theme.spacing[10]}; /* 40px */
-  border-radius: ${({ theme }) => theme.borderRadius.base}; /* 8px */
+  border-radius: ${({ theme }) => theme.borderRadius.ten}; /* 8px */
   box-shadow: ${({ theme }) => theme.shadows.base};
   width: 100%;
   max-width: 534px; /* Max width for the login form area */
@@ -35,8 +35,7 @@ export const LoginFormBox = styled.div`
 
 export const InputGroup = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing[5]}; /* 20px */
-  width: 400px;
-  /* InputGroup 자체에는 position: relative;가 필요하지 않습니다. */
+  width: 350px;
 `;
 
 export const StyledLabel = styled.label`
@@ -72,46 +71,68 @@ export const StyledInput = styled.input`
 `;
 
 export const LoginButton = styled(ButtonStyle)`
-  width: 400px;
+  width: 350px;
+`;
+
+export const LoginRememberMeOption = styled.div`
+  margin-bottom: ${({ theme }) => theme.spacing[5]}; /* Padding above LoginButton */
+  width: 350px; /* Match input/button width */
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Align checkbox to the left */
+
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.gray[600]};
+
+  input[type='checkbox'] {
+    vertical-align: middle;
+    margin-right: ${({ theme }) => theme.spacing[2]}; /* 8px space between checkbox and label */
+  }
+
+  label {
+    vertical-align: middle;
+  }
 `;
 
 export const LoginOptions = styled.div`
-  margin-top: ${({ theme }) => theme.spacing[5]}; /* 20px */
+  /* Reset previous margin-top if it was too large */
+  margin-top: ${({ theme }) => theme.spacing[2]}; /* Small margin top, e.g., 8px below the password input */
+  margin-bottom: ${({ theme }) => theme.spacing[5]}; /* Add padding here (e.g., 20px) below checkbox and above button */
+
   font-size: ${({ theme }) => theme.fontSizes.sm}; /* 14px */
   color: ${({ theme }) => theme.colors.gray[600]};
-  width: 400px; /* InputGroup 및 LoginButton과 동일한 너비로 설정 */
-  /* LoginOptions 자체는 이제 LoginFormBox 내에서 중앙 정렬될 것입니다. */
+  width: 400px;
 
-  display: flex;
-  flex-direction: column; /* Stack children vertically */
-  gap: ${({ theme }) => theme.spacing[2]}; /* Small gap between checkbox line and links line */
+  display: flex; /* Make it a flex container to control its single child */
+  flex-direction: column;
+  /* No gap needed here if LoginLinksContainer is removed from it */
 
   /* Style for the div containing the checkbox and label */
   & > div:first-of-type {
-    display: flex; /* Make it a flex container */
-    align-items: center; /* Vertically align checkbox and label */
-    justify-content: flex-start; /* Checkbox and label to the left */
-    width: 100%; /* 부모의 너비를 가득 채우도록 */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
   }
 
   input[type='checkbox'] {
-    vertical-align: middle; /* Ensures checkbox aligns with text */
+    vertical-align: middle;
     margin-right: ${({ theme }) => theme.spacing[2]}; /* 8px */
   }
 
   label {
-    vertical-align: middle; /* Ensures label aligns with checkbox */
+    vertical-align: middle;
   }
 `;
 
 export const LoginLinksContainer = styled.div`
-  margin-top: ${({ theme }) => theme.spacing[2]}; /* 8px */
-  display: flex; /* Use flexbox for horizontal arrangement of links and separators */
-  justify-content: center; /* 내부 링크들을 중앙 정렬 */
-  align-items: center; /* Vertically align links and separators */
-  gap: ${({ theme }) => theme.spacing[2]}; /* Gap between link/separator components */
-  width: 100%; /* 부모의 너비를 가득 채우도록 */
-  /* margin: 0 auto; 제거 - justify-content: center; 가 더 적합 */
+  margin-top: ${({ theme }) => theme.spacing[5]}; /* 20px - space below login button */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing[2]};
+  width: 100%;
 `;
 
 export const OptionLink = styled.a`
