@@ -5,6 +5,7 @@ const Section = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
+    padding: 0 12px;
 `;
 const Label = styled.div`
   font-weight: 600;
@@ -15,7 +16,7 @@ const Label = styled.div`
 const Notice = styled.div`
   color: #ff4d4f;
   font-size: 14px;
-  margin-bottom: 24px;
+  margin-bottom:30px;
   align-self: flex-start;
 `;
 const TableHeaderRow = styled.div`

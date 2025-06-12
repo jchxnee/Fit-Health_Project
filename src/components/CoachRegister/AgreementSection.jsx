@@ -4,11 +4,12 @@ import {FaCheckSquare} from "react-icons/fa";
 
 const Section = styled.section`
   width: 100%;
+    padding: 0 12px;
 `;
 const Row = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 12px;
   margin-bottom: 24px;
     

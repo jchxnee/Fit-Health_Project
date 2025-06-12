@@ -6,6 +6,7 @@ const Section = styled.section`
     display: flex;
     align-items: flex-start;
     flex-direction: column;
+    padding: 0 12px;
 `;
 const Label = styled.div`
   font-weight: 600;
