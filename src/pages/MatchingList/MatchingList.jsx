@@ -9,7 +9,7 @@ import SelectBar from '../../components/selectbar/BasicSelectBar';
 import SubTable from '../../components/SubTable';
 import theme from '../../styles/theme';
 import { FaSearch } from 'react-icons/fa';
-import Pagination from '../../components/Pagination';
+import Pagination from '../../components/Pagination'; // Pagination 컴포넌트 임포트 확인
 import HistoryModal from '../../components/modal/HistoryModal';
 
 // 실제 데이터 (allMatchingData)는 외부 상수이므로 컴포넌트 외부에 정의
@@ -22,7 +22,6 @@ const allMatchingData = [
     sessions: '10회/10회',
     amount: '50,000원',
     startDate: '2025/06/04 19:00',
-
     history: [
       { date: '2025/06/04', session: '1회차' },
       { date: '2025/06/06', session: '2회차' },
@@ -190,7 +189,6 @@ const tableColumns = [
   { key: 'startDate', label: '시작일자', sortable: true },
 ];
 
-// Styled-components (변동 없음)
 const PageWrapper = styled.div`
   width: 100%;
   display: flex;
@@ -263,21 +261,23 @@ const MatchingList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState([]);
 
+  // 페이지네이션 상태 추가
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // 한 페이지에 표시할 항목 수
+
   // 모달 상태 관리
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRowData, setSelectedRowData] = useState(null); // 클릭된 행의 데이터를 저장
+  const [selectedRowData, setSelectedRowData] = useState(null);
 
   useEffect(() => {
     let currentFilteredData = allMatchingData;
 
-    // 셀렉트바 필터링
     if (currentSelection !== 'all') {
       currentFilteredData = currentFilteredData.filter((item) => {
         return item.status === currentSelection;
       });
     }
 
-    // 검색어 필터링
     if (searchTerm) {
       currentFilteredData = currentFilteredData.filter((item) =>
         item.coachName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -285,7 +285,16 @@ const MatchingList = () => {
     }
 
     setFilteredData(currentFilteredData);
-  }, [currentSelection, searchTerm]); // allMatchingData는 이제 외부 상수이므로 의존성 배열에서 제거
+    setCurrentPage(1); // 필터링 또는 검색 시 현재 페이지를 1로 초기화
+  }, [currentSelection, searchTerm]);
+
+  // 현재 페이지에 해당하는 데이터만 잘라냄
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+
+  // 총 페이지 수 계산
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const handleSelectBarChange = (selectedValue) => {
     setCurrentSelection(selectedValue);
@@ -296,16 +305,19 @@ const MatchingList = () => {
     setSearchTerm(event.target.value);
   };
 
-  // SubTable에서 행 클릭 시 호출될 함수
   const handleRowClick = (rowData) => {
-    setSelectedRowData(rowData); // 클릭된 행 데이터 저장
-    setIsModalOpen(true); // 모달 열기
+    setSelectedRowData(rowData);
+    setIsModalOpen(true);
   };
 
-  // 모달 닫기 함수
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedRowData(null); // 모달 닫을 때 데이터 초기화
+    setSelectedRowData(null);
+  };
+
+  // 페이지 변경 핸들러
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   return (
@@ -321,19 +333,20 @@ const MatchingList = () => {
               <SearchInput type="text" placeholder="이름 검색" value={searchTerm} onChange={handleSearchChange} />
             </SearchInputWrapper>
           </TableWrapper>
-          <SubTable data={filteredData} columns={tableColumns} onRowClick={handleRowClick} />
+          <SubTable data={currentItems} columns={tableColumns} onRowClick={handleRowClick} />
+          {/* Pagination 컴포넌트에 prop 전달 */}
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </ContentWrapper>
       </PageWrapper>
       <Footer />
 
-      {/* HistoryModal 렌더링 */}
-      {selectedRowData && ( // selectedRowData가 있을 때만 모달 렌더링
+      {selectedRowData && (
         <HistoryModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           coachName={selectedRowData.coachName}
-          sessions={selectedRowData.sessions} // 세션 정보 전달
-          history={selectedRowData.history || []} // 이용 기록 배열 전달 (없으면 빈 배열)
+          sessions={selectedRowData.sessions}
+          history={selectedRowData.history || []}
         />
       )}
     </>

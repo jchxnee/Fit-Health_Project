@@ -5,7 +5,6 @@ import theme from './styles/theme';
 import BasicModal from './components/modal/BasicModal';
 import NotificationList from './components/NotificationList';
 import Header from './components/Header';
-import CoachList from './pages/MatchingPage/CoachList';
 import CategoryMenu from './components/CategoryMenu';
 import Footer from './components/Footer';
 import BasicFilter from './components/filter/BasicFilter';
@@ -14,18 +13,22 @@ import GlobalStyle from './styles/GlobalStyle';
 import MainPage from './pages/MainPage.jsx';
 import RecommendedExerciseSection from './pages/RecommendExercise.jsx';
 import CoachDetail from './pages/MatchingPage/CoachDetail';
-import RecommendExercise from "./pages/RecommendExercise.jsx";
-import CoachRegister from "./pages/CoachRegister.jsx";
-import RegionSelect from "./components/RegionSelect.jsx";
-import CoachCalendar from "./components/CoachDetails/CoachCalendar.jsx";
+import RecommendExercise from './pages/RecommendExercise.jsx';
+import CoachRegister from './pages/CoachRegister.jsx';
+import RegionSelect from './components/RegionSelect.jsx';
+import CoachCalendar from './components/CoachDetails/CoachCalendar.jsx';
 
 function App() {
+  const userInfo = {
+    name: '이주찬',
+    img: '../src/assets/beta_user_img.png',
+  };
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-        <Header/>
+      <Header user={userInfo} />
       <CoachCalendar />
-        <Footer/>
+      <Footer />
     </ThemeProvider>
   );
 }
