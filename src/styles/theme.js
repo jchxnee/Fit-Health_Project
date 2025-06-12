@@ -2,10 +2,10 @@ const theme = {
   colors: {
     primary: '#3d4149',
     button: '#1A4AA2',
-    secondary: '#3A72FF',
     info: '#61dafb',
     success: '#22c55e',
     warning: '#f59e0b',
+    star: '#F9D926',
     danger: '#ef4444',
     white: '#ffffff',
     black: '#000000',
@@ -103,6 +103,7 @@ const theme = {
     '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
     inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
     none: 'none',
+    bottom: '1px solid rgba(0, 0, 0, 0.05)',
   },
   zIndices: {
     hide: -1,

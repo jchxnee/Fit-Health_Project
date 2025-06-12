@@ -32,6 +32,7 @@ const GlobalStyle = createGlobalStyle`
     background: none;
     cursor: pointer;
     font: inherit;
+    outline: none;
   }
 
   /* 리스트 스타일 초기화 */
@@ -48,7 +49,6 @@ const GlobalStyle = createGlobalStyle`
 
   /* 입력 필드 스타일 초기화 */
   input, textarea {
-    font: inherit;
     border: none;
     outline: none;
   }

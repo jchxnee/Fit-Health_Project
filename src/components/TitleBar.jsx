@@ -4,7 +4,6 @@ import styled from 'styled-components';
 function TitleBar({ title }) {
   return (
     <Container>
-      <Divider />
       <Title>{title}</Title>
     </Container>
   );
@@ -15,21 +14,16 @@ export default TitleBar;
 const Container = styled.div`
   width: ${({ theme }) => theme.width.lg};
   display: flex;
+  margin-top: ${({ theme }) => theme.spacing['8']};
   flex-direction: column;
   justify-content: flex-end;
   box-sizing: border-box;
-  background-color: ${({ theme }) => theme.colors.white};
+  border-top: 1px solid ${({ theme }) => theme.colors.gray['400']};
 `;
 
 const Title = styled.div`
   text-align: start;
   font-size: ${({ theme }) => theme.fontSizes['3xl']};
-  color: ${({ theme }) => theme.colors.gray['700']};
-  padding: 0 ${({ theme }) => theme.spacing['3']};
-`;
-
-const Divider = styled.hr`
-  border: none;
-  border-top: 1px solid ${({ theme }) => theme.colors.gray['400']};
-  width: 100%;
+  color: ${({ theme }) => theme.colors.primary};
+  padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['3']};
 `;
