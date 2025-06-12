@@ -17,6 +17,8 @@ import RecommendExercise from './pages/RecommendExercise.jsx';
 import CoachRegister from './pages/CoachRegister.jsx';
 import RegionSelect from './components/RegionSelect.jsx';
 import CoachCalendar from './components/CoachDetails/CoachCalendar.jsx';
+import NextReservation from './pages/MatchingList/NextReservation.jsx';
+import HistoryModal from './components/modal/HistoryModal.jsx';
 
 function App() {
   const userInfo = {
@@ -29,6 +31,7 @@ function App() {
       <Header user={userInfo} />
       <CoachCalendar />
       <Footer />
+      <HistoryModal />
     </ThemeProvider>
   );
 }
