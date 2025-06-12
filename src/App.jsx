@@ -16,13 +16,14 @@ import CommunityPostDetailPage from './pages/CommunityPostDetailPage';
 import ReviewCreationPage from './pages/ReviewCreationPage';
 import CoachReview from './pages/CoachReview';
 import MyReviewsPage from './pages/MyReviewsPage';
-import NoticePage from './pages/NoticePage';
+import NoticePage from './pages/noticePage/NoticePage';
+import NoticeDetailPage from './pages/noticePage/NoticeDetailPage';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <NoticePage />
+      <NoticeDetailPage />
     </ThemeProvider>
   );
 }
