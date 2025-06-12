@@ -15,12 +15,13 @@ import MainPage from './pages/MainPage.jsx';
 import RecommendedExerciseSection from './pages/RecommendExercise.jsx';
 import CoachDetail from './pages/MatchingPage/CoachDetail';
 import RecommendExercise from "./pages/RecommendExercise.jsx";
+import CoachRegister from "./pages/CoachRegister.jsx";
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <RecommendExercise />
+      <CoachRegister />
     </ThemeProvider>
   );
 }
