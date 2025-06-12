@@ -5,6 +5,10 @@ import 'moment/locale/ko'; // Import Korean locale for moment
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './CalendarStyles.css'; // We'll create this for custom styles
 import CoachSubBar from '../CoachSubBar'; // Import CoachSubBar
+import Header from '../Header';
+import Footer from '../Footer';
+import CoachList from '../../pages/CoachMatching/CoachList';
+import CoachMatchingList from './CoachMatchingList';
 
 moment.locale('ko'); // Set moment to use Korean locale
 const localizer = momentLocalizer(moment);
@@ -31,6 +35,10 @@ const CustomToolbar = ({ label, onNavigate, onView, view }) => {
 };
 
 function MyCalendar() {
+  const userInfo = {
+    name: '이주찬',
+    img: '../src/assets/beta_user_img.png',
+  };
   // Set the initial date to October 2024 as in the new image
   const [currentDate, setCurrentDate] = useState(new Date(2024, 9, 1)); // October is month 9 (0-indexed)
   const [view, setView] = useState('month'); // Keep track of the current view
@@ -165,26 +173,31 @@ function MyCalendar() {
   };
 
   return (
-    <div style={{ width: '1008px', margin: '0 auto', padding: '50px' }}>
-      <Calendar
-        localizer={localizer}
-        events={events}
-        startAccessor="start"
-        endAccessor="end"
-        style={{ height: '100%' }}
-        defaultView="month"
-        toolbar={true}
-        views={['month']} // Allow month, week, day views
-        date={currentDate}
-        onNavigate={(newDate) => setCurrentDate(newDate)}
-        onView={(newView) => setView(newView)} // Update view state
-        components={{
-          toolbar: CustomToolbar,
-          event: Event,
-        }}
-        eventPropGetter={eventPropGetter}
-      />
-    </div>
+    <>
+      <Header user={userInfo} />
+      <div style={{ width: '1008px', margin: '0 auto', padding: '50px' }}>
+        <Calendar
+          localizer={localizer}
+          events={events}
+          startAccessor="start"
+          endAccessor="end"
+          style={{ height: '100%' }}
+          defaultView="month"
+          toolbar={true}
+          views={['month']} // Allow month, week, day views
+          date={currentDate}
+          onNavigate={(newDate) => setCurrentDate(newDate)}
+          onView={(newView) => setView(newView)} // Update view state
+          components={{
+            toolbar: CustomToolbar,
+            event: Event,
+          }}
+          eventPropGetter={eventPropGetter}
+        />
+      </div>
+      <CoachMatchingList />
+      <Footer />
+    </>
   );
 }
 

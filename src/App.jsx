@@ -19,19 +19,13 @@ import RegionSelect from './components/RegionSelect.jsx';
 import CoachCalendar from './components/CoachDetails/CoachCalendar.jsx';
 import NextReservation from './pages/MatchingList/NextReservation.jsx';
 import HistoryModal from './components/modal/HistoryModal.jsx';
+import CoachList from './pages/CoachMatching/CoachList';
 
 function App() {
-  const userInfo = {
-    name: '이주찬',
-    img: '../src/assets/beta_user_img.png',
-  };
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <Header user={userInfo} />
       <CoachCalendar />
-      <Footer />
-      <HistoryModal />
     </ThemeProvider>
   );
 }
