@@ -13,7 +13,7 @@ const FooterContainer = styled.footer`
   margin: 0 auto;
   padding: ${({ theme }) => theme.spacing[8]} 0;
   box-sizing: border-box;
-
+  margin-top: 50px;
   @media (max-width: ${({ theme }) => theme.width.sm}) {
     padding: ${({ theme }) => theme.spacing[6]} 0;
   }

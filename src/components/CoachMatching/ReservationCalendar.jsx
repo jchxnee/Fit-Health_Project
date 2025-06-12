@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import theme from '../../styles/theme';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
+// 스타일 컴포넌트들은 변경 없음
 const TimeReservationText = styled.p`
   font-size: 0.95em;
   color: ${theme.colors.gray[600]};
@@ -18,9 +19,8 @@ const DatePickerContainer = styled.div`
   justify-content: center;
   gap: 15px;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: ${theme.colors.white};
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   align-items: center;
 `;
 
@@ -217,17 +217,34 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
 
   useEffect(() => {
     // selectedDate prop이 변경될 때, 캘린더 표시 월을 해당 날짜로 업데이트
-    // 단, selectedDate가 실제로 변경되었을 때만 업데이트
-    if (selectedDate && new Date(selectedDate).toDateString() !== currentDisplayDate.toDateString()) {
-      setCurrentDisplayDate(new Date(selectedDate));
+    // 이펙트 내부에서 new Date(selectedDate)를 사용하여 새 Date 객체를 생성하고,
+    // currentDisplayDate가 현재 prop의 날짜와 다른 경우에만 업데이트하여 불필요한 렌더링 방지.
+    // 주의: currentDisplayDate를 의존성 배열에서 제거해야 무한 루프를 막을 수 있습니다.
+    if (selectedDate) {
+      const newDateFromProp = new Date(selectedDate);
+      // 현재 표시 중인 월/년도와 prop으로 받은 날짜의 월/년도가 다를 때만 업데이트
+      if (
+        newDateFromProp.getFullYear() !== currentDisplayDate.getFullYear() ||
+        newDateFromProp.getMonth() !== currentDisplayDate.getMonth()
+      ) {
+        setCurrentDisplayDate(newDateFromProp);
+      }
+    } else {
+      // selectedDate가 null/undefined가 되면 현재 월로 돌아오도록 처리
+      // 이 부분은 필요에 따라 제거하거나 다른 로직으로 변경할 수 있습니다.
+      const today = new Date();
+      if (
+        today.getFullYear() !== currentDisplayDate.getFullYear() ||
+        today.getMonth() !== currentDisplayDate.getMonth()
+      ) {
+        setCurrentDisplayDate(today);
+      }
     }
-  }, [selectedDate, currentDisplayDate]); // currentDisplayDate도 의존성 배열에 추가하여 무한 루프 방지
+  }, [selectedDate]); // **currentDisplayDate를 의존성 배열에서 제거했습니다!**
 
   const getCalendarDays = (year, month) => {
     const days = [];
-    // `new Date(year, month, 1)`은 해당 월의 첫째 날을 생성
     const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0:일, 1:월, ..., 6:토
-    // `new Date(year, month + 1, 0)`은 다음 달의 0번째 날, 즉 현재 월의 마지막 날을 생성
     const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
 
     // 이전 달의 플레이스홀더 날짜
@@ -237,7 +254,6 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
 
     // 현재 달의 날짜
     for (let i = 1; i <= lastDayOfMonth; i++) {
-      // 날짜를 정확히 YYYY-MM-DD 형태로 저장하기 위해 Date 객체 생성
       const date = new Date(year, month, i);
       days.push({ day: i, isPlaceholder: false, date: date });
     }
@@ -307,12 +323,10 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
           </DayNames>
           <CalendarGrid>
             {calendarDays.map((dayInfo, index) => {
-              // 1. dayInfo.date를 로컬 시간 기준으로 YYYY-MM-DD 형식으로 포맷합니다.
               const formattedDayInfoDate = dayInfo.date
                 ? `${dayInfo.date.getFullYear()}-${(dayInfo.date.getMonth() + 1).toString().padStart(2, '0')}-${dayInfo.date.getDate().toString().padStart(2, '0')}`
                 : null;
 
-              // 2. 포맷된 로컬 날짜와 selectedDate를 비교하여 선택 여부를 결정합니다.
               const isSelected = !dayInfo.isPlaceholder && formattedDayInfoDate === selectedDate;
 
               const isWeekend = dayInfo.date && (dayInfo.date.getDay() === 0 || dayInfo.date.getDay() === 6);
@@ -326,7 +340,6 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
                     dayInfo.isPlaceholder
                       ? null
                       : () => {
-                          // 날짜를 YYYY-MM-DD 형식으로 변환하여 전달
                           const year = dayInfo.date.getFullYear();
                           const month = (dayInfo.date.getMonth() + 1).toString().padStart(2, '0');
                           const day = dayInfo.date.getDate().toString().padStart(2, '0');

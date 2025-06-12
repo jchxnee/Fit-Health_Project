@@ -9,19 +9,24 @@ import CommunityPage from './pages/CommunityPage';
 import GlobalStyle from './styles/GlobalStyle';
 import MainPage from './pages/MainPage.jsx';
 import RecommendedExerciseSection from './pages/RecommendExercise.jsx';
-import CoachDetail from './pages/MatchingPage/CoachDetail';
-import CoachMatching from './pages/MatchingPage/CoachMatching';
+import CoachDetail from './pages/CoachMatching/CoachDetail';
+import CoachMatching from './pages/CoachMatching/CoachMatching';
 import CommunityPostCreationPage from './pages/CommunityPostCreationPage';
 import CommunityPostDetailPage from './pages/CommunityPostDetailPage';
 import ReviewCreationPage from './pages/ReviewCreationPage';
 import CoachReview from './pages/CoachReview';
+import NextReservation from './pages/MatchingList/NextReservation';
+import SelectExercise from './components/MainPage/SelectExercise';
+import SelectGoal from './components/MainPage/SelectGoal';
+import MemberInfoPage from './pages/MemberInfoPage';
+import CustomInfoPage from './pages/CustomInfoPage';
+import MatchingList from './pages/MatchingList/MatchingList';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <CoachMatching />
-      <ReviewCreationPage />
+      <MatchingList />
     </ThemeProvider>
   );
 }
