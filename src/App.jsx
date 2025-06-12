@@ -15,13 +15,15 @@ import GlobalStyle from './styles/GlobalStyle';
 import MainPage from './pages/MainPage.jsx';
 import RecommendedExerciseSection from './pages/RecommendExercise.jsx';
 import CoachDetail from './pages/MatchingPage/CoachDetail';
+import CoachMatching from './pages/MatchingPage/CoachMatching';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <CoachDetail />
+      {/* <CoachDetail /> */}
       {/* <CoachList /> */}
+      <CoachMatching />
     </ThemeProvider>
   );
 }
