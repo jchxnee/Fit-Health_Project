@@ -6,14 +6,14 @@ const Wrapper = styled.section`
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  padding: 100px 0 0 0;
-  background: #fff;
+  padding: ${({ theme }) => `${theme.spacing[24]} 0 0 0`};
+  background: ${({ theme }) => theme.colors.white};
 `;
 const Title = styled.h1`
   font-family: 'SUITE', sans-serif;
-  font-weight: 700;
-  font-size: 28px;
-  color: #3D4149;
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
+  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 const MainTitle = () => (

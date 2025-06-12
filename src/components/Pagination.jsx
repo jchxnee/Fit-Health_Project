@@ -13,7 +13,6 @@ const Pagination = ({ totalPages, currentPage, onPageChange }) => {
       >
         &lt;
       </PageButton>
-
       {pages.map((page) => (
         <PageButton key={page} onClick={() => onPageChange(page)} isActive={page === currentPage}>
           {page}

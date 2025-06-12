@@ -1,25 +1,23 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import CommunityCategoryMenu from '../components/CommunityCategoryMenu';
-import { FaPencilAlt } from 'react-icons/fa'; // '글쓰기' 아이콘
+import { FaPencilAlt, FaEye } from 'react-icons/fa'; // '글쓰기' 아이콘
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-// import ProfileImg from './YourProfileImgComponent'; // 프로필 이미지 컴포넌트 경로
+import { RiMessage2Fill } from 'react-icons/ri';
+import betaImg from '../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 function CommunityPage() {
-  const [user, setUser] = useState({
-    name: '김현아',
-    img: 'https://picsum.photos/600/400',
-  });
+  const [user] = useState({ name: '김현아', img: betaImg });
 
   // 공지사항 데이터 (예시)
   const notices = [{ id: 1, title: '공지: 핏헬스 가이드라인', icon: '>', link: '#' }];
 
   // TOP 5 커뮤니티 글 데이터 (예시)
   const topPosts = [
-    { id: 1, title: '왜진왜진 이거 살 잘빠지더라고요', views: 3500, comments: 10, likes: 20 },
-    { id: 2, title: '아 그래요?', views: 3700, comments: 15, likes: 18 },
-    { id: 3, title: '왜진왜진 이거 살 잘빠지더라고요', views: 3900, comments: 12, likes: 19 },
+    { id: 1, title: '왜진왜진 이거 살 잘빠지더라고요', views: 3500, comments: 10 },
+    { id: 2, title: '아 그래요?', views: 3700, comments: 15 },
+    { id: 3, title: '와진짜 이거 살 잘빠지더라고요', views: 3900, comments: 12 },
   ];
 
   // 최신 사진 게시글 데이터 (예시)
@@ -28,15 +26,15 @@ function CommunityPage() {
       id: 1,
       img: 'https://picsum.photos/600/400',
       title: '이거 어떻게 쓰는 거예요?',
-      content: '머니건 이마이건 님이 알려주셨는데 어떻게 하면 될까요??!!',
+      content: '아니 바 사니까 이것도 같이 딸려오는데 이게 뭔가요 악력키우기인가요?',
       views: 3700,
       comments: 10,
     },
     {
       id: 2,
       img: 'https://picsum.photos/600/400',
-      title: '## 300',
-      content: '₩R300 이치카고 벽타는 배구 그냥 몸이 이만기만합니다~~~~~!!',
+      title: '비타 300',
+      content: '비타300 이거 먹고 변비도 낫구 그냥 몸이 건강한 기분입니다~~!!',
       views: 3200,
       comments: 10,
     },
@@ -46,99 +44,114 @@ function CommunityPage() {
   const generalPosts = [
     {
       id: 1,
-      title: '골레 잡막이는 방법 ㅠㅠ 아시는 분',
-      content: '골레가 잘 안 먹혀요. 고려아는데 잘먹는 방법이 있을까요?',
+      title: '광배 잘먹이는 방법..ㅠㅠ 아시는분',
+      content: '광배가 잘 안먹어요... 안먹을때 잘 먹게 하는 방법이 있을까요?',
       views: 3700,
       comments: 10,
     },
     {
       id: 2,
       title: '운동해요!',
-      content: '요양에 그릴리스트장에서 같이 퇴근헬스하삼! ㅎㅎ',
+      content: '요 앞에 고릴라헬스장에서 같이 퇴근헬스하실분!! ㅎㅎ',
       views: 3700,
       comments: 10,
     },
   ];
 
   return (
-    <PageContainer>
-      <Header user={user} />
-      <MainContentArea>
-        <SidebarWrapper>
-          <CommunityCategoryMenu /> {/* 이전에 만든 CategoryMenu 컴포넌트 */}
-        </SidebarWrapper>
+    <>
+      <PageContainer>
+        <Header user={user} />
+        <MainContentArea>
+          <SidebarWrapper>
+            <CommunityCategoryMenu /> {/* 이전에 만든 CategoryMenu 컴포넌트 */}
+          </SidebarWrapper>
 
-        <MainContentWrapper>
-          {/* 커뮤니티 타이틀 및 글쓰기 버튼 */}
-          <SectionHeader>
-            <SectionTitle>커뮤니티</SectionTitle>
-            <WriteButton>
-              <FaPencilAlt />
-              글쓰기
-            </WriteButton>
-          </SectionHeader>
+          <MainContentWrapper>
+            {/* 커뮤니티 타이틀 및 글쓰기 버튼 */}
+            <SectionHeader>
+              <SectionTitle>커뮤니티</SectionTitle>
+              <WriteButton>
+                <FaPencilAlt />
+                글쓰기
+              </WriteButton>
+            </SectionHeader>
 
-          {/* 공지사항 섹션 */}
-          <NoticeSection>
-            {notices.map((notice) => (
-              <NoticeItem key={notice.id}>
-                <NoticeLabel>공지</NoticeLabel>
-                <NoticeText>{notice.title}</NoticeText>
-                <NoticeLink href={notice.link}>{notice.icon}</NoticeLink>
-              </NoticeItem>
-            ))}
-          </NoticeSection>
+            {/* 공지사항 섹션 */}
+            <NoticeSection>
+              {notices.map((notice) => (
+                <NoticeItem key={notice.id}>
+                  <NoticeLabel>공지</NoticeLabel>
+                  <NoticeText>{notice.title}</NoticeText>
+                  <NoticeLink href={notice.link}>{notice.icon}</NoticeLink>
+                </NoticeItem>
+              ))}
+            </NoticeSection>
 
-          {/* TOP 5 커뮤니티 글 섹션 */}
-          <SectionTitleSmall>TOP 5 커뮤니티 글</SectionTitleSmall>
-          <TopPostsGrid>
-            {topPosts.map((post) => (
-              <PostCard key={post.id}>
-                <PostCardTitle>{post.title}</PostCardTitle>
-                <PostMeta>
-                  <span>👀 {post.views}</span>
-                  <span>💬 {post.comments}</span>
-                  <span>❤️ {post.likes}</span>
-                </PostMeta>
-              </PostCard>
-            ))}
-          </TopPostsGrid>
-
-          {/* 고객님들의 최신 사진 게시글 섹션 */}
-          <SectionTitleSmall>고객님들의 최신 사진 게시글</SectionTitleSmall>
-          <PhotoPostsGrid>
-            {photoPosts.map((post) => (
-              <PhotoPostCard key={post.id}>
-                <PhotoPostImage src={post.img} alt={post.title} />
-                <PhotoPostContent>
-                  <PhotoPostTitle>{post.title}</PhotoPostTitle>
-                  <PhotoPostText>{post.content}</PhotoPostText>
+            {/* TOP 5 커뮤니티 글 섹션 */}
+            <SectionTitleSmall>TOP 5 커뮤니티 글🔥</SectionTitleSmall>
+            <TopPostsGrid>
+              {topPosts.map((post) => (
+                <PostCard key={post.id}>
+                  <PostCardTitle>{post.title}</PostCardTitle>
                   <PostMeta>
-                    <span>👀 {post.views}</span>
-                    <span>💬 {post.comments}</span>
+                    <span>
+                      <FaEye /> {post.views}
+                    </span>
+                    <span>
+                      <RiMessage2Fill /> {post.comments}
+                    </span>
                   </PostMeta>
-                </PhotoPostContent>
-              </PhotoPostCard>
-            ))}
-          </PhotoPostsGrid>
+                </PostCard>
+              ))}
+            </TopPostsGrid>
 
-          {/* 일반 게시글 목록 */}
-          <GeneralPostsContainer>
-            {generalPosts.map((post) => (
-              <GeneralPostItem key={post.id}>
-                <GeneralPostTitle>{post.title}</GeneralPostTitle>
-                <GeneralPostContent>{post.content}</GeneralPostContent>
-                <PostMeta>
-                  <span>👀 {post.views}</span>
-                  <span>💬 {post.comments}</span>
-                </PostMeta>
-              </GeneralPostItem>
-            ))}
-          </GeneralPostsContainer>
-        </MainContentWrapper>
-      </MainContentArea>
+            {/* 고객님들의 최신 사진 게시글 섹션 */}
+            <SectionTitleMini>고객님들의 최신 사진 게시글</SectionTitleMini>
+            <PhotoPostsGrid>
+              {photoPosts.map((post) => (
+                <PhotoPostCard key={post.id}>
+                  <PhotoPostImage src={post.img} alt={post.title} />
+                  <PhotoPostContent>
+                    <PhotoPostTitle>{post.title}</PhotoPostTitle>
+                    <PhotoPostText>{post.content}</PhotoPostText>
+                    <PostMeta>
+                      <span>
+                        {' '}
+                        <FaEye /> {post.views}
+                      </span>
+                      <span>
+                        <RiMessage2Fill /> {post.comments}
+                      </span>
+                    </PostMeta>
+                  </PhotoPostContent>
+                </PhotoPostCard>
+              ))}
+            </PhotoPostsGrid>
+
+            {/* 일반 게시글 목록 */}
+            <GeneralPostsContainer>
+              {generalPosts.map((post) => (
+                <GeneralPostItem key={post.id}>
+                  <GeneralPostTitle>{post.title}</GeneralPostTitle>
+                  <GeneralPostContent>{post.content}</GeneralPostContent>
+                  <PostMeta>
+                    <span>
+                      {' '}
+                      <FaEye /> {post.views}
+                    </span>
+                    <span>
+                      <RiMessage2Fill /> {post.comments}
+                    </span>
+                  </PostMeta>
+                </GeneralPostItem>
+              ))}
+            </GeneralPostsContainer>
+          </MainContentWrapper>
+        </MainContentArea>
+      </PageContainer>
       <Footer />
-    </PageContainer>
+    </>
   );
 }
 
@@ -155,28 +168,25 @@ const PageContainer = styled.div`
   align-items: center; /* 전체 콘텐츠 중앙 정렬 */
 `;
 
-// Header (Placeholder)
-
 // 메인 콘텐츠 영역 (사이드바 + 본문)
 const MainContentArea = styled.div`
-  width: ${({ theme }) => theme.width.lg}; /* 1008px */
+  width: ${({ theme }) => theme.width.lg};
   display: flex;
-  gap: ${({ theme }) => theme.spacing[5]}; /* 사이드바와 메인 콘텐츠 사이 간격 */
-  margin-top: ${({ theme }) => theme.spacing[8]}; /* 헤더 아래 여백 */
-  align-items: flex-start; /* 사이드바와 메인 콘텐츠 상단 정렬 */
+  gap: ${({ theme }) => theme.spacing[5]};
+  margin-top: ${({ theme }) => theme.spacing[8]};
+  align-items: flex-start;
 `;
 
 // 왼쪽 사이드바 Wrapper (CategoryMenu를 감쌈)
 const SidebarWrapper = styled.div`
-  /* CategoryMenu 자체에 너비가 정의되어 있으므로 여기서는 추가 너비 지정 불필요 */
-  flex-shrink: 0; /* 축소되지 않도록 함 */
+  flex-shrink: 0;
 `;
 
 // 메인 콘텐츠 Wrapper
 const MainContentWrapper = styled.div`
   flex-grow: 1; /* 남은 공간을 모두 차지 */
   background-color: ${({ theme }) => theme.colors.white};
-  padding: ${({ theme }) => theme.spacing[8]}; /* 내부 패딩 */
+  padding: ${({ theme }) => theme.spacing[8]};
   border-radius: ${({ theme }) => theme.borderRadius.base};
   box-shadow: ${({ theme }) => theme.shadows.sm};
 `;
@@ -266,10 +276,18 @@ const NoticeLink = styled.a`
 
 // 서브 타이틀
 const SectionTitleSmall = styled.h2`
+  text-align: start;
   font-size: ${({ theme }) => theme.fontSizes.xl};
   color: ${({ theme }) => theme.colors.primary};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   margin-bottom: ${({ theme }) => theme.spacing[5]};
+`;
+
+const SectionTitleMini = styled.h2`
+  text-align: start;
+  font-size: ${({ theme }) => theme.fontSizes.base};
+  color: ${({ theme }) => theme.colors.primary};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
 `;
 
 // TOP 5 커뮤니티 글 그리드
@@ -285,11 +303,9 @@ const PostCard = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
   border-radius: ${({ theme }) => theme.borderRadius.base};
   padding: ${({ theme }) => theme.spacing[3]};
-  text-align: center;
+  text-align: start;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
 `;
 
 const PostCardTitle = styled.h3`
@@ -297,11 +313,11 @@ const PostCardTitle = styled.h3`
   color: ${({ theme }) => theme.colors.gray[800]};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   margin: 0 0 ${({ theme }) => theme.spacing[2]} 0;
-  text-align: center;
 `;
 
 const PostMeta = styled.div`
   display: flex;
+  justify-content: end;
   gap: ${({ theme }) => theme.spacing[3]};
   font-size: ${({ theme }) => theme.fontSizes.xs};
   color: ${({ theme }) => theme.colors.gray[500]};
@@ -317,21 +333,22 @@ const PostMeta = styled.div`
 const PhotoPostsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: ${({ theme }) => theme.spacing[4]};
+  padding: ${({ theme }) => theme.spacing[4]} ${({ theme }) => theme.spacing[10]};
+  gap: ${({ theme }) => theme.spacing[10]};
   margin-bottom: ${({ theme }) => theme.spacing[8]};
 `;
 
 const PhotoPostCard = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.borderRadius.base};
+  border-radius: ${({ theme }) => theme.borderRadius.ten};
   overflow: hidden; /* 이미지 둥근 테두리 위해 */
 `;
 
 const PhotoPostImage = styled.img`
   width: 100%;
-  height: 150px; /* 이미지 높이 고정 */
-  object-fit: cover; /* 이미지가 잘리지 않고 채워지도록 */
+  height: 200px;
+  object-fit: cover;
   display: block;
 `;
 
@@ -343,6 +360,7 @@ const PhotoPostContent = styled.div`
 `;
 
 const PhotoPostTitle = styled.h3`
+  text-align: start;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.gray[800]};
@@ -350,6 +368,7 @@ const PhotoPostTitle = styled.h3`
 `;
 
 const PhotoPostText = styled.p`
+  text-align: start;
   font-size: ${({ theme }) => theme.fontSizes.xs};
   color: ${({ theme }) => theme.colors.gray[600]};
   margin: 0;
@@ -379,6 +398,7 @@ const GeneralPostItem = styled.div`
 `;
 
 const GeneralPostTitle = styled.h3`
+  text-align: start;
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ theme }) => theme.colors.gray[800]};
@@ -386,6 +406,7 @@ const GeneralPostTitle = styled.h3`
 `;
 
 const GeneralPostContent = styled.p`
+  text-align: start;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.gray[700]};
   margin: 0;

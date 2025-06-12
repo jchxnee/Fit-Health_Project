@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.section`
+<<<<<<< HEAD
   width: 100%;
   display: flex;
   justify-content: center;
@@ -43,6 +44,45 @@ const CategoryBtn = styled.button`
     background: #3d6eff;
     color: #fff;
   }
+=======
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: ${({ theme }) => `${theme.spacing[5]} 0 ${theme.spacing[6]} 0`};
+    background: ${({ theme }) => theme.colors.white};
+`;
+
+const Button = styled.div`
+    width: ${({ theme }) => theme.width.lg};
+    display: flex;
+`;
+const List = styled.div`
+    width: 674px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: left;
+    gap: ${({ theme }) => theme.spacing[4]};
+`;
+const CategoryBtn = styled.button`
+    min-width: 74px;
+    padding: ${({ theme }) => theme.spacing[2]};
+    border-radius: ${({ theme }) => theme.borderRadius['3xl']};
+    border: 1.5px solid ${({ theme }) => theme.colors.gray[300]};
+    background: ${({ selected, theme }) => (selected ? theme.colors.secondary : 'transparent')};
+    color: ${({ selected, theme }) => (selected ? theme.colors.white : theme.colors.primary)};
+    font-family: 'SUITE', sans-serif;
+    font-size: ${({ theme }) => theme.fontSizes.base};
+    font-weight: ${({ theme }) => theme.fontWeights.medium};
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    outline: none;
+    box-shadow: none;
+    &:hover {
+        background: ${({ theme }) => theme.colors.secondary};
+        color: ${({ theme }) => theme.colors.white};
+    }
+>>>>>>> 70501a72eb118cfda5e9f341353246ce4bc751ea
 `;
 
 const categories = [

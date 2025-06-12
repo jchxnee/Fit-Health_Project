@@ -21,12 +21,11 @@ const Item = styled.div`
 const IconBox = styled.div`
   width: 40px;
   height: 40px;
-  background: #eee;
+  background: ${({theme}) => theme.colors.gray[300]};
   border-radius: 10px;
   margin-bottom: 8px;
 `;
 const Label = styled.span`
-  font-family: 'SUITE', sans-serif;
   font-size: ${({ theme }) => theme.fontSizes.sm };
   color: ${({ theme }) => theme.colors.primary};
 `;

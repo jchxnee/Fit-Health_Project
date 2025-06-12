@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-function TitleBar({ title }) {
+function ButtonTitleBar({ title }) {
   return (
     <Container>
       <Title>{title}</Title>
@@ -9,21 +9,19 @@ function TitleBar({ title }) {
   );
 }
 
-export default TitleBar;
+export default ButtonTitleBar;
 
 const Container = styled.div`
   width: 1008px;
   display: flex;
-  margin-top: ${({ theme }) => theme.spacing['8']};
   flex-direction: column;
   justify-content: flex-end;
   box-sizing: border-box;
-  border-top: 1px solid ${({ theme }) => theme.colors.gray['400']};
 `;
 
 const Title = styled.div`
   text-align: left;
   font-size: ${({ theme }) => theme.fontSizes['3xl']};
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.gray['700']};
   padding: 0 ${({ theme }) => theme.spacing['3']};
 `;

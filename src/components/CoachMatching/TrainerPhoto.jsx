@@ -40,46 +40,42 @@ const TrainerCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: ${({ theme }) => theme.colors.gray[100]};
+  background: ${({ theme }) => theme.colors.white};
   border-radius: ${({ theme }) => theme.borderRadius['2xl']};
-  justify-content: center;
+  overflow: hidden;
+  box-shadow: ${({ theme }) => theme.shadows.md};
 `;
-const ProfileImg = styled.div`
+
+const PhotoImg = styled.img`
   width: 100%;
-  height: 80%;
-  background: ${({ theme }) => theme.colors.gray[300]};
-  border-radius: ${({ theme }) => `${theme.borderRadius['2xl']} ${theme.borderRadius['2xl']} 0 0`};
-  margin-bottom: ${({ theme }) => theme.spacing[4]};
-`;
-const Name = styled.div`
-  font-family: 'SUITE', sans-serif;
-  font-size: ${({ theme }) => theme.fontSizes.xl};
-  color: ${({ theme }) => theme.colors.primary};
+  height: 100%;
+  object-fit: cover;
+  border-radius: ${({ theme }) => theme.borderRadius['2xl']};
 `;
 
 const trainers = [
-    { name: '김순자 트레이너' },
-    { name: '정나미 트레이너' },
-    { name: '고훈 트레이너' },
+  { name: '김순자 트레이너', imageUrl: '/public/img/chest.png' },
+  { name: '정나미 트레이너', imageUrl: '/public/img/trainer2.jpg' },
+  { name: '고훈 트레이너', imageUrl: '/public/img/trainer3.jpg' },
+  { name: '김현아 트레이너', imageUrl: '/public/img/trainer4.jpg' },
 ];
 
-const PopularTrainer = () => (
-    <Wrapper>
-        <Container>
-            <TitleRow>
-                <Title>이 달의 인기 트레이너</Title>
-                <ViewAll>전체보기</ViewAll>
-            </TitleRow>
-            <List>
-                {trainers.map((t) => (
-                    <TrainerCard key={t.name}>
-                        <ProfileImg />
-                        <Name>{t.name}</Name>
-                    </TrainerCard>
-                ))}
-            </List>
-        </Container>
-    </Wrapper>
+const TrainerPhoto = () => (
+  <Wrapper>
+    <Container>
+      <TitleRow>
+        <Title>트레이너 사진</Title>
+        <ViewAll>전체보기</ViewAll>
+      </TitleRow>
+      <List>
+        {trainers.map((t) => (
+          <TrainerCard key={t.name}>
+            <PhotoImg src={t.imageUrl} alt={t.name} />
+          </TrainerCard>
+        ))}
+      </List>
+    </Container>
+  </Wrapper>
 );
 
-export default PopularTrainer;
+export default TrainerPhoto;

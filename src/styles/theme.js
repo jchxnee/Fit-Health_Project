@@ -1,7 +1,6 @@
 const theme = {
   colors: {
     primary: '#3d4149',
-    secondary: '#535bf2',
     button: '#1A4AA2',
     info: '#61dafb',
     success: '#22c55e',
@@ -9,6 +8,7 @@ const theme = {
     danger: '#ef4444',
     white: '#ffffff',
     black: '#000000',
+    skyblue: '#BDDDF8',
     gray: {
       100: '#f3f4f6',
       200: '#e5e7eb',
@@ -48,7 +48,7 @@ const theme = {
     sm: '576px',
     md: '768px',
     lg: '1008px', // 컨텐츠 크기
-    xl: '100%', // 헤더, 푸터
+    xl: '0 auto', // 헤더, 푸터
   },
   spacing: {
     0: '0px',
@@ -74,6 +74,7 @@ const theme = {
   },
   borderRadius: {
     none: '0px',
+    xs: '1.5px',
     sm: '2px',
     base: '4px',
     md: '6px',
@@ -93,6 +94,7 @@ const theme = {
     '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
     inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
     none: 'none',
+    bottom: '1px solid rgba(0, 0, 0, 0.05)',
   },
   zIndices: {
     hide: -1,
