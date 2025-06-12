@@ -21,12 +21,17 @@ import SelectGoal from './components/MainPage/SelectGoal';
 import MemberInfoPage from './pages/MemberInfoPage';
 import CustomInfoPage from './pages/CustomInfoPage';
 import MatchingList from './pages/MatchingList/MatchingList';
+import MyReviewsPage from './pages/MyReviewsPage';
+import NoticePage from './pages/noticePage/NoticePage';
+import NoticeDetailPage from './pages/noticePage/NoticeDetailPage';
+import FAQPage from './pages/FAQPage/FAQPage';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <MatchingList />
+      <FAQPage />
     </ThemeProvider>
   );
 }

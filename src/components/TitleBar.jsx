@@ -25,5 +25,5 @@ const Title = styled.div`
   text-align: left;
   font-size: ${({ theme }) => theme.fontSizes['3xl']};
   color: ${({ theme }) => theme.colors.primary};
-  padding: 0 ${({ theme }) => theme.spacing['3']};
+  padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['3']};
 `;
