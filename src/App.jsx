@@ -9,12 +9,14 @@ import CommunityPage from './pages/CommunityPage';
 import GlobalStyle from './styles/GlobalStyle';
 import ReviewCreationPage from './pages/ReviewCreationPage';
 import CoachReview from './pages/CoachReview';
+import CommunityPostDetailPage from './pages/CommunityPostDetailPage';
+import MyReviewsPage from './pages/MyReviewsPage';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <ReviewCreationPage />
+      <MyReviewsPage />
     </ThemeProvider>
   );
 }
