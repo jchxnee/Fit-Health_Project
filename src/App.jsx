@@ -19,12 +19,14 @@ import MyReviewsPage from './pages/MyReviewsPage';
 import NoticePage from './pages/noticePage/NoticePage';
 import NoticeDetailPage from './pages/noticePage/NoticeDetailPage';
 import FAQPage from './pages/FAQPage/FAQPage';
+import MyPostsPage from './pages/myselfWrite/MyPostsPage';
+import MyCommentsPage from './pages/myselfWrite/MyCommentsPage';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <FAQPage />
+      <MyPostsPage />
     </ThemeProvider>
   );
 }

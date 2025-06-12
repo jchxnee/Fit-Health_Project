@@ -7,8 +7,8 @@ export const FilterButton = styled.button`
   align-items: center;
   justify-content: space-between;
   background-color: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.gray[900]};
-  border: 1px solid ${({ theme }) => theme.colors.gray[500]};
+  color: ${({ theme }) => theme.colors.primary};
+  border: 1px solid ${({ theme }) => theme.colors.gray[300]};
   border-radius: ${({ theme }) => theme.borderRadius.base};
   padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]};
   font-size: ${({ theme }) => theme.fontSizes.sm};
@@ -104,8 +104,6 @@ const SearchFilterContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  max-width: ${({ theme }) => theme.width.xs};
-  padding: ${({ theme }) => theme.spacing[4]} 0;
   box-sizing: border-box;
   background-color: ${({ theme }) => theme.colors.white};
 
