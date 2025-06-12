@@ -17,12 +17,15 @@ import CoachDetail from './pages/MatchingPage/CoachDetail';
 import RecommendExercise from "./pages/RecommendExercise.jsx";
 import CoachRegister from "./pages/CoachRegister.jsx";
 import RegionSelect from "./components/RegionSelect.jsx";
+import CoachCalendar from "./components/CoachDetails/CoachCalendar.jsx";
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <CoachRegister />
+        <Header/>
+      <CoachCalendar />
+        <Footer/>
     </ThemeProvider>
   );
 }

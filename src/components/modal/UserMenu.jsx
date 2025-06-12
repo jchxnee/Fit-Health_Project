@@ -29,8 +29,8 @@ function UserMenu() {
 export default UserMenu;
 
 const StyledFaSyncAlt = styled(FaSyncAlt)`
-  font-size: 14px;
-  margin-left: 8px;
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  margin-left: ${({ theme }) => theme.spacing[2]};
   color: ${({ theme }) => theme.colors.gray[600]};
 `;
 

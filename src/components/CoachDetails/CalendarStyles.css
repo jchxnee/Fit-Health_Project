@@ -1,0 +1,205 @@
+/* General Calendar Container Adjustments */
+.rbc-calendar {
+    max-width: 1008px; /* 이미지 너비에 맞춰 설정 */
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box; /* 모든 요소에 box-sizing 적용 */
+}
+
+/* 모든 요소에 box-sizing: border-box 적용 (안정성을 위해) */
+* {
+    box-sizing: border-box;
+}
+
+/* Custom Toolbar Styles */
+.rbc-toolbar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 0;
+    padding: 10px 15px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.rbc-toolbar .rbc-toolbar-label {
+    font-size: 1.4em;
+    font-weight: 500;
+    color: #333;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.rbc-toolbar .rbc-btn-group {
+    display: flex;
+    align-items: center;
+}
+
+.rbc-toolbar .rbc-btn-group button {
+    background-color: #f5f5f5;
+    border: 1px solid #d0d0d0;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 0 4px;
+    font-size: 0.9em;
+    color: #555;
+    transition: all 0.2s ease;
+}
+
+.rbc-toolbar .rbc-btn-group button:hover {
+    background-color: #e0e0e0;
+    border-color: #c0c0c0;
+    color: #333;
+}
+
+/* Specific styles for navigation arrows */
+.rbc-nav-arrows button {
+    padding: 8px 15px;
+}
+
+/* New styles for the right control group */
+.rbc-right-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+
+/* 캘린더 그리드 구조를 위한 핵심 변경 사항 */
+/* 월별 뷰 전체 컨테이너 */
+.rbc-month-view {
+    border: none;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 요일 헤더 행 */
+.rbc-month-view > .rbc-row:first-child {
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: #f8f8f8;
+}
+
+.rbc-header {
+    text-align: center;
+    padding: 10px 0;
+    font-weight: normal;
+    color: #666;
+    flex: 1;
+    min-width: 0;
+    box-shadow: 1px 0 0 0 #f0f0f0; /* 오른쪽 테두리 효과를 그림자로 */
+
+    transform: translateZ(0); /* GPU 가속 강제 */
+    -webkit-font-smoothing: antialiased; /* 폰트 렌더링 개선 시도 (WebKit/Chrome) */
+    backface-visibility: hidden; /* 추가로 안정화 시도 */
+}
+
+.rbc-header:last-child {
+    box-shadow: none; /* 마지막 요일 헤더는 그림자 없음 */
+}
+
+
+/* 월별 날짜 행 */
+.rbc-month-row {
+    display: flex;
+    width: 100%;
+    border: none;
+    min-height: 120px;
+    border-top: 1px solid #e0e0e0; /* 가로 구분선 */
+}
+
+/* 개별 날짜 셀 */
+.rbc-day-bg {
+    flex: 1;
+    min-width: 0;
+    box-shadow: 1px 0 0 0 #e0e0e0; /* 오른쪽 테두리 효과를 그림자로 */
+
+    transform: translateZ(0); /* GPU 가속 강제 */
+    -webkit-font-smoothing: antialiased; /* 폰트 렌더링 개선 시도 (WebKit/Chrome) */
+    backface-visibility: hidden; /* 추가로 안정화 시도 */
+}
+
+.rbc-day-bg:last-child {
+    box-shadow: none; /* 마지막 날짜 셀은 그림자 없음 */
+}
+
+/* 날짜 번호 및 이벤트 컨테이너 스타일 */
+.rbc-date-cell {
+    padding: 8px;
+    text-align: right;
+    font-size: 1em;
+    color: #666;
+}
+
+.rbc-events-container {
+    padding: 0 5px 5px 5px;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.rbc-row-segment .rbc-event {
+    min-height: 25px;
+}
+
+
+/* Today's date background */
+.rbc-now {
+    background-color: #f7fcff;
+}
+
+/* Past month/future month days in the current view */
+.rbc-off-range-bg {
+    background-color: #fdfdfd;
+    color: #bbb;
+}
+
+/* Event Styling Overrides */
+.rbc-event {
+    font-size: 13px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: auto !important;
+    line-height: 1.3;
+    white-space: normal;
+    margin-bottom: 2px;
+}
+
+.rbc-event-initial {
+    font-weight: bold;
+    min-width: 15px;
+    text-align: center;
+    margin-right: 4px;
+}
+
+.rbc-event-title {
+    /* No specific style needed */
+}
+
+/* Remove default blue border on selected events */
+.rbc-event.rbc-selected {
+    border-color: transparent;
+    outline: none;
+}
+
+/* Week and Day view specific adjustments if they are included */
+.rbc-time-content { /* Styles for week/day view time slots */ }
+.rbc-allday-cell { /* Styles for all-day events in week/day view */ }
+.rbc-current-time-indicator {
+    background-color: #007bff;
+}
+
+/* Hide default list/calendar icons if not used in toolbar */
+.rbc-list-icon-group {
+    display: none;
+}

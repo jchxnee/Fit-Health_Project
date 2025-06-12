@@ -13,7 +13,7 @@ function TitleBar({ title }) {
 export default TitleBar;
 
 const Container = styled.div`
-  width: 1008px;
+  width: ${({ theme }) => theme.width.lg};
   display: flex;
   flex-direction: column;
   justify-content: flex-end;

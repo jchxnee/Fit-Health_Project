@@ -199,65 +199,66 @@ const SectionTitle = styled.h1`
 const WriteButton = styled.button`
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing[2]};
-  padding: ${({ theme }) => theme.spacing[3]} ${({ theme }) => theme.spacing[4]}; /* 12px 16px */
+  gap: ${({ theme }) => theme.spacing[1]}; /* 5px */
   background-color: ${({ theme }) => theme.colors.button};
   color: ${({ theme }) => theme.colors.white};
   border: none;
   border-radius: ${({ theme }) => theme.borderRadius.base};
-  font-size: ${({ theme }) => theme.fontSizes.sm};
+  padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[4]};
+  font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.semibold};
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: #163a82; /* 버튼 호버 색상 (button 색상보다 약간 어둡게) */
-  }
-
-  svg {
-    font-size: 14px;
+    background-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 // 공지사항 섹션
 const NoticeSection = styled.div`
-  background-color: ${({ theme }) => theme.colors.gray[100]}; /* 공지 배경색 */
-  border-radius: ${({ theme }) => theme.borderRadius.base};
-  padding: ${({ theme }) => theme.spacing[3]};
-  margin-bottom: ${({ theme }) => theme.spacing[8]};
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  margin-bottom: ${({ theme }) => theme.spacing[5]};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
+  padding-bottom: ${({ theme }) => theme.spacing[2]};
 `;
 
 const NoticeItem = styled.div`
   display: flex;
   align-items: center;
-  flex-grow: 1;
+  padding: ${({ theme }) => theme.spacing[2]} 0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
+
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
 const NoticeLabel = styled.span`
-  background-color: ${({ theme }) => theme.colors.gray[400]}; /* 공지 라벨 배경색 */
-  color: ${({ theme }) => theme.colors.white};
+  background-color: ${({ theme }) => theme.colors.gray[100]};
+  padding: ${({ theme }) => theme.spacing[1]} ${({ theme }) => theme.spacing[2]};
+  border-radius: ${({ theme }) => theme.borderRadius.base};
   font-size: ${({ theme }) => theme.fontSizes.xs};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
-  padding: 2px 8px;
-  border-radius: ${({ theme }) => theme.borderRadius.sm};
-  margin-right: ${({ theme }) => theme.spacing[3]};
+  margin-right: ${({ theme }) => theme.spacing[2]};
+  color: ${({ theme }) => theme.colors.gray[600]};
+  white-space: nowrap;
 `;
 
 const NoticeText = styled.span`
+  flex-grow: 1;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.gray[800]};
-  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const NoticeLink = styled.a`
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  color: ${({ theme }) => theme.colors.gray[600]};
+  font-size: ${({ theme }) => theme.fontSizes.xs};
+  color: ${({ theme }) => theme.colors.gray[400]};
+  margin-left: ${({ theme }) => theme.spacing[2]};
   text-decoration: none;
   cursor: pointer;
-  margin-left: ${({ theme }) => theme.spacing[3]};
 
   &:hover {
     color: ${({ theme }) => theme.colors.primary};
@@ -268,131 +269,152 @@ const NoticeLink = styled.a`
 const SectionTitleSmall = styled.h2`
   font-size: ${({ theme }) => theme.fontSizes.xl};
   color: ${({ theme }) => theme.colors.primary};
-  font-weight: ${({ theme }) => theme.fontWeights.bold};
-  margin-bottom: ${({ theme }) => theme.spacing[5]};
+  font-weight: ${({ theme }) => theme.fontWeights.semibold};
+  margin-bottom: ${({ theme }) => theme.spacing[2]};
+  text-align: left;
 `;
 
 // TOP 5 커뮤니티 글 그리드
 const TopPostsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: ${({ theme }) => theme.spacing[4]};
-  margin-bottom: ${({ theme }) => theme.spacing[8]};
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: ${({ theme }) => theme.spacing[5]};
+  margin-bottom: ${({ theme }) => theme.spacing[10]};
 `;
 
 const PostCard = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.borderRadius.base};
-  padding: ${({ theme }) => theme.spacing[3]};
-  text-align: center;
+  border: 1px solid ${({ theme }) => theme.colors.gray[100]};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  padding: ${({ theme }) => theme.spacing[5]};
+  box-shadow: ${({ theme }) => theme.shadows.sm};
+  min-height: ${({ theme }) => theme.spacing[32]};
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: ${({ theme }) => theme.shadows.md};
+    transform: translateY(-2px);
+  }
 `;
 
 const PostCardTitle = styled.h3`
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  color: ${({ theme }) => theme.colors.gray[800]};
-  font-weight: ${({ theme }) => theme.fontWeights.medium};
-  margin: 0 0 ${({ theme }) => theme.spacing[2]} 0;
-  text-align: center;
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
+  color: ${({ theme }) => theme.colors.primary};
+  margin-bottom: ${({ theme }) => theme.spacing[2]};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const PostMeta = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing[3]};
   font-size: ${({ theme }) => theme.fontSizes.xs};
-  color: ${({ theme }) => theme.colors.gray[500]};
-
-  span {
-    display: flex;
-    align-items: center;
-    gap: 3px; /* 아이콘과 숫자 사이 간격 */
-  }
+  color: ${({ theme }) => theme.colors.gray[400]};
+  display: flex;
+  gap: ${({ theme }) => theme.spacing[4]};
+  margin-top: ${({ theme }) => theme.spacing[2]};
 `;
 
 // 최신 사진 게시글 그리드
 const PhotoPostsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: ${({ theme }) => theme.spacing[4]};
-  margin-bottom: ${({ theme }) => theme.spacing[8]};
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: ${({ theme }) => theme.spacing[5]};
+  margin-bottom: ${({ theme }) => theme.spacing[10]};
 `;
 
 const PhotoPostCard = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.borderRadius.base};
-  overflow: hidden; /* 이미지 둥근 테두리 위해 */
+  border: 1px solid ${({ theme }) => theme.colors.gray[100]};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  padding: ${({ theme }) => theme.spacing[4]};
+  box-shadow: ${({ theme }) => theme.shadows.sm};
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: ${({ theme }) => theme.shadows.md};
+    transform: translateY(-2px);
+  }
 `;
 
 const PhotoPostImage = styled.img`
   width: 100%;
-  height: 150px; /* 이미지 높이 고정 */
-  object-fit: cover; /* 이미지가 잘리지 않고 채워지도록 */
-  display: block;
+  height: ${({ theme }) => theme.spacing[32]};
+  object-fit: cover;
+  border-radius: ${({ theme }) => theme.borderRadius.sm};
+  margin-bottom: ${({ theme }) => theme.spacing[2]};
 `;
 
 const PhotoPostContent = styled.div`
-  padding: ${({ theme }) => theme.spacing[3]};
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[1]};
+  padding: ${({ theme }) => theme.spacing[2]} 0;
 `;
 
 const PhotoPostTitle = styled.h3`
-  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
-  color: ${({ theme }) => theme.colors.gray[800]};
-  margin: 0;
+  color: ${({ theme }) => theme.colors.primary};
+  margin-bottom: ${({ theme }) => theme.spacing[1]};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const PhotoPostText = styled.p`
-  font-size: ${({ theme }) => theme.fontSizes.xs};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.gray[600]};
-  margin: 0;
-  line-height: 1.3;
+  margin-bottom: ${({ theme }) => theme.spacing[2]};
   display: -webkit-box;
-  -webkit-line-clamp: 2; /* 2줄까지만 표시 */
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.5;
 `;
 
 // 일반 게시글 목록
 const GeneralPostsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[4]};
+  border: 1px solid ${({ theme }) => theme.colors.gray[100]};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  overflow: hidden;
+  box-shadow: ${({ theme }) => theme.shadows.sm};
 `;
 
 const GeneralPostItem = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.borderRadius.base};
   padding: ${({ theme }) => theme.spacing[4]};
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[1]};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.gray[50]};
+  }
 `;
 
 const GeneralPostTitle = styled.h3`
   font-size: ${({ theme }) => theme.fontSizes.base};
-  font-weight: ${({ theme }) => theme.fontWeights.medium};
-  color: ${({ theme }) => theme.colors.gray[800]};
-  margin: 0;
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
+  color: ${({ theme }) => theme.colors.primary};
+  margin-bottom: ${({ theme }) => theme.spacing[1]};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const GeneralPostContent = styled.p`
   font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: ${({ theme }) => theme.colors.gray[700]};
-  margin: 0;
-  line-height: 1.5;
+  color: ${({ theme }) => theme.colors.gray[600]};
+  margin-bottom: ${({ theme }) => theme.spacing[2]};
   display: -webkit-box;
-  -webkit-line-clamp: 2; /* 2줄까지만 표시 */
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.5;
 `;

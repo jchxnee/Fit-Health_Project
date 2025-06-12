@@ -16,7 +16,7 @@ const PageWrapper = styled.div`
   min-height: 100vh;
   background-color: ${theme.colors.white};
   margin-top: 20px;
-  margin-bottom: 100px;
+  margin-bottom: ${({ theme }) => theme.spacing[24]};
 `;
 
 const TitleBarContainer = styled.div`
@@ -45,7 +45,7 @@ const EditButton = styled.button`
   transition: background-color 0.2s ease-in-out;
 
   &:hover {
-    background-color: ${theme.colors.primaryDark};
+    background-color: ${({ theme }) => theme.colors.gray[800]};
   }
 `;
 

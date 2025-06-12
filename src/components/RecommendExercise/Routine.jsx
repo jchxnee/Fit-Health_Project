@@ -45,8 +45,8 @@ const TrainerCard = styled.div`
     gap: ${({ theme }) => theme.spacing[3]};
 `;
 const ProfileImg = styled.div`
-  width: 160px;
-  height: 160px;
+  width: ${({ theme }) => theme.spacing[40]};
+  height: ${({ theme }) => theme.spacing[40]};
   background: ${({ theme }) => theme.colors.gray[300]};
   border-radius: ${({ theme }) => `${theme.borderRadius['2xl']}`};
   background-image: ${({ img }) => img ? `url(${img})` : 'none'};

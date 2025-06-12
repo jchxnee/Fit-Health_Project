@@ -82,7 +82,7 @@ const TableCell = styled.td`
 `;
 
 const ExerciseImage = styled.img`
-  width: 80px;
+  width: ${({ theme }) => theme.spacing[20]};
   height: auto;
   border-radius: ${theme.borderRadius.sm};
   object-fit: contain;

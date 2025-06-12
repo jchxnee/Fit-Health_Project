@@ -91,7 +91,7 @@ const StyledTable = styled.table`
 border-top: 1px solid ${({ theme }) => theme.colors.gray['200']};
 border-bottom: 1px solid ${({ theme }) => theme.colors.gray['200']};
   border-collapse: collapse;
-  min-width: 1008px;
+  min-width: ${({ theme }) => theme.width.lg};
 
   th, td {
     padding: ${({ theme }) => theme.spacing['3']} ${({ theme }) => theme.spacing['4']};

@@ -59,8 +59,8 @@ const PostWriter = styled.div`
 `;
 
 const ProfileImg = styled.img`
-  width: 24px;
-  height: 24px;
+  width: ${({ theme }) => theme.spacing[6]};
+  height: ${({ theme }) => theme.spacing[6]};
   border-radius: 50%;
   object-fit: cover;
 `;

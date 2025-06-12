@@ -4,42 +4,42 @@ import styled from 'styled-components';
 const BMICalcWrapper = styled.div`
   width: 100%;
     max-width: 700px;
-  border-radius: 10px;
+  border-radius: ${({ theme }) => theme.borderRadius.ten};
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: ${({ theme }) => theme.spacing.lg};
   align-items: center;
   margin: 0 auto;
 `;
 const Title = styled.div`
-    background: #eee;
+    background: ${({ theme }) => theme.colors.gray[100]};
     width: 100%;
     max-width: 700px;
     text-align: left;
-    padding: 15px;
-    border-radius: 6px;
-    font-size: 22px;
-  font-weight: 500;
-  color: #444;
-  margin-bottom: 8px;
+    padding: ${({ theme }) => theme.spacing[4]};
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    font-size: ${({ theme }) => theme.fontSizes.xl};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
+  color: ${({ theme }) => theme.colors.gray[700]};
+  margin-bottom: ${({ theme }) => theme.spacing[2]};
 `;
 const InputRow = styled.div`
   display: flex;
-  gap: 24px;
+  gap: ${({ theme }) => theme.spacing[6]};
   align-items: center;
 `;
 const Input = styled.input`
   width: 120px;
-  padding: 10px 12px;
-  font-size: 18px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]};
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+  border: 1px solid ${({ theme }) => theme.colors.gray[300]};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
   outline: none;
 `;
 const Result = styled.div`
-  font-size: 20px;
-  color: #222;
-  margin-top: 10px;
+  font-size: ${({ theme }) => theme.fontSizes.xl};
+  color: ${({ theme }) => theme.colors.gray[800]};
+  margin-top: ${({ theme }) => theme.spacing[2]};
 `;
 
 const BMICalculator = () => {
