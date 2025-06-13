@@ -5,6 +5,7 @@ const theme = {
     info: '#61dafb',
     success: '#22c55e',
     warning: '#f59e0b',
+    star: '#F9D926',
     danger: '#ef4444',
     white: '#ffffff',
     black: '#000000',
@@ -19,6 +20,14 @@ const theme = {
       700: '#374151',
       800: '#1f2937',
       900: '#111827',
+    },
+    event: {
+      holiday: '#F8D7DA',
+      exercise: '#E3F0FF',
+      study: '#D1F5E0',
+      travel: '#FDE6EF',
+      work: '#FFF6D1',
+      default: '#E9E9E9',
     },
   },
   fontSizes: {

@@ -16,7 +16,7 @@ const PageWrapper = styled.div`
   width: 100%;
   min-height: 100vh;
   background-color: ${theme.colors.white};
-  margin-top: 20px;
+  margin-top: ${theme.spacing[5]};
   margin-bottom: 100px;
 `;
 
@@ -33,7 +33,7 @@ const SidebarWrapper = styled.div`
   width: 200px;
   padding-right: ${theme.spacing[8]};
   background-color: ${theme.colors.white};
-  margin-top: 30px;
+  margin-top: ${theme.spacing[8]};
 `;
 
 const MainContentWrapper = styled.div`
@@ -49,7 +49,7 @@ const FilterAndSearchContainer = styled.div`
   align-items: center;
   width: 90%;
   margin-bottom: ${theme.spacing[2]};
-  margin-top: 20px;
+  margin-top: ${theme.spacing[5]};
 `;
 
 const CoachListContainer = styled.div`
