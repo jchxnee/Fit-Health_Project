@@ -37,8 +37,6 @@ function UserMenu() {
       icon: <StyledFaSyncAlt />,
     },
     { name: '로그아웃', action: () => console.log('로그아웃 클릭') },
-    { name: '건강 상품', to: '/productList' },
-    { name: '로그아웃', action: () => console.log('로그아웃 클릭') }, // 로그아웃은 여전히 함수로 유지
   ];
 
   return (

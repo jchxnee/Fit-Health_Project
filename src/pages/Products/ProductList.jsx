@@ -20,7 +20,6 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 20px 0;
 `;
 
 const TitleBarContainer = styled.div`
