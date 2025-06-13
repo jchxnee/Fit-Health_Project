@@ -15,12 +15,18 @@ import HistoryModal from './components/modal/HistoryModal.jsx';
 import CoachList from './pages/CoachMatching/CoachList';
 import MatchingList from './pages/MatchingList/MatchingList';
 import ProductList from './pages/Products/ProductList';
+import SignUpPage from './pages/MemberPage/SignUpPage';
+import LoginPage from './pages/MemberPage/LoginPage';
+import CoachMatching from './pages/CoachMatching/CoachMatching';
+import CoachReview from './pages/community/CoachReview';
+import PaymentPage from './pages/PayPage/PaymentPage';
+import CommunityPage from './pages/community/CommunityPage';
+import NoticePage from './pages/noticePage/NoticePage';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <ProductList />
       <Router>
         <Routes>
           {/* 기본 */}
@@ -29,6 +35,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} /> {/* 로그인 */}
           <Route path="/mypage" element={<></>} /> {/* 마이페이지 */}
           <Route path="/exercise" element={<RecommendExercise />} /> {/* 추천 운동 */}
+          <Route path="/productList" element={<ProductList />} /> {/* 건강 상품 리스트 */}
           {/* 코치 */}
           <Route path="/coachList" element={<CoachList />} /> {/* 핏코치 매칭 */}
           <Route path="/coachRegister" element={<CoachRegister />} /> {/* 코치 등록 */}
