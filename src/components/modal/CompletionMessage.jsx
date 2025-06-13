@@ -27,8 +27,8 @@ const Container = styled.div`
 `;
 
 const CheckIcon = styled(FaCheckCircle)`
-  font-size: 46px;
-  color: #4caf50;
+  font-size: ${({ theme }) => theme.fontSizes['5xl']};
+  color: ${({ theme }) => theme.colors.success};
   margin-right: ${({ theme }) => theme.spacing['3']};
 `;
 

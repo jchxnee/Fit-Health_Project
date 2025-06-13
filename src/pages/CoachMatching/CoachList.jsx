@@ -8,6 +8,8 @@ import Header from '../../components/Header';
 import BasicFilter from '../../components/filter/BasicFilter';
 import CoachListItem from '../../components/CoachMatching/CoachListItem';
 import theme from '../../styles/theme';
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import { Link } from 'react-router-dom';
 
 const PageWrapper = styled.div`
   display: flex;
@@ -16,7 +18,10 @@ const PageWrapper = styled.div`
   width: 100%;
   min-height: 100vh;
   background-color: ${theme.colors.white};
-  margin-top: 20px;
+<<<<<<<< HEAD:src/pages/CoachMatching/CoachList.jsx
+  margin-top: ${theme.spacing[5]};
+========
+>>>>>>>> 6f68e5b22b58a0819ed05e3f7274946804b4d07d:src/pages/coach/CoachList.jsx
   margin-bottom: 100px;
 `;
 
@@ -33,7 +38,7 @@ const SidebarWrapper = styled.div`
   width: 200px;
   padding-right: ${theme.spacing[8]};
   background-color: ${theme.colors.white};
-  margin-top: 30px;
+  margin-top: ${theme.spacing[8]};
 `;
 
 const MainContentWrapper = styled.div`
@@ -47,9 +52,9 @@ const FilterAndSearchContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  width: 90%;
+  width: 100%;
   margin-bottom: ${theme.spacing[2]};
-  margin-top: 20px;
+  margin-top: ${theme.spacing[5]};
 `;
 
 const CoachListContainer = styled.div`
@@ -61,6 +66,7 @@ const CoachListContainer = styled.div`
 `;
 
 const CoachList = () => {
+  const [user] = useState({ name: '김현아', img: betaImg });
   const [filters, setFilters] = useState({
     search: '',
     status: '전체',
@@ -173,7 +179,7 @@ const CoachList = () => {
 
   return (
     <>
-      <Header />
+      <Header user={user} />
 
       <PageWrapper>
         <RecommendedExerciseSection title={'핏코치 매칭'} />
@@ -190,7 +196,9 @@ const CoachList = () => {
             </FilterAndSearchContainer>
             <CoachListContainer>
               {coaches.map((coach) => (
-                <CoachListItem key={coach.id} coach={coach} />
+                <Link key={coach.id} to={`/coach/${coach.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <CoachListItem coach={coach} />
+                </Link>
               ))}
             </CoachListContainer>
           </MainContentWrapper>

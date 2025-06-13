@@ -1,11 +1,10 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
-import Header from '../components/Header'; // Header 컴포넌트 임포트 (경로 수정 필요)
-import Footer from '../components/Footer';
-import TitleBar from '../components/TitleBar';
+import Header from '../../components/Header'; // Header 컴포넌트 임포트 (경로 수정 필요)
+import Footer from '../../components/Footer';
+import TitleBar from '../../components/TitleBar';
 import { FaCamera } from 'react-icons/fa';
-import { IoIosArrowDown } from 'react-icons/io'; // 드롭다운 화살표 아이콘
-import betaImg from '../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 import { GoTriangleDown } from 'react-icons/go';
 
 function CommunityPostCreationPage() {

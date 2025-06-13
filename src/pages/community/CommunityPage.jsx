@@ -1,17 +1,22 @@
+// CommunityPage.jsx
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import CommunityCategoryMenu from '../components/CommunityCategoryMenu';
-import { FaPencilAlt, FaEye } from 'react-icons/fa'; // '글쓰기' 아이콘
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import { FaPencilAlt, FaThumbsUp, FaEye } from 'react-icons/fa'; // '글쓰기' 아이콘
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 import { RiMessage2Fill } from 'react-icons/ri';
-import betaImg from '../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import CustomCategoryMenu from '../../components/CustomCategoryMenu';
+import GeneralPostsList from '../../components/GeneralPostsList'; // 새로 만든 컴포넌트 import
 
 function CommunityPage() {
   const [user] = useState({ name: '김현아', img: betaImg });
+  const [activeCategory, setActiveCategory] = useState('전체');
 
   // 공지사항 데이터 (예시)
   const notices = [{ id: 1, title: '공지: 핏헬스 가이드라인', icon: '>', link: '#' }];
+
+  const communityCategories = [{ name: '전체' }, { name: '운동해요!' }, { name: '궁금해요!' }, { name: '소통해요!' }];
 
   // TOP 5 커뮤니티 글 데이터 (예시)
   const topPosts = [
@@ -27,7 +32,7 @@ function CommunityPage() {
       img: 'https://picsum.photos/600/400',
       title: '이거 어떻게 쓰는 거예요?',
       content: '아니 바 사니까 이것도 같이 딸려오는데 이게 뭔가요 악력키우기인가요?',
-      views: 3700,
+      heart: 3700,
       comments: 10,
     },
     {
@@ -35,7 +40,7 @@ function CommunityPage() {
       img: 'https://picsum.photos/600/400',
       title: '비타 300',
       content: '비타300 이거 먹고 변비도 낫구 그냥 몸이 건강한 기분입니다~~!!',
-      views: 3200,
+      heart: 3200,
       comments: 10,
     },
   ];
@@ -46,14 +51,63 @@ function CommunityPage() {
       id: 1,
       title: '광배 잘먹이는 방법..ㅠㅠ 아시는분',
       content: '광배가 잘 안먹어요... 안먹을때 잘 먹게 하는 방법이 있을까요?',
-      views: 3700,
+      category: '궁금해요!',
+      timeAgo: '5분 전',
+      heart: 3700,
       comments: 10,
     },
     {
       id: 2,
       title: '운동해요!',
       content: '요 앞에 고릴라헬스장에서 같이 퇴근헬스하실분!! ㅎㅎ',
-      views: 3700,
+      category: '궁금해요!',
+      timeAgo: '5분 전',
+      heart: 3700,
+      comments: 10,
+    },
+    {
+      id: 3,
+      title: '운동해요!',
+      content: '요 앞에 고릴라헬스장에서 같이 퇴근헬스하실분!! ㅎㅎ',
+      category: '궁금해요!',
+      timeAgo: '5분 전',
+      heart: 3700,
+      comments: 10,
+    },
+    {
+      id: 4,
+      title: '운동해요!',
+      content: '요 앞에 고릴라헬스장에서 같이 퇴근헬스하실분!! ㅎㅎ',
+      category: '소통해요!',
+      timeAgo: '5분 전',
+      heart: 3700,
+      comments: 10,
+    },
+    {
+      id: 5,
+      title: '운동해요!',
+      content: '요 앞에 고릴라헬스장에서 같이 퇴근헬스하실분!! ㅎㅎ',
+      category: '궁금해요!',
+      timeAgo: '5분 전',
+      heart: 3700,
+      comments: 10,
+    },
+    {
+      id: 6,
+      title: '운동해요!',
+      content: '요 앞에 고릴라헬스장에서 같이 퇴근헬스하실분!! ㅎㅎ',
+      category: '운동해요!',
+      timeAgo: '5분 전',
+      heart: 3700,
+      comments: 10,
+    },
+    {
+      id: 7,
+      title: '운동해요!',
+      content: '요 앞에 고릴라헬스장에서 같이 퇴근헬스하실분!! ㅎㅎ',
+      category: '궁금해요!',
+      timeAgo: '5분 전',
+      heart: 3700,
       comments: 10,
     },
   ];
@@ -64,7 +118,11 @@ function CommunityPage() {
         <Header user={user} />
         <MainContentArea>
           <SidebarWrapper>
-            <CommunityCategoryMenu /> {/* 이전에 만든 CategoryMenu 컴포넌트 */}
+            <CustomCategoryMenu
+              categories={communityCategories}
+              selectedCategory={activeCategory}
+              onSelectCategory={setActiveCategory}
+            />
           </SidebarWrapper>
 
           <MainContentWrapper>
@@ -118,7 +176,7 @@ function CommunityPage() {
                     <PostMeta>
                       <span>
                         {' '}
-                        <FaEye /> {post.views}
+                        <FaThumbsUp /> {post.heart}
                       </span>
                       <span>
                         <RiMessage2Fill /> {post.comments}
@@ -128,25 +186,7 @@ function CommunityPage() {
                 </PhotoPostCard>
               ))}
             </PhotoPostsGrid>
-
-            {/* 일반 게시글 목록 */}
-            <GeneralPostsContainer>
-              {generalPosts.map((post) => (
-                <GeneralPostItem key={post.id}>
-                  <GeneralPostTitle>{post.title}</GeneralPostTitle>
-                  <GeneralPostContent>{post.content}</GeneralPostContent>
-                  <PostMeta>
-                    <span>
-                      {' '}
-                      <FaEye /> {post.views}
-                    </span>
-                    <span>
-                      <RiMessage2Fill /> {post.comments}
-                    </span>
-                  </PostMeta>
-                </GeneralPostItem>
-              ))}
-            </GeneralPostsContainer>
+            <GeneralPostsList posts={generalPosts} />
           </MainContentWrapper>
         </MainContentArea>
       </PageContainer>
@@ -157,9 +197,8 @@ function CommunityPage() {
 
 export default CommunityPage;
 
-// --- 스타일 컴포넌트 ---
-
-// 전체 페이지 컨테이너
+// --- CommunityPage에 남겨둘 스타일 컴포넌트 ---
+// 일반 게시글 목록 관련 스타일은 GeneralPostsList.jsx로 이동했습니다.
 const PageContainer = styled.div`
   width: 100%;
   min-height: 100vh;
@@ -168,7 +207,6 @@ const PageContainer = styled.div`
   align-items: center; /* 전체 콘텐츠 중앙 정렬 */
 `;
 
-// 메인 콘텐츠 영역 (사이드바 + 본문)
 const MainContentArea = styled.div`
   width: ${({ theme }) => theme.width.lg};
   display: flex;
@@ -177,12 +215,10 @@ const MainContentArea = styled.div`
   align-items: flex-start;
 `;
 
-// 왼쪽 사이드바 Wrapper (CategoryMenu를 감쌈)
 const SidebarWrapper = styled.div`
   flex-shrink: 0;
 `;
 
-// 메인 콘텐츠 Wrapper
 const MainContentWrapper = styled.div`
   flex-grow: 1; /* 남은 공간을 모두 차지 */
   background-color: ${({ theme }) => theme.colors.white};
@@ -191,7 +227,6 @@ const MainContentWrapper = styled.div`
   box-shadow: ${({ theme }) => theme.shadows.sm};
 `;
 
-// 섹션 헤더 (제목 + 버튼)
 const SectionHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -229,7 +264,6 @@ const WriteButton = styled.button`
   }
 `;
 
-// 공지사항 섹션
 const NoticeSection = styled.div`
   background-color: ${({ theme }) => theme.colors.gray[100]}; /* 공지 배경색 */
   border-radius: ${({ theme }) => theme.borderRadius.base};
@@ -274,7 +308,6 @@ const NoticeLink = styled.a`
   }
 `;
 
-// 서브 타이틀
 const SectionTitleSmall = styled.h2`
   text-align: start;
   font-size: ${({ theme }) => theme.fontSizes.xl};
@@ -290,7 +323,6 @@ const SectionTitleMini = styled.h2`
   font-weight: ${({ theme }) => theme.fontWeights.bold};
 `;
 
-// TOP 5 커뮤니티 글 그리드
 const TopPostsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -299,13 +331,14 @@ const TopPostsGrid = styled.div`
 `;
 
 const PostCard = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: #e5ebff;
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.borderRadius.base};
+  border-radius: ${({ theme }) => theme.borderRadius.xl};
   padding: ${({ theme }) => theme.spacing[3]};
   text-align: start;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 `;
 
 const PostCardTitle = styled.h3`
@@ -329,7 +362,6 @@ const PostMeta = styled.div`
   }
 `;
 
-// 최신 사진 게시글 그리드
 const PhotoPostsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -373,44 +405,6 @@ const PhotoPostText = styled.p`
   color: ${({ theme }) => theme.colors.gray[600]};
   margin: 0;
   line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /* 2줄까지만 표시 */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-// 일반 게시글 목록
-const GeneralPostsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[4]};
-`;
-
-const GeneralPostItem = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.borderRadius.base};
-  padding: ${({ theme }) => theme.spacing[4]};
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[1]};
-`;
-
-const GeneralPostTitle = styled.h3`
-  text-align: start;
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  font-weight: ${({ theme }) => theme.fontWeights.medium};
-  color: ${({ theme }) => theme.colors.gray[800]};
-  margin: 0;
-`;
-
-const GeneralPostContent = styled.p`
-  text-align: start;
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: ${({ theme }) => theme.colors.gray[700]};
-  margin: 0;
-  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2; /* 2줄까지만 표시 */
   -webkit-box-orient: vertical;

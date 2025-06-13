@@ -12,7 +12,7 @@ function TitleBar({ title }) {
 export default TitleBar;
 
 const Container = styled.div`
-  width: 1008px;
+  width: ${({ theme }) => theme.width.lg};
   display: flex;
   margin-top: ${({ theme }) => theme.spacing['8']};
   flex-direction: column;
@@ -22,8 +22,8 @@ const Container = styled.div`
 `;
 
 const Title = styled.div`
-  text-align: left;
+  text-align: start;
   font-size: ${({ theme }) => theme.fontSizes['3xl']};
   color: ${({ theme }) => theme.colors.primary};
-  padding: 0 ${({ theme }) => theme.spacing['3']};
+  padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['3']};
 `;

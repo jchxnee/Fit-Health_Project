@@ -206,7 +206,7 @@ const PaymentPage = () => {
         </TermsAndConditionsGroup>
 
         {/* 결제하기 버튼 */}
-        <PaymentButton>237,500원 결제하기</PaymentButton>
+        <PaymentButton to="/matchingList">237,500원 결제하기</PaymentButton>
       </PaymentContentBox>
     </PaymentContainer>
   );

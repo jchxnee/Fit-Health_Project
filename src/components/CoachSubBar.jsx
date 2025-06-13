@@ -29,6 +29,11 @@ const StyledIconButton = styled.button`
     box-shadow: ${({ theme }) => theme.shadows.sm};
   }
 
+  &.active {
+    background-color: ${({ theme }) => theme.colors.white};
+    box-shadow: ${({ theme }) => theme.shadows.sm};
+  }
+
   & > svg {
     font-size: ${({ theme }) => theme.fontSizes.lg};
     color: ${({ theme }) => theme.colors.gray['700']};
@@ -44,13 +49,19 @@ const StyledCalendarIcon = styled(StyledIconButton)`
   }
 `;
 
-const CoachSubBar = () => {
+const CoachSubBar = ({ onView, currentView }) => {
   return (
     <StyledButtonsContainer>
-      <StyledIconButton>
+      <StyledIconButton
+        onClick={() => onView('detail')}
+        className={currentView === 'detail' ? 'active' : ''}
+      >
         <FaListUl />
       </StyledIconButton>
-      <StyledCalendarIcon>
+      <StyledCalendarIcon
+        onClick={() => onView('month')}
+        className={currentView === 'month' ? 'active' : ''}
+      >
         <PiCalendar />
       </StyledCalendarIcon>
     </StyledButtonsContainer>

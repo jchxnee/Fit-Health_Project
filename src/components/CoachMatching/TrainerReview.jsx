@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { FiMessageCircle } from 'react-icons/fi';
 import { FaRegEye, FaStar, FaRegStar, FaStarHalfAlt } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const Wrapper = styled.section`
   width: 100%;
@@ -59,8 +60,8 @@ const PostWriter = styled.div`
 `;
 
 const ProfileImg = styled.img`
-  width: 24px;
-  height: 24px;
+  width: ${({ theme }) => theme.spacing[6]};
+  height: ${({ theme }) => theme.spacing[6]};
   border-radius: 50%;
   object-fit: cover;
 `;
@@ -171,9 +172,11 @@ const TrainerReview = () => (
             </PostBox>
           ))}
         </PostsColumn>
-        <MoreInfoBox>
-          <MoreText>리뷰 더보기</MoreText>
-        </MoreInfoBox>
+        <Link to="/coachReview">
+          <MoreInfoBox>
+            <MoreText>리뷰 더보기</MoreText>
+          </MoreInfoBox>
+        </Link>
       </ContentAndMoreWrapper>
     </Container>
   </Wrapper>

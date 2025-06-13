@@ -19,8 +19,8 @@ const Banner = styled.div`
   margin: ${({ theme }) => `${theme.spacing[10]} 0`};
 `;
 const Arrow = styled.button`
-  width: 54px;
-  height: 50px;
+  width: ${({ theme }) => theme.spacing[12]};
+  height: ${({ theme }) => theme.spacing[12]};
   background: ${({ theme }) => theme.colors.white};
   border-radius: 50%;
   border: none;
