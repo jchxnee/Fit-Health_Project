@@ -15,6 +15,11 @@ const ButtonStyle = styled.button`
   width: ${({ theme }) => (theme.fullWidth ? '100%' : 'auto')};
   box-sizing: border-box;
 
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+
   &:hover {
     opacity: 0.9;
   }

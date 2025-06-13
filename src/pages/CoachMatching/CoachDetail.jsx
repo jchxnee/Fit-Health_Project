@@ -56,6 +56,11 @@ const EditButton = styled.button`
 `;
 
 const CoachDetail = () => {
+  const userInfo = {
+    name: '이주찬',
+    img: '../../assets/beta_user_img.png',
+  };
+
   const trainerQuals = [
     { text: '국가공인 생활스포츠지도사 자격 보유 (생활체육지도사 2급 - 보디빌딩)' },
     { text: '전국 피트니스 대회 입상 경력 (2023 NABBA WFF KOREA 스포츠 모델 부문 2위)' },
@@ -80,7 +85,7 @@ const CoachDetail = () => {
   ];
   return (
     <>
-      <Header />
+      <Header user={userInfo} />
       <PageWrapper>
         <TitleBarContainer>
           <ButtonTitleBar title={'핏코치 매칭'} />

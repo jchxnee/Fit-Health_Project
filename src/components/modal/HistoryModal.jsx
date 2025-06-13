@@ -220,7 +220,7 @@ const HistorySession = styled.span`
   color: ${theme.colors.gray['600']};
 `;
 
-const HistoryModal = ({ isOpen, onClose, coachName, sessions, history }) => {
+const HistoryModal = ({ isOpen, onClose, coachName, history }) => {
   if (!isOpen) return null;
 
   const [activeDate, setActiveDate] = useState(new Date());
