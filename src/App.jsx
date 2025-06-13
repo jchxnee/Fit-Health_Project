@@ -20,6 +20,10 @@ import LoginPage from './pages/MemberPage/LoginPage';
 import CoachMatching from './pages/CoachMatching/CoachMatching';
 import CoachReview from './pages/community/CoachReview';
 import PaymentPage from './pages/PayPage/PaymentPage';
+import MyPage from './pages/MemberPage/MyPage';
+import ChatPage from './pages/ChatPage';
+import CommunityPage from './pages/community/CommunityPage';
+import NoticePage from './pages/noticePage/NoticePage';
 
 function App() {
   return (
