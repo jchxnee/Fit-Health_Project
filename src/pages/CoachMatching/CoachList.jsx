@@ -8,7 +8,7 @@ import Header from '../../components/Header';
 import BasicFilter from '../../components/filter/BasicFilter';
 import CoachListItem from '../../components/CoachMatching/CoachListItem';
 import theme from '../../styles/theme';
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import betaImg from '../../assets/beta_user_img.png';
 import { Link } from 'react-router-dom';
 
 const PageWrapper = styled.div`
@@ -59,6 +59,19 @@ const CoachListContainer = styled.div`
   border: 1px solid ${theme.colors.gray[200]};
   border-radius: ${theme.borderRadius.md};
   overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  & > a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+
+    &:not(:last-of-type) {
+      border-bottom: 1px solid ${theme.colors.gray[200]};
+    }
+  }
 `;
 
 const CoachList = () => {
