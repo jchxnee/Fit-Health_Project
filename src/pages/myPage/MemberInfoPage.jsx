@@ -87,9 +87,9 @@ const PersonalInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: ${({ theme }) => theme.spacing['20']}; /* Top padding for the content below header */
+  padding-top: ${({ theme }) => theme.spacing['20']};
   background-color: #f9fafa;
-  min-height: calc(100vh - 60px); /* Adjust for header height if it's 60px */
+  min-height: calc(100vh - 60px);
   box-sizing: border-box;
   width: 100%;
 `;
@@ -100,26 +100,26 @@ const PersonalInfoForm = styled.div`
   border-radius: ${({ theme }) => theme.borderRadius.ten};
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   width: 100%;
-  max-width: 700px; /* Consistent with other forms */
+  max-width: 700px;
   display: flex;
   flex-direction: column;
   align-items: center;
 `;
 
 const PageTitle = styled.h1`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']}; /* 24px */
+  font-size: ${({ theme }) => theme.fontSizes['2xl']};
   font-weight: ${({ theme }) => theme.fontWeights.semibold};
   color: ${({ theme }) => theme.colors.gray['800']};
-  margin-bottom: ${({ theme }) => theme.spacing['10']}; /* Space below title */
+  margin-bottom: ${({ theme }) => theme.spacing['10']};
   text-align: center;
 `;
 
 const InputGroup = styled.div`
   display: flex;
-  flex-direction: column; /* Label and Input are stacked */
-  margin-bottom: ${({ theme }) => theme.spacing['6']}; /* Space between input groups */
+  flex-direction: column;
+  margin-bottom: ${({ theme }) => theme.spacing['6']};
   width: 100%;
-  max-width: 480px; /* Consistent input width */
+  max-width: 480px;
   text-align: left;
 `;
 
@@ -127,18 +127,18 @@ const Label = styled.label`
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.primary};
   font-weight: ${({ theme }) => theme.fontWeights.normal};
-  margin-bottom: ${({ theme }) => theme.spacing['2']}; /* Space between label and input */
+  margin-bottom: ${({ theme }) => theme.spacing['2']};
 `;
 
 const Input = styled.input`
   width: 100%;
   padding: ${({ theme }) => theme.spacing['2']} 0; /* 상하 패딩, 좌우 0 */
   border: none; /* No border initially */
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['300']}; /* Only bottom border */
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['300']};
   font-size: ${({ theme }) => theme.fontSizes.base};
   color: ${({ theme }) => theme.colors.gray['800']};
   box-sizing: border-box;
-  outline: none; /* Remove outline on focus */
+  outline: none;
   transition: border-color 0.2s ease;
 
   &::placeholder {
@@ -146,11 +146,11 @@ const Input = styled.input`
   }
 
   &:focus {
-    border-color: ${({ theme }) => theme.colors.primary}; /* Primary color on focus */
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 const SubmitButton = styled(ButtonStyle)`
   width: 80%;
-  margin-top: ${({ theme }) => theme.spacing['8']}; /* Margin above button */
+  margin-top: ${({ theme }) => theme.spacing['8']};
 `;
