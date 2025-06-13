@@ -13,6 +13,8 @@
     "server": "json-server --watch db.json --port 3001"
   },
   "dependencies": {
+    "@nivo/core": "^0.99.0",
+    "@nivo/line": "^0.99.0",
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
     "react": "^19.1.0",

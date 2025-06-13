@@ -7,7 +7,9 @@ html {
 
 input,
 div,
-button {
+button,
+select,
+p {
   box-sizing: border-box;
   font-family: 'SUITE', sans-serif;
 }
