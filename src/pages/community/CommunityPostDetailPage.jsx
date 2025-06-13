@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 import { FaHeart, FaRegHeart, FaEllipsisV, FaShareAlt } from 'react-icons/fa'; // 좋아요, 더보기, 공유 아이콘
 import { RiMessage2Fill } from 'react-icons/ri'; // 댓글 아이콘
 import { FaPaperPlane } from 'react-icons/fa'; // 댓글 전송 아이콘
-import betaImg from '../assets/beta_user_img.png'; // 더미 사용자 이미지 (경로 수정 필요)
+import betaImg from '../../assets/beta_user_img.png'; // 더미 사용자 이미지 (경로 수정 필요)
 
 function CommunityPostDetailPage() {
   const [user] = useState({ name: '김현아', img: betaImg }); // 현재 로그인 사용자 정보 (더미)

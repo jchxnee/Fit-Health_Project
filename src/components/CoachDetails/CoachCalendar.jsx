@@ -7,9 +7,9 @@ import './CalendarStyles.css'; // We'll create this for custom styles
 import CoachSubBar from '../CoachSubBar'; // Import CoachSubBar
 import Header from '../Header';
 import Footer from '../Footer';
-import CoachList from '../../pages/CoachMatching/CoachList';
+import CoachList from '../../pages/coach/CoachList';
 import CoachMatchingList from './CoachMatchingList';
-import styled from "styled-components";
+import styled from 'styled-components';
 
 moment.locale('ko'); // Set moment to use Korean locale
 const localizer = momentLocalizer(moment);
@@ -175,7 +175,6 @@ function MyCalendar() {
 
   return (
     <>
-
       <Header user={userInfo} />
       <CalendarContainer>
         <Calendar
@@ -199,11 +198,9 @@ function MyCalendar() {
       </CalendarContainer>
       <CoachMatchingList />
       <Footer />
-
     </>
   );
 }
-
 
 const CalendarContainer = styled.div`
   width: 100%;
@@ -211,5 +208,5 @@ const CalendarContainer = styled.div`
   justify-content: center;
   align-items: center;
   margin-top: 40px;
-`
+`;
 export default MyCalendar;

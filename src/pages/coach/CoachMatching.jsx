@@ -7,6 +7,7 @@ import TitleBar from '../../components/TitleBar';
 
 import SelectCourse from '../../components/CoachMatching/SelectCourse';
 import ReservationCalendar from '../../components/CoachMatching/ReservationCalendar';
+import { Link } from 'react-router-dom';
 
 const PageWrapper = styled.div`
   display: flex;
@@ -51,7 +52,7 @@ const TrainerNameText = styled.p`
   font-weight: bold;
 `;
 
-const SubmitButton = styled.button`
+const SubmitButton = styled(Link)`
   background-color: ${theme.colors.button};
   color: ${theme.colors.white};
   border: none;
@@ -72,17 +73,10 @@ const SubmitButton = styled.button`
   }
 `;
 
-const SelectedDateTimeDisplay = styled.div`
-  text-align: center;
-  font-size: 1.1em;
-  color: ${theme.colors.black};
-  font-weight: bold;
-  margin-top: 10px;
-  span {
-    color: ${theme.colors.primary};
-  }
+const NavItem = styled(Link)`
+  width: 100%;
+  outline: none;
 `;
-
 const CoachMatching = () => {
   const [userInfo] = useState({
     name: '이주찬',
@@ -176,7 +170,9 @@ const CoachMatching = () => {
             onTimeChange={handleTimeChange}
           />
         </ContentContainer>
-        <SubmitButton disabled={!selectedDate || !selectedTime || courseQuantity === 0}>신청하기</SubmitButton>
+        <SubmitButton to="/paymentPage" disabled={!selectedDate || !selectedTime || courseQuantity === 0}>
+          신청하기
+        </SubmitButton>
       </PageWrapper>
       <Footer />
     </>

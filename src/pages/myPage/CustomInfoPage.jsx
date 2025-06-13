@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import ButtonStyle from '../styles/common/Button';
-import * as S from '../styles/common/SelectGoal';
+import ButtonStyle from '../../styles/common/Button';
+import * as S from '../../styles/common/SelectGoal';
 
 const categories = [
   '체형교정·가벼운통증',

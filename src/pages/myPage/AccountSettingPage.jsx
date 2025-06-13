@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { CiCamera } from 'react-icons/ci';
-import ButtonStyle from '../styles/common/Button';
+import ButtonStyle from '../../styles/common/Button';
 
 function AccountSettingsPage() {
   // Dummy data for user information

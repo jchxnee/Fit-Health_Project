@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import TitleBar from '../components/TitleBar';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
+import TitleBar from '../../components/TitleBar';
 import { FaChevronDown, FaStar, FaStarHalfAlt, FaRegStar, FaThumbsUp, FaRegThumbsUp } from 'react-icons/fa';
-import { BsHeartFill } from 'react-icons/bs'; // 추천 아이콘 (하트 모양으로 가정)
-import betaImg from '../assets/beta_user_img.png'; // 사용자 이미지 (Header에서 사용)
+import betaImg from '../../assets/beta_user_img.png'; // 사용자 이미지 (Header에서 사용)
 import { IoMdMore } from 'react-icons/io';
 
 // --- 더미 데이터 (실제로는 API에서 받아옴) ---

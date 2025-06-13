@@ -2,12 +2,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FaPencilAlt, FaThumbsUp, FaEye } from 'react-icons/fa'; // '글쓰기' 아이콘
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 import { RiMessage2Fill } from 'react-icons/ri';
-import betaImg from '../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
-import CustomCategoryMenu from '../components/CustomCategoryMenu';
-import GeneralPostsList from '../components/GeneralPostsList'; // 새로 만든 컴포넌트 import
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import CustomCategoryMenu from '../../components/CustomCategoryMenu';
+import GeneralPostsList from '../../components/GeneralPostsList'; // 새로 만든 컴포넌트 import
 
 function CommunityPage() {
   const [user] = useState({ name: '김현아', img: betaImg });

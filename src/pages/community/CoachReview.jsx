@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'; // useMemo 추가
 import styled from 'styled-components';
-import Header from '../components/Header'; // 실제 Header 컴포넌트 경로로 변경
-import Footer from '../components/Footer'; // 실제 Footer 컴포넌트 경로로 변경
-import betaImg from '../assets/beta_user_img.png'; // 더미 사용자 프로필 이미지 및 후기 내 등 사진으로 사용
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
+import betaImg from '../../assets/beta_user_img.png';
 import { FaChevronDown, FaThumbsUp, FaRegThumbsUp, FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
-import TitleBar from '../components/TitleBar'; // TitleBar 컴포넌트 경로 확인
+import TitleBar from '../../components/TitleBar'; // TitleBar 컴포넌트 경로 확인
 
 function CoachReview() {
   const [user] = useState({ name: '김현아', img: betaImg }); // 현재 로그인 사용자 정보 (더미)
