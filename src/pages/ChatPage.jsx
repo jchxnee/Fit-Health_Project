@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import { FiPaperclip, FiCamera, FiSmile } from 'react-icons/fi';
 import { MdSend } from 'react-icons/md';
 import styled from 'styled-components';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import betaImg from '../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import TitleBar from '../components/TitleBar';
 
 const ChatPage = () => {
+  const [user] = useState({ name: '김현아', img: betaImg });
   // 예시 데이터 (실제로는 API에서 가져옴)
   const chatRooms = [
     {
@@ -85,83 +90,93 @@ const ChatPage = () => {
   const activeChatRoom = chatRooms.find((chat) => chat.id === activeChatId);
 
   return (
-    <ChatPageContainer>
-      <ChatContentBox>
-        {/* 왼쪽 채팅 목록 섹션 */}
-        <ChatListSection>
-          <ChatTabContainer>
-            <ChatTab $isActive={activeTab === 'ongoing'} onClick={() => setActiveTab('ongoing')}>
-              진행중
-            </ChatTab>
-            <ChatTab $isActive={activeTab === 'completed'} onClick={() => setActiveTab('completed')}>
-              종료됨
-            </ChatTab>
-          </ChatTabContainer>
-          <ChatListScrollContainer>
-            {filteredChatRooms.map((room) => (
-              <ChatListItem key={room.id} $isActive={room.id === activeChatId} onClick={() => setActiveChatId(room.id)}>
-                <ChatAvatar>{room.avatar ? <img src={room.avatar} alt="아바타" /> : room.name.charAt(0)}</ChatAvatar>
-                <ChatInfo>
-                  <ChatName>{room.name}</ChatName>
-                  <LastMessage>{room.lastMessage}</LastMessage>
-                </ChatInfo>
-                <LastMessageTime>{room.time}</LastMessageTime>
-              </ChatListItem>
-            ))}
-          </ChatListScrollContainer>
-        </ChatListSection>
+    <>
+      <Header user={user} />
+      <ChatPageContainer>
+        <TitleBar title="1:1 채팅" />
 
-        {/* 오른쪽 채팅창 섹션 */}
-        <ChatWindowSection>
-          <ChatWindowHeader>
-            <ChatWindowName>{activeChatRoom ? activeChatRoom.name : '채팅방 선택'}</ChatWindowName>
-            {activeChatRoom && (
-              <ChatStatus $isOngoing={activeChatRoom.status === 'ongoing'}>
-                {activeChatRoom.status === 'ongoing' ? '진행중' : '완료됨'}
-              </ChatStatus>
-            )}
-          </ChatWindowHeader>
+        <ChatContentBox>
+          {/* 왼쪽 채팅 목록 섹션 */}
+          <ChatListSection>
+            <ChatTabContainer>
+              <ChatTab $isActive={activeTab === 'ongoing'} onClick={() => setActiveTab('ongoing')}>
+                진행중
+              </ChatTab>
+              <ChatTab $isActive={activeTab === 'completed'} onClick={() => setActiveTab('completed')}>
+                종료됨
+              </ChatTab>
+            </ChatTabContainer>
+            <ChatListScrollContainer>
+              {filteredChatRooms.map((room) => (
+                <ChatListItem
+                  key={room.id}
+                  $isActive={room.id === activeChatId}
+                  onClick={() => setActiveChatId(room.id)}
+                >
+                  <ChatAvatar>{room.avatar ? <img src={room.avatar} alt="아바타" /> : room.name.charAt(0)}</ChatAvatar>
+                  <ChatInfo>
+                    <ChatName>{room.name}</ChatName>
+                    <LastMessage>{room.lastMessage}</LastMessage>
+                  </ChatInfo>
+                  <LastMessageTime>{room.time}</LastMessageTime>
+                </ChatListItem>
+              ))}
+            </ChatListScrollContainer>
+          </ChatListSection>
 
-          <ChatMessagesContainer>
-            {messages.map((message) => (
-              <MessageWrapper key={message.id} $isSent={message.isSent}>
-                {message.isSent ? (
-                  <>
-                    <MessageTime $isSent={true}>{message.time}</MessageTime>
-                    <SentMessageBubble>{message.text}</SentMessageBubble>
-                  </>
-                ) : (
-                  <>
-                    <ReceivedMessageBubble>{message.text}</ReceivedMessageBubble>
-                    <MessageTime $isSent={false}>{message.time}</MessageTime>
-                  </>
-                )}
-              </MessageWrapper>
-            ))}
-          </ChatMessagesContainer>
-          <ChatInputArea>
-            <InputIcons>
-              <FiPaperclip title="파일 첨부" />
-            </InputIcons>
-            <InputField
-              placeholder="메시지를 입력해주세요..."
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  // Shift+Enter는 줄바꿈, Enter만은 전송
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-            />
-            <SendButton onClick={handleSendMessage} disabled={!messageInput.trim()}>
-              <MdSend size={24} /> {/* 전송 아이콘 */}
-            </SendButton>
-          </ChatInputArea>
-        </ChatWindowSection>
-      </ChatContentBox>
-    </ChatPageContainer>
+          {/* 오른쪽 채팅창 섹션 */}
+          <ChatWindowSection>
+            <ChatWindowHeader>
+              <ChatWindowName>{activeChatRoom ? activeChatRoom.name : '채팅방 선택'}</ChatWindowName>
+              {activeChatRoom && (
+                <ChatStatus $isOngoing={activeChatRoom.status === 'ongoing'}>
+                  {activeChatRoom.status === 'ongoing' ? '진행중' : '완료됨'}
+                </ChatStatus>
+              )}
+            </ChatWindowHeader>
+
+            <ChatMessagesContainer>
+              {messages.map((message) => (
+                <MessageWrapper key={message.id} $isSent={message.isSent}>
+                  {message.isSent ? (
+                    <>
+                      <MessageTime $isSent={true}>{message.time}</MessageTime>
+                      <SentMessageBubble>{message.text}</SentMessageBubble>
+                    </>
+                  ) : (
+                    <>
+                      <ReceivedMessageBubble>{message.text}</ReceivedMessageBubble>
+                      <MessageTime $isSent={false}>{message.time}</MessageTime>
+                    </>
+                  )}
+                </MessageWrapper>
+              ))}
+            </ChatMessagesContainer>
+            <ChatInputArea>
+              <InputIcons>
+                <FiPaperclip title="파일 첨부" />
+              </InputIcons>
+              <InputField
+                placeholder="메시지를 입력해주세요..."
+                value={messageInput}
+                onChange={(e) => setMessageInput(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    // Shift+Enter는 줄바꿈, Enter만은 전송
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
+              />
+              <SendButton onClick={handleSendMessage} disabled={!messageInput.trim()}>
+                <MdSend size={24} /> {/* 전송 아이콘 */}
+              </SendButton>
+            </ChatInputArea>
+          </ChatWindowSection>
+        </ChatContentBox>
+      </ChatPageContainer>
+      <Footer />
+    </>
   );
 };
 
@@ -174,7 +189,6 @@ const ChatPageContainer = styled.div`
   align-items: center;
   width: 100%;
   min-height: calc(100vh - 120px); /* 헤더/푸터를 제외한 높이 (대략적인 값, 실제 높이에 따라 조절) */
-  padding: ${({ theme }) => theme.spacing[8]} 0;
   box-sizing: border-box;
 `;
 
@@ -185,6 +199,7 @@ const ChatContentBox = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
   width: 100%;
   max-width: ${({ theme }) => theme.width.lg}; /* 1008px */
+  margin-top: ${({ theme }) => theme.spacing[8]};
   display: flex;
   height: 700px; /* 고정 높이 또는 min-height로 조절 */
   overflow: hidden; /* 내부 스크롤을 위해 */

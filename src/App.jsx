@@ -16,6 +16,8 @@ import CoachRegister from './pages/coach/CoachRegister';
 import CoachDetail from './pages/coach/CoachDetail';
 import CoachReview from './pages/community/CoachReview';
 import PaymentPage from './pages/PayPage/PaymentPage';
+import MyPage from './pages/MemberPage/MyPage';
+import ChatPage from './pages/ChatPage';
 
 function App() {
   return (
@@ -23,12 +25,13 @@ function App() {
       <GlobalStyle />
       <Router>
         <Routes>
-          {/* 기본 */}
+          {/* 공통 */}
           <Route path="/" element={<MainPage />} /> {/* 메인페이지 */}
           <Route path="/signup" element={<SignUpPage />} /> {/* 회원가입 */}
           <Route path="/login" element={<LoginPage />} /> {/* 로그인 */}
-          <Route path="/mypage" element={<></>} /> {/* 마이페이지 */}
+          <Route path="/mypage" element={<MyPage />} /> {/* 마이페이지 */}
           <Route path="/exercise" element={<RecommendExercise />} /> {/* 추천 운동 */}
+          <Route path="/chat" element={<ChatPage />} /> {/* 채팅 */}
           {/* 코치 */}
           <Route path="/coachList" element={<CoachList />} /> {/* 핏코치 매칭 */}
           <Route path="/coachRegister" element={<CoachRegister />} /> {/* 코치 등록 */}

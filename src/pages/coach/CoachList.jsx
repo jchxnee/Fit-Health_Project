@@ -18,7 +18,6 @@ const PageWrapper = styled.div`
   width: 100%;
   min-height: 100vh;
   background-color: ${theme.colors.white};
-  margin-top: ${theme.spacing[5]};
   margin-bottom: 100px;
 `;
 

@@ -10,6 +10,9 @@ import { ResponsiveLine } from '@nivo/line';
 import { MdOutlineHealthAndSafety } from 'react-icons/md';
 import { CiCircleInfo } from 'react-icons/ci';
 import ButtonStyle from '../../styles/common/Button';
+import Footer from '../../components/Footer';
+import Header from '../../components/Header';
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const bodyMetrics = [
   {
@@ -62,6 +65,7 @@ const bodyMetrics = [
 const MyPage = () => {
   const [chartData, setChartData] = useState(bodyMetrics);
   const [isHealthInputModalOpen, setIsHealthInputModalOpen] = useState(false); // 모달 상태 추가
+  const [user] = useState({ name: '김현아', img: betaImg });
 
   // 모달 입력 필드 상태 추가
   const [healthDataInput, setHealthDataInput] = useState({
@@ -120,229 +124,233 @@ const MyPage = () => {
   };
 
   return (
-    <PageContainer>
-      <TitleBar title={'마이페이지'} />
+    <>
+      <Header user={user} />
+      <PageContainer>
+        <TitleBar title={'마이페이지'} />
 
-      <ProfileSection>
-        <ProfileImage src={UserProfileImage} alt="Coach Avatar" />
-        <ProfileInfo>
-          <ProfileName>김현아님</ProfileName>
-          <ProfileEmail>
-            <ProfileIcon src={kakaotalkIcon} alt="KakaoTalk" />
-            haha020911@naver.com
-          </ProfileEmail>
-        </ProfileInfo>
-        <SettingButton>계정 설정</SettingButton>
-      </ProfileSection>
+        <ProfileSection>
+          <ProfileImage src={UserProfileImage} alt="Coach Avatar" />
+          <ProfileInfo>
+            <ProfileName>김현아님</ProfileName>
+            <ProfileEmail>
+              <ProfileIcon src={kakaotalkIcon} alt="KakaoTalk" />
+              haha020911@naver.com
+            </ProfileEmail>
+          </ProfileInfo>
+          <SettingButton>계정 설정</SettingButton>
+        </ProfileSection>
 
-      <AlertBar>
-        <StyledFaBell />
-        읽지 않은 알림이 3개 있습니다.
-      </AlertBar>
+        <AlertBar>
+          <StyledFaBell />
+          읽지 않은 알림이 3개 있습니다.
+        </AlertBar>
 
-      {/* 건강 정보 섹션 추가 */}
-      <HealthInfoContainer>
-        <HealthInfoSectionHeader>
-          <SectionHeader>
-            건강 정보
-            <MdOutlineHealthAndSafety />
-          </SectionHeader>
-          <HealthInfoInputButton onClick={openHealthInputModal}>건강정보 입력</HealthInfoInputButton>
-        </HealthInfoSectionHeader>
-        <ChartContainer>
-          <ResponsiveLine
-            data={chartData}
-            margin={{ top: 50, right: 140, bottom: 70, left: 50 }}
-            xScale={{ type: 'point' }}
-            yScale={{
-              type: 'linear',
-              min: 'auto',
-              max: 'auto',
-              stacked: false,
-              reverse: false,
-            }}
-            yFormat=" >-.2f"
-            axisTop={null}
-            axisRight={null}
-            axisBottom={{
-              tickSize: 5,
-              tickPadding: 5,
-              tickRotation: -45,
-              legend: '날짜',
-              legendOffset: 50,
-              legendPosition: 'middle',
-              truncateTickAt: 0,
-              format: (value) => {
-                const parts = value.split('.');
-                return parts.length === 3 ? `${parts[1]}.${parts[2]}` : value;
-              },
-            }}
-            axisLeft={{
-              tickSize: 5,
-              tickPadding: 5,
-              tickRotation: 0,
-              legend: '값 (kg)',
-              legendOffset: -40,
-              legendPosition: 'middle',
-            }}
-            pointSize={10}
-            pointColor={{ theme: 'background' }}
-            pointBorderWidth={2}
-            pointBorderColor={{ from: 'serieColor' }}
-            pointLabelYOffset={-12}
-            useMesh={true}
-            colors={['#FF5733', '#3366FF', '#33CC33']}
-            theme={{
-              axis: {
-                domain: {
+        {/* 건강 정보 섹션 추가 */}
+        <HealthInfoContainer>
+          <HealthInfoSectionHeader>
+            <SectionHeader>
+              건강 정보
+              <MdOutlineHealthAndSafety />
+            </SectionHeader>
+            <HealthInfoInputButton onClick={openHealthInputModal}>건강정보 입력</HealthInfoInputButton>
+          </HealthInfoSectionHeader>
+          <ChartContainer>
+            <ResponsiveLine
+              data={chartData}
+              margin={{ top: 50, right: 140, bottom: 70, left: 50 }}
+              xScale={{ type: 'point' }}
+              yScale={{
+                type: 'linear',
+                min: 'auto',
+                max: 'auto',
+                stacked: false,
+                reverse: false,
+              }}
+              yFormat=" >-.2f"
+              axisTop={null}
+              axisRight={null}
+              axisBottom={{
+                tickSize: 5,
+                tickPadding: 5,
+                tickRotation: -45,
+                legend: '날짜',
+                legendOffset: 50,
+                legendPosition: 'middle',
+                truncateTickAt: 0,
+                format: (value) => {
+                  const parts = value.split('.');
+                  return parts.length === 3 ? `${parts[1]}.${parts[2]}` : value;
+                },
+              }}
+              axisLeft={{
+                tickSize: 5,
+                tickPadding: 5,
+                tickRotation: 0,
+                legend: '값 (kg)',
+                legendOffset: -40,
+                legendPosition: 'middle',
+              }}
+              pointSize={10}
+              pointColor={{ theme: 'background' }}
+              pointBorderWidth={2}
+              pointBorderColor={{ from: 'serieColor' }}
+              pointLabelYOffset={-12}
+              useMesh={true}
+              colors={['#FF5733', '#3366FF', '#33CC33']}
+              theme={{
+                axis: {
+                  domain: {
+                    line: {
+                      stroke: '#d4d4d4',
+                      strokeWidth: 1,
+                    },
+                  },
+                  ticks: {
+                    line: {
+                      stroke: '#d4d4d4',
+                      strokeWidth: 1,
+                    },
+                    text: {
+                      fontSize: 11,
+                      fill: '#333333',
+                    },
+                  },
+                  legend: {
+                    text: {
+                      fontSize: 12,
+                      fill: '#333333',
+                      fontWeight: 'bold',
+                    },
+                  },
+                },
+                grid: {
                   line: {
-                    stroke: '#d4d4d4',
+                    stroke: '#e0e0e0',
                     strokeWidth: 1,
                   },
                 },
-                ticks: {
-                  line: {
-                    stroke: '#d4d4d4',
-                    strokeWidth: 1,
-                  },
-                  text: {
-                    fontSize: 11,
-                    fill: '#333333',
-                  },
-                },
-                legend: {
+                legends: {
                   text: {
                     fontSize: 12,
                     fill: '#333333',
-                    fontWeight: 'bold',
                   },
                 },
-              },
-              grid: {
-                line: {
-                  stroke: '#e0e0e0',
-                  strokeWidth: 1,
+                tooltip: {
+                  container: {
+                    background: 'white',
+                    color: '#333333',
+                    fontSize: 12,
+                    borderRadius: '4px',
+                    boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.1)',
+                  },
                 },
-              },
-              legends: {
-                text: {
-                  fontSize: 12,
-                  fill: '#333333',
-                },
-              },
-              tooltip: {
-                container: {
-                  background: 'white',
-                  color: '#333333',
-                  fontSize: 12,
-                  borderRadius: '4px',
-                  boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.1)',
-                },
-              },
-            }}
-            legends={[
-              {
-                anchor: 'bottom-right',
-                direction: 'column',
-                justify: false,
-                translateX: 120,
-                translateY: 0,
-                itemsSpacing: 0,
-                itemDirection: 'left-to-right',
-                itemWidth: 80,
-                itemHeight: 20,
-                itemOpacity: 0.75,
-                symbolSize: 12,
-                symbolShape: 'circle',
-                symbolBorderColor: 'rgba(0, 0, 0, .5)',
-                effects: [
-                  {
-                    on: 'hover',
-                    style: {
-                      itemBackground: 'rgba(0, 0, 0, .03)',
-                      itemOpacity: 1,
+              }}
+              legends={[
+                {
+                  anchor: 'bottom-right',
+                  direction: 'column',
+                  justify: false,
+                  translateX: 120,
+                  translateY: 0,
+                  itemsSpacing: 0,
+                  itemDirection: 'left-to-right',
+                  itemWidth: 80,
+                  itemHeight: 20,
+                  itemOpacity: 0.75,
+                  symbolSize: 12,
+                  symbolShape: 'circle',
+                  symbolBorderColor: 'rgba(0, 0, 0, .5)',
+                  effects: [
+                    {
+                      on: 'hover',
+                      style: {
+                        itemBackground: 'rgba(0, 0, 0, .03)',
+                        itemOpacity: 1,
+                      },
                     },
-                  },
-                ],
-              },
-            ]}
-          />
-        </ChartContainer>
-        <Divider />
-      </HealthInfoContainer>
+                  ],
+                },
+              ]}
+            />
+          </ChartContainer>
+          <Divider />
+        </HealthInfoContainer>
 
-      <SectionBlock>
-        <SectionHeader>
-          내역
-          <LuClipboardList />
-        </SectionHeader>
-        <SectionLink href="#">신청 내역</SectionLink>
-        <Divider />
-      </SectionBlock>
+        <SectionBlock>
+          <SectionHeader>
+            내역
+            <LuClipboardList />
+          </SectionHeader>
+          <SectionLink href="#">신청 내역</SectionLink>
+          <Divider />
+        </SectionBlock>
 
-      <SectionBlock>
-        <SectionHeader>
-          관리
-          <AiOutlineTool />
-        </SectionHeader>
-        <SectionLink href="#">핏코치 정보 수정</SectionLink>
-        <SectionLink href="#">내가 쓴 게시물/댓글</SectionLink>
-        <Divider />
-      </SectionBlock>
+        <SectionBlock>
+          <SectionHeader>
+            관리
+            <AiOutlineTool />
+          </SectionHeader>
+          <SectionLink href="#">핏코치 정보 수정</SectionLink>
+          <SectionLink href="#">내가 쓴 게시물/댓글</SectionLink>
+          <Divider />
+        </SectionBlock>
 
-      {/* 건강 정보 입력 모달 */}
-      {isHealthInputModalOpen && (
-        <ModalOverlay onClick={closeHealthInputModal}>
-          <ModalContent onClick={(e) => e.stopPropagation()}>
-            <ModalHeader>
-              <ModalTitle>건강 정보 입력</ModalTitle>
-              <CloseButton onClick={closeHealthInputModal}>&times;</CloseButton>
-            </ModalHeader>
-            <FormGroup>
-              {' '}
-              {/* 폼 그룹 추가 */}
-              <InputContainer>
-                <InputLabel htmlFor="weight">몸무게 (kg)</InputLabel>
-                <InputField
-                  type="number" // 숫자만 입력 받도록
-                  id="weight"
-                  name="weight"
-                  value={healthDataInput.weight}
-                  onChange={handleInputChange}
-                  placeholder="예: 70.5"
-                  step="0.1" // 소수점 입력 가능
-                />
-              </InputContainer>
-              <InputContainer>
-                <InputLabel htmlFor="bodyFatMass">체지방량 (kg)</InputLabel>
-                <InputField
-                  type="number"
-                  id="bodyFatMass"
-                  name="bodyFatMass"
-                  value={healthDataInput.bodyFatMass}
-                  onChange={handleInputChange}
-                  placeholder="예: 15.2"
-                  step="0.1"
-                />
-              </InputContainer>
-              <InputContainer>
-                <InputLabel htmlFor="skeletalMuscleMass">골격근량 (kg)</InputLabel>
-                <InputField
-                  type="number"
-                  id="skeletalMuscleMass"
-                  name="skeletalMuscleMass"
-                  value={healthDataInput.skeletalMuscleMass}
-                  onChange={handleInputChange}
-                  placeholder="예: 30.1"
-                  step="0.1"
-                />
-              </InputContainer>
-            </FormGroup>
-            <ModalSelectButton onClick={handleSubmitHealthData}>확인</ModalSelectButton>
-          </ModalContent>
-        </ModalOverlay>
-      )}
-    </PageContainer>
+        {/* 건강 정보 입력 모달 */}
+        {isHealthInputModalOpen && (
+          <ModalOverlay onClick={closeHealthInputModal}>
+            <ModalContent onClick={(e) => e.stopPropagation()}>
+              <ModalHeader>
+                <ModalTitle>건강 정보 입력</ModalTitle>
+                <CloseButton onClick={closeHealthInputModal}>&times;</CloseButton>
+              </ModalHeader>
+              <FormGroup>
+                {' '}
+                {/* 폼 그룹 추가 */}
+                <InputContainer>
+                  <InputLabel htmlFor="weight">몸무게 (kg)</InputLabel>
+                  <InputField
+                    type="number" // 숫자만 입력 받도록
+                    id="weight"
+                    name="weight"
+                    value={healthDataInput.weight}
+                    onChange={handleInputChange}
+                    placeholder="예: 70.5"
+                    step="0.1" // 소수점 입력 가능
+                  />
+                </InputContainer>
+                <InputContainer>
+                  <InputLabel htmlFor="bodyFatMass">체지방량 (kg)</InputLabel>
+                  <InputField
+                    type="number"
+                    id="bodyFatMass"
+                    name="bodyFatMass"
+                    value={healthDataInput.bodyFatMass}
+                    onChange={handleInputChange}
+                    placeholder="예: 15.2"
+                    step="0.1"
+                  />
+                </InputContainer>
+                <InputContainer>
+                  <InputLabel htmlFor="skeletalMuscleMass">골격근량 (kg)</InputLabel>
+                  <InputField
+                    type="number"
+                    id="skeletalMuscleMass"
+                    name="skeletalMuscleMass"
+                    value={healthDataInput.skeletalMuscleMass}
+                    onChange={handleInputChange}
+                    placeholder="예: 30.1"
+                    step="0.1"
+                  />
+                </InputContainer>
+              </FormGroup>
+              <ModalSelectButton onClick={handleSubmitHealthData}>확인</ModalSelectButton>
+            </ModalContent>
+          </ModalOverlay>
+        )}
+      </PageContainer>
+      <Footer />
+    </>
   );
 };
 
@@ -355,7 +363,6 @@ const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: ${({ theme }) => theme.spacing['10']} ${({ theme }) => theme.spacing['4']};
 `;
 
 const ProfileSection = styled.div`
