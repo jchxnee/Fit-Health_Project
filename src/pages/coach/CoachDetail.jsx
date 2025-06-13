@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import TrainerPhoto from '../../components/CoachMatching/TrainerPhoto';
@@ -10,7 +10,6 @@ import { FiEdit } from 'react-icons/fi';
 import TrainerQualifications from '../../components/CoachMatching/TrainerSpec';
 import TrainerProfile from '../../components/CoachMatching/TrainerProfile';
 import TrainerCourse from '../../components/CoachMatching/TrainerCourse';
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const PageWrapper = styled.div`
   display: flex;
@@ -19,6 +18,7 @@ const PageWrapper = styled.div`
   width: 100%;
   min-height: 100vh;
   background-color: ${theme.colors.white};
+  margin-top: 20px;
   margin-bottom: 100px;
 `;
 
@@ -28,7 +28,6 @@ const TitleBarContainer = styled.div`
   align-items: center;
   width: ${theme.width.lg};
   padding: 0;
-  margin-top: ${({ theme }) => theme.spacing['8']};
   margin-bottom: ${theme.spacing.lg};
   padding-bottom: ${theme.spacing.md};
   border-top: 1px solid ${({ theme }) => theme.colors.gray['400']};
@@ -57,7 +56,11 @@ const EditButton = styled.button`
 `;
 
 const CoachDetail = () => {
-  const [user] = useState({ name: '김현아', img: betaImg });
+  const userInfo = {
+    name: '이주찬',
+    img: '../../assets/beta_user_img.png',
+  };
+
   const trainerQuals = [
     { text: '국가공인 생활스포츠지도사 자격 보유 (생활체육지도사 2급 - 보디빌딩)' },
     { text: '전국 피트니스 대회 입상 경력 (2023 NABBA WFF KOREA 스포츠 모델 부문 2위)' },
@@ -82,7 +85,7 @@ const CoachDetail = () => {
   ];
   return (
     <>
-      <Header user={user} />
+      <Header user={userInfo} />
       <PageWrapper>
         <TitleBarContainer>
           <ButtonTitleBar title={'핏코치 매칭'} />

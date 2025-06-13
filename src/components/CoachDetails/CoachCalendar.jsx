@@ -8,7 +8,7 @@ import CoachSubBar from '../CoachSubBar'; // Import CoachSubBar
 import Header from '../Header';
 import Footer from '../Footer';
 
-import CoachList from '../../pages/CoachMatching/CoachList';
+import CoachList from '../../pages/coach/CoachList';
 import CoachMatchingList from './CoachMatchingList';
 import styled from 'styled-components';
 
