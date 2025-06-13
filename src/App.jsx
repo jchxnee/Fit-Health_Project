@@ -20,12 +20,13 @@ import CoachCalendar from './components/CoachDetails/CoachCalendar.jsx';
 import NextReservation from './pages/MatchingList/NextReservation.jsx';
 import HistoryModal from './components/modal/HistoryModal.jsx';
 import CoachList from './pages/CoachMatching/CoachList';
+import MatchingList from './pages/MatchingList/MatchingList';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <CoachCalendar />
+      <MatchingList />
     </ThemeProvider>
   );
 }
