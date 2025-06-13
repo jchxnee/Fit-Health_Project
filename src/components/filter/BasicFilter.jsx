@@ -11,6 +11,7 @@ export const FilterButton = styled.button`
   border: 1px solid ${({ theme }) => theme.colors.gray[300]};
   border-radius: ${({ theme }) => theme.borderRadius.base};
   padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]};
+  outline: none;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   cursor: pointer;
   transition: background-color 0.3s ease;

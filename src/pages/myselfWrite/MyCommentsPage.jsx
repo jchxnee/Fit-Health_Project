@@ -7,6 +7,7 @@ import BasicFilter from '../../components/filter/BasicFilter'; // BasicFilter �
 import betaImg from '../../assets/beta_user_img.png'; // 더미 사용자 프로필 이미지 및 후기 내 등 사진으로 사용
 import CommentsList from '../../components/CommentsList'; // MyCommentsList로 변경
 import TitleBar from '../../components/TitleBar';
+import { Link } from 'react-router-dom';
 
 // --- 임시 데이터는 컴포넌트 외부로 이동 ---
 const MY_COMMENTS_DATA = [
@@ -119,7 +120,7 @@ const TabContainer = styled.div`
   flex-grow: 0;
 `;
 
-const TabButton = styled.button`
+const TabButton = styled(Link)`
   background: none;
   border: none;
   padding: ${({ theme }) => theme.spacing[3]} ${({ theme }) => theme.spacing[4]};
@@ -218,8 +219,8 @@ function MyCommentsPage() {
           <TitleBar title="내가 작성한 게시물/댓글" />
           <Container>
             <TabContainer>
-              <TabButton>나의 게시물</TabButton>
-              <TabButton $active={true}>나의 댓글</TabButton>
+              <TabButton to="/myPostPage">나의 게시물</TabButton>
+              <TabButton to="/myCommentsPage">나의 댓글</TabButton> {/* 나의 댓글 페이지로 이동 */}
             </TabContainer>
             <BasicFilter filterOptions={filterOptions} onFilterChange={handleFilterChange} />
           </Container>

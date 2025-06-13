@@ -15,8 +15,12 @@ import {
   PaymentButton,
 } from '../../styles/common/Payment';
 import TitleBar from '../../components/TitleBar';
+import Footer from '../../components/Footer';
+import Header from '../../components/Header';
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const PaymentPage = () => {
+  const [user] = useState({ name: '김현아', img: betaImg });
   const [agreements, setAgreements] = useState({
     rule: false, // 예약 이용규칙 및 취소/환불 동의
     privacyCollect: false, // 개인정보 수집 및 이용 동의
@@ -59,156 +63,160 @@ const PaymentPage = () => {
   };
 
   return (
-    <PaymentContainer>
-      <TitleBar title={'결제'} />
-      <PaymentContentBox>
-        {/* 레슨 정보 */}
-        <section>
-          <SectionTitle>요가 레슨</SectionTitle>
-          <InfoStackedRow>
-            <InfoKey>김요가 트레이너</InfoKey>
-            <InfoValue>2025.06.12 PM 6시 30분</InfoValue>
-          </InfoStackedRow>
-          <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
-        </section>
+    <>
+      <Header user={user} />
+      <PaymentContainer>
+        <TitleBar title={'결제'} />
+        <PaymentContentBox>
+          {/* 레슨 정보 */}
+          <section>
+            <SectionTitle>요가 레슨</SectionTitle>
+            <InfoStackedRow>
+              <InfoKey>김요가 트레이너</InfoKey>
+              <InfoValue>2025.06.12 PM 6시 30분</InfoValue>
+            </InfoStackedRow>
+            <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
+          </section>
 
-        {/* 예약자 정보 */}
-        <section>
-          <SectionTitle>예약자 정보</SectionTitle>
-          <InfoRow className="horizontal-start">
-            <InfoKey>김현아</InfoKey>
-            <InfoValue>010-5028-0682</InfoValue>
-          </InfoRow>
-          <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
-        </section>
+          {/* 예약자 정보 */}
+          <section>
+            <SectionTitle>예약자 정보</SectionTitle>
+            <InfoRow className="horizontal-start">
+              <InfoKey>김현아</InfoKey>
+              <InfoValue>010-5028-0682</InfoValue>
+            </InfoRow>
+            <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
+          </section>
 
-        {/* 결제 정보 */}
-        <PaymentAmountSection>
-          <SectionTitle>결제 정보</SectionTitle>
-          <InfoRow>
-            <InfoKey>5회 핏헬스 회원가</InfoKey>
-            <InfoValue>250,000원</InfoValue>
-          </InfoRow>
-          <InfoRow>
-            <InfoKey>할인 금액</InfoKey>
-            <InfoValue>1,250원</InfoValue>
-          </InfoRow>
-          <TotalAmountRow>
-            <TotalAmountKey>총 결제 금액</TotalAmountKey>
-            <TotalAmountValue $isRed>237,500원</TotalAmountValue>
-          </TotalAmountRow>
-          <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
-        </PaymentAmountSection>
+          {/* 결제 정보 */}
+          <PaymentAmountSection>
+            <SectionTitle>결제 정보</SectionTitle>
+            <InfoRow>
+              <InfoKey>5회 핏헬스 회원가</InfoKey>
+              <InfoValue>250,000원</InfoValue>
+            </InfoRow>
+            <InfoRow>
+              <InfoKey>할인 금액</InfoKey>
+              <InfoValue>1,250원</InfoValue>
+            </InfoRow>
+            <TotalAmountRow>
+              <TotalAmountKey>총 결제 금액</TotalAmountKey>
+              <TotalAmountValue $isRed>237,500원</TotalAmountValue>
+            </TotalAmountRow>
+            <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
+          </PaymentAmountSection>
 
-        {/* 전체 동의 및 약관 부분 */}
-        <TermsAndConditionsGroup>
-          <AllAgreeCheckboxWrapper onClick={() => handleAllAgreeChange({ target: { checked: !allAgreed } })}>
-            <input type="checkbox" checked={allAgreed} onChange={handleAllAgreeChange} />
-            <label>전체 동의</label>
-          </AllAgreeCheckboxWrapper>
+          {/* 전체 동의 및 약관 부분 */}
+          <TermsAndConditionsGroup>
+            <AllAgreeCheckboxWrapper onClick={() => handleAllAgreeChange({ target: { checked: !allAgreed } })}>
+              <input type="checkbox" checked={allAgreed} onChange={handleAllAgreeChange} />
+              <label>전체 동의</label>
+            </AllAgreeCheckboxWrapper>
 
-          <TermItem>
-            <TermLabel>
-              <CheckboxAndText onClick={() => handleIndividualAgreeChange('rule')}>
-                <TermCheckbox
-                  type="checkbox"
-                  checked={agreements.rule}
-                  onChange={() => handleIndividualAgreeChange('rule')}
-                />
-                <TermText>[필수] 예약 이용규칙 및 취소/환불 동의</TermText>
-                <TermLink
-                  onClick={(e) => {
-                    e.preventDefault(); // 기본 링크 동작 방지
-                    e.stopPropagation(); // 이벤트 버블링 방지
-                    handleToggleTermContent('rule');
-                  }}
-                >
-                  (자세히 보기)
-                </TermLink>
-              </CheckboxAndText>
-            </TermLabel>
-            <TermsContent $isOpen={termContentsOpen.rule}>
-              <p>
-                본 약관은 요가 레슨 예약 및 취소, 환불에 대한 규정을 명시합니다. <br />
-                예약 변경 및 취소는 최소 24시간 전에 이루어져야 하며, 24시간 이내 취소 시 수수료가 발생할 수 있습니다.{' '}
-                <br />
-                환불 정책은 결제 방식 및 시점에 따라 상이할 수 있습니다.
-              </p>
-              <p>추가적인 약관 내용이 여기에 표시될 수 있습니다.</p>
-            </TermsContent>
-          </TermItem>
+            <TermItem>
+              <TermLabel>
+                <CheckboxAndText onClick={() => handleIndividualAgreeChange('rule')}>
+                  <TermCheckbox
+                    type="checkbox"
+                    checked={agreements.rule}
+                    onChange={() => handleIndividualAgreeChange('rule')}
+                  />
+                  <TermText>[필수] 예약 이용규칙 및 취소/환불 동의</TermText>
+                  <TermLink
+                    onClick={(e) => {
+                      e.preventDefault(); // 기본 링크 동작 방지
+                      e.stopPropagation(); // 이벤트 버블링 방지
+                      handleToggleTermContent('rule');
+                    }}
+                  >
+                    (자세히 보기)
+                  </TermLink>
+                </CheckboxAndText>
+              </TermLabel>
+              <TermsContent $isOpen={termContentsOpen.rule}>
+                <p>
+                  본 약관은 요가 레슨 예약 및 취소, 환불에 대한 규정을 명시합니다. <br />
+                  예약 변경 및 취소는 최소 24시간 전에 이루어져야 하며, 24시간 이내 취소 시 수수료가 발생할 수 있습니다.{' '}
+                  <br />
+                  환불 정책은 결제 방식 및 시점에 따라 상이할 수 있습니다.
+                </p>
+                <p>추가적인 약관 내용이 여기에 표시될 수 있습니다.</p>
+              </TermsContent>
+            </TermItem>
 
-          <TermItem>
-            <TermLabel>
-              <CheckboxAndText onClick={() => handleIndividualAgreeChange('privacyCollect')}>
-                <TermCheckbox
-                  type="checkbox"
-                  checked={agreements.privacyCollect}
-                  onChange={() => handleIndividualAgreeChange('privacyCollect')}
-                />
-                <TermText>[필수] 개인정보 수집 및 이용 동의</TermText>
-                <TermLink
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleToggleTermContent('privacyCollect');
-                  }}
-                >
-                  (자세히 보기)
-                </TermLink>
-              </CheckboxAndText>
-            </TermLabel>
-            {/* 개인정보 수집 및 이용 내용 */}
-            <TermsContent $isOpen={termContentsOpen.privacyCollect}>
-              <p>
-                개인정보 수집 및 이용 동의 내용은 다음과 같습니다: <br />
-                수집 항목 (이름, 연락처 등), <br />
-                수집 목적 (예약 확인, 서비스 제공 등), <br />
-                보유 및 이용 기간. <br />
-                상세 내용은 개인정보처리방침을 확인해주세요.
-              </p>
-              <p>개인정보 수집 및 이용 관련 추가 정보입니다.</p>
-            </TermsContent>
-          </TermItem>
+            <TermItem>
+              <TermLabel>
+                <CheckboxAndText onClick={() => handleIndividualAgreeChange('privacyCollect')}>
+                  <TermCheckbox
+                    type="checkbox"
+                    checked={agreements.privacyCollect}
+                    onChange={() => handleIndividualAgreeChange('privacyCollect')}
+                  />
+                  <TermText>[필수] 개인정보 수집 및 이용 동의</TermText>
+                  <TermLink
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleToggleTermContent('privacyCollect');
+                    }}
+                  >
+                    (자세히 보기)
+                  </TermLink>
+                </CheckboxAndText>
+              </TermLabel>
+              {/* 개인정보 수집 및 이용 내용 */}
+              <TermsContent $isOpen={termContentsOpen.privacyCollect}>
+                <p>
+                  개인정보 수집 및 이용 동의 내용은 다음과 같습니다: <br />
+                  수집 항목 (이름, 연락처 등), <br />
+                  수집 목적 (예약 확인, 서비스 제공 등), <br />
+                  보유 및 이용 기간. <br />
+                  상세 내용은 개인정보처리방침을 확인해주세요.
+                </p>
+                <p>개인정보 수집 및 이용 관련 추가 정보입니다.</p>
+              </TermsContent>
+            </TermItem>
 
-          <TermItem>
-            <TermLabel>
-              <CheckboxAndText onClick={() => handleIndividualAgreeChange('privacyThirdParty')}>
-                <TermCheckbox
-                  type="checkbox"
-                  checked={agreements.privacyThirdParty}
-                  onChange={() => handleIndividualAgreeChange('privacyThirdParty')}
-                />
-                <TermText>[필수] 개인정보 제 3자 제공 동의</TermText>
-                <TermLink
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleToggleTermContent('privacyThirdParty');
-                  }}
-                >
-                  (자세히 보기)
-                </TermLink>
-              </CheckboxAndText>
-            </TermLabel>
-            {/* 개인정보 제 3자 제공 내용 */}
-            <TermsContent $isOpen={termContentsOpen.privacyThirdParty}>
-              <p>
-                개인정보 제3자 제공 동의 내용은 다음과 같습니다: <br />
-                제공받는 자 (결제 대행사, 트레이너 등), <br />
-                제공 항목, <br />
-                제공 목적. <br />
-                서비스 제공을 위해 필요한 최소한의 정보만 제공됩니다.
-              </p>
-              <p>제3자 제공에 대한 상세 동의 내역입니다.</p>
-            </TermsContent>
-          </TermItem>
-        </TermsAndConditionsGroup>
+            <TermItem>
+              <TermLabel>
+                <CheckboxAndText onClick={() => handleIndividualAgreeChange('privacyThirdParty')}>
+                  <TermCheckbox
+                    type="checkbox"
+                    checked={agreements.privacyThirdParty}
+                    onChange={() => handleIndividualAgreeChange('privacyThirdParty')}
+                  />
+                  <TermText>[필수] 개인정보 제 3자 제공 동의</TermText>
+                  <TermLink
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleToggleTermContent('privacyThirdParty');
+                    }}
+                  >
+                    (자세히 보기)
+                  </TermLink>
+                </CheckboxAndText>
+              </TermLabel>
+              {/* 개인정보 제 3자 제공 내용 */}
+              <TermsContent $isOpen={termContentsOpen.privacyThirdParty}>
+                <p>
+                  개인정보 제3자 제공 동의 내용은 다음과 같습니다: <br />
+                  제공받는 자 (결제 대행사, 트레이너 등), <br />
+                  제공 항목, <br />
+                  제공 목적. <br />
+                  서비스 제공을 위해 필요한 최소한의 정보만 제공됩니다.
+                </p>
+                <p>제3자 제공에 대한 상세 동의 내역입니다.</p>
+              </TermsContent>
+            </TermItem>
+          </TermsAndConditionsGroup>
 
-        {/* 결제하기 버튼 */}
-        <PaymentButton to="/matchingList">237,500원 결제하기</PaymentButton>
-      </PaymentContentBox>
-    </PaymentContainer>
+          {/* 결제하기 버튼 */}
+          <PaymentButton to="/matchingList">237,500원 결제하기</PaymentButton>
+        </PaymentContentBox>
+      </PaymentContainer>
+      <Footer />
+    </>
   );
 };
 

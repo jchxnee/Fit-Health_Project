@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import ButtonStyle from './Button';
+import { Link } from 'react-router-dom';
 
 export const PaymentContainer = styled.div`
   display: flex;
@@ -7,7 +8,6 @@ export const PaymentContainer = styled.div`
   align-items: center;
   width: 100%;
   min-height: 100vh;
-  padding: ${({ theme }) => theme.spacing[10]} 0;
 `;
 
 export const PaymentContentBox = styled.div`
@@ -82,7 +82,34 @@ export const TotalAmountValue = styled(InfoValue)`
   color: ${({ theme }) => theme.colors.danger};
 `;
 
-export const PaymentButton = styled(ButtonStyle)`
+export const PaymentButton = styled(Link)`
   width: 100%;
   padding: ${({ theme }) => theme.spacing[4]} ${({ theme }) => theme.spacing[8]};
+  background-color: ${({ theme }) => theme.colors.button};
+  color: ${({ theme }) => theme.colors.white};
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
+  padding: ${({ theme }) => theme.spacing[3]} ${({ theme }) => theme.spacing[32]};
+  border: none;
+  border-radius: ${({ theme }) => theme.borderRadius.base};
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  outline: none;
+  align-items: center;
+  width: ${({ theme }) => (theme.fullWidth ? '100%' : 'auto')};
+  box-sizing: border-box;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:active {
+    opacity: 0.9;
+  }
 `;

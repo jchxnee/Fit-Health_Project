@@ -8,6 +8,7 @@ const StyledButton = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
   margin: ${theme.spacing[2]};
   border-radius: ${theme.borderRadius.md};
+  outline: none;
   cursor: pointer;
   font-size: ${theme.fontSizes.base};
   font-weight: ${theme.fontWeights.semibold};
