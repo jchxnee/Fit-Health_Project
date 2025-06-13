@@ -11,6 +11,8 @@ import theme from '../../styles/theme';
 import { FaSearch } from 'react-icons/fa';
 import Pagination from '../../components/Pagination'; // Pagination 컴포넌트 임포트 확인
 import HistoryModal from '../../components/modal/HistoryModal';
+import MatchingApprove from "../../components/modal/MatchingApprove.jsx";
+import MatchingRefuse from "../../components/modal/MatchingRefuse.jsx";
 
 // 실제 데이터 (allMatchingData)는 외부 상수이므로 컴포넌트 외부에 정의
 const allMatchingData = [
@@ -341,7 +343,7 @@ const MatchingList = () => {
       <Footer />
 
       {selectedRowData && (
-        <HistoryModal
+        <MatchingRefuse
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           coachName={selectedRowData.coachName}
