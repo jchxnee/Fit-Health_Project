@@ -24,7 +24,7 @@ function CategoryMenu() {
 export default CategoryMenu;
 
 const MenuContainer = styled.div`
-  width: 220px;
+  width: 190px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

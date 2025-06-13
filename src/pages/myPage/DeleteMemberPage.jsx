@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import ButtonStyle from '../styles/common/Button';
+import ButtonStyle from '../../styles/common/Button';
 
 const DeleteMemberPage = () => {
   const [currentPassword, setCurrentPassword] = useState('');

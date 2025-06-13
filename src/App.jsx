@@ -1,62 +1,48 @@
 import { ThemeProvider } from 'styled-components';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
-import TitleBar from './components/TitleBar';
 import theme from './styles/theme';
-import BasicModal from './components/modal/BasicModal';
-import NotificationList from './components/NotificationList';
-import Header from './components/Header';
-import CategoryMenu from './components/CategoryMenu';
-import Footer from './components/Footer';
-import BasicFilter from './components/filter/BasicFilter';
-import CommunityPage from './pages/CommunityPage';
 import GlobalStyle from './styles/GlobalStyle';
 import MainPage from './pages/MainPage.jsx';
-import RecommendedExerciseSection from './pages/RecommendExercise.jsx';
-import CoachDetail from './pages/CoachMatching/CoachDetail';
-import CoachMatching from './pages/CoachMatching/CoachMatching';
-import CommunityPostCreationPage from './pages/CommunityPostCreationPage';
-import CommunityPostDetailPage from './pages/CommunityPostDetailPage';
-import ReviewCreationPage from './pages/ReviewCreationPage';
-import CoachReview from './pages/CoachReview';
-import NextReservation from './pages/MatchingList/NextReservation';
-import SelectExercise from './components/MainPage/SelectExercise';
-import SelectGoal from './components/MainPage/SelectGoal';
-import MemberInfoPage from './pages/MemberInfoPage';
-import CustomInfoPage from './pages/CustomInfoPage';
-import MatchingList from './pages/MatchingList/MatchingList';
-import MyReviewsPage from './pages/MyReviewsPage';
-import NoticePage from './pages/noticePage/NoticePage';
-import NoticeDetailPage from './pages/noticePage/NoticeDetailPage';
-import FAQPage from './pages/FAQPage/FAQPage';
-import MyPostsPage from './pages/myselfWrite/MyPostsPage';
-import MyCommentsPage from './pages/myselfWrite/MyCommentsPage';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
+import CoachMatching from './pages/coach/CoachMatching';
+import CoachList from './pages/coach/CoachList';
+import CommunityPage from './pages/community/CommunityPage';
+import RecommendExercise from './pages/RecommendExercise';
+import NoticePage from './pages/noticePage/NoticePage';
+import MatchingList from './pages/MatchingList/MatchingList';
+import CoachRegister from './pages/coach/CoachRegister';
+import CoachDetail from './pages/coach/CoachDetail';
+import CoachReview from './pages/community/CoachReview';
+import PaymentPage from './pages/PaymentPage';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <Router>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<MainPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/login" element={<LoginPage />} />
-          </Routes>
-        </Layout>
+        <Routes>
+          {/* 기본 */}
+          <Route path="/" element={<MainPage />} /> {/* 메인페이지 */}
+          <Route path="/signup" element={<SignUpPage />} /> {/* 회원가입 */}
+          <Route path="/login" element={<LoginPage />} /> {/* 로그인 */}
+          <Route path="/mypage" element={<></>} /> {/* 마이페이지 */}
+          <Route path="/exercise" element={<RecommendExercise />} /> {/* 추천 운동 */}
+          {/* 코치 */}
+          <Route path="/coachList" element={<CoachList />} /> {/* 핏코치 매칭 */}
+          <Route path="/coachRegister" element={<CoachRegister />} /> {/* 코치 등록 */}
+          <Route path="/coach/:id" element={<CoachDetail />} /> {/* 코치 등록 */}
+          <Route path="/coachMatching" element={<CoachMatching />} /> {/* 핏코치 매칭 신청 */}
+          <Route path="/coachReview" element={<CoachReview />} /> {/* 코치 리뷰 */}
+          <Route path="/paymentPage" element={<PaymentPage />} /> {/* 결제페이지 */}
+          {/* 커뮤니티 */}
+          <Route path="/community" element={<CommunityPage />} /> {/* 커뮤니티 */}
+          <Route path="/notice" element={<NoticePage />} /> {/* 공지사항 */}
+          {/* 고객 */}
+          <Route path="/matchingList" element={<MatchingList />} /> {/* 신청 내역 */}
+        </Routes>
       </Router>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        closeOnClick
-        draggable
-        hideProgressBar={false}
-        newestOnTop
-        theme="light"
-        pauseOnHover
-      />
     </ThemeProvider>
   );
 }

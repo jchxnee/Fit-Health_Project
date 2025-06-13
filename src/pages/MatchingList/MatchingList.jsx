@@ -10,9 +10,13 @@ import SubTable from '../../components/SubTable';
 import theme from '../../styles/theme';
 import { FaSearch } from 'react-icons/fa';
 import Pagination from '../../components/Pagination'; // Pagination 컴포넌트 임포트 확인
+<<<<<<< HEAD
 import HistoryModal from '../../components/modal/HistoryModal';
 import MatchingApprove from "../../components/modal/MatchingApprove.jsx";
 import MatchingRefuse from "../../components/modal/MatchingRefuse.jsx";
+=======
+import MatchingRefuse from '../../components/modal/MatchingRefuse.jsx';
+>>>>>>> 6f68e5b22b58a0819ed05e3f7274946804b4d07d
 
 // 실제 데이터 (allMatchingData)는 외부 상수이므로 컴포넌트 외부에 정의
 const allMatchingData = [
@@ -197,7 +201,10 @@ const PageWrapper = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
+<<<<<<< HEAD
   padding: 20px;
+=======
+>>>>>>> 6f68e5b22b58a0819ed05e3f7274946804b4d07d
 `;
 
 const ContentWrapper = styled.div`

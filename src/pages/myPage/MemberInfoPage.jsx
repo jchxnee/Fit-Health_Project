@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import ButtonStyle from '../styles/common/Button';
+import ButtonStyle from '../../styles/common/Button';
 
 const MemberInfoPage = () => {
   const [phoneNumber, setPhoneNumber] = useState('010-1234-5678'); // 더미 데이터
