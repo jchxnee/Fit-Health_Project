@@ -4,8 +4,8 @@ import './App.css';
 import theme from './styles/theme';
 import GlobalStyle from './styles/GlobalStyle';
 import MainPage from './pages/MainPage.jsx';
-import SignUpPage from './pages/SignUpPage';
-import LoginPage from './pages/LoginPage';
+import SignUpPage from './pages/MemberPage/SignUpPage';
+import LoginPage from './pages/MemberPage/LoginPage';
 import CoachMatching from './pages/coach/CoachMatching';
 import CoachList from './pages/coach/CoachList';
 import CommunityPage from './pages/community/CommunityPage';
@@ -15,7 +15,7 @@ import MatchingList from './pages/MatchingList/MatchingList';
 import CoachRegister from './pages/coach/CoachRegister';
 import CoachDetail from './pages/coach/CoachDetail';
 import CoachReview from './pages/community/CoachReview';
-import PaymentPage from './pages/PaymentPage';
+import PaymentPage from './pages/PayPage/PaymentPage';
 
 function App() {
   return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import UserProfileImage from '/public/img/minju.png';
