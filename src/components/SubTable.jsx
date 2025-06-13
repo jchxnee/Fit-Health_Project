@@ -150,7 +150,7 @@ export default SubTable;
 const StyledTableContainer = styled.div`
   width: 100%;
   overflow-x: auto;
-  margin-top: 20px;
+  margin-top: 10px;
   width: ${theme.width.lg};
 `;
 
