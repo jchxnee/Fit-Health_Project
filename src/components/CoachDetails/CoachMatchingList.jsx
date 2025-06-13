@@ -11,8 +11,6 @@ import theme from '../../styles/theme';
 import { FaSearch } from 'react-icons/fa';
 import Pagination from '../../components/Pagination'; // Pagination 컴포넌트 임포트 확인
 import HistoryModal from '../../components/modal/HistoryModal';
-import MatchingApprove from "../../components/modal/MatchingApprove.jsx";
-import MatchingRefuse from "../../components/modal/MatchingRefuse.jsx";
 
 // 실제 데이터 (allMatchingData)는 외부 상수이므로 컴포넌트 외부에 정의
 const allMatchingData = [
@@ -246,7 +244,7 @@ const SearchIcon = styled(FaSearch)`
   font-size: ${({ theme }) => theme.fontSizes.md};
 `;
 
-const MatchingList = () => {
+const CoachMatchingList = () => {
   const userInfo = {
     name: '이주찬',
     img: '../../assets/beta_user_img.png',
@@ -324,12 +322,11 @@ const MatchingList = () => {
 
   return (
     <>
-      <Header user={userInfo} />
       <PageWrapper>
-        <TitleBar title={'신청내역'} />
         <ContentWrapper>
           <TableWrapper>
             <SelectBar options={selectBarOptions} onSelect={handleSelectBarChange} initialSelected={'all'} />
+
             <SearchInputWrapper>
               <SearchIcon />
               <SearchInput type="text" placeholder="이름 검색" value={searchTerm} onChange={handleSearchChange} />
@@ -340,10 +337,9 @@ const MatchingList = () => {
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </ContentWrapper>
       </PageWrapper>
-      <Footer />
 
       {selectedRowData && (
-        <MatchingRefuse
+        <HistoryModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           coachName={selectedRowData.coachName}
@@ -355,4 +351,4 @@ const MatchingList = () => {
   );
 };
 
-export default MatchingList;
+export default CoachMatchingList;

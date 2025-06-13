@@ -17,8 +17,8 @@ const CoachCard = styled.div`
 `;
 
 const ProfileImage = styled.img`
-  width: 64px;
-  height: 64px;
+  width: ${({ theme }) => theme.spacing[16]};
+  height: ${({ theme }) => theme.spacing[16]};
   border-radius: ${theme.borderRadius.full};
   object-fit: cover;
   margin-right: ${theme.spacing[4]};
@@ -34,7 +34,7 @@ const NameAndSpecialization = styled.div`
   display: flex;
   align-items: baseline;
   flex-direction: column;
-  padding-left: 20px;
+  padding-left: ${({ theme }) => theme.spacing[5]};
 `;
 
 const Name = styled.div`

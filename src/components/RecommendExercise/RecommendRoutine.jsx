@@ -1,13 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
-import theme from '../styles/theme';
+import theme from "../../styles/theme.js";
 
 const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: ${theme.spacing[8]} ${theme.spacing[4]};
-  max-width: ${theme.width.lg};
+  max-width: 1008px;
+  width: 100%;
   margin: 0 auto;
 `;
 
@@ -81,7 +82,7 @@ const TableCell = styled.td`
 `;
 
 const ExerciseImage = styled.img`
-  width: 80px;
+  width: ${({ theme }) => theme.spacing[20]};
   height: auto;
   border-radius: ${theme.borderRadius.sm};
   object-fit: contain;

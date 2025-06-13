@@ -21,6 +21,14 @@ const theme = {
       800: '#1f2937',
       900: '#111827',
     },
+    event: {
+      holiday: '#F8D7DA',
+      exercise: '#E3F0FF',
+      study: '#D1F5E0',
+      travel: '#FDE6EF',
+      work: '#FFF6D1',
+      default: '#E9E9E9',
+    },
   },
   fontSizes: {
     xxs: '8px',
