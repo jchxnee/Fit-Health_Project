@@ -36,6 +36,7 @@ function UserMenu() {
       action: () => console.log('핏코치 등록 클릭'),
     },
     { name: '로그아웃', action: () => console.log('로그아웃 클릭') },
+    { name: '건강 상품', action: () => console.log('로그아웃 클릭') },
   ];
 
   return (
@@ -77,6 +78,7 @@ function Header({ user }) {
             <span>추천 운동</span>
             <span>커뮤니티</span>
             <span>공지사항</span>
+            <span>건강 상품</span>
           </HeaderNavLeft>
         </HeaderLeft>
         {user !== null ? (

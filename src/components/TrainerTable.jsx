@@ -6,7 +6,7 @@ import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 import { IoReload } from 'react-icons/io5';
 import theme from '../styles/theme';
 
-const SubTable = ({ data, columns, onRowClick }) => {
+const TrainerTable = ({ data, columns, onRowClick }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
   const [openMenuId, setOpenMenuId] = useState(null); // 열려있는 메뉴의 row id를 저장
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 }); // 메뉴 위치 상태 추가
@@ -233,7 +233,7 @@ const SubTable = ({ data, columns, onRowClick }) => {
   );
 };
 
-export default SubTable;
+export default TrainerTable;
 
 // Styled-components (수정된 StyledTableContainer와 PopupMenu)
 const StyledTableContainer = styled.div`

@@ -50,9 +50,13 @@ const EditButton = styled.button`
 `;
 
 const CoachDetail = () => {
+  const userInfo = {
+    name: '이주찬',
+    img: '../../assets/beta_user_img.png',
+  };
   return (
     <>
-      <Header />
+      <Header user={userInfo} />
       <PageWrapper>
         <TitleBarContainer>
           <RecommendedExerciseSection title={'핏코치 매칭'} />

@@ -12,7 +12,7 @@ import CommunityPage from './pages/CommunityPage';
 import GlobalStyle from './styles/GlobalStyle';
 import MainPage from './pages/MainPage.jsx';
 import RecommendedExerciseSection from './pages/RecommendExercise.jsx';
-import CoachDetail from './pages/MatchingPage/CoachDetail';
+import CoachDetail from './pages/CoachMatching/CoachDetail';
 import RecommendExercise from './pages/RecommendExercise.jsx';
 import CoachRegister from './pages/CoachRegister.jsx';
 import RegionSelect from './components/RegionSelect.jsx';
@@ -21,12 +21,13 @@ import NextReservation from './pages/MatchingList/NextReservation.jsx';
 import HistoryModal from './components/modal/HistoryModal.jsx';
 import CoachList from './pages/CoachMatching/CoachList';
 import MatchingList from './pages/MatchingList/MatchingList';
+import ProductList from './pages/Products/ProductList';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <MatchingList />
+      <ProductList />
     </ThemeProvider>
   );
 }

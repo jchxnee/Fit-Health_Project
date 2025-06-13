@@ -65,7 +65,6 @@ const TrainerPhoto = () => (
     <Container>
       <TitleRow>
         <Title>트레이너 사진</Title>
-        <ViewAll>전체보기</ViewAll>
       </TitleRow>
       <List>
         {trainers.map((t) => (
