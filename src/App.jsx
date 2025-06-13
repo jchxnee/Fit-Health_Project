@@ -47,6 +47,7 @@ function App() {
           <Route path="/coachMatching" element={<CoachMatching />} /> {/* 핏코치 매칭 신청 */}
           <Route path="/coachReview" element={<CoachReview />} /> {/* 코치 리뷰 */}
           <Route path="/paymentPage" element={<PaymentPage />} /> {/* 결제페이지 */}
+          <Route path="/coachmatchingList" element={<CoachCalendar />} /> {/* 결제페이지 */}
           {/* 커뮤니티 */}
           <Route path="/community" element={<CommunityPage />} /> {/* 커뮤니티 */}
           <Route path="/communityPostCreationPage" element={<CommunityPostCreationPage />} /> {/* 커뮤니티 글등록 */}

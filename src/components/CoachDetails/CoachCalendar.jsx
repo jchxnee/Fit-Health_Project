@@ -13,7 +13,6 @@ import styled from 'styled-components';
 // react-transition-group 임포트
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import TitleBar from '../TitleBar.jsx';
-import theme from '../../styles/theme.js';
 
 // === 매칭 데이터 (CoachCalendar와 CoachMatchingList에서 공유) ===
 const allMatchingData = [
@@ -189,7 +188,7 @@ const localizer = momentLocalizer(moment);
 // Custom Toolbar Component for react-big-calendar
 const CustomToolbar = ({ label, onNavigate, onView, view }) => {
   return (
-      <div className="rbc-toolbar">
+    <div className="rbc-toolbar">
       <span className="rbc-btn-group rbc-nav-arrows">
         <button type="button" onClick={() => onNavigate('PREV')}>
           &lt;
@@ -198,11 +197,11 @@ const CustomToolbar = ({ label, onNavigate, onView, view }) => {
           &gt;
         </button>
       </span>
-        <span className="rbc-toolbar-label">{label}</span>
-        <span className="rbc-right-group">
-          <CoachSubBar onView={onView} currentView={view} />
+      <span className="rbc-toolbar-label">{label}</span>
+      <span className="rbc-right-group">
+        <CoachSubBar onView={onView} currentView={view} />
       </span>
-      </div>
+    </div>
   );
 };
 
@@ -221,30 +220,27 @@ function CoachCalendar() {
   const listRef = useRef(null);
 
   // 모든 매칭 데이터를 기반으로 캘린더 이벤트 생성
-  const calendarEvents = useMemo(
-      () => {
-        const events = [];
-        allMatchingData.forEach((match) => {
-          if (match.history && match.history.length > 0) {
-            match.history.forEach((session) => {
-              const [year, month, day] = session.date.split('/').map(Number);
-              const eventDate = new Date(year, month - 1, day);
+  const calendarEvents = useMemo(() => {
+    const events = [];
+    allMatchingData.forEach((match) => {
+      if (match.history && match.history.length > 0) {
+        match.history.forEach((session) => {
+          const [year, month, day] = session.date.split('/').map(Number);
+          const eventDate = new Date(year, month - 1, day);
 
-              events.push({
-                title: `${match.coachName} - ${session.session}`,
-                start: eventDate,
-                end: moment(eventDate).endOf('day').toDate(),
-                type: 'session', // 세션 타입
-                matchId: match.id,
-                status: match.status, // 매칭의 상태를 이벤트에 추가 (스타일링용)
-              });
-            });
-          }
+          events.push({
+            title: `${match.coachName} - ${session.session}`,
+            start: eventDate,
+            end: moment(eventDate).endOf('day').toDate(),
+            type: 'session', // 세션 타입
+            matchId: match.id,
+            status: match.status, // 매칭의 상태를 이벤트에 추가 (스타일링용)
+          });
         });
-        return events;
-      },
-      [allMatchingData],
-  );
+      }
+    });
+    return events;
+  }, [allMatchingData]);
 
   // 이벤트 Prop Getter (캘린더 이벤트 스타일링)
   const eventPropGetter = (event) => {
@@ -292,15 +288,15 @@ function CoachCalendar() {
   // 이벤트 렌더링 컴포넌트 (캘린더 내 각 이벤트 블록의 내용)
   const Event = ({ event }) => {
     return (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          {/* 코치 이름의 첫 글자를 initial로 표시 */}
-          {event.initial && (
-              <span className="event-initial" style={{ fontWeight: 'bold' }}>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {/* 코치 이름의 첫 글자를 initial로 표시 */}
+        {event.initial && (
+          <span className="event-initial" style={{ fontWeight: 'bold' }}>
             {event.initial}
           </span>
-          )}
-          <span className="event-title">{event.title}</span>
-        </div>
+        )}
+        <span className="event-title">{event.title}</span>
+      </div>
     );
   };
 
@@ -310,73 +306,73 @@ function CoachCalendar() {
   };
 
   return (
-      <>
-        <Header user={userInfo} />
-        <ContentWrapper>
-          <TitleBar title="매칭 내역" />
-          {/* <CoachSubBarWrapper> // 이 부분은 삭제했습니다.
+    <>
+      <Header user={userInfo} />
+      <ContentWrapper>
+        <TitleBar title="매칭 내역" />
+        {/* <CoachSubBarWrapper> // 이 부분은 삭제했습니다.
           <CoachSubBar onView={handleViewChange} currentView={view} />
         </CoachSubBarWrapper> */}
-        </ContentWrapper>
-        <CalendarContainer>
-          {/* TransitionGroup으로 뷰 전환을 감싸 애니메이션 적용 */}
-          <TransitionGroup component={null}>
-            {' '}
-            {/* component={null}로 불필요한 div 생성 방지 */}
-            {view === 'month' && (
-                <CSSTransition
-                    nodeRef={calendarRef} // ref 연결
-                    key="calendar-view"
-                    timeout={1000} // 애니메이션 지속 시간 (ms)
-                    classNames="fade" // CSS 클래스 프리픽스
-                >
-                  <div ref={calendarRef} className="view-transition-wrapper">
-                    <Calendar
-                        localizer={localizer}
-                        events={calendarEvents}
-                        startAccessor="start"
-                        endAccessor="end"
-                        style={{ height: '100%' }}
-                        defaultView="month"
-                        toolbar={true}
-                        views={['month']} // Calendar 컴포넌트가 내부적으로 지원하는 뷰는 'month'만
-                        date={currentDate}
-                        onNavigate={(newDate) => setCurrentDate(newDate)}
-                        components={{
-                          toolbar: (props) => (
-                              <CustomToolbar
-                                  {...props}
-                                  onView={handleViewChange} // CustomToolbar를 통해 CoachSubBar에 우리의 handleViewChange를 전달
-                                  view={view} // CustomToolbar에도 현재 뷰 상태 전달
-                              />
-                          ),
-                          event: Event,
-                        }}
-                        eventPropGetter={eventPropGetter}
-                    />
-                  </div>
-                </CSSTransition>
-            )}
-            {view === 'list' && (
-                <CSSTransition
-                    nodeRef={listRef} // ref 연결
-                    key="list-view"
-                    timeout={300} // 애니메이션 지속 시간 (ms)
-                    classNames="fade" // CSS 클래스 프리픽스
-                >
-                  <div ref={listRef} className="view-transition-wrapper">
-                    <CoachMatchingList
-                        allMatchingData={allMatchingData}
-                        onView={handleViewChange} // <--- 추가
-                        currentView={view} // <--- 추가
-                    />
-                  </div>
-                </CSSTransition>
-            )}
-          </TransitionGroup>
-        </CalendarContainer>
-        <Footer />
-      </>
+      </ContentWrapper>
+      <CalendarContainer>
+        {/* TransitionGroup으로 뷰 전환을 감싸 애니메이션 적용 */}
+        <TransitionGroup component={null}>
+          {' '}
+          {/* component={null}로 불필요한 div 생성 방지 */}
+          {view === 'month' && (
+            <CSSTransition
+              nodeRef={calendarRef} // ref 연결
+              key="calendar-view"
+              timeout={1000} // 애니메이션 지속 시간 (ms)
+              classNames="fade" // CSS 클래스 프리픽스
+            >
+              <div ref={calendarRef} className="view-transition-wrapper">
+                <Calendar
+                  localizer={localizer}
+                  events={calendarEvents}
+                  startAccessor="start"
+                  endAccessor="end"
+                  style={{ height: '100%' }}
+                  defaultView="month"
+                  toolbar={true}
+                  views={['month']} // Calendar 컴포넌트가 내부적으로 지원하는 뷰는 'month'만
+                  date={currentDate}
+                  onNavigate={(newDate) => setCurrentDate(newDate)}
+                  components={{
+                    toolbar: (props) => (
+                      <CustomToolbar
+                        {...props}
+                        onView={handleViewChange} // CustomToolbar를 통해 CoachSubBar에 우리의 handleViewChange를 전달
+                        view={view} // CustomToolbar에도 현재 뷰 상태 전달
+                      />
+                    ),
+                    event: Event,
+                  }}
+                  eventPropGetter={eventPropGetter}
+                />
+              </div>
+            </CSSTransition>
+          )}
+          {view === 'list' && (
+            <CSSTransition
+              nodeRef={listRef} // ref 연결
+              key="list-view"
+              timeout={300} // 애니메이션 지속 시간 (ms)
+              classNames="fade" // CSS 클래스 프리픽스
+            >
+              <div ref={listRef} className="view-transition-wrapper">
+                <CoachMatchingList
+                  allMatchingData={allMatchingData}
+                  onView={handleViewChange} // <--- 추가
+                  currentView={view} // <--- 추가
+                />
+              </div>
+            </CSSTransition>
+          )}
+        </TransitionGroup>
+      </CalendarContainer>
+      <Footer />
+    </>
   );
 }
 
