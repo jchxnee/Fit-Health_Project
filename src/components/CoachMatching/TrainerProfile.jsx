@@ -4,6 +4,7 @@ import { FaMapMarkerAlt, FaRegEnvelope } from 'react-icons/fa';
 import { FaInstagram } from 'react-icons/fa';
 import theme from '../../styles/theme';
 import { RiKakaoTalkFill } from 'react-icons/ri';
+import { Link } from 'react-router-dom';
 
 const ProfileCard = styled.div`
   display: flex;
@@ -146,6 +147,15 @@ const StyledInstagramIcon = styled(FaInstagram)`
   padding: 2px;
 `;
 
+const NavItem = styled(Link)`
+  width: 110px;
+  outline: none;
+`;
+const BackDiv = styled.div`
+  display: flex;
+  justify-content: end;
+`;
+
 const TrainerProfile = ({ trainer }) => {
   return (
     <ProfileCard>
@@ -181,7 +191,11 @@ const TrainerProfile = ({ trainer }) => {
           {trainer.location}
         </Location>
         <Introduction>{trainer.introduction}</Introduction>
-        <ApplyButton>신청하기</ApplyButton>
+        <BackDiv>
+          <NavItem to="/coachMatching">
+            <ApplyButton>신청하기</ApplyButton>
+          </NavItem>
+        </BackDiv>
       </ProfileInfo>
     </ProfileCard>
   );

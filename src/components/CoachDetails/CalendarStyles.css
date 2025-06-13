@@ -1,11 +1,10 @@
 /* General Calendar Container Adjustments */
 .rbc-calendar {
-  max-width: 1008px; /* 이미지 너비에 맞춰 설정 */
+  width: 1008px; /* 이미지 너비에 맞춰 설정 */
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   box-sizing: border-box; /* 모든 요소에 box-sizing 적용 */
 }
 
@@ -16,6 +15,7 @@
 
 /* Custom Toolbar Styles */
 .rbc-toolbar {
+  width: 100%;
   display: flex;
   justify-content: flex-start;
   align-items: center;

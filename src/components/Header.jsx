@@ -2,6 +2,7 @@ import React, { useState } from 'react'; // useState import
 import styled from 'styled-components'; // css import
 import headerIcon from '../assets/header_icon.png';
 import { FaBell, FaChevronDown, FaChevronUp, FaSyncAlt } from 'react-icons/fa'; // FaChevronDown, FaChevronUp import
+import { Link } from 'react-router-dom';
 
 // NotificationList 컴포넌트 (제공된 코드)
 function NotificationList() {
@@ -28,25 +29,35 @@ function NotificationList() {
 // UserMenu 컴포넌트 (제공된 코드)
 function UserMenu() {
   const menuItems = [
-    { name: '마이페이지', action: () => console.log('마이페이지 클릭') },
-    { name: '신청 내역', action: () => console.log('신청 내역 클릭') },
+    { name: '마이페이지', to: '/mypage' },
+    { name: '신청 내역', to: '/matchingList' },
     {
       name: '핏코치 등록',
+      to: '/coachRegister',
       icon: <StyledFaSyncAlt />,
-      action: () => console.log('핏코치 등록 클릭'),
     },
     { name: '로그아웃', action: () => console.log('로그아웃 클릭') },
     { name: '건강 상품', action: () => console.log('로그아웃 클릭') },
+    { name: '로그아웃', action: () => console.log('로그아웃 클릭') }, // 로그아웃은 여전히 함수로 유지
   ];
 
   return (
     <UserMenuContainer>
-      {menuItems.map((item) => (
-        <UserMenuItem key={item.name} onClick={item.action}>
-          {item.name}
-          {item.icon && item.icon}
-        </UserMenuItem>
-      ))}
+      {menuItems.map((item) =>
+        item.to ? (
+          <NavItem key={item.name} to={item.to}>
+            <UserMenuItem>
+              {item.name}
+              {item.icon && item.icon}
+            </UserMenuItem>
+          </NavItem>
+        ) : (
+          <UserMenuItem key={item.name} onClick={item.action}>
+            {item.name}
+            {item.icon && item.icon}
+          </UserMenuItem>
+        )
+      )}
     </UserMenuContainer>
   );
 }
@@ -72,13 +83,19 @@ function Header({ user }) {
     <HeaderComponent>
       <HeaderContent>
         <HeaderLeft>
-          <HeaderIcon src={headerIcon} alt="icon" />
+          <NavItem to="/">
+            <HeaderIcon src={headerIcon} alt="icon" />
+          </NavItem>
           <HeaderNavLeft>
             <span>핏코치 매칭</span>
             <span>추천 운동</span>
             <span>커뮤니티</span>
             <span>공지사항</span>
             <span>건강 상품</span>
+            <NavItem to="/coachList">핏코치 매칭</NavItem>
+            <NavItem to="/exercise">추천 운동</NavItem>
+            <NavItem to="/community">커뮤니티</NavItem>
+            <NavItem to="/notice">공지사항</NavItem>
           </HeaderNavLeft>
         </HeaderLeft>
         {user !== null ? (
@@ -88,7 +105,7 @@ function Header({ user }) {
                 <FaBell />
                 {hasNotifications && <RedDot />} {/* 알림이 있을 경우 빨간 점 표시 */}
               </NotificationWrapper>
-              <span>채팅</span>
+              <NavItem to="/chat">채팅</NavItem>
               <ProfileWrapper onClick={handleUserMenuClick}>
                 <ProfileImg src={user.img} alt="profileIcon" />
                 <span>{user.name}님</span>
@@ -113,7 +130,6 @@ function Header({ user }) {
     </HeaderComponent>
   );
 }
-
 const HeaderComponent = styled.header`
   width: 100%;
   height: 60px;
@@ -159,6 +175,10 @@ const HeaderNavLeft = styled.nav`
       color: ${({ theme }) => theme.colors.button};
     }
   }
+`;
+
+const NavItem = styled(Link)`
+  outline: none;
 `;
 
 const HeaderRight = styled.div`
@@ -340,6 +360,10 @@ const UserMenuContainer = styled.div`
   justify-content: space-around;
   align-items: center;
   box-shadow: ${({ theme }) => theme.shadows.sm};
+
+  button {
+    outline: none;
+  }
 `;
 
 const UserMenuItem = styled.div`

@@ -9,6 +9,8 @@ import theme from '../../styles/theme';
 import { FaSearch } from 'react-icons/fa';
 import Pagination from '../../components/Pagination';
 import HistoryModal from '../../components/modal/HistoryModal';
+import MatchingApprove from '../../components/modal/MatchingApprove.jsx';
+import MatchingRefuse from '../../components/modal/MatchingRefuse.jsx';
 
 const allMatchingData = [
   {
@@ -338,7 +340,7 @@ const MatchingList = () => {
       <Footer />
 
       {selectedRowData && (
-        <HistoryModal
+        <MatchingRefuse
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           coachName={selectedRowData.coachName}

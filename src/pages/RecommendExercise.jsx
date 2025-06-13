@@ -1,18 +1,18 @@
-import React from "react";
-import Routine from "../components/RecommendExercise/Routine.jsx";
-import Header from "../components/Header.jsx";
-import Footer from "../components/Footer.jsx";
-import TitleBar from "../components/TitleBar.jsx";
-import CategoryMenu from "../components/CategoryMenu.jsx";
-import BMICalculator from "../components/RecommendExercise/BMICalculator.jsx";
-import RecommendRoutine from "../components/RecommendExercise/RecommendRoutine.jsx";
-import styled from "styled-components";
+import React, { useState } from 'react';
+import Routine from '../components/RecommendExercise/Routine.jsx';
+import Header from '../components/Header.jsx';
+import Footer from '../components/Footer.jsx';
+import TitleBar from '../components/TitleBar.jsx';
+import CategoryMenu from '../components/CategoryMenu.jsx';
+import BMICalculator from '../components/RecommendExercise/BMICalculator.jsx';
+import RecommendRoutine from '../components/RecommendExercise/RecommendRoutine.jsx';
+import styled from 'styled-components';
+import betaImg from '../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const HeaderContainer = styled.div`
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    padding: ${({ theme }) => theme.spacing[8]};
+  width: 100%;
+  display: flex;
+  justify-content: center;
 `;
 
 const MainRow = styled.div`
@@ -41,25 +41,26 @@ const ContentWrapper = styled.div`
 `;
 
 function RecommendExercise() {
-    return(
-        <>
-            <Header/>
-            <HeaderContainer>
-                <TitleBar title="운동 추천"/>
-            </HeaderContainer>
-            <MainRow>
-                <CategoryMenuWrapper>
-                    <CategoryMenu/>
-                </CategoryMenuWrapper>
-                <ContentWrapper>
-                    <BMICalculator/>
-                    <Routine/>
-                    <RecommendRoutine/>
-                </ContentWrapper>
-            </MainRow>
-            <Footer/>
-        </>
-    )
+  const [user] = useState({ name: '김현아', img: betaImg });
+  return (
+    <>
+      <Header user={user} />
+      <HeaderContainer>
+        <TitleBar title="운동 추천" />
+      </HeaderContainer>
+      <MainRow>
+        <CategoryMenuWrapper>
+          <CategoryMenu />
+        </CategoryMenuWrapper>
+        <ContentWrapper>
+          <BMICalculator />
+          <Routine />
+          <RecommendRoutine />
+        </ContentWrapper>
+      </MainRow>
+      <Footer />
+    </>
+  );
 }
 
-export default RecommendExercise
+export default RecommendExercise;

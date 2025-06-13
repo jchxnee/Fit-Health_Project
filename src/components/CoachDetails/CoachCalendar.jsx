@@ -7,8 +7,15 @@ import './CalendarStyles.css'; // We'll create this for custom styles
 import CoachSubBar from '../CoachSubBar'; // Import CoachSubBar
 import Header from '../Header';
 import Footer from '../Footer';
+<<<<<<< HEAD
 import CoachList from '../../pages/CoachMatching/CoachList';
 import CoachMatchingList from './CoachMatchingList';
+import styled from "styled-components";
+=======
+import CoachList from '../../pages/coach/CoachList';
+import CoachMatchingList from './CoachMatchingList';
+import styled from 'styled-components';
+>>>>>>> 6f68e5b22b58a0819ed05e3f7274946804b4d07d
 
 moment.locale('ko'); // Set moment to use Korean locale
 const localizer = momentLocalizer(moment);
@@ -174,8 +181,12 @@ function MyCalendar() {
 
   return (
     <>
+<<<<<<< HEAD
+
+=======
+>>>>>>> 6f68e5b22b58a0819ed05e3f7274946804b4d07d
       <Header user={userInfo} />
-      <div style={{ width: '1008px', margin: '0 auto', padding: '50px' }}>
+      <CalendarContainer>
         <Calendar
           localizer={localizer}
           events={events}
@@ -194,11 +205,30 @@ function MyCalendar() {
           }}
           eventPropGetter={eventPropGetter}
         />
-      </div>
+      </CalendarContainer>
       <CoachMatchingList />
       <Footer />
+<<<<<<< HEAD
+
+=======
+>>>>>>> 6f68e5b22b58a0819ed05e3f7274946804b4d07d
     </>
   );
 }
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> 6f68e5b22b58a0819ed05e3f7274946804b4d07d
+const CalendarContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+<<<<<<< HEAD
+`
+=======
+`;
+>>>>>>> 6f68e5b22b58a0819ed05e3f7274946804b4d07d
 export default MyCalendar;
