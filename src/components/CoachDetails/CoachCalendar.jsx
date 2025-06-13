@@ -8,11 +8,12 @@ import CoachSubBar from './CoachSubBar.jsx';
 import Header from '../Header.jsx';
 import Footer from '../Footer.jsx';
 import CoachMatchingList from './CoachMatchingList.jsx';
-import styled from "styled-components";
+import styled from 'styled-components';
 
 // react-transition-group 임포트
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-
+import TitleBar from '../TitleBar.jsx';
+import theme from '../../styles/theme.js';
 
 // === 매칭 데이터 (CoachCalendar와 CoachMatchingList에서 공유) ===
 const allMatchingData = [
@@ -199,7 +200,6 @@ const CustomToolbar = ({ label, onNavigate, onView, view }) => {
       </span>
         <span className="rbc-toolbar-label">{label}</span>
         <span className="rbc-right-group">
-        {/* CoachSubBar에게 onView와 현재 뷰를 전달 */}
           <CoachSubBar onView={onView} currentView={view} />
       </span>
       </div>
@@ -212,21 +212,21 @@ function CoachCalendar() {
     img: '../src/assets/beta_user_img.png', // 이미지 경로 확인 필요
   };
 
-  const [view, setView] = useState('month'); // 'month' (캘린더 뷰) 또는 'list' (매칭 리스트 뷰)
+  // 초기 뷰를 'list'로 설정
+  const [view, setView] = useState('list'); // <-- 이 부분 변경: 'month' -> 'list'
   const [currentDate, setCurrentDate] = useState(moment().toDate()); // 캘린더의 현재 날짜
 
   // 각 뷰 컴포넌트에 대한 ref 생성 (CSSTransition에 필요)
   const calendarRef = useRef(null);
   const listRef = useRef(null);
 
-
   // 모든 매칭 데이터를 기반으로 캘린더 이벤트 생성
   const calendarEvents = useMemo(
       () => {
         const events = [];
-        allMatchingData.forEach(match => {
+        allMatchingData.forEach((match) => {
           if (match.history && match.history.length > 0) {
-            match.history.forEach(session => {
+            match.history.forEach((session) => {
               const [year, month, day] = session.date.split('/').map(Number);
               const eventDate = new Date(year, month - 1, day);
 
@@ -236,14 +236,14 @@ function CoachCalendar() {
                 end: moment(eventDate).endOf('day').toDate(),
                 type: 'session', // 세션 타입
                 matchId: match.id,
-                status: match.status // 매칭의 상태를 이벤트에 추가 (스타일링용)
+                status: match.status, // 매칭의 상태를 이벤트에 추가 (스타일링용)
               });
             });
           }
         });
         return events;
       },
-      [allMatchingData]
+      [allMatchingData],
   );
 
   // 이벤트 Prop Getter (캘린더 이벤트 스타일링)
@@ -312,14 +312,22 @@ function CoachCalendar() {
   return (
       <>
         <Header user={userInfo} />
+        <ContentWrapper>
+          <TitleBar title="매칭 내역" />
+          {/* <CoachSubBarWrapper> // 이 부분은 삭제했습니다.
+          <CoachSubBar onView={handleViewChange} currentView={view} />
+        </CoachSubBarWrapper> */}
+        </ContentWrapper>
         <CalendarContainer>
           {/* TransitionGroup으로 뷰 전환을 감싸 애니메이션 적용 */}
-          <TransitionGroup component={null}> {/* component={null}로 불필요한 div 생성 방지 */}
+          <TransitionGroup component={null}>
+            {' '}
+            {/* component={null}로 불필요한 div 생성 방지 */}
             {view === 'month' && (
                 <CSSTransition
                     nodeRef={calendarRef} // ref 연결
                     key="calendar-view"
-                    timeout={300} // 애니메이션 지속 시간 (ms)
+                    timeout={1000} // 애니메이션 지속 시간 (ms)
                     classNames="fade" // CSS 클래스 프리픽스
                 >
                   <div ref={calendarRef} className="view-transition-wrapper">
@@ -349,7 +357,6 @@ function CoachCalendar() {
                   </div>
                 </CSSTransition>
             )}
-
             {view === 'list' && (
                 <CSSTransition
                     nodeRef={listRef} // ref 연결
@@ -358,7 +365,11 @@ function CoachCalendar() {
                     classNames="fade" // CSS 클래스 프리픽스
                 >
                   <div ref={listRef} className="view-transition-wrapper">
-                    <CoachMatchingList allMatchingData={allMatchingData} />
+                    <CoachMatchingList
+                        allMatchingData={allMatchingData}
+                        onView={handleViewChange} // <--- 추가
+                        currentView={view} // <--- 추가
+                    />
                   </div>
                 </CSSTransition>
             )}
@@ -369,36 +380,71 @@ function CoachCalendar() {
   );
 }
 
+const ContentWrapper = styled.div`
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+`;
+
+// CoachSubBar를 위한 새로운 스타일드 컴포넌트 (삭제했습니다. 이제 CoachSubBar는 CustomToolbar 안에만 존재합니다.)
+// const CoachSubBarWrapper = styled.div`
+//   width: ${theme.width.lg}; /* TitleBar와 동일한 너비로 맞춤 */
+//   display: flex;
+//   justify-content: flex-end; /* 오른쪽 정렬 */
+//   padding: 10px 0; /* 상하 패딩 추가 */
+//   margin-bottom: 20px; /* 캘린더/리스트와의 간격 */
+// `;
+
 // 캘린더/리스트를 담는 컨테이너 스타일
+
 const CalendarContainer = styled.div`
   width: 100%;
+
   display: flex;
+
   justify-content: center;
+
   align-items: center;
+
   position: relative;
+
   min-height: 850px; /* 둘 다 커버 가능하도록 충분히 확보 */
 
   .view-transition-wrapper {
     position: absolute;
+
     width: 1008px;
+
     top: 0px;
+
     transition: opacity 300ms ease-in-out;
   }
 
   .fade-enter {
     opacity: 0;
+
     z-index: 1;
   }
+
   .fade-enter-active {
     opacity: 1;
+
     z-index: 1;
   }
+
   .fade-exit {
     opacity: 1;
+
     z-index: 0;
   }
+
   .fade-exit-active {
     opacity: 0;
+
     z-index: 0;
   }
 `;

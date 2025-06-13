@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar.jsx'; // 컴포넌트 경로 확인
 import SelectBar from '../../components/selectbar/BasicSelectBar.jsx'; // 컴포넌트 경로 확인
-import SubTable from '../../components/SubTable.jsx'; // 컴포넌트 경로 확인
 import theme from '../../styles/theme.js'; // 테마 경로 확인
 import { FaSearch } from 'react-icons/fa';
 import Pagination from '../../components/Pagination.jsx'; // Pagination 컴포넌트 임포트 확인
-import HistoryModal from '../../components/modal/HistoryModal.jsx'; // HistoryModal 임포트 확인
+import HistoryModal from '../../components/modal/HistoryModal.jsx';
+import TrainerTable from '../TrainerTable.jsx';
+import CoachSubBar from './CoachSubBar.jsx'; // CoachSubBar 임포트 추가
 
 const tableColumns = [
   { key: 'coachName', label: '코치 이름', sortable: true },
@@ -17,13 +18,7 @@ const tableColumns = [
   { key: 'startDate', label: '시작일자', sortable: true },
 ];
 
-const PageWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-`;
+
 
 const ContentWrapper = styled.div`
   width: ${theme.width.lg}; /* 테마에서 정의된 너비 사용 */
@@ -69,8 +64,15 @@ const SearchIcon = styled(FaSearch)`
   font-size: ${({ theme }) => theme.fontSizes.md};
 `;
 
-// allMatchingData를 prop으로 받도록 수정했습니다.
-const CoachMatchingList = ({ allMatchingData: initialMatchingData }) => {
+const SubWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 16px; /* 검색창과 버튼 사이 간격 추가 */
+  align-items: center; /* 수직 정렬 */
+`;
+
+// allMatchingData와 함께 onView, currentView prop을 받도록 수정
+const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, currentView }) => { // <-- prop 추가
   const selectBarOptions = [
     { label: '전체', value: 'all' },
     { label: '완료됨', value: '완료됨' },
@@ -100,7 +102,7 @@ const CoachMatchingList = ({ allMatchingData: initialMatchingData }) => {
 
     if (searchTerm) {
       currentFilteredData = currentFilteredData.filter((item) =>
-          item.coachName.toLowerCase().includes(searchTerm.toLowerCase())
+          item.coachName.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 
@@ -139,20 +141,21 @@ const CoachMatchingList = ({ allMatchingData: initialMatchingData }) => {
 
   return (
       <>
-        <PageWrapper>
-          <ContentWrapper>
-            <TitleBar title="매칭 내역" />
-            <TableWrapper>
-              <SelectBar options={selectBarOptions} onSelect={handleSelectBarChange} initialSelected={'all'} />
+        <ContentWrapper>
+          <TableWrapper>
+            <SelectBar options={selectBarOptions} onSelect={handleSelectBarChange} initialSelected={'all'} />
+            <SubWrapper>
               <SearchInputWrapper>
                 <SearchIcon />
                 <SearchInput type="text" placeholder="이름 검색" value={searchTerm} onChange={handleSearchChange} />
               </SearchInputWrapper>
-            </TableWrapper>
-            <SubTable data={currentItems} columns={tableColumns} onRowClick={handleRowClick} />
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
-          </ContentWrapper>
-        </PageWrapper>
+              {/* CoachSubBar를 여기에 렌더링하고 props 전달 */}
+              <CoachSubBar onView={onView} currentView={currentView} /> {/* <-- 추가 */}
+            </SubWrapper>
+          </TableWrapper>
+          <TrainerTable data={currentItems} columns={tableColumns} onRowClick={handleRowClick} />
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+        </ContentWrapper>
 
         {selectedRowData && (
             <HistoryModal

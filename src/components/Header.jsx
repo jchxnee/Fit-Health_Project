@@ -87,11 +87,6 @@ function Header({ user }) {
             <HeaderIcon src={headerIcon} alt="icon" />
           </NavItem>
           <HeaderNavLeft>
-            <span>핏코치 매칭</span>
-            <span>추천 운동</span>
-            <span>커뮤니티</span>
-            <span>공지사항</span>
-            <span>건강 상품</span>
             <NavItem to="/coachList">핏코치 매칭</NavItem>
             <NavItem to="/exercise">추천 운동</NavItem>
             <NavItem to="/community">커뮤니티</NavItem>

@@ -29,7 +29,8 @@
     "react-spinners": "^0.17.0",
     "react-toastify": "^11.0.5",
     "react-transition-group": "^4.4.5",
-    "styled-components": "^6.1.18",
+    "router-dom": "^3.0.3",
+    "styled-components": "^6.1.19",
     "yup": "^1.6.1",
     "zustand": "^5.0.5"
   },

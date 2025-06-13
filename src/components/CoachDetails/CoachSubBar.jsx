@@ -22,7 +22,7 @@ const StyledIconButton = styled.button`
 
     &:hover,
     &:focus {
-        background-color: ${({ theme }) => theme.colors.white};
+        background: #ccc;
         box-shadow: ${({ theme }) => theme.shadows.sm};
     }
 

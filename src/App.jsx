@@ -15,12 +15,19 @@ import HistoryModal from './components/modal/HistoryModal.jsx';
 import CoachList from './pages/CoachMatching/CoachList';
 import MatchingList from './pages/MatchingList/MatchingList';
 import ProductList from './pages/Products/ProductList';
+import SignUpPage from "./pages/MemberPage/SignUpPage.jsx";
+import LoginPage from "./pages/MemberPage/LoginPage.jsx";
+import CoachMatching from "./pages/coach/CoachMatching.jsx";
+import CoachReview from "./pages/community/CoachReview.jsx";
+import PaymentPage from "./pages/PayPage/PaymentPage.jsx";
+import CommunityPage from "./pages/community/CommunityPage.jsx";
+import NoticePage from "./pages/noticePage/NoticePage.jsx";
+import CoachMatchingList from "./components/CoachDetails/CoachMatchingList.jsx";
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <ProductList />
       <Router>
         <Routes>
           {/* 기본 */}
@@ -41,6 +48,7 @@ function App() {
           <Route path="/notice" element={<NoticePage />} /> {/* 공지사항 */}
           {/* 고객 */}
           <Route path="/matchingList" element={<MatchingList />} /> {/* 신청 내역 */}
+          <Route path="/CoachmatchingList" element={<CoachCalendar />} /> {/* 신청 내역 */}
         </Routes>
       </Router>
     </ThemeProvider>
