@@ -9,6 +9,7 @@ import Header from '../Header';
 import Footer from '../Footer';
 import CoachList from '../../pages/CoachMatching/CoachList';
 import CoachMatchingList from './CoachMatchingList';
+import styled from "styled-components";
 
 moment.locale('ko'); // Set moment to use Korean locale
 const localizer = momentLocalizer(moment);
@@ -174,8 +175,9 @@ function MyCalendar() {
 
   return (
     <>
+
       <Header user={userInfo} />
-      <div style={{ width: '1008px', margin: '0 auto', padding: '50px' }}>
+      <CalendarContainer>
         <Calendar
           localizer={localizer}
           events={events}
@@ -194,11 +196,20 @@ function MyCalendar() {
           }}
           eventPropGetter={eventPropGetter}
         />
-      </div>
+      </CalendarContainer>
       <CoachMatchingList />
       <Footer />
+
     </>
   );
 }
 
+
+const CalendarContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+`
 export default MyCalendar;

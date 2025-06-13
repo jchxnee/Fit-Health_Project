@@ -24,7 +24,7 @@ import MatchingList from "./pages/MatchingList/MatchingList.jsx";
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <MatchingList />
+      <CoachCalendar />
     </ThemeProvider>
   );
 }
