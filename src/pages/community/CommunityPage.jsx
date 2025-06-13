@@ -8,6 +8,7 @@ import { RiMessage2Fill } from 'react-icons/ri';
 import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 import CustomCategoryMenu from '../../components/CustomCategoryMenu';
 import GeneralPostsList from '../../components/GeneralPostsList'; // 새로 만든 컴포넌트 import
+import { Link } from 'react-router-dom';
 
 function CommunityPage() {
   const [user] = useState({ name: '김현아', img: betaImg });
@@ -129,7 +130,7 @@ function CommunityPage() {
             {/* 커뮤니티 타이틀 및 글쓰기 버튼 */}
             <SectionHeader>
               <SectionTitle>커뮤니티</SectionTitle>
-              <WriteButton>
+              <WriteButton to="/communityPostCreationPage">
                 <FaPencilAlt />
                 글쓰기
               </WriteButton>
@@ -217,6 +218,7 @@ const MainContentArea = styled.div`
 
 const SidebarWrapper = styled.div`
   flex-shrink: 0;
+  margin-top: 106px;
 `;
 
 const MainContentWrapper = styled.div`
@@ -241,8 +243,9 @@ const SectionTitle = styled.h1`
   margin: 0;
 `;
 
-const WriteButton = styled.button`
+const WriteButton = styled(Link)`
   display: flex;
+  outline: none;
   align-items: center;
   gap: ${({ theme }) => theme.spacing[2]};
   padding: ${({ theme }) => theme.spacing[3]} ${({ theme }) => theme.spacing[4]}; /* 12px 16px */

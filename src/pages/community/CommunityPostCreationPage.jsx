@@ -6,6 +6,7 @@ import TitleBar from '../../components/TitleBar';
 import { FaCamera } from 'react-icons/fa';
 import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 import { GoTriangleDown } from 'react-icons/go';
+import { Link } from 'react-router-dom';
 
 function CommunityPostCreationPage() {
   const [title, setTitle] = useState('');
@@ -88,7 +89,7 @@ function CommunityPostCreationPage() {
               )}
             </CategorySelect>
             <SubmitButtonWrapper>
-              <SubmitTextButton onClick={handleSubmit} disabled={!isFormValid} $isValid={isFormValid}>
+              <SubmitTextButton to="/community" onClick={handleSubmit} disabled={!isFormValid} $isValid={isFormValid}>
                 등록
               </SubmitTextButton>
               {!isFormValid && <Tooltip>제목과 내용을 입력해주세요</Tooltip>}
@@ -210,7 +211,7 @@ const SubmitButtonWrapper = styled.div`
   display: inline-block;
 `;
 
-const SubmitTextButton = styled.button`
+const SubmitTextButton = styled(Link)`
   background: none;
   border: none;
   color: ${({ $isValid, theme }) => ($isValid ? theme.colors.primary : theme.colors.gray['400'])};

@@ -24,6 +24,7 @@ import MyPage from './pages/MemberPage/MyPage';
 import ChatPage from './pages/ChatPage';
 import CommunityPage from './pages/community/CommunityPage';
 import NoticePage from './pages/noticePage/NoticePage';
+import CommunityPostCreationPage from './pages/community/CommunityPostCreationPage';
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
           <Route path="/paymentPage" element={<PaymentPage />} /> {/* 결제페이지 */}
           {/* 커뮤니티 */}
           <Route path="/community" element={<CommunityPage />} /> {/* 커뮤니티 */}
+          <Route path="/communityPostCreationPage" element={<CommunityPostCreationPage />} /> {/* 커뮤니티 글등록 */}
           <Route path="/notice" element={<NoticePage />} /> {/* 공지사항 */}
           {/* 고객 */}
           <Route path="/matchingList" element={<MatchingList />} /> {/* 신청 내역 */}
