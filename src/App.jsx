@@ -27,12 +27,33 @@ import NoticeDetailPage from './pages/noticePage/NoticeDetailPage';
 import FAQPage from './pages/FAQPage/FAQPage';
 import MyPostsPage from './pages/myselfWrite/MyPostsPage';
 import MyCommentsPage from './pages/myselfWrite/MyCommentsPage';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import SignUpPage from './pages/SignUpPage';
+import LoginPage from './pages/LoginPage';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <CommunityPage />
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/login" element={<LoginPage />} />
+          </Routes>
+        </Layout>
+      </Router>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        closeOnClick
+        draggable
+        hideProgressBar={false}
+        newestOnTop
+        theme="light"
+        pauseOnHover
+      />
     </ThemeProvider>
   );
 }
