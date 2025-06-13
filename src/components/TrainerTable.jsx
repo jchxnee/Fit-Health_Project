@@ -1,15 +1,18 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react'; // useRef, useEffect 추가
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import StatusBadge from './StatusBadge';
 import { CiMenuKebab } from 'react-icons/ci';
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 import { IoReload } from 'react-icons/io5';
-import theme from '../styles/theme'; // theme 임포트 추가 (SubTable이 ThemeProvider 내부에 있어도 CSS 변수를 직접 사용하지 않는 이상 필요)
+import theme from '../styles/theme';
 
-const SubTable = ({ data, columns, onRowClick }) => {
+const TrainerTable = ({ data, columns, onRowClick }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
   const [openMenuId, setOpenMenuId] = useState(null); // 열려있는 메뉴의 row id를 저장
-  const menuRef = useRef(null); // 메뉴 외부 클릭 감지를 위한 ref
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 }); // 메뉴 위치 상태 추가
+  const menuRef = useRef(null); // 팝업 메뉴 DOM 엘리먼트 참조
+  const currentMenuButtonRef = useRef(null); // 현재 열린 메뉴를 트리거한 버튼 DOM 엘리먼트 참조
+  const tableContainerRef = useRef(null); // StyledTableContainer DOM 엘리먼트 참조
 
   // 정렬된 데이터 반환 함수 (useMemo 최적화)
   const sortedData = useMemo(() => {
@@ -39,8 +42,16 @@ const SubTable = ({ data, columns, onRowClick }) => {
   // 메뉴 외부 클릭 감지 useEffect
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      // 팝업 메뉴 자체나 팝업 메뉴를 연 버튼이 아닌 다른 곳을 클릭했을 때 닫기
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        currentMenuButtonRef.current &&
+        !currentMenuButtonRef.current.contains(event.target)
+      ) {
         setOpenMenuId(null); // 메뉴 닫기
+        setMenuPosition({ top: 0, left: 0 }); // 메뉴 위치 초기화
+        currentMenuButtonRef.current = null; // 버튼 참조 초기화
       }
     };
 
@@ -48,7 +59,7 @@ const SubTable = ({ data, columns, onRowClick }) => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [menuRef]);
+  }, [currentMenuButtonRef, menuRef]);
 
   const handleSortClick = (key) => {
     let direction = 'ascending';
@@ -79,21 +90,51 @@ const SubTable = ({ data, columns, onRowClick }) => {
   };
 
   // 더보기 메뉴 토글 핸들러
-  const handleThreeDotsMenuClick = (e, rowId) => {
-    e.stopPropagation(); // 행 클릭 이벤트가 전파되는 것을 막음
-    setOpenMenuId(openMenuId === rowId ? null : rowId); // 이미 열려있으면 닫고, 아니면 열기
-  };
+  const handleThreeDotsMenuClick = useCallback(
+    (e, rowId) => {
+      e.stopPropagation(); // 행 클릭 이벤트가 전파되는 것을 막음
+
+      if (openMenuId === rowId) {
+        // 이미 열려있는 메뉴를 다시 클릭하면 닫기
+        setOpenMenuId(null);
+        setMenuPosition({ top: 0, left: 0 });
+        currentMenuButtonRef.current = null;
+      } else {
+        const buttonRect = e.currentTarget.getBoundingClientRect(); // '...' 버튼의 뷰포트 기준 위치
+        const tableContainer = tableContainerRef.current; // StyledTableContainer의 DOM 엘리먼트
+        const tableContainerRect = tableContainer ? tableContainer.getBoundingClientRect() : null; // 테이블 컨테이너의 뷰포트 기준 위치
+
+        if (!tableContainerRect) {
+          console.warn('Table container ref not found. Popup might not position correctly.');
+          return;
+        }
+
+        setMenuPosition({
+          // 팝업의 top은 '...' 버튼의 뷰포트 top에서 테이블 컨테이너의 뷰포트 top을 뺀 값으로 계산 (상대적인 top)
+          top: buttonRect.top - tableContainerRect.top,
+          // 팝업의 left는 테이블 컨테이너의 전체 너비 (오른쪽 끝) + 여백
+          left: tableContainerRect.width + 10, // 10px 여백
+        });
+        setOpenMenuId(rowId);
+        currentMenuButtonRef.current = e.currentTarget; // 현재 열린 메뉴를 트리거한 버튼 참조 저장
+      }
+    },
+    [openMenuId]
+  ); // openMenuId를 의존성 배열에 추가하여 상태 변경 시 함수 재생성
 
   // 메뉴 아이템 클릭 핸들러
   const handleMenuItemClick = (e, action, rowData) => {
     e.stopPropagation(); // 메뉴 아이템 클릭 시 메뉴가 바로 닫히지 않도록
     setOpenMenuId(null); // 메뉴 아이템 클릭 후 메뉴 닫기
+    setMenuPosition({ top: 0, left: 0 }); // 위치 초기화
+    currentMenuButtonRef.current = null; // 버튼 참조 초기화
     alert(`${rowData.coachName} 코치의 ${action} 선택됨!`); // 실제 로직으로 대체
     // 예: if (action === '1:1 채팅') { /* 1:1 채팅 로직 */ }
   };
 
   return (
-    <StyledTableContainer>
+    // StyledTableContainer에 ref 속성 추가
+    <StyledTableContainer ref={tableContainerRef}>
       <StyledTable>
         <thead>
           <tr>
@@ -113,45 +154,94 @@ const SubTable = ({ data, columns, onRowClick }) => {
         <tbody>
           {sortedData.map((row, rowIndex) => (
             <tr key={row.id || rowIndex} onClick={() => handleRowClick(row)}>
-              {' '}
-              {/* row.id 사용 권장, 없으면 rowIndex 사용 */}
               {columns.map((col) => (
                 <td key={col.key}>{col.key === 'status' ? <StatusBadge status={row[col.key]} /> : row[col.key]}</td>
               ))}
               <TdMenuCell>
-                {' '}
-                {/* 새로운 Styled-component 추가 */}
                 <ThreeDotsMenu onClick={(e) => handleThreeDotsMenuClick(e, row.id)}>
                   <CiMenuKebab />
                 </ThreeDotsMenu>
-                {openMenuId === row.id && (
-                  <PopupMenu ref={menuRef}>
-                    <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '1:1 채팅', row)}>1:1 채팅</PopupMenuItem>
-                    <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '정산신청', row)}>정산신청</PopupMenuItem>
-                    <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '승인', row)}>승인</PopupMenuItem>
-                    <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '거절', row)}>거절</PopupMenuItem>
-                    <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '삭제', row)} $isDelete>
-                      삭제
-                    </PopupMenuItem>
-                  </PopupMenu>
-                )}
               </TdMenuCell>
             </tr>
           ))}
         </tbody>
       </StyledTable>
+      {/* openMenuId가 null이 아닐 때만 팝업 메뉴 렌더링 */}
+      {openMenuId !== null && (
+        // PopupMenu는 StyledTableContainer의 자식으로, StyledTable 밖에서 렌더링
+        <PopupMenu ref={menuRef} $top={menuPosition.top} $left={menuPosition.left}>
+          {/* sortedData에서 해당 row 데이터를 찾아 전달 */}
+          <PopupMenuItem
+            onClick={(e) =>
+              handleMenuItemClick(
+                e,
+                '1:1 채팅',
+                sortedData.find((d) => d.id === openMenuId)
+              )
+            }
+          >
+            1:1 채팅
+          </PopupMenuItem>
+          <PopupMenuItem
+            onClick={(e) =>
+              handleMenuItemClick(
+                e,
+                '정산신청',
+                sortedData.find((d) => d.id === openMenuId)
+              )
+            }
+          >
+            정산신청
+          </PopupMenuItem>
+          <PopupMenuItem
+            onClick={(e) =>
+              handleMenuItemClick(
+                e,
+                '승인',
+                sortedData.find((d) => d.id === openMenuId)
+              )
+            }
+          >
+            승인
+          </PopupMenuItem>
+          <PopupMenuItem
+            onClick={(e) =>
+              handleMenuItemClick(
+                e,
+                '거절',
+                sortedData.find((d) => d.id === openMenuId)
+              )
+            }
+          >
+            거절
+          </PopupMenuItem>
+          <PopupMenuItem
+            onClick={(e) =>
+              handleMenuItemClick(
+                e,
+                '삭제',
+                sortedData.find((d) => d.id === openMenuId)
+              )
+            }
+            $isDelete
+          >
+            삭제
+          </PopupMenuItem>
+        </PopupMenu>
+      )}
     </StyledTableContainer>
   );
 };
 
-export default SubTable;
+export default TrainerTable;
 
-// 기존 Styled-components 정의 (변동 없음)
+// Styled-components (수정된 StyledTableContainer와 PopupMenu)
 const StyledTableContainer = styled.div`
   width: 100%;
-  overflow-x: auto;
   margin-top: 20px;
   width: ${theme.width.lg};
+  margin-bottom: 60px;
+  position: relative; /* 중요: 이 요소를 기준으로 자식 absolute 요소가 위치합니다. */
 `;
 
 const StyledTable = styled.table`
@@ -224,30 +314,31 @@ const ThreeDotsMenu = styled.button`
   border-radius: ${theme.borderRadius.sm};
   width: 100%;
   height: 100%;
-  position: relative; /* 팝업 메뉴의 기준점 */
-  z-index: 1; /* 다른 요소 위에 팝업이 뜨도록 */
+  position: relative;
+  z-index: 1;
+  outline: none;
 `;
 
-// 새로 추가된 Styled-components
 const TdMenuCell = styled.td`
-  position: relative; /* 팝업 메뉴의 위치를 위한 기준점 설정 */
-  width: 50px; /* 케밥 메뉴 아이콘이 들어갈 칸의 너비 조정 */
-  text-align: center !important; /* 가운데 정렬 */
+  position: relative;
+  width: 50px;
+  text-align: center !important;
 `;
 
 const PopupMenu = styled.div`
-  position: absolute;
-  top: 100%; /* 더보기 버튼 바로 아래에 위치 */
-  right: 0; /* 더보기 버튼의 우측 정렬 */
+  position: absolute; /* fixed 대신 absolute로 변경 */
+  top: ${({ $top }) => $top}px;
+  left: ${({ $left }) => $left}px;
   background: ${theme.colors.white};
   border: 1px solid ${theme.colors.gray['200']};
   border-radius: ${theme.borderRadius.md};
   box-shadow: ${theme.shadows.md};
-  min-width: 120px; /* 메뉴의 최소 너비 */
-  z-index: ${theme.zIndices.dropdown}; /* 다른 UI 요소 위에 표시 */
+  min-width: 120px;
+  z-index: ${theme.zIndices.docked};
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* border-radius 적용을 위해 */
+  overflow: hidden;
+  outline: none;
 `;
 
 const PopupMenuItem = styled.button`
@@ -259,8 +350,8 @@ const PopupMenuItem = styled.button`
   font-size: ${theme.fontSizes.sm};
   color: ${({ theme, $isDelete }) => ($isDelete ? theme.colors.danger : theme.colors.gray['800'])};
   cursor: pointer;
-  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
-
+  white-space: nowrap;
+  outline: none;
   &:hover {
     background-color: ${theme.colors.gray['100']};
   }

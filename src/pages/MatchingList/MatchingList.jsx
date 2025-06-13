@@ -1,20 +1,17 @@
-// MatchingList.jsx 파일
-
 import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import SelectBar from '../../components/selectbar/BasicSelectBar';
-import SubTable from '../../components/SubTable';
+import UserTable from '../../components/UserTable';
 import theme from '../../styles/theme';
 import { FaSearch } from 'react-icons/fa';
-import Pagination from '../../components/Pagination'; // Pagination 컴포넌트 임포트 확인
+import Pagination from '../../components/Pagination';
 import HistoryModal from '../../components/modal/HistoryModal';
 import MatchingApprove from '../../components/modal/MatchingApprove.jsx';
 import MatchingRefuse from '../../components/modal/MatchingRefuse.jsx';
 
-// 실제 데이터 (allMatchingData)는 외부 상수이므로 컴포넌트 외부에 정의
 const allMatchingData = [
   {
     id: 1,
@@ -335,7 +332,7 @@ const MatchingList = () => {
               <SearchInput type="text" placeholder="이름 검색" value={searchTerm} onChange={handleSearchChange} />
             </SearchInputWrapper>
           </TableWrapper>
-          <SubTable data={currentItems} columns={tableColumns} onRowClick={handleRowClick} />
+          <UserTable data={currentItems} columns={tableColumns} onRowClick={handleRowClick} />
           {/* Pagination 컴포넌트에 prop 전달 */}
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </ContentWrapper>

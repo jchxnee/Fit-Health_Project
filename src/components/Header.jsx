@@ -36,6 +36,8 @@ function UserMenu() {
       to: '/coachRegister',
       icon: <StyledFaSyncAlt />,
     },
+    { name: '로그아웃', action: () => console.log('로그아웃 클릭') },
+    { name: '건강 상품', to: '/productList' },
     { name: '로그아웃', action: () => console.log('로그아웃 클릭') }, // 로그아웃은 여전히 함수로 유지
   ];
 
@@ -89,6 +91,7 @@ function Header({ user }) {
             <NavItem to="/exercise">추천 운동</NavItem>
             <NavItem to="/community">커뮤니티</NavItem>
             <NavItem to="/notice">공지사항</NavItem>
+            <NavItem to="/productList">건강 상품</NavItem>
           </HeaderNavLeft>
         </HeaderLeft>
         {user !== null ? (

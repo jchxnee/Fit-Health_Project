@@ -4,20 +4,22 @@ import './App.css';
 import theme from './styles/theme';
 import GlobalStyle from './styles/GlobalStyle';
 import MainPage from './pages/MainPage.jsx';
+import RecommendedExerciseSection from './pages/RecommendExercise.jsx';
+import CoachDetail from './pages/CoachMatching/CoachDetail';
+import RecommendExercise from './pages/RecommendExercise.jsx';
+import CoachRegister from './pages/coach/CoachRegister';
+import RegionSelect from './components/RegionSelect.jsx';
+import CoachCalendar from './components/CoachDetails/CoachCalendar.jsx';
+import NextReservation from './pages/MatchingList/NextReservation.jsx';
+import HistoryModal from './components/modal/HistoryModal.jsx';
+import CoachList from './pages/CoachMatching/CoachList';
+import MatchingList from './pages/MatchingList/MatchingList';
+import ProductList from './pages/Products/ProductList';
 import SignUpPage from './pages/MemberPage/SignUpPage';
 import LoginPage from './pages/MemberPage/LoginPage';
-import CoachMatching from './pages/coach/CoachMatching';
-import CoachList from './pages/coach/CoachList';
-import CommunityPage from './pages/community/CommunityPage';
-import RecommendExercise from './pages/RecommendExercise';
-import NoticePage from './pages/noticePage/NoticePage';
-import MatchingList from './pages/MatchingList/MatchingList';
-import CoachRegister from './pages/coach/CoachRegister';
-import CoachDetail from './pages/coach/CoachDetail';
+import CoachMatching from './pages/CoachMatching/CoachMatching';
 import CoachReview from './pages/community/CoachReview';
 import PaymentPage from './pages/PayPage/PaymentPage';
-import MyPage from './pages/MemberPage/MyPage';
-import ChatPage from './pages/ChatPage';
 
 function App() {
   return (
@@ -31,6 +33,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} /> {/* 로그인 */}
           <Route path="/mypage" element={<MyPage />} /> {/* 마이페이지 */}
           <Route path="/exercise" element={<RecommendExercise />} /> {/* 추천 운동 */}
+          <Route path="/productList" element={<ProductList />} /> {/* 건강 상품 리스트 */}
           <Route path="/chat" element={<ChatPage />} /> {/* 채팅 */}
           {/* 코치 */}
           <Route path="/coachList" element={<CoachList />} /> {/* 핏코치 매칭 */}

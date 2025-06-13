@@ -6,7 +6,7 @@ import Footer from '../../components/Footer';
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import SelectBar from '../../components/selectbar/BasicSelectBar';
-import SubTable from '../../components/SubTable';
+import SubTable from '../TrainerTable';
 import theme from '../../styles/theme';
 import { FaSearch } from 'react-icons/fa';
 import Pagination from '../../components/Pagination'; // Pagination 컴포넌트 임포트 확인

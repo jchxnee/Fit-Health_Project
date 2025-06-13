@@ -18,10 +18,9 @@ const PageWrapper = styled.div`
   width: 100%;
   min-height: 100vh;
   background-color: ${theme.colors.white};
-<<<<<<<< HEAD:src/pages/CoachMatching/CoachList.jsx
+
   margin-top: ${theme.spacing[5]};
-========
->>>>>>>> 6f68e5b22b58a0819ed05e3f7274946804b4d07d:src/pages/coach/CoachList.jsx
+
   margin-bottom: 100px;
 `;
 
