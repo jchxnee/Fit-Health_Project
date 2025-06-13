@@ -5,8 +5,8 @@ const Wrapper = styled.section`
   width: 100%;
   display: flex;
   justify-content: center;
-  background: #fff;
-  padding: 38px 0;
+  background: ${({ theme }) => theme.colors.white};
+  padding: ${({ theme }) => theme.spacing[10]} 0;
 `;
 const List = styled.div`
   display: flex;
@@ -19,11 +19,11 @@ const Item = styled.div`
   cursor: pointer;
 `;
 const IconBox = styled.div`
-  width: 40px;
-  height: 40px;
+  width: ${({ theme }) => theme.spacing[10]};
+  height: ${({ theme }) => theme.spacing[10]};
   background: ${({theme}) => theme.colors.gray[300]};
-  border-radius: 10px;
-  margin-bottom: 8px;
+  border-radius: ${({ theme }) => theme.borderRadius.ten};
+  margin-bottom: ${({ theme }) => theme.spacing[2]};
 `;
 const Label = styled.span`
   font-size: ${({ theme }) => theme.fontSizes.sm };

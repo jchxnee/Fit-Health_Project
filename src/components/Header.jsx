@@ -141,7 +141,7 @@ const HeaderLeft = styled.div`
 
 const HeaderIcon = styled.img`
   width: 124px;
-  height: 24px;
+  height: ${({ theme }) => theme.spacing[6]};
 `;
 
 const HeaderNavLeft = styled.nav`

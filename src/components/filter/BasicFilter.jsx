@@ -14,7 +14,7 @@ export const FilterButton = styled.button`
   font-size: ${({ theme }) => theme.fontSizes.sm};
   cursor: pointer;
   transition: background-color 0.3s ease;
-  min-width: 80px;
+  min-width: ${({ theme }) => theme.spacing[20]};
   position: relative;
 
   &:hover {

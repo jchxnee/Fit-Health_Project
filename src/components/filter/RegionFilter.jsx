@@ -4,7 +4,7 @@ import theme from '/src/styles/theme.js';
 
 const StyledButton = styled.button`
   min-width: 50px;
-  height: 48px;
+  height: ${({ theme }) => theme.spacing[12]};
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
   margin: ${theme.spacing[2]};
   border-radius: ${theme.borderRadius.md};
@@ -15,7 +15,7 @@ const StyledButton = styled.button`
 
   background-color: ${(props) => (props.selected ? theme.colors.skyblue : theme.colors.white)};
   color: ${(props) => (props.selected ? theme.colors.black : theme.colors.black)};
-  border: 1px solid ${(props) => (props.selected ? theme.colors.bl : theme.colors.gray[300])};
+  border: 1px solid ${(props) => (props.selected ? theme.colors.skyblue : theme.colors.gray[300])};
 
   &:hover {
     box-shadow: ${theme.shadows.sm};
