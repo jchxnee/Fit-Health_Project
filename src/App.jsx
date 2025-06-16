@@ -72,6 +72,7 @@ function App() {
           <Route path="/nextReservation" element={<NextReservation />} /> {/* 다음 회차 예약 */}
           <Route path="/coachReview" element={<CoachReview />} /> {/* 코치 리뷰 */}
           <Route path="/paymentPage" element={<PaymentPage />} /> {/* 결제페이지 */}
+          <Route path="/coachmatchingList" element={<CoachCalendar />} /> {/* 결제페이지 */}
           {/* 커뮤니티 */}
           <Route path="/community" element={<CommunityPage />} /> {/* 커뮤니티 */}
           <Route path="/communityPostCreationPage" element={<CommunityPostCreationPage />} /> {/* 커뮤니티 글등록 */}

@@ -18,13 +18,12 @@ const tableColumns = [
   { key: 'startDate', label: '시작일자', sortable: true },
 ];
 
-
-
 const ContentWrapper = styled.div`
   width: ${theme.width.lg}; /* 테마에서 정의된 너비 사용 */
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: ${theme.spacing[2]};
 `;
 
 const TableWrapper = styled.div`
@@ -72,7 +71,8 @@ const SubWrapper = styled.div`
 `;
 
 // allMatchingData와 함께 onView, currentView prop을 받도록 수정
-const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, currentView }) => { // <-- prop 추가
+const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, currentView }) => {
+  // <-- prop 추가
   const selectBarOptions = [
     { label: '전체', value: 'all' },
     { label: '완료됨', value: '완료됨' },
@@ -102,7 +102,7 @@ const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, curre
 
     if (searchTerm) {
       currentFilteredData = currentFilteredData.filter((item) =>
-          item.coachName.toLowerCase().includes(searchTerm.toLowerCase()),
+        item.coachName.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -140,33 +140,33 @@ const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, curre
   };
 
   return (
-      <>
-        <ContentWrapper>
-          <TableWrapper>
-            <SelectBar options={selectBarOptions} onSelect={handleSelectBarChange} initialSelected={'all'} />
-            <SubWrapper>
-              <SearchInputWrapper>
-                <SearchIcon />
-                <SearchInput type="text" placeholder="이름 검색" value={searchTerm} onChange={handleSearchChange} />
-              </SearchInputWrapper>
-              {/* CoachSubBar를 여기에 렌더링하고 props 전달 */}
-              <CoachSubBar onView={onView} currentView={currentView} /> {/* <-- 추가 */}
-            </SubWrapper>
-          </TableWrapper>
-          <TrainerTable data={currentItems} columns={tableColumns} onRowClick={handleRowClick} />
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
-        </ContentWrapper>
+    <>
+      <ContentWrapper>
+        <TableWrapper>
+          <SelectBar options={selectBarOptions} onSelect={handleSelectBarChange} initialSelected={'all'} />
+          <SubWrapper>
+            <SearchInputWrapper>
+              <SearchIcon />
+              <SearchInput type="text" placeholder="이름 검색" value={searchTerm} onChange={handleSearchChange} />
+            </SearchInputWrapper>
+            {/* CoachSubBar를 여기에 렌더링하고 props 전달 */}
+            <CoachSubBar onView={onView} currentView={currentView} /> {/* <-- 추가 */}
+          </SubWrapper>
+        </TableWrapper>
+        <TrainerTable data={currentItems} columns={tableColumns} onRowClick={handleRowClick} />
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+      </ContentWrapper>
 
-        {selectedRowData && (
-            <HistoryModal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                coachName={selectedRowData.coachName}
-                sessions={selectedRowData.sessions}
-                history={selectedRowData.history || []}
-            />
-        )}
-      </>
+      {selectedRowData && (
+        <HistoryModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          coachName={selectedRowData.coachName}
+          sessions={selectedRowData.sessions}
+          history={selectedRowData.history || []}
+        />
+      )}
+    </>
   );
 };
 
