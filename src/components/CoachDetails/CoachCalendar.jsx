@@ -1,21 +1,191 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react'; // useRef 추가
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
-import 'moment/locale/ko'; // Import Korean locale for moment
+import 'moment/locale/ko';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import './CalendarStyles.css'; // We'll create this for custom styles
-import CoachSubBar from '../CoachSubBar'; // Import CoachSubBar
-import Header from '../Header';
-import Footer from '../Footer';
-
-import CoachList from '../../pages/coach/CoachList';
-import CoachMatchingList from './CoachMatchingList';
+import './CalendarStyles.css'; // 캘린더 전용 스타일
+import CoachSubBar from './CoachSubBar.jsx';
+import Header from '../Header.jsx';
+import Footer from '../Footer.jsx';
+import CoachMatchingList from './CoachMatchingList.jsx';
 import styled from 'styled-components';
 
-moment.locale('ko'); // Set moment to use Korean locale
+// react-transition-group 임포트
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import TitleBar from '../TitleBar.jsx';
+
+// === 매칭 데이터 (CoachCalendar와 CoachMatchingList에서 공유) ===
+const allMatchingData = [
+  {
+    id: 1,
+    coachName: '김현아',
+    category: '도수',
+    status: '완료됨',
+    sessions: '10회/10회',
+    amount: '50,000원',
+    startDate: '2025/06/04 19:00',
+    history: [
+      { date: '2025/06/04', session: '1회차' },
+      { date: '2025/06/06', session: '2회차' },
+      { date: '2025/06/08', session: '3회차' },
+      { date: '2025/06/10', session: '4회차' },
+      { date: '2025/06/12', session: '5회차' },
+      { date: '2025/06/14', session: '6회차' },
+      { date: '2025/06/16', session: '7회차' },
+      { date: '2025/06/18', session: '8회차' },
+      { date: '2025/06/20', session: '9회차' },
+      { date: '2025/06/22', session: '10회차' },
+    ],
+  },
+  {
+    id: 2,
+    coachName: '이주찬',
+    category: '재활',
+    status: '진행중',
+    sessions: '2회/10회',
+    amount: '138,000원',
+    startDate: '2025/06/04 19:00',
+    history: [
+      { date: '2025/06/04', session: '1회차' },
+      { date: '2025/06/06', session: '2회차' },
+    ],
+  },
+  {
+    id: 3,
+    coachName: '전진영',
+    category: '헬스',
+    status: '완료됨',
+    sessions: '4회/4회',
+    amount: '182,000원',
+    startDate: '2025/06/04 19:00',
+    history: [
+      { date: '2025/06/01', session: '1회차' },
+      { date: '2025/06/02', session: '2회차' },
+      { date: '2025/06/03', session: '3회차' },
+      { date: '2025/06/04', session: '4회차' },
+    ],
+  },
+  {
+    id: 4,
+    coachName: '전진영',
+    category: '헬스',
+    status: '취소됨',
+    sessions: '0회/9회',
+    amount: '440,000원',
+    startDate: '2025/06/04 19:00',
+    history: [], // 취소된 기록은 비어있을 수 있음
+  },
+  {
+    id: 5,
+    coachName: '황인태',
+    category: '도수',
+    status: '진행중',
+    sessions: '8회/10회',
+    amount: '423,000원',
+    startDate: '2025/06/04 19:00',
+    history: [
+      { date: '2025/06/01', session: '1회차' },
+      { date: '2025/06/03', session: '2회차' },
+      { date: '2025/06/05', session: '3회차' },
+      { date: '2025/06/07', session: '4회차' },
+      { date: '2025/06/09', session: '5회차' },
+      { date: '2025/06/11', session: '6회차' },
+      { date: '2025/06/13', session: '7회차' },
+      { date: '2025/06/15', session: '8회차' },
+    ],
+  },
+  {
+    id: 6,
+    coachName: '전진영',
+    category: '재활',
+    status: '완료됨',
+    sessions: '10회/10회',
+    amount: '517,000원',
+    startDate: '2025/06/04 19:00',
+    history: [
+      { date: '2025/05/20', session: '1회차' },
+      { date: '2025/05/22', session: '2회차' },
+      { date: '2025/05/24', session: '3회차' },
+      { date: '2025/05/26', session: '4회차' },
+      { date: '2025/05/28', session: '5회차' },
+      { date: '2025/05/30', session: '6회차' },
+      { date: '2025/06/01', session: '7회차' },
+      { date: '2025/06/03', session: '8회차' },
+      { date: '2025/06/05', session: '9회차' },
+      { date: '2025/06/07', session: '10회차' },
+    ],
+  },
+  {
+    id: 7,
+    coachName: '전진영',
+    category: '재활',
+    status: '취소됨',
+    sessions: '0회/10회',
+    amount: '517,000원',
+    startDate: '2025/06/04 19:00',
+    history: [],
+  },
+  {
+    id: 8,
+    coachName: '전진영',
+    category: '재활',
+    status: '진행중',
+    sessions: '5회/10회',
+    amount: '517,000원',
+    startDate: '2025/06/04 19:00',
+    history: [
+      { date: '2025/06/04', session: '1회차' },
+      { date: '2025/06/07', session: '2회차' },
+      { date: '2025/06/10', session: '3회차' },
+      { date: '2025/06/13', session: '4회차' },
+      { date: '2025/06/16', session: '5회차' },
+    ],
+  },
+  {
+    id: 9,
+    coachName: '전진영',
+    category: '재활',
+    status: '완료됨',
+    sessions: '10회/10회',
+    amount: '517,000원',
+    startDate: '2025/06/04 19:00',
+    history: [
+      { date: '2025/04/10', session: '1회차' },
+      { date: '2025/04/12', session: '2회차' },
+      { date: '2025/04/14', session: '3회차' },
+      { date: '2025/04/16', session: '4회차' },
+      { date: '2025/04/18', session: '5회차' },
+      { date: '2025/04/20', session: '6회차' },
+      { date: '2025/04/22', session: '7회차' },
+      { date: '2025/04/24', session: '8회차' },
+      { date: '2025/04/26', session: '9회차' },
+      { date: '2025/04/28', session: '10회차' },
+    ],
+  },
+  {
+    id: 10,
+    coachName: '전진영',
+    category: '재활',
+    status: '진행중',
+    sessions: '7회/10회',
+    amount: '517,000원',
+    startDate: '2025/06/04 19:00',
+    history: [
+      { date: '2025/06/01', session: '1회차' },
+      { date: '2025/06/03', session: '2회차' },
+      { date: '2025/06/05', session: '3회차' },
+      { date: '2025/06/07', session: '4회차' },
+      { date: '2025/06/09', session: '5회차' },
+      { date: '2025/06/11', session: '6회차' },
+      { date: '2025/06/13', session: '7회차' },
+    ],
+  },
+];
+
+moment.locale('ko'); // moment를 한국어 로케일로 설정
 const localizer = momentLocalizer(moment);
 
-// Custom Toolbar Component
+// Custom Toolbar Component for react-big-calendar
 const CustomToolbar = ({ label, onNavigate, onView, view }) => {
   return (
     <div className="rbc-toolbar">
@@ -29,141 +199,97 @@ const CustomToolbar = ({ label, onNavigate, onView, view }) => {
       </span>
       <span className="rbc-toolbar-label">{label}</span>
       <span className="rbc-right-group">
-        <span className="rbc-btn-group rbc-nav-arrows"></span>
         <CoachSubBar onView={onView} currentView={view} />
       </span>
     </div>
   );
 };
 
-function MyCalendar() {
+function CoachCalendar() {
   const userInfo = {
     name: '이주찬',
-    img: '../src/assets/beta_user_img.png',
+    img: '../src/assets/beta_user_img.png', // 이미지 경로 확인 필요
   };
-  // Set the initial date to October 2024 as in the new image
-  const [currentDate, setCurrentDate] = useState(new Date(2024, 9, 1)); // October is month 9 (0-indexed)
-  const [view, setView] = useState('month'); // Keep track of the current view
 
-  const events = useMemo(
-    () => [
-      {
-        title: '임시공휴일',
-        start: new Date(2024, 9, 1), // Oct 1st
-        end: new Date(2024, 9, 1, 23, 59, 59),
-        type: 'holiday',
-        initial: 'H',
-      },
-      {
-        title: '개천절',
-        start: new Date(2024, 9, 3), // Oct 3rd
-        end: new Date(2024, 9, 3, 23, 59, 59),
-        type: 'holiday',
-        initial: 'H',
-      },
-      {
-        title: '한글날',
-        start: new Date(2024, 9, 9), // Oct 9th
-        end: new Date(2024, 9, 9, 23, 59, 59),
-        type: 'holiday',
-        initial: 'H',
-      },
-      {
-        title: '전시회 방문',
-        start: new Date(2024, 9, 10), // Oct 10th
-        end: new Date(2024, 9, 10, 23, 59, 59),
-        type: 'personal',
-        initial: 'P',
-      },
-      {
-        title: 'FE 스터디', // Changed title
-        start: new Date(2024, 9, 13), // Oct 13th
-        end: new Date(2024, 9, 13, 23, 59, 59),
-        type: 'green',
-        initial: 'S',
-      },
-      {
-        title: '운동',
-        start: new Date(2024, 9, 16), // Oct 16th
-        end: new Date(2024, 9, 16, 12, 0, 0),
-        type: 'activity',
-        initial: 'G',
-      },
-      {
-        title: '은행업무',
-        start: new Date(2024, 9, 16, 13, 0, 0),
-        end: new Date(2024, 9, 16, 17, 0, 0),
-        type: 'errand',
-        initial: 'E',
-      },
-      {
-        title: '여행', // Changed title
-        start: new Date(2024, 9, 20), // Oct 20th
-        end: new Date(2024, 9, 22, 23, 59, 59), // Spanning multiple days
-        type: 'long_personal',
-        initial: 'P',
-      },
-    ],
-    []
-  );
+  // 초기 뷰를 'list'로 설정
+  const [view, setView] = useState('list'); // <-- 이 부분 변경: 'month' -> 'list'
+  const [currentDate, setCurrentDate] = useState(moment().toDate()); // 캘린더의 현재 날짜
 
-  const eventPropGetter = (event, start, end, isSelected) => {
+  // 각 뷰 컴포넌트에 대한 ref 생성 (CSSTransition에 필요)
+  const calendarRef = useRef(null);
+  const listRef = useRef(null);
+
+  // 모든 매칭 데이터를 기반으로 캘린더 이벤트 생성
+  const calendarEvents = useMemo(() => {
+    const events = [];
+    allMatchingData.forEach((match) => {
+      if (match.history && match.history.length > 0) {
+        match.history.forEach((session) => {
+          const [year, month, day] = session.date.split('/').map(Number);
+          const eventDate = new Date(year, month - 1, day);
+
+          events.push({
+            title: `${match.coachName} - ${session.session}`,
+            start: eventDate,
+            end: moment(eventDate).endOf('day').toDate(),
+            type: 'session', // 세션 타입
+            matchId: match.id,
+            status: match.status, // 매칭의 상태를 이벤트에 추가 (스타일링용)
+          });
+        });
+      }
+    });
+    return events;
+  }, [allMatchingData]);
+
+  // 이벤트 Prop Getter (캘린더 이벤트 스타일링)
+  const eventPropGetter = (event) => {
     let newStyle = {
-      backgroundColor: 'lightgray', // Default
+      backgroundColor: 'lightgray',
       color: 'black',
-      borderRadius: '4px', // Slightly rounded corners
-      border: '1px solid transparent', // Subtle border
+      borderRadius: '4px',
+      border: '1px solid transparent',
       fontSize: '12px',
-      padding: '2px 5px', // More padding
+      padding: '2px 5px',
       display: 'flex',
       alignItems: 'center',
-      gap: '5px', // Space between initial and title
+      gap: '5px',
     };
 
-    switch (event.type) {
-      case 'holiday':
-        newStyle.backgroundColor = '#FCDADA'; // Lighter red
-        newStyle.color = '#B32626'; // Darker red text
-        newStyle.border = '1px solid #F8B4B4';
-        break;
-      case 'personal':
-        newStyle.backgroundColor = '#FCE0F6'; // Lighter pink
-        newStyle.color = '#B326B3'; // Darker pink text
-        newStyle.border = '1px solid #F8B4F8';
-        break;
-      case 'green':
-        newStyle.backgroundColor = '#DBFCDA'; // Lighter green
-        newStyle.color = '#26B326'; // Darker green text
+    switch (event.status) {
+      case '완료됨':
+        newStyle.backgroundColor = '#DBFCDA'; // 연한 녹색
+        newStyle.color = '#26B326'; // 진한 녹색 텍스트
         newStyle.border = '1px solid #B4F8B4';
         break;
-      case 'activity':
-        newStyle.backgroundColor = '#D0E3FC'; // Lighter blue
-        newStyle.color = '#2667B3'; // Darker blue text
-        newStyle.border = '1px solid #B4D6F8';
+      case '진행중':
+        newStyle.backgroundColor = '#D9EDF7'; // 연한 파란색
+        newStyle.color = '#31708F'; // 진한 파란색 텍스트
+        newStyle.border = '1px solid #BCE8F1';
         break;
-      case 'errand':
-        newStyle.backgroundColor = '#FBFCD0'; // Lighter yellow
-        newStyle.color = '#B3B326'; // Darker yellow text
-        newStyle.border = '1px solid #F8F8B4';
-        break;
-      case 'long_personal':
-        newStyle.backgroundColor = '#FCE0F6'; // Similar to personal, light pink
-        newStyle.color = '#B326B3';
-        newStyle.border = '1px solid #F8B4F8';
+      case '취소됨':
+        newStyle.backgroundColor = '#FCDADA'; // 연한 빨간색
+        newStyle.color = '#B32626'; // 진한 빨간색 텍스트
+        newStyle.border = '1px solid #F8B4F4';
         break;
       default:
+        // 정의되지 않은 상태에 대한 기본값 (혹은 없는 경우)
+        newStyle.backgroundColor = '#D0E3FC';
+        newStyle.color = '#2667B3';
+        newStyle.border = '1px solid #B4D6F8';
         break;
     }
-
     return {
       className: '',
       style: newStyle,
     };
   };
 
+  // 이벤트 렌더링 컴포넌트 (캘린더 내 각 이벤트 블록의 내용)
   const Event = ({ event }) => {
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
+        {/* 코치 이름의 첫 글자를 initial로 표시 */}
         {event.initial && (
           <span className="event-initial" style={{ fontWeight: 'bold' }}>
             {event.initial}
@@ -174,41 +300,149 @@ function MyCalendar() {
     );
   };
 
+  // 뷰 변경 핸들러 (CoachSubBar에서 호출될 함수)
+  const handleViewChange = (newView) => {
+    setView(newView);
+  };
+
   return (
     <>
       <Header user={userInfo} />
+      <ContentWrapper>
+        <TitleBar title="매칭 내역" />
+        {/* <CoachSubBarWrapper> // 이 부분은 삭제했습니다.
+          <CoachSubBar onView={handleViewChange} currentView={view} />
+        </CoachSubBarWrapper> */}
+      </ContentWrapper>
       <CalendarContainer>
-        <Calendar
-          localizer={localizer}
-          events={events}
-          startAccessor="start"
-          endAccessor="end"
-          style={{ height: '100%' }}
-          defaultView="month"
-          toolbar={true}
-          views={['month']} // Allow month, week, day views
-          date={currentDate}
-          onNavigate={(newDate) => setCurrentDate(newDate)}
-          onView={(newView) => setView(newView)} // Update view state
-          components={{
-            toolbar: CustomToolbar,
-            event: Event,
-          }}
-          eventPropGetter={eventPropGetter}
-        />
+        {/* TransitionGroup으로 뷰 전환을 감싸 애니메이션 적용 */}
+        <TransitionGroup component={null}>
+          {' '}
+          {/* component={null}로 불필요한 div 생성 방지 */}
+          {view === 'month' && (
+            <CSSTransition
+              nodeRef={calendarRef} // ref 연결
+              key="calendar-view"
+              timeout={1000} // 애니메이션 지속 시간 (ms)
+              classNames="fade" // CSS 클래스 프리픽스
+            >
+              <div ref={calendarRef} className="view-transition-wrapper">
+                <Calendar
+                  localizer={localizer}
+                  events={calendarEvents}
+                  startAccessor="start"
+                  endAccessor="end"
+                  style={{ height: '100%' }}
+                  defaultView="month"
+                  toolbar={true}
+                  views={['month']} // Calendar 컴포넌트가 내부적으로 지원하는 뷰는 'month'만
+                  date={currentDate}
+                  onNavigate={(newDate) => setCurrentDate(newDate)}
+                  components={{
+                    toolbar: (props) => (
+                      <CustomToolbar
+                        {...props}
+                        onView={handleViewChange} // CustomToolbar를 통해 CoachSubBar에 우리의 handleViewChange를 전달
+                        view={view} // CustomToolbar에도 현재 뷰 상태 전달
+                      />
+                    ),
+                    event: Event,
+                  }}
+                  eventPropGetter={eventPropGetter}
+                />
+              </div>
+            </CSSTransition>
+          )}
+          {view === 'list' && (
+            <CSSTransition
+              nodeRef={listRef} // ref 연결
+              key="list-view"
+              timeout={300} // 애니메이션 지속 시간 (ms)
+              classNames="fade" // CSS 클래스 프리픽스
+            >
+              <div ref={listRef} className="view-transition-wrapper">
+                <CoachMatchingList
+                  allMatchingData={allMatchingData}
+                  onView={handleViewChange} // <--- 추가
+                  currentView={view} // <--- 추가
+                />
+              </div>
+            </CSSTransition>
+          )}
+        </TransitionGroup>
       </CalendarContainer>
-      <CoachMatchingList />
       <Footer />
     </>
   );
 }
 
-const CalendarContainer = styled.div`
+const ContentWrapper = styled.div`
   width: 100%;
+
   display: flex;
-  justify-content: center;
+
+  flex-direction: column;
+
   align-items: center;
-  margin-top: 40px;
 `;
 
-export default MyCalendar;
+// CoachSubBar를 위한 새로운 스타일드 컴포넌트 (삭제했습니다. 이제 CoachSubBar는 CustomToolbar 안에만 존재합니다.)
+// const CoachSubBarWrapper = styled.div`
+//   width: ${theme.width.lg}; /* TitleBar와 동일한 너비로 맞춤 */
+//   display: flex;
+//   justify-content: flex-end; /* 오른쪽 정렬 */
+//   padding: 10px 0; /* 상하 패딩 추가 */
+//   margin-bottom: 20px; /* 캘린더/리스트와의 간격 */
+// `;
+
+// 캘린더/리스트를 담는 컨테이너 스타일
+
+const CalendarContainer = styled.div`
+  width: 100%;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  position: relative;
+
+  min-height: 850px; /* 둘 다 커버 가능하도록 충분히 확보 */
+
+  .view-transition-wrapper {
+    position: absolute;
+
+    width: 1008px;
+
+    top: 0px;
+
+    transition: opacity 300ms ease-in-out;
+  }
+
+  .fade-enter {
+    opacity: 0;
+
+    z-index: 1;
+  }
+
+  .fade-enter-active {
+    opacity: 1;
+
+    z-index: 1;
+  }
+
+  .fade-exit {
+    opacity: 1;
+
+    z-index: 0;
+  }
+
+  .fade-exit-active {
+    opacity: 0;
+
+    z-index: 0;
+  }
+`;
+
+export default CoachCalendar;

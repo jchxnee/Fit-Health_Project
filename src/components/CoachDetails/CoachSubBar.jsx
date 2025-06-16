@@ -1,36 +1,34 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FaListUl } from 'react-icons/fa';
-import { PiCalendar } from 'react-icons/pi';
-
+import { FaListUl } from 'react-icons/fa'; // 리스트 아이콘
+import { PiCalendar } from 'react-icons/pi'; // 캘린더 아이콘
 const StyledButtonsContainer = styled.div`
   display: inline-flex;
   gap: ${({ theme }) => theme.spacing['1']};
-  background-color: ${({ theme }) => theme.colors.gray['100']};
   border-radius: ${({ theme }) => theme.borderRadius.md};
   padding: ${({ theme }) => theme.spacing['1']};
+  margin-right: ${({ theme }) => theme.spacing[4]};
 `;
 
 const StyledIconButton = styled.button`
-  background-color: transparent;
   border: none;
-  padding: ${({ theme }) => theme.spacing['3']};
+  padding: 10px ${({ theme }) => theme.spacing['4']};
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: ${({ theme }) => theme.borderRadius.md};
   transition: background-color 0.2s ease;
+  outline: none;
 
   &:hover,
-  &:active,
   &:focus {
-    background-color: ${({ theme }) => theme.colors.white};
+    background: #ccc;
     box-shadow: ${({ theme }) => theme.shadows.sm};
   }
 
   &.active {
-    background-color: ${({ theme }) => theme.colors.white};
+    background-color: lightgray;
     box-shadow: ${({ theme }) => theme.shadows.sm};
   }
 
@@ -41,28 +39,29 @@ const StyledIconButton = styled.button`
 `;
 
 const StyledCalendarIcon = styled(StyledIconButton)`
-  padding: ${({ theme }) => theme.spacing['2']};
-
+  border: 1.5px solid ${({ theme }) => theme.colors.gray[300]};
   & > svg {
     font-size: ${({ theme }) => theme.fontSizes['2xl']};
-    font-weight: ${({ theme }) => theme.fontWeights.extrabold};
   }
 `;
 
 const CoachSubBar = ({ onView, currentView }) => {
   return (
     <StyledButtonsContainer>
+      {/* 리스트 뷰 버튼 */}
       <StyledIconButton
-        onClick={() => onView('detail')}
-        className={currentView === 'detail' ? 'active' : ''}
+        onClick={() => onView('list')} // 클릭 시 'list' 뷰로 전환 요청
+        className={currentView === 'list' ? 'active' : ''} // currentView가 'list'일 때 active 클래스 적용
       >
-        <FaListUl />
+        <FaListUl /> {/* 리스트 아이콘 */}
       </StyledIconButton>
+
+      {/* 캘린더 뷰 버튼 */}
       <StyledCalendarIcon
-        onClick={() => onView('month')}
-        className={currentView === 'month' ? 'active' : ''}
+        onClick={() => onView('month')} // 클릭 시 'month' 뷰로 전환 요청
+        className={currentView === 'month' ? 'active' : ''} // currentView가 'month'일 때 active 클래스 적용
       >
-        <PiCalendar />
+        <PiCalendar /> {/* 캘린더 아이콘 */}
       </StyledCalendarIcon>
     </StyledButtonsContainer>
   );
