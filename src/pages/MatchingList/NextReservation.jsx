@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
 import ReservationCalendar from '../../components/CoachMatching/ReservationCalendar';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
@@ -36,29 +37,26 @@ const SubmitButton = styled.button`
 `;
 
 const NextReservation = () => {
+  const navigate = useNavigate(); // useNavigate 훅 사용
+
   const userInfo = {
     name: '이주찬',
     img: '../../assets/beta_user_img.png',
   };
 
-  // **** 여기를 수정합니다. ****
-  // 로컬 시간대를 고려하여 현재 날짜를 YYYY-MM-DD 형식으로 가져오는 헬퍼 함수
   const getTodayDateString = () => {
     const today = new Date();
     const year = today.getFullYear();
-    const month = (today.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
     const day = today.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
 
   const [selectedDate, setSelectedDate] = useState(getTodayDateString());
-  // **************************
-
   const [selectedTime, setSelectedTime] = useState(null);
 
   const [trainerId, setTrainerId] = useState(1);
   const [trainerInfo, setTrainerInfo] = useState(null);
-
   const [oneTimePrice, setOneTimePrice] = useState(0);
 
   useEffect(() => {
@@ -88,6 +86,16 @@ const NextReservation = () => {
   const handleTimeChange = (e) => {
     setSelectedTime(e.target.value);
   };
+
+  // 신청하기 버튼 클릭 핸들러
+  const handleSubmit = () => {
+    if (selectedDate && selectedTime) {
+      // 선택된 날짜와 시간이 있을 경우에만 페이지 이동
+      navigate('/matchingList');
+    }
+    // disabled 상태일 때는 이 함수 자체가 호출되지 않거나, 호출되더라도 아무것도 하지 않습니다.
+  };
+
   return (
     <>
       <Header user={userInfo} />
@@ -100,7 +108,10 @@ const NextReservation = () => {
         selectedTime={selectedTime}
         onTimeChange={handleTimeChange}
       />
-      <SubmitButton disabled={!selectedDate || !selectedTime}>신청하기</SubmitButton>
+      {/* SubmitButton은 실제 button 태그로 유지하고 onClick 핸들러 추가 */}
+      <SubmitButton onClick={handleSubmit} disabled={!selectedDate || !selectedTime}>
+        신청하기
+      </SubmitButton>
       <Footer />
     </>
   );

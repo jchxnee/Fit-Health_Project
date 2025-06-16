@@ -2,63 +2,69 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
 import { Link } from 'react-router-dom';
+import Header from '../../components/Header';
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
+  const [user] = useState({ name: '김현아', img: betaImg });
   return (
-    <LoginContainer>
-      <LoginTitle>로그인</LoginTitle>
-      <LoginFormBox>
-        <InputGroup>
-          <StyledLabel htmlFor="username">아이디</StyledLabel>
-          <StyledInput
-            type="text"
-            id="username"
-            required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </InputGroup>
-        <InputGroup>
-          <StyledLabel htmlFor="password">비밀번호</StyledLabel>
-          <StyledInput
-            type="password"
-            id="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </InputGroup>
+    <>
+      <Header user={user} />
 
-        {/* Only the "아이디 저장" checkbox div here, ABOVE LoginButton */}
-        <LoginRememberMeOption>
-          <input type="checkbox" id="remember-me" />
-          <label htmlFor="remember-me">아이디저장</label>
-        </LoginRememberMeOption>
+      <LoginContainer>
+        <LoginTitle>로그인</LoginTitle>
+        <LoginFormBox>
+          <InputGroup>
+            <StyledLabel htmlFor="username">아이디</StyledLabel>
+            <StyledInput
+              type="text"
+              id="username"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </InputGroup>
+          <InputGroup>
+            <StyledLabel htmlFor="password">비밀번호</StyledLabel>
+            <StyledInput
+              type="password"
+              id="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </InputGroup>
 
-        <LoginButton>로그인</LoginButton>
+          {/* Only the "아이디 저장" checkbox div here, ABOVE LoginButton */}
+          <LoginRememberMeOption>
+            <input type="checkbox" id="remember-me" />
+            <label htmlFor="remember-me">아이디저장</label>
+          </LoginRememberMeOption>
 
-        {/* LoginLinksContainer is moved back BELOW LoginButton */}
-        <LoginLinksContainer>
-          <OptionLink href="#">아이디 찾기</OptionLink>
-          <LinkSeparator>|</LinkSeparator>
-          <OptionLink href="#">비밀번호 찾기</OptionLink>
-          <LinkSeparator>|</LinkSeparator>
-          <OptionLink to="/signup">회원가입</OptionLink>
-        </LoginLinksContainer>
+          <LoginButton>로그인</LoginButton>
 
-        <SNSLoginDivider>
-          <span>SNS 계정으로 로그인</span>
-        </SNSLoginDivider>
-        <SNSLoginIcons>
-          <SNSIcon src="/public/img/kakaotalk.png" alt="Kakao Login" />
-          <SNSIcon src="/public/img/naver.png" alt="Naver Login" />
-          <SNSIcon src="/public/img/google.png" alt="Google Login" />
-        </SNSLoginIcons>
-      </LoginFormBox>
-    </LoginContainer>
+          {/* LoginLinksContainer is moved back BELOW LoginButton */}
+          <LoginLinksContainer>
+            <OptionLink href="#">아이디 찾기</OptionLink>
+            <LinkSeparator>|</LinkSeparator>
+            <OptionLink href="#">비밀번호 찾기</OptionLink>
+            <LinkSeparator>|</LinkSeparator>
+            <OptionLink to="/signup">회원가입</OptionLink>
+          </LoginLinksContainer>
+
+          <SNSLoginDivider>
+            <span>SNS 계정으로 로그인</span>
+          </SNSLoginDivider>
+          <SNSLoginIcons>
+            <SNSIcon src="/public/img/kakaotalk.png" alt="Kakao Login" />
+            <SNSIcon src="/public/img/naver.png" alt="Naver Login" />
+            <SNSIcon src="/public/img/google.png" alt="Google Login" />
+          </SNSLoginIcons>
+        </LoginFormBox>
+      </LoginContainer>
+    </>
   );
 }
 
@@ -68,12 +74,13 @@ const LoginContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  min-height: 93vh;
   padding-top: ${({ theme }) => theme.spacing[20]}; /* 80px from theme.spacing */
   background-color: #fdfafa; /* Light background */
   width: 100%;
   box-sizing: border-box;
 
+  input,
   a,
   button {
     outline: none;

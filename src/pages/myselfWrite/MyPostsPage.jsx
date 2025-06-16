@@ -56,6 +56,8 @@ const PageContainer = styled.div`
   flex-direction: column;
   align-items: center;
 
+  input,
+  a,
   button {
     outline: none;
   }
@@ -73,12 +75,21 @@ const MainContentArea = styled.div`
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap; /* BasicFilter가 줄바꿈될 때를 대비하여 flex-wrap 추가 */
+  gap: ${({ theme }) => theme.spacing[2]}; /* 자식 요소 사이 간격 */
+  align-items: flex-end; /* 탭과 필터가 하단에 정렬되도록 */
+
+  @media (max-width: ${({ theme }) => theme.width.md}) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 `;
 
 const TabContainer = styled.div`
   display: flex;
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  margin-bottom: ${({ theme }) => theme.spacing[6]};
+  flex-shrink: 0;
+  flex-grow: 0;
 `;
 
 const TabButton = styled(Link)`
@@ -91,10 +102,6 @@ const TabButton = styled(Link)`
   cursor: pointer;
   border-bottom: 2px solid ${({ theme, $active }) => ($active ? theme.colors.primary : 'transparent')};
   transition: all 0.2s ease-in-out;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.primary};
-  }
 `;
 
 function MyPostsPage() {
@@ -184,8 +191,10 @@ function MyPostsPage() {
           <TitleBar title="내가 작성한 게시물/댓글" />
           <Container>
             <TabContainer>
-              <TabButton to="/myPostPage">나의 게시물</TabButton>
-              <TabButton to="/myCommentsPage">나의 댓글</TabButton> {/* 나의 댓글 페이지로 이동 */}
+              <TabButton style={{ borderBottom: '1px solid #6b7280' }} to="/myPostPage">
+                나의 게시물
+              </TabButton>
+              <TabButton to="/myCommentsPage">나의 댓글</TabButton>
             </TabContainer>
             <BasicFilter filterOptions={filterOptions} onFilterChange={handleFilterChange} />
           </Container>

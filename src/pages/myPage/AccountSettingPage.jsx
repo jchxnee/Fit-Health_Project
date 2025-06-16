@@ -5,6 +5,7 @@ import ButtonStyle from '../../styles/common/Button';
 import Header from '../../components/Header';
 import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 import Footer from '../../components/Footer';
+import { Link } from 'react-router-dom';
 
 function AccountSettingsPage() {
   // Dummy data for user information
@@ -77,9 +78,9 @@ function AccountSettingsPage() {
           </InputGroup>
 
           <ButtonGroup>
-            <SettingsButton onClick={handlePersonalDataManagement}>개인 정보 관리</SettingsButton>
-            <SettingsButton onClick={handleCustomDataManagement}>맞춤 정보 관리</SettingsButton>
-            <SettingsButton onClick={handleWithdrawal}>회원 탈퇴</SettingsButton>
+            <SettingsButton to="/memberInfoPage">개인 정보 관리</SettingsButton>
+            <SettingsButton to="/customInfoPage">맞춤 정보 관리</SettingsButton>
+            <SettingsButton to="/deleteMemberPage">회원 탈퇴</SettingsButton>
           </ButtonGroup>
         </SettingsForm>
       </SettingsContainer>
@@ -224,7 +225,22 @@ const ButtonGroup = styled.div`
   max-width: 380px;
 `;
 
-const SettingsButton = styled(ButtonStyle)`
+const SettingsButton = styled(Link)`
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+  padding: ${({ theme }) => theme.spacing[3]} ${({ theme }) => theme.spacing[32]};
+  border-radius: ${({ theme }) => theme.borderRadius.base};
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: ${({ theme }) => (theme.fullWidth ? '100%' : 'auto')};
+  box-sizing: border-box;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+
   width: 380px;
   background-color: ${({ theme }) => theme.colors.white}; /* white 색상 사용 */
   color: ${({ theme }) => theme.colors.primary};
@@ -240,4 +256,6 @@ const SettingsButton = styled(ButtonStyle)`
   &:active {
     background-color: ${({ theme }) => theme.colors.gray[100]}; /* gray[200] 색상 사용 */
   }
+
+  outline: none;
 `;

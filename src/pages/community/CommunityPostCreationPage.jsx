@@ -1,29 +1,30 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
-import Header from '../../components/Header'; // Header 컴포넌트 임포트 (경로 수정 필요)
+import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import TitleBar from '../../components/TitleBar';
 import { FaCamera } from 'react-icons/fa';
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import betaImg from '../../assets/beta_user_img.png';
 import { GoTriangleDown } from 'react-icons/go';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // useNavigate 훅 임포트 추가
 
 function CommunityPostCreationPage() {
+  const navigate = useNavigate(); // useNavigate 훅 사용
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [imageCount, setImageCount] = useState(0);
   const [user] = useState({ name: '김현아', img: betaImg });
-  const contentTextareaRef = useRef(null); // textarea 참조
-  const [isContentFocused, setIsContentFocused] = useState(false); // textarea 포커스 상태
+  const contentTextareaRef = useRef(null);
+  const [isContentFocused, setIsContentFocused] = useState(false);
 
-  // 카테고리 관련 상태 추가
-  const [selectedCategory, setSelectedCategory] = useState('함께해요!'); // 기본 카테고리
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // 드롭다운 열림/닫힘 상태
-  const dropdownRef = useRef(null); // 드롭다운 외부 클릭 감지를 위한 ref
+  const [selectedCategory, setSelectedCategory] = useState('운동해요!'); // 기본 카테고리 (수정: '함께해요!' -> '운동해요!'로 변경, 제공된 categories 배열에 맞춰 통일)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
+  // 카테고리 배열은 '운동해요!', '궁금해요!', '소통해요!'로 통일 (기존과 동일)
   const categories = ['운동해요!', '궁금해요!', '소통해요!'];
 
-  // 제목과 내용이 모두 입력되었는지 확인하는 함수
   const isFormValid = title.trim() !== '' && content.trim() !== '';
 
   const handleTitleChange = (e) => {
@@ -38,22 +39,26 @@ function CommunityPostCreationPage() {
     setImageCount((prevCount) => Math.min(prevCount + 1, 15));
   };
 
-  const handleSubmit = () => {
-    if (!isFormValid) return; // 폼이 유효하지 않으면 실행하지 않음
+  // 등록 버튼 클릭 핸들러 수정
+  const handleSubmitClick = (e) => {
+    e.preventDefault(); // Link의 기본 동작(페이지 이동) 방지
+    if (isFormValid) {
+      console.log('선택된 카테고리:', selectedCategory);
+      console.log('제목:', title);
+      console.log('내용:', content);
+      console.log('이미지 수:', imageCount);
+      // 실제 등록 로직 추가 (API 호출 등)
 
-    console.log('선택된 카테고리:', selectedCategory);
-    console.log('제목:', title);
-    console.log('내용:', content);
-    console.log('이미지 수:', imageCount);
-    // 실제 등록 로직 추가
+      // 등록 성공 후 페이지 이동
+      navigate('/community');
+    }
   };
 
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
-    setIsDropdownOpen(false); // 카테고리 선택 후 드롭다운 닫기
+    setIsDropdownOpen(false);
   };
 
-  // 외부 클릭 감지 (드롭다운 닫기)
   React.useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -89,7 +94,14 @@ function CommunityPostCreationPage() {
               )}
             </CategorySelect>
             <SubmitButtonWrapper>
-              <SubmitTextButton to="/community" onClick={handleSubmit} disabled={!isFormValid} $isValid={isFormValid}>
+              {/* Link를 유지하되, onClick으로 페이지 이동을 제어 */}
+              <SubmitTextButton
+                to="/community"
+                onClick={handleSubmitClick} // 클릭 핸들러 변경
+                $isValid={isFormValid}
+                // disabled prop은 Link에 직접적으로 작동하지 않으므로 제거하거나 스타일용으로만 사용
+                // 여기서는 $isValid prop을 통해 스타일만 제어하고 실제 disabled는 onClick 로직으로 처리
+              >
                 등록
               </SubmitTextButton>
               {!isFormValid && <Tooltip>제목과 내용을 입력해주세요</Tooltip>}
@@ -211,23 +223,28 @@ const SubmitButtonWrapper = styled.div`
   display: inline-block;
 `;
 
+// Link 기반 SubmitTextButton은 유지하되, 클릭 핸들러에서 이동 제어
 const SubmitTextButton = styled(Link)`
   background: none;
   border: none;
   color: ${({ $isValid, theme }) => ($isValid ? theme.colors.primary : theme.colors.gray['400'])};
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.semibold};
+  /* Link 컴포트에 disabled prop은 직접적으로 작동하지 않으므로 cursor 스타일로만 제어 */
   cursor: ${({ $isValid }) => ($isValid ? 'pointer' : 'not-allowed')};
   outline: none;
   transition: color 0.2s ease-in-out;
+  text-decoration: none; /* Link의 기본 밑줄 제거 */
 
   &:hover {
+    /* $isValid 상태에 따라 hover 스타일 적용 */
     text-decoration: ${({ $isValid }) => ($isValid ? 'underline' : 'none')};
+    color: ${({ $isValid, theme }) => ($isValid ? theme.colors.primaryDark : theme.colors.gray['400'])};
   }
 
-  &:disabled {
-    opacity: 0.6;
-  }
+  /* disabled 상태와 유사한 시각적 효과를 위해 opacity만 적용 (실제 클릭 방지는 onClick 로직에서) */
+  opacity: ${({ $isValid }) => ($isValid ? 1 : 0.6)};
+  pointer-events: ${({ $isValid }) => ($isValid ? 'auto' : 'none')}; /* 비활성화 시 마우스 이벤트 방지 */
 `;
 
 const Tooltip = styled.div`
@@ -326,7 +343,7 @@ const ContentTextareaContainer = styled.div`
 const ContentTextarea = styled.textarea`
   width: 100%;
   height: 100%;
-  padding: ${({ theme }) => theme.spacing['3']}; /* textarea 자체에 패딩 추가 */
+  padding: ${({ theme }) => theme.spacing['3']};
   border-radius: ${({ theme }) => theme.borderRadius.base};
   font-size: ${({ theme }) => theme.fontSizes.base};
   color: ${({ theme }) => theme.colors.gray['800']};

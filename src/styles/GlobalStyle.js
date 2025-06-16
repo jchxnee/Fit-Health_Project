@@ -79,18 +79,6 @@ const GlobalStyle = createGlobalStyle`
     background: #555;
   }
 
-  /* 선택 영역 스타일링 */
-  ::selection {
-    background: #007bff;
-    color: white;
-  }
-
-  /* 기본 포커스 스타일 */
-  :focus {
-    outline: 2px solid #007bff;
-    outline-offset: 2px;
-  }
-
   /* 기본 애니메이션 */
   * {
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;

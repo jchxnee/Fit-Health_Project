@@ -11,7 +11,7 @@ import {
 
 import TitleBar from '../../components/TitleBar';
 
-const TermsOfServicePage = () => {
+const TermOfServicePage = () => {
   return (
     <ContentWrapper>
       <TitleBar title={'이용약관'} />
@@ -130,4 +130,4 @@ const TermsOfServicePage = () => {
   );
 };
 
-export default TermsOfServicePage;
+export default TermOfServicePage;

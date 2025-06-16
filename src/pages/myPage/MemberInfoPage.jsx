@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
+import Header from '../../components/Header';
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const MemberInfoPage = () => {
   const [phoneNumber, setPhoneNumber] = useState('010-1234-5678'); // 더미 데이터
@@ -8,6 +10,7 @@ const MemberInfoPage = () => {
   const [currentPassword, setCurrentPassword] = useState(''); // 더미 데이터
   const [newPassword, setNewPassword] = useState(''); // 더미 데이터
   const [confirmNewPassword, setConfirmNewPassword] = useState(''); // 더미 데이터
+  const [user] = useState({ name: '김현아', img: betaImg });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,68 +19,71 @@ const MemberInfoPage = () => {
   };
 
   return (
-    <PersonalInfoContainer>
-      <PersonalInfoForm onSubmit={handleSubmit}>
-        <PageTitle>개인 정보 관리</PageTitle>
+    <>
+      <Header user={user} />
+      <PersonalInfoContainer>
+        <PersonalInfoForm onSubmit={handleSubmit}>
+          <PageTitle>개인 정보 관리</PageTitle>
 
-        <InputGroup>
-          <Label htmlFor="phoneNumber">전화번호</Label>
-          <Input
-            type="tel"
-            id="phoneNumber"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            placeholder="하이픈 없이 숫자만 입력"
-          />
-        </InputGroup>
+          <InputGroup>
+            <Label htmlFor="phoneNumber">전화번호</Label>
+            <Input
+              type="tel"
+              id="phoneNumber"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="하이픈 없이 숫자만 입력"
+            />
+          </InputGroup>
 
-        <InputGroup>
-          <Label htmlFor="email">이메일</Label>
-          <Input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="이메일 주소 입력"
-          />
-        </InputGroup>
+          <InputGroup>
+            <Label htmlFor="email">이메일</Label>
+            <Input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="이메일 주소 입력"
+            />
+          </InputGroup>
 
-        <InputGroup>
-          <Label htmlFor="currentPassword">현재 비밀번호</Label>
-          <Input
-            type="password"
-            id="currentPassword"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            placeholder="현재 비밀번호 입력"
-          />
-        </InputGroup>
+          <InputGroup>
+            <Label htmlFor="currentPassword">현재 비밀번호</Label>
+            <Input
+              type="password"
+              id="currentPassword"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="현재 비밀번호 입력"
+            />
+          </InputGroup>
 
-        <InputGroup>
-          <Label htmlFor="newPassword">새 비밀번호</Label>
-          <Input
-            type="password"
-            id="newPassword"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="새 비밀번호 (8~16자, 영문/숫자/특수문자)"
-          />
-        </InputGroup>
+          <InputGroup>
+            <Label htmlFor="newPassword">새 비밀번호</Label>
+            <Input
+              type="password"
+              id="newPassword"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="새 비밀번호 (8~16자, 영문/숫자/특수문자)"
+            />
+          </InputGroup>
 
-        <InputGroup>
-          <Label htmlFor="confirmNewPassword">비밀번호 확인</Label>
-          <Input
-            type="password"
-            id="confirmNewPassword"
-            value={confirmNewPassword}
-            onChange={(e) => setConfirmNewPassword(e.target.value)}
-            placeholder="새 비밀번호 다시 입력"
-          />
-        </InputGroup>
+          <InputGroup>
+            <Label htmlFor="confirmNewPassword">비밀번호 확인</Label>
+            <Input
+              type="password"
+              id="confirmNewPassword"
+              value={confirmNewPassword}
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
+              placeholder="새 비밀번호 다시 입력"
+            />
+          </InputGroup>
 
-        <SubmitButton type="submit">개인 정보 변경</SubmitButton>
-      </PersonalInfoForm>
-    </PersonalInfoContainer>
+          <SubmitButton type="submit">개인 정보 변경</SubmitButton>
+        </PersonalInfoForm>
+      </PersonalInfoContainer>
+    </>
   );
 };
 

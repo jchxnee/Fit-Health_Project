@@ -293,7 +293,8 @@ const MyPage = () => {
             <AiOutlineTool />
           </SectionHeader>
           <SectionLink to="/coachRegister">핏코치 정보 수정</SectionLink>
-          <SectionLink to="/myPostPage">내가 작성한 게시물/댓글</SectionLink>
+          <SectionLink to="/myPostsPage">내가 작성한 게시물/댓글</SectionLink>
+          <SectionLink to="/myReviewsPage">내가 작성한 리뷰</SectionLink>
           <Divider />
         </SectionBlock>
 
@@ -507,8 +508,8 @@ const AlertBar = styled.div`
   padding: ${({ theme }) => theme.spacing['3']} ${({ theme }) => theme.spacing['4']};
   width: 100%;
   max-width: ${({ theme }) => theme.width.md};
-  display: flex; /* Use flexbox for vertical alignment */
-  align-items: center; /* Vertically center items within the alert bar */
+  display: flex;
+  align-items: center;
   gap: ${({ theme }) => theme.spacing['2']};
   font-size: ${({ theme }) => theme.fontSizes.base};
   margin-bottom: ${({ theme }) => theme.spacing['10']};
@@ -524,37 +525,38 @@ const StyledFaBell = styled(FaBell)`
 const SectionBlock = styled.div`
   width: 100%;
   max-width: ${({ theme }) => theme.width.md};
-  text-align: left; /* Ensure text within sections is left-aligned */
+  text-align: left;
 `;
 
 const SectionHeader = styled.h3`
-  font-size: ${({ theme }) => theme.fontSizes.xl}; /* 20px */
+  font-size: ${({ theme }) => theme.fontSizes.xl};
   font-weight: ${({ theme }) => theme.fontWeights.semibold};
   color: ${({ theme }) => theme.colors.primary};
-  margin-bottom: ${({ theme }) => theme.spacing['3']}; /* 20px */
+  padding-top: ${({ theme }) => theme.spacing['3']};
+  margin-bottom: ${({ theme }) => theme.spacing['3']};
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing['1']}; /* 8px between text and icon */
+  gap: ${({ theme }) => theme.spacing['1']};
 `;
 
 const SectionLink = styled(Link)`
-  display: block; /* Make it a block element to take full width */
-  font-size: ${({ theme }) => theme.fontSizes.base}; /* 16px */
+  display: block;
+  font-size: ${({ theme }) => theme.fontSizes.base};
   color: ${({ theme }) => theme.colors.primary};
-  padding: ${({ theme }) => theme.spacing['3']} 0; /* 12px vertical padding */
+  padding: ${({ theme }) => theme.spacing['3']} 0;
   text-decoration: none;
   transition: color 0.2s ease;
   cursor: pointer;
 
   &:hover {
-    color: ${({ theme }) => theme.colors.secondary}; /* Use your theme's secondary color for hover */
+    color: ${({ theme }) => theme.colors.secondary};
   }
 `;
 
 const Divider = styled.div`
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['200']}; /* Using gray 200 for divider */
-  margin-top: ${({ theme }) => theme.spacing['8']}; /* 16px above */
-  margin-bottom: 0; /* 16px below */
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['200']};
+  margin-top: ${({ theme }) => theme.spacing['8']};
+  margin-bottom: 0;
 `;
 
 // 모달 오버레이

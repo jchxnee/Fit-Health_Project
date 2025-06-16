@@ -1,8 +1,12 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import heroImage from '/public/img/introduce.jpg';
+import Footer from '../../components/Footer';
+import Header from '../../components/Header';
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const CompanyIntroducionPage = () => {
+  const [user] = useState({ name: '김현아', img: betaImg });
   const introductionSectionRef = useRef(null); // 소개 섹션으로 스크롤하기 위한 ref
   const scrollToIntroduction = () => {
     introductionSectionRef.current.scrollIntoView({
@@ -11,105 +15,109 @@ const CompanyIntroducionPage = () => {
     });
   };
   return (
-    <LandingPageContainer>
-      {/* 히어로 섹션: 페이지 상단의 메인 비주얼 및 핵심 메시지 영역 */}
-      <HeroSection style={{ backgroundImage: `url(${heroImage})` }}>
-        <HeroTextContainer>
-          <HeroSubtitle>No excuses. Just results.</HeroSubtitle>
-          <HeroTitle>건강은 장소를 가리지 않습니다.</HeroTitle>
-          <HeroButtonsContainer>
-            {/* 'FIT-HEALTH 알아보기' 버튼: 클릭 시 소개 섹션으로 스크롤 */}
-            <HeroButton $isPrimary={false} onClick={scrollToIntroduction}>
-              FIT-HEALTH 알아보기 &gt;
-            </HeroButton>{' '}
-            <HeroButton $isPrimary={true}>핏코치 매칭 신청 &gt;</HeroButton>
-          </HeroButtonsContainer>
-        </HeroTextContainer>
-      </HeroSection>
+    <>
+      <Header user={user} />
+      <LandingPageContainer>
+        {/* 히어로 섹션: 페이지 상단의 메인 비주얼 및 핵심 메시지 영역 */}
+        <HeroSection style={{ backgroundImage: `url(${heroImage})` }}>
+          <HeroTextContainer>
+            <HeroSubtitle>No excuses. Just results.</HeroSubtitle>
+            <HeroTitle>건강은 장소를 가리지 않습니다.</HeroTitle>
+            <HeroButtonsContainer>
+              {/* 'FIT-HEALTH 알아보기' 버튼: 클릭 시 소개 섹션으로 스크롤 */}
+              <HeroButton $isPrimary={false} onClick={scrollToIntroduction}>
+                FIT-HEALTH 알아보기 &gt;
+              </HeroButton>{' '}
+              <HeroButton $isPrimary={true}>핏코치 매칭 신청 &gt;</HeroButton>
+            </HeroButtonsContainer>
+          </HeroTextContainer>
+        </HeroSection>
 
-      {/* 소개 섹션: FIT-HEALTH 플랫폼의 개요와 장점을 설명하는 부분 */}
-      <IntroductionSection ref={introductionSectionRef}>
-        <SectionTitle>
-          건강을 위한 가장 똑똑한 선택 <br />
-          <span>FIT-HEALTH</span>
-        </SectionTitle>
-        <IntroductionText>
-          FIT:HEALTH는 건강 목표 설정부터 맞춤 핏코치 매칭, 1:1 운동 상담, 건강데이터 수집 등을 서비스하며 <br />
-          여러분의 건강 여정을 통합적으로 지원하는 스마트 헬스케어 플랫폼입니다.
-        </IntroductionText>
-        <IntroFeatureContainer>
-          <IntroFeatureItem>
-            <IntroFeatureIcon>💪</IntroFeatureIcon>
-            나에게 딱 맞는 전문 코치 매칭
-          </IntroFeatureItem>
-          <IntroFeatureItem>
-            비대면 1:1 채팅으로 실시간 상담
-            <IntroFeatureIcon>💬</IntroFeatureIcon>
-          </IntroFeatureItem>
-          <IntroFeatureItem>
-            <IntroFeatureIcon>📋</IntroFeatureIcon>
-            나만의 운동 프로그램 추천받기
-          </IntroFeatureItem>
-          <IntroFeatureItem>
-            전문성과 편리함, 맞춤형 건강관리의 기준. <br />
-            이제 건강은 혼자가 아닌 함께 관리하세요.
-          </IntroFeatureItem>
-        </IntroFeatureContainer>
-      </IntroductionSection>
+        {/* 소개 섹션: FIT-HEALTH 플랫폼의 개요와 장점을 설명하는 부분 */}
+        <IntroductionSection ref={introductionSectionRef}>
+          <SectionTitle>
+            건강을 위한 가장 똑똑한 선택 <br />
+            <span>FIT-HEALTH</span>
+          </SectionTitle>
+          <IntroductionText>
+            FIT:HEALTH는 건강 목표 설정부터 맞춤 핏코치 매칭, 1:1 운동 상담, 건강데이터 수집 등을 서비스하며 <br />
+            여러분의 건강 여정을 통합적으로 지원하는 스마트 헬스케어 플랫폼입니다.
+          </IntroductionText>
+          <IntroFeatureContainer>
+            <IntroFeatureItem>
+              <IntroFeatureIcon>💪</IntroFeatureIcon>
+              나에게 딱 맞는 전문 코치 매칭
+            </IntroFeatureItem>
+            <IntroFeatureItem>
+              비대면 1:1 채팅으로 실시간 상담
+              <IntroFeatureIcon>💬</IntroFeatureIcon>
+            </IntroFeatureItem>
+            <IntroFeatureItem>
+              <IntroFeatureIcon>📋</IntroFeatureIcon>
+              나만의 운동 프로그램 추천받기
+            </IntroFeatureItem>
+            <IntroFeatureItem>
+              전문성과 편리함, 맞춤형 건강관리의 기준. <br />
+              이제 건강은 혼자가 아닌 함께 관리하세요.
+            </IntroFeatureItem>
+          </IntroFeatureContainer>
+        </IntroductionSection>
 
-      {/* 특징 섹션: 제공하는 서비스의 세부 종류(헬스, 요가, 도수, 재활)를 소개하는 부분 */}
-      <FeatureSection>
-        <SectionTitle>전문가와 함께하세요</SectionTitle>
-        <FeatureGrid>
-          <FeatureItem>
-            <FeatureImage src="" alt="헬스 이미지" />
-            <FeatureTitle>헬스</FeatureTitle>
-            <FeatureDescription>
-              운동을 처음하시나요?
-              <br />
-              언제 어디서든 전문성을 갖춘 트레이너와 <br />
-              함께해보세요.
-            </FeatureDescription>
-          </FeatureItem>
-          <FeatureItem>
-            <FeatureImage src="" alt="요가 이미지" />
-            <FeatureTitle>요가</FeatureTitle>
-            <FeatureDescription>
-              바쁜 일상과 출장 중에도 나만의 시간은 필요합니다.
-              <br />
-              전문 요가 강사와 함께하는 실시간 1:1 세션으로, <br />
-              어디서든 몸과 마음의 균형을 회복하세요.
-              <br />
-              공간이 좁아도, 요가 매트 하나만 있으면 충분합니다.
-            </FeatureDescription>
-          </FeatureItem>
-          <FeatureItem>
-            <FeatureImage src="" alt="도수 이미지" />
-            <FeatureTitle>도수</FeatureTitle>
-            <FeatureDescription>
-              장시간 여행과 낯선 숙소에서 쌓인 피로와 <br />
-              긴장을 풀어드립니다.
-              <br />
-              국가자격 보유 도수 전문가의 온라인 맞춤 스트레칭 <br />
-              프로그램으로, 목·어깨·허리 통증까지 전문적으로 <br />
-              관리받으세요.
-            </FeatureDescription>
-          </FeatureItem>
-          <FeatureItem>
-            <FeatureImage src="" alt="재활 이미지" />
-            <FeatureTitle>재활</FeatureTitle>
-            <FeatureDescription>
-              부상 회복 중인 분들을 위한 섬세한 운동 설계.
-              <br />
-              물리치료 기반의 재활 운동 프로그램은 회복 상태, <br />
-              통증 부위, 움직임 제한 등을 고려해 1:1로 진행됩니다.
-              <br />
-              출장 중에도 치료 흐름이 끊기지 않도록 도와드립니다.
-            </FeatureDescription>
-          </FeatureItem>
-        </FeatureGrid>
-      </FeatureSection>
-    </LandingPageContainer>
+        {/* 특징 섹션: 제공하는 서비스의 세부 종류(헬스, 요가, 도수, 재활)를 소개하는 부분 */}
+        <FeatureSection>
+          <SectionTitle>전문가와 함께하세요</SectionTitle>
+          <FeatureGrid>
+            <FeatureItem>
+              <FeatureImage src="" alt="헬스 이미지" />
+              <FeatureTitle>헬스</FeatureTitle>
+              <FeatureDescription>
+                운동을 처음하시나요?
+                <br />
+                언제 어디서든 전문성을 갖춘 트레이너와 <br />
+                함께해보세요.
+              </FeatureDescription>
+            </FeatureItem>
+            <FeatureItem>
+              <FeatureImage src="" alt="요가 이미지" />
+              <FeatureTitle>요가</FeatureTitle>
+              <FeatureDescription>
+                바쁜 일상과 출장 중에도 나만의 시간은 필요합니다.
+                <br />
+                전문 요가 강사와 함께하는 실시간 1:1 세션으로, <br />
+                어디서든 몸과 마음의 균형을 회복하세요.
+                <br />
+                공간이 좁아도, 요가 매트 하나만 있으면 충분합니다.
+              </FeatureDescription>
+            </FeatureItem>
+            <FeatureItem>
+              <FeatureImage src="" alt="도수 이미지" />
+              <FeatureTitle>도수</FeatureTitle>
+              <FeatureDescription>
+                장시간 여행과 낯선 숙소에서 쌓인 피로와 <br />
+                긴장을 풀어드립니다.
+                <br />
+                국가자격 보유 도수 전문가의 온라인 맞춤 스트레칭 <br />
+                프로그램으로, 목·어깨·허리 통증까지 전문적으로 <br />
+                관리받으세요.
+              </FeatureDescription>
+            </FeatureItem>
+            <FeatureItem>
+              <FeatureImage src="" alt="재활 이미지" />
+              <FeatureTitle>재활</FeatureTitle>
+              <FeatureDescription>
+                부상 회복 중인 분들을 위한 섬세한 운동 설계.
+                <br />
+                물리치료 기반의 재활 운동 프로그램은 회복 상태, <br />
+                통증 부위, 움직임 제한 등을 고려해 1:1로 진행됩니다.
+                <br />
+                출장 중에도 치료 흐름이 끊기지 않도록 도와드립니다.
+              </FeatureDescription>
+            </FeatureItem>
+          </FeatureGrid>
+        </FeatureSection>
+      </LandingPageContainer>
+      <Footer />
+    </>
   );
 };
 
