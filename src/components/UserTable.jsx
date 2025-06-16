@@ -5,6 +5,7 @@ import { CiMenuKebab } from 'react-icons/ci';
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 import { IoReload } from 'react-icons/io5';
 import theme from '../styles/theme';
+import { Link } from 'react-router-dom';
 
 const UserTable = ({ data, columns, onRowClick }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
@@ -172,6 +173,7 @@ const UserTable = ({ data, columns, onRowClick }) => {
         <PopupMenu ref={menuRef} $top={menuPosition.top} $left={menuPosition.left}>
           {/* sortedData에서 해당 row 데이터를 찾아 전달 */}
           <PopupMenuItem
+            to="/chat"
             onClick={(e) =>
               handleMenuItemClick(
                 e,
@@ -183,6 +185,7 @@ const UserTable = ({ data, columns, onRowClick }) => {
             1:1 채팅
           </PopupMenuItem>
           <PopupMenuItem
+            to="/reviewCreationPage"
             onClick={(e) =>
               handleMenuItemClick(
                 e,
@@ -194,6 +197,7 @@ const UserTable = ({ data, columns, onRowClick }) => {
             후기 남기기
           </PopupMenuItem>
           <PopupMenuItem
+            to="/nextReservation"
             onClick={(e) =>
               handleMenuItemClick(
                 e,
@@ -341,7 +345,7 @@ const PopupMenu = styled.div`
   outline: none;
 `;
 
-const PopupMenuItem = styled.button`
+const PopupMenuItem = styled(Link)`
   background: none;
   border: none;
   padding: ${theme.spacing['3']} ${theme.spacing['4']};

@@ -130,10 +130,6 @@ const TabButton = styled(Link)`
   cursor: pointer;
   border-bottom: 2px solid ${({ theme, $active }) => ($active ? theme.colors.primary : 'transparent')};
   transition: all 0.2s ease-in-out;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.primary};
-  }
 `;
 
 function MyCommentsPage() {
@@ -215,12 +211,14 @@ function MyCommentsPage() {
       <PageContainer>
         <Header user={user} />
         <MainContentArea>
-          {/* TitleBar를 사용하므로 SectionTitle은 주석 처리 또는 제거 */}
           <TitleBar title="내가 작성한 게시물/댓글" />
           <Container>
             <TabContainer>
               <TabButton to="/myPostPage">나의 게시물</TabButton>
-              <TabButton to="/myCommentsPage">나의 댓글</TabButton> {/* 나의 댓글 페이지로 이동 */}
+              <TabButton style={{ borderBottom: '1px solid #6b7280' }} to="/myCommentsPage">
+                나의 댓글
+              </TabButton>{' '}
+              {/* 나의 댓글 페이지로 이동 */}
             </TabContainer>
             <BasicFilter filterOptions={filterOptions} onFilterChange={handleFilterChange} />
           </Container>

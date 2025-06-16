@@ -17,10 +17,10 @@ import TitleBar from '../../components/TitleBar';
 const OperatingPolicyPage = () => {
   return (
     <ContentWrapper>
-      <TitleBar title={'이용약관'} />
+      <TitleBar title={'운영정책'} />
       <RecommendedExerciseWrapper>
         <Section>
-          <SectionHeading>회사 주식회사 FIT-GPT 이용약관</SectionHeading>
+          <SectionHeading>회사 주식회사 FIT-GPT 운영정책</SectionHeading>
 
           <Article>
             <Paragraph>

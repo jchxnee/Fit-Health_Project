@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
-<<<<<<<< HEAD:src/pages/MemberPage/CustomInfoPage.jsx
 import { Button, Item, List, Wrapper } from '../../styles/common/SelectGoal';
-========
 import * as S from '../../styles/common/SelectGoal';
->>>>>>>> be0150b768c4d0a4f1767845e6fed60793269ec4:src/pages/myPage/CustomInfoPage.jsx
+import Header from '../../components/Header';
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const categories = [
   '체형교정·가벼운통증',
@@ -246,6 +245,7 @@ const CustomInfoPage = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false); // 지역 모달 상태
   const [selected, setSelected] = useState('근력향상');
+  const [user] = useState({ name: '김현아', img: betaImg });
 
   const handleProvinceSelect = (province) => {
     setSelectedProvince(province);
@@ -277,131 +277,134 @@ const CustomInfoPage = () => {
   };
 
   return (
-    <CustomInfoContainer>
-      <CustomInfoForm onSubmit={handleSubmit}>
-        <PageTitle>맞춤 정보 관리</PageTitle>
+    <>
+      <Header user={user} />
+      <CustomInfoContainer>
+        <CustomInfoForm onSubmit={handleSubmit}>
+          <PageTitle>맞춤 정보 관리</PageTitle>
 
-        {/* 주소 섹션 */}
-        <InputGroup>
-          <Label>주소</Label>
-          <RegionSelectionBox onClick={() => setIsRegionModalOpen(true)}>
-            <SelectedRegionText $hasSelected={selectedProvince || selectedCity}>
-              {selectedProvince && selectedCity
-                ? `${selectedProvince} ${selectedCity}`
-                : selectedProvince
-                  ? selectedProvince
-                  : '지역을 선택하세요'}
-            </SelectedRegionText>
-            {/* 드롭다운 아이콘 */}
-            <span>▼</span>
-          </RegionSelectionBox>
-        </InputGroup>
+          {/* 주소 섹션 */}
+          <InputGroup>
+            <Label>주소</Label>
+            <RegionSelectionBox onClick={() => setIsRegionModalOpen(true)}>
+              <SelectedRegionText $hasSelected={selectedProvince || selectedCity}>
+                {selectedProvince && selectedCity
+                  ? `${selectedProvince} ${selectedCity}`
+                  : selectedProvince
+                    ? selectedProvince
+                    : '지역을 선택하세요'}
+              </SelectedRegionText>
+              {/* 드롭다운 아이콘 */}
+              <span>▼</span>
+            </RegionSelectionBox>
+          </InputGroup>
 
-        {/* 성별 섹션 */}
-        <InputGroup>
-          <Label>성별</Label>
-          <GenderSelection>
-            <GenderButton
-              type="button"
-              $isSelected={selectedGender === 'male'}
-              onClick={() => setSelectedGender('male')}
-            >
-              남성
-            </GenderButton>
-            <GenderButton
-              type="button"
-              $isSelected={selectedGender === 'female'}
-              onClick={() => setSelectedGender('female')}
-            >
-              여성
-            </GenderButton>
-          </GenderSelection>
-        </InputGroup>
+          {/* 성별 섹션 */}
+          <InputGroup>
+            <Label>성별</Label>
+            <GenderSelection>
+              <GenderButton
+                type="button"
+                $isSelected={selectedGender === 'male'}
+                onClick={() => setSelectedGender('male')}
+              >
+                남성
+              </GenderButton>
+              <GenderButton
+                type="button"
+                $isSelected={selectedGender === 'female'}
+                onClick={() => setSelectedGender('female')}
+              >
+                여성
+              </GenderButton>
+            </GenderSelection>
+          </InputGroup>
 
-        {/* 키 섹션 */}
-        <InputGroup>
-          <Label htmlFor="height">키</Label>
-          <InputWithUnit>
-            <StyledInput
-              type="number"
-              id="height"
-              value={height}
-              onChange={(e) => setHeight(e.target.value)}
-              placeholder="예) 175"
-            />
-            <UnitText>cm</UnitText>
-          </InputWithUnit>
-        </InputGroup>
+          {/* 키 섹션 */}
+          <InputGroup>
+            <Label htmlFor="height">키</Label>
+            <InputWithUnit>
+              <StyledInput
+                type="number"
+                id="height"
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                placeholder="예) 175"
+              />
+              <UnitText>cm</UnitText>
+            </InputWithUnit>
+          </InputGroup>
 
-        {/* 몸무게 섹션 */}
-        <InputGroup>
-          <Label htmlFor="weight">몸무게</Label>
-          <InputWithUnit>
-            <StyledInput
-              type="number"
-              id="weight"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              placeholder="예) 65"
-            />
-            <UnitText>kg</UnitText>
-          </InputWithUnit>
-        </InputGroup>
+          {/* 몸무게 섹션 */}
+          <InputGroup>
+            <Label htmlFor="weight">몸무게</Label>
+            <InputWithUnit>
+              <StyledInput
+                type="number"
+                id="weight"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                placeholder="예) 65"
+              />
+              <UnitText>kg</UnitText>
+            </InputWithUnit>
+          </InputGroup>
 
-        {/* 목표 섹션 (컴포넌트가 있다고 가정) */}
-        <InputGroup>
-          <Label>목표</Label>
-          <Wrapper>
-            <Button>
-              <List>
-                {categories.map((cat) => (
-                  <Item key={cat} selected={selected === cat} onClick={() => setSelected(cat)}>
-                    <Label>{cat}</Label>
-                  </Item>
-                ))}
-              </List>
-            </Button>
-          </Wrapper>
-        </InputGroup>
+          {/* 목표 섹션 (컴포넌트가 있다고 가정) */}
+          <InputGroup>
+            <Label>목표</Label>
+            <Wrapper>
+              <Button>
+                <List>
+                  {categories.map((cat) => (
+                    <Item key={cat} selected={selected === cat} onClick={() => setSelected(cat)}>
+                      <Label>{cat}</Label>
+                    </Item>
+                  ))}
+                </List>
+              </Button>
+            </Wrapper>
+          </InputGroup>
 
-        <SubmitButton type="submit">맞춤 정보 변경</SubmitButton>
-      </CustomInfoForm>
+          <SubmitButton type="submit">맞춤 정보 변경</SubmitButton>
+        </CustomInfoForm>
 
-      {/* 지역 선택 모달 */}
-      {isRegionModalOpen && (
-        <ModalOverlay onClick={() => setIsRegionModalOpen(false)}>
-          <RegionModalContent onClick={(e) => e.stopPropagation()}>
-            {' '}
-            {/* 모달 클릭 시 닫히지 않도록 이벤트 전파 중단 */}
-            <ModalHeader>
-              지역 선택
-              <ResetButton onClick={handleRegionReset}>초기화</ResetButton>
-            </ModalHeader>
-            <ModalBody>
-              <ProvinceList>
-                {Object.keys(regions).map((province) => (
-                  <ListItem
-                    key={province}
-                    $isSelected={selectedProvince === province}
-                    onClick={() => handleProvinceSelect(province)}
-                  >
-                    {province.replace(/특별자치시|광역시|특별자치도|도/, '')} {/* 짧은 이름 표시 */}
-                  </ListItem>
-                ))}
-              </ProvinceList>
-              <CityList>
-                {selectedProvince &&
-                  regions[selectedProvince].map((city) => (
-                    <ListItem key={city} $isSelected={selectedCity === city} onClick={() => handleCitySelect(city)}>
-                      {city}
+        {/* 지역 선택 모달 */}
+        {isRegionModalOpen && (
+          <ModalOverlay onClick={() => setIsRegionModalOpen(false)}>
+            <RegionModalContent onClick={(e) => e.stopPropagation()}>
+              {' '}
+              {/* 모달 클릭 시 닫히지 않도록 이벤트 전파 중단 */}
+              <ModalHeader>
+                지역 선택
+                <ResetButton onClick={handleRegionReset}>초기화</ResetButton>
+              </ModalHeader>
+              <ModalBody>
+                <ProvinceList>
+                  {Object.keys(regions).map((province) => (
+                    <ListItem
+                      key={province}
+                      $isSelected={selectedProvince === province}
+                      onClick={() => handleProvinceSelect(province)}
+                    >
+                      {province.replace(/특별자치시|광역시|특별자치도|도/, '')} {/* 짧은 이름 표시 */}
                     </ListItem>
                   ))}
-              </CityList>
-            </ModalBody>
-          </RegionModalContent>
-        </ModalOverlay>
-      )}
-    </CustomInfoContainer>
+                </ProvinceList>
+                <CityList>
+                  {selectedProvince &&
+                    regions[selectedProvince].map((city) => (
+                      <ListItem key={city} $isSelected={selectedCity === city} onClick={() => handleCitySelect(city)}>
+                        {city}
+                      </ListItem>
+                    ))}
+                </CityList>
+              </ModalBody>
+            </RegionModalContent>
+          </ModalOverlay>
+        )}
+      </CustomInfoContainer>
+    </>
   );
 };
 
@@ -411,7 +414,7 @@ const CustomInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: ${({ theme }) => theme.spacing['20']};
+  padding-top: ${({ theme }) => theme.spacing['10']};
   background-color: #f9fafa;
   min-height: calc(100vh - 60px);
   box-sizing: border-box;

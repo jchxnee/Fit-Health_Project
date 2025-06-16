@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { FaInstagram, FaYoutube } from 'react-icons/fa';
 import { RiKakaoTalkFill } from 'react-icons/ri';
+import { Link } from 'react-router-dom';
 
 const FooterContainer = styled.footer`
   background-color: ${({ theme }) => theme.colors.gray[100]};
@@ -248,13 +249,13 @@ export default function Footer() {
           </FooterLogo>
           <FooterCompanyGroup>
             <li>
-              <a href="#privacy">개인정보처리방침</a>
+              <Link to="/privacyPolicy">개인정보처리방침</Link>
             </li>
             <li>
-              <a href="#terms">이용약관</a>
+              <Link to="/termOfService">이용약관</Link>
             </li>
             <li>
-              <a href="#policy">운영정책</a>
+              <Link to="/operatingPolicy">운영정책</Link>
             </li>
           </FooterCompanyGroup>
         </CompanyInfoSection>
@@ -273,19 +274,19 @@ export default function Footer() {
             <FooterMenuGroup>
               <li>회사</li>
               <li>
-                <a href="#customer-instroduce">회사소개</a>
+                <Link to="/introduce">회사소개</Link>
               </li>
               <li>
-                <a href="#careers">채용안내</a>
+                <Link to="">채용안내</Link>
               </li>
             </FooterMenuGroup>
             <FooterMenuGroup>
               <li>고객센터</li>
               <li>
-                <a href="#board">공지사항</a>
+                <Link to="/notice">공지사항</Link>
               </li>
               <li>
-                <a href="#faq">자주묻는 질문</a>
+                <Link to="/faqPage">자주묻는 질문</Link>
               </li>
             </FooterMenuGroup>
           </div>

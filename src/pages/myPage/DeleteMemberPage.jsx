@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
+import Header from '../../components/Header';
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const DeleteMemberPage = () => {
   const [currentPassword, setCurrentPassword] = useState('');
+  const [user] = useState({ name: '김현아', img: betaImg });
 
   const handleWithdraw = (e) => {
     e.preventDefault();
@@ -30,24 +33,27 @@ const DeleteMemberPage = () => {
   };
 
   return (
-    <WithdrawContainer>
-      <WithdrawForm onSubmit={handleWithdraw}>
-        <PageTitle>회원 탈퇴</PageTitle>
+    <>
+      <Header user={user} />
+      <WithdrawContainer>
+        <WithdrawForm onSubmit={handleWithdraw}>
+          <PageTitle>회원 탈퇴</PageTitle>
 
-        <InputGroup>
-          <Label htmlFor="currentPassword">현재 비밀번호</Label>
-          <StyledInput
-            type="password"
-            id="currentPassword"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            placeholder="" // '회원 탈퇴.png' 이미지에 placeholder 없음
-          />
-        </InputGroup>
+          <InputGroup>
+            <Label htmlFor="currentPassword">현재 비밀번호</Label>
+            <StyledInput
+              type="password"
+              id="currentPassword"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="" // '회원 탈퇴.png' 이미지에 placeholder 없음
+            />
+          </InputGroup>
 
-        <WithdrawButton type="submit">회원 탈퇴</WithdrawButton>
-      </WithdrawForm>
-    </WithdrawContainer>
+          <WithdrawButton type="submit">회원 탈퇴</WithdrawButton>
+        </WithdrawForm>
+      </WithdrawContainer>
+    </>
   );
 };
 
@@ -57,7 +63,7 @@ const WithdrawContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: ${({ theme }) => theme.spacing['20']};
+  padding-top: ${({ theme }) => theme.spacing['32']};
   background-color: #f9fafa;
   min-height: calc(100vh - 60px); /* 헤더 높이를 제외한 최소 높이 */
   box-sizing: border-box;
