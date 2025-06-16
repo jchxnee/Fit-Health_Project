@@ -17,6 +17,11 @@ const FooterContainer = styled.footer`
   @media (max-width: ${({ theme }) => theme.width.sm}) {
     padding: ${({ theme }) => theme.spacing[6]} 0;
   }
+
+  a,
+  button {
+    outline: none;
+  }
 `;
 
 const FooterContentWrapper = styled.div`

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
+import { Link } from 'react-router-dom';
 
 function LoginPage() {
   const [username, setUsername] = useState('');
@@ -45,7 +46,7 @@ function LoginPage() {
           <LinkSeparator>|</LinkSeparator>
           <OptionLink href="#">비밀번호 찾기</OptionLink>
           <LinkSeparator>|</LinkSeparator>
-          <OptionLink href="#">회원가입</OptionLink>
+          <OptionLink to="/signup">회원가입</OptionLink>
         </LoginLinksContainer>
 
         <SNSLoginDivider>
@@ -72,6 +73,11 @@ const LoginContainer = styled.div`
   background-color: #fdfafa; /* Light background */
   width: 100%;
   box-sizing: border-box;
+
+  a,
+  button {
+    outline: none;
+  }
 `;
 
 const LoginTitle = styled.h1`
@@ -194,7 +200,7 @@ const LoginLinksContainer = styled.div`
   width: 100%;
 `;
 
-const OptionLink = styled.a`
+const OptionLink = styled(Link)`
   color: ${({ theme }) => theme.colors.gray[600]};
   text-decoration: none;
 
