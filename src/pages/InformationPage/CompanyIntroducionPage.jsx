@@ -4,6 +4,7 @@ import heroImage from '/public/img/introduce.jpg';
 import Footer from '../../components/Footer';
 import Header from '../../components/Header';
 import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import { Link } from 'react-router-dom';
 
 const CompanyIntroducionPage = () => {
   const [user] = useState({ name: '김현아', img: betaImg });
@@ -28,7 +29,9 @@ const CompanyIntroducionPage = () => {
               <HeroButton $isPrimary={false} onClick={scrollToIntroduction}>
                 FIT-HEALTH 알아보기 &gt;
               </HeroButton>{' '}
-              <HeroButton $isPrimary={true}>핏코치 매칭 신청 &gt;</HeroButton>
+              <HeroButton to="/coachList" $isPrimary={true}>
+                핏코치 매칭 신청 &gt;
+              </HeroButton>
             </HeroButtonsContainer>
           </HeroTextContainer>
         </HeroSection>
@@ -186,7 +189,7 @@ const HeroButtonsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-const HeroButton = styled.button`
+const HeroButton = styled(Link)`
   background-color: transparent;
   color: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.white};

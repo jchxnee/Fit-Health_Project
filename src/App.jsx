@@ -39,6 +39,7 @@ import TermOfServicePage from './pages/InformationPage/TermOfServicePage';
 import PrivacyPolicyPage from './pages/InformationPage/PrivacyPolicyPage';
 import CompanyIntroducionPage from './pages/InformationPage/CompanyIntroducionPage';
 import FAQPage from './pages/FAQPage/FAQPage';
+import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
 
 function App() {
   return (
@@ -62,8 +63,7 @@ function App() {
           <Route path="/operatingPolicy" element={<OperatingPolicyPage />} /> {/* 운영정책 */}
           <Route path="/privacyPolicy" element={<PrivacyPolicyPage />} /> {/* 개인정보처리방침 */}
           <Route path="/introduce" element={<CompanyIntroducionPage />} /> {/* 회사소개 */}
-          <Route path="/introduce" element={<CompanyIntroducionPage />} /> {/* 회사소개 */}
-          <Route path="/introduce" element={<CompanyIntroducionPage />} /> {/* 회사소개 */}
+          <Route path="/recruitmentInfo" element={<RecruitmentInfoPage />} /> {/* 채용공고 */}
           {/* 코치 */}
           <Route path="/coachList" element={<CoachList />} /> {/* 핏코치 매칭 */}
           <Route path="/coachRegister" element={<CoachRegister />} /> {/* 코치 등록 */}
