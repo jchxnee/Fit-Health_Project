@@ -20,6 +20,10 @@ const MainContainer = styled.section`
   display: flex;
   flex-direction: column;
   gap: 80px;
+
+  button {
+    outline: none;
+  }
 `;
 
 function CoachRegister() {

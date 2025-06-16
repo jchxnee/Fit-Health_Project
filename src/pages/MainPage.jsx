@@ -13,11 +13,9 @@ import Header from '../components/Header.jsx';
 import betaImg from '../assets/beta_user_img.png'; // 사용자 이미지 (Header에서 사용)
 
 function MainPage() {
-  const [user] = useState({ name: '김현아', img: betaImg });
-
   return (
     <>
-      <Header user={user} />
+      <Header user={null} />
       <MainTitle />
       <SelectExercise />
       <AdBanner />

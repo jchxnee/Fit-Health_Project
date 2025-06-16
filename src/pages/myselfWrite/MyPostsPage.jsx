@@ -6,6 +6,7 @@ import betaImg from '../../assets/beta_user_img.png'; // 더미 사용자 프로
 import GeneralPostsList from '../../components/GeneralPostsList';
 import BasicFilter from '../../components/filter/BasicFilter';
 import TitleBar from '../../components/TitleBar';
+import { Link } from 'react-router-dom';
 
 // --- 임시 데이터는 컴포넌트 외부로 이동 ---
 const MY_POSTS_DATA = [
@@ -80,7 +81,7 @@ const TabContainer = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing[6]};
 `;
 
-const TabButton = styled.button`
+const TabButton = styled(Link)`
   background: none;
   border: none;
   padding: ${({ theme }) => theme.spacing[3]} ${({ theme }) => theme.spacing[4]};
@@ -180,11 +181,11 @@ function MyPostsPage() {
       <PageContainer>
         <Header user={user} />
         <MainContentArea>
-          <TitleBar title="내가 작성한/댓글" />
+          <TitleBar title="내가 작성한 게시물/댓글" />
           <Container>
             <TabContainer>
-              <TabButton $active={true}>나의 게시물</TabButton>
-              <TabButton>나의 댓글</TabButton> {/* 나의 댓글 페이지로 이동 */}
+              <TabButton to="/myPostPage">나의 게시물</TabButton>
+              <TabButton to="/myCommentsPage">나의 댓글</TabButton> {/* 나의 댓글 페이지로 이동 */}
             </TabContainer>
             <BasicFilter filterOptions={filterOptions} onFilterChange={handleFilterChange} />
           </Container>

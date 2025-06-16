@@ -118,7 +118,7 @@ function Header({ user }) {
             )}
           </HeaderRight>
         ) : (
-          <HeaderRight>로그인/회원가입</HeaderRight>
+          <HeaderRight to="/login">로그인/회원가입</HeaderRight>
         )}
       </HeaderContent>
     </HeaderComponent>
@@ -135,6 +135,11 @@ const HeaderComponent = styled.header`
   position: sticky;
   top: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 헤더 그림자 추가 */
+
+  a,
+  button {
+    outline: none;
+  }
 `;
 
 const HeaderContent = styled.div`
@@ -175,11 +180,12 @@ const NavItem = styled(Link)`
   outline: none;
 `;
 
-const HeaderRight = styled.div`
+const HeaderRight = styled(Link)`
   text-align: center;
   font-size: ${({ theme }) => theme.fontSizes.lg};
   color: ${({ theme }) => theme.colors.primary};
   font-weight: ${({ theme }) => theme.fontWeights.regular};
+
   cursor: pointer;
   display: flex;
   align-items: center;

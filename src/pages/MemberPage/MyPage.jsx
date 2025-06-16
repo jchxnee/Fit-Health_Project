@@ -13,6 +13,7 @@ import ButtonStyle from '../../styles/common/Button';
 import Footer from '../../components/Footer';
 import Header from '../../components/Header';
 import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import { Link } from 'react-router-dom';
 
 const bodyMetrics = [
   {
@@ -138,7 +139,7 @@ const MyPage = () => {
               haha020911@naver.com
             </ProfileEmail>
           </ProfileInfo>
-          <SettingButton>계정 설정</SettingButton>
+          <SettingButton to="/accountSettingPage">계정 설정</SettingButton>
         </ProfileSection>
 
         <AlertBar>
@@ -282,7 +283,7 @@ const MyPage = () => {
             내역
             <LuClipboardList />
           </SectionHeader>
-          <SectionLink href="#">신청 내역</SectionLink>
+          <SectionLink to="/matchingList">신청 내역</SectionLink>
           <Divider />
         </SectionBlock>
 
@@ -291,8 +292,8 @@ const MyPage = () => {
             관리
             <AiOutlineTool />
           </SectionHeader>
-          <SectionLink href="#">핏코치 정보 수정</SectionLink>
-          <SectionLink href="#">내가 쓴 게시물/댓글</SectionLink>
+          <SectionLink to="/coachRegister">핏코치 정보 수정</SectionLink>
+          <SectionLink to="/myPostPage">내가 작성한 게시물/댓글</SectionLink>
           <Divider />
         </SectionBlock>
 
@@ -363,6 +364,11 @@ const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  a,
+  button {
+    outline: none;
+  }
 `;
 
 const ProfileSection = styled.div`
@@ -433,7 +439,27 @@ const ProfileIcon = styled.img`
   flex-shrink: 0; /* Prevent it from shrinking */
 `;
 
-const SettingButton = styled(ButtonStyle)`
+const SettingButton = styled(Link)`
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
+  border-radius: ${({ theme }) => theme.borderRadius.base};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: ${({ theme }) => (theme.fullWidth ? '100%' : 'auto')};
+  box-sizing: border-box;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:active {
+    opacity: 0.9;
+  }
   background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.gray['600']}; /* Using gray 600 for button text */
   border: 1px solid ${({ theme }) => theme.colors.gray['300']}; /* Using gray 300 for border */
@@ -511,7 +537,7 @@ const SectionHeader = styled.h3`
   gap: ${({ theme }) => theme.spacing['1']}; /* 8px between text and icon */
 `;
 
-const SectionLink = styled.a`
+const SectionLink = styled(Link)`
   display: block; /* Make it a block element to take full width */
   font-size: ${({ theme }) => theme.fontSizes.base}; /* 16px */
   color: ${({ theme }) => theme.colors.primary};

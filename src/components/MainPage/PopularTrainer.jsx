@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Wrapper = styled.section`
@@ -22,6 +23,10 @@ const Title = styled.h2`
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   font-size: ${({ theme }) => theme.fontSizes['2xl']};
   color: ${({ theme }) => theme.colors.primary};
+`;
+
+const NavItem = styled(Link)`
+  outline: none;
 `;
 const ViewAll = styled.span`
   font-family: 'SUITE', sans-serif;
@@ -57,29 +62,27 @@ const Name = styled.div`
   color: ${({ theme }) => theme.colors.primary};
 `;
 
-const trainers = [
-    { name: '김순자 트레이너' },
-    { name: '정나미 트레이너' },
-    { name: '고훈 트레이너' },
-];
+const trainers = [{ name: '김순자 트레이너' }, { name: '정나미 트레이너' }, { name: '고훈 트레이너' }];
 
 const PopularTrainer = () => (
-    <Wrapper>
-        <Container>
-            <TitleRow>
-                <Title>이 달의 인기 트레이너</Title>
-                <ViewAll>전체보기</ViewAll>
-            </TitleRow>
-            <List>
-                {trainers.map((t) => (
-                    <TrainerCard key={t.name}>
-                        <ProfileImg />
-                        <Name>{t.name}</Name>
-                    </TrainerCard>
-                ))}
-            </List>
-        </Container>
-    </Wrapper>
+  <Wrapper>
+    <Container>
+      <TitleRow>
+        <Title>이 달의 인기 트레이너</Title>
+        <NavItem to="/coachList">
+          <ViewAll>전체보기</ViewAll>
+        </NavItem>
+      </TitleRow>
+      <List>
+        {trainers.map((t) => (
+          <TrainerCard key={t.name}>
+            <ProfileImg />
+            <Name>{t.name}</Name>
+          </TrainerCard>
+        ))}
+      </List>
+    </Container>
+  </Wrapper>
 );
 
 export default PopularTrainer;

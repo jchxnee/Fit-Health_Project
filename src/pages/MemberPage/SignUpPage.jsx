@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import logoSrc from '../../assets/header_icon.png';
 import ButtonStyle from '../../styles/common/Button';
+import { useNavigate } from 'react-router-dom';
 
 function SignUpPage() {
   const [id, setId] = useState('');
@@ -14,6 +15,23 @@ function SignUpPage() {
   const [agreeService, setAgreeService] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
 
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // 유효성 검사
+    if (!email || !password || password !== passwordConfirm || !agreeService || !agreePrivacy) {
+      alert('모든 필수 항목을 입력하고 약관에 동의해야 합니다.');
+      return;
+    }
+
+    // 회원가입 처리 로직 (ex: API 호출)
+    // await axios.post(...);
+
+    navigate('/login');
+  };
+
   // 약관 내용 토글 상태
   const [showServiceTerms, setShowServiceTerms] = useState(false);
   const [showPrivacyTerms, setShowPrivacyTerms] = useState(false);
@@ -21,7 +39,7 @@ function SignUpPage() {
   return (
     <SignupContainer>
       <LogoImage src={logoSrc} alt="FIT:HEALTH 로고" />
-      <SignupForm>
+      <SignupForm onSubmit={handleSubmit}>
         <FormTitle>회원가입</FormTitle>
 
         <InputGroup>
@@ -174,11 +192,17 @@ const SignupContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: ${({ theme }) => theme.spacing['20']};
+  padding-top: ${({ theme }) => theme.spacing['10']};
   background-color: #fdfafa;
   min-height: 100vh;
   box-sizing: border-box;
   width: 100%;
+
+  input,
+  a,
+  button {
+    outline: none;
+  }
 `;
 
 const LogoImage = styled.img`
@@ -187,7 +211,7 @@ const LogoImage = styled.img`
   margin-bottom: ${({ theme }) => theme.spacing['12']};
 `;
 
-const SignupForm = styled.div`
+const SignupForm = styled.form`
   background-color: ${({ theme }) => theme.colors.white};
   padding: ${({ theme }) => theme.spacing['10']};
   border-radius: 10px;

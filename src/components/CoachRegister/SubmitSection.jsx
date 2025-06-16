@@ -1,13 +1,13 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
 
 const Row = styled.div`
   display: flex;
   justify-content: flex-end;
   width: 100%;
-    
 `;
-const SubmitButton = styled.button`
+const SubmitButton = styled(Link)`
   background: #2563eb;
   color: #fff;
   border: none;
@@ -16,7 +16,7 @@ const SubmitButton = styled.button`
   font-weight: 600;
   font-size: 18px;
   cursor: pointer;
-  box-shadow: 0 2px 8px 0 rgba(37,99,235,0.08);
+  box-shadow: 0 2px 8px 0 rgba(37, 99, 235, 0.08);
   transition: background 0.2s;
   &:hover {
     background: #1746b3;
@@ -26,9 +26,11 @@ const SubmitButton = styled.button`
 function SubmitSection() {
   return (
     <Row>
-      <SubmitButton type="submit">등록하기</SubmitButton>
+      <SubmitButton to="/" type="submit">
+        등록하기
+      </SubmitButton>
     </Row>
   );
 }
 
-export default SubmitSection; 
+export default SubmitSection;

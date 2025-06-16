@@ -229,6 +229,7 @@ const ChatTab = styled.button`
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ $isActive, theme }) => ($isActive ? theme.fontWeights.semibold : theme.fontWeights.medium)};
   color: ${({ $isActive, theme }) => ($isActive ? theme.colors.button : theme.colors.primary)};
+  outline: none;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 
@@ -429,6 +430,7 @@ const SendButton = styled.button`
   background-color: ${({ theme }) => theme.colors.button}; /* 버튼 색상 */
   color: ${({ theme }) => theme.colors.white};
   border: none;
+  outline: none;
   border-radius: ${({ theme }) => theme.borderRadius.base};
   padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[4]};
   font-size: ${({ theme }) => theme.fontSizes.base};

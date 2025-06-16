@@ -2,6 +2,9 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { CiCamera } from 'react-icons/ci';
 import ButtonStyle from '../../styles/common/Button';
+import Header from '../../components/Header';
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import Footer from '../../components/Footer';
 
 function AccountSettingsPage() {
   // Dummy data for user information
@@ -9,6 +12,7 @@ function AccountSettingsPage() {
   const [userBirthdate, setUserBirthdate] = useState('1990-05-15'); // Example birthdate
   const [profileImgSrc, setProfileImgSrc] = useState('https://via.placeholder.com/100'); // Placeholder image
 
+  const [user] = useState({ name: '김현아', img: betaImg });
   // Functions to handle "수정" clicks (these would open modals or navigate)
   const handleNameEdit = () => {
     alert('이름 수정 기능');
@@ -41,42 +45,46 @@ function AccountSettingsPage() {
   };
 
   return (
-    <SettingsContainer>
-      <SettingsForm>
-        <PageTitle>계정 설정</PageTitle>
+    <>
+      <Header user={user} />
+      <SettingsContainer>
+        <SettingsForm>
+          <PageTitle>계정 설정</PageTitle>
 
-        <ProfileImageWrapper onClick={handleProfileImageChange}>
-          <ProfileImage src={profileImgSrc} alt="프로필 이미지" />
-          <CameraIcon>
-            <StyledCameraIcon />
-          </CameraIcon>
-        </ProfileImageWrapper>
+          <ProfileImageWrapper onClick={handleProfileImageChange}>
+            <ProfileImage src={profileImgSrc} alt="프로필 이미지" />
+            <CameraIcon>
+              <StyledCameraIcon />
+            </CameraIcon>
+          </ProfileImageWrapper>
 
-        {/* 이름 InputGroup */}
-        <InputGroup>
-          <LabelWrapper>
-            <Label>이름</Label>
-            <ActionLink onClick={handleNameEdit}>수정</ActionLink>
-          </LabelWrapper>
-          <DisplayText>{userName}</DisplayText>
-        </InputGroup>
+          {/* 이름 InputGroup */}
+          <InputGroup>
+            <LabelWrapper>
+              <Label>이름</Label>
+              <ActionLink onClick={handleNameEdit}>수정</ActionLink>
+            </LabelWrapper>
+            <DisplayText>{userName}</DisplayText>
+          </InputGroup>
 
-        {/* 생년월일 InputGroup */}
-        <InputGroup>
-          <LabelWrapper>
-            <Label>생년월일</Label>
-            <ActionLink onClick={handleBirthdateEdit}>수정</ActionLink>
-          </LabelWrapper>
-          <DisplayText>{userBirthdate}</DisplayText>
-        </InputGroup>
+          {/* 생년월일 InputGroup */}
+          <InputGroup>
+            <LabelWrapper>
+              <Label>생년월일</Label>
+              <ActionLink onClick={handleBirthdateEdit}>수정</ActionLink>
+            </LabelWrapper>
+            <DisplayText>{userBirthdate}</DisplayText>
+          </InputGroup>
 
-        <ButtonGroup>
-          <SettingsButton onClick={handlePersonalDataManagement}>개인 정보 관리</SettingsButton>
-          <SettingsButton onClick={handleCustomDataManagement}>맞춤 정보 관리</SettingsButton>
-          <SettingsButton onClick={handleWithdrawal}>회원 탈퇴</SettingsButton>
-        </ButtonGroup>
-      </SettingsForm>
-    </SettingsContainer>
+          <ButtonGroup>
+            <SettingsButton onClick={handlePersonalDataManagement}>개인 정보 관리</SettingsButton>
+            <SettingsButton onClick={handleCustomDataManagement}>맞춤 정보 관리</SettingsButton>
+            <SettingsButton onClick={handleWithdrawal}>회원 탈퇴</SettingsButton>
+          </ButtonGroup>
+        </SettingsForm>
+      </SettingsContainer>
+      <Footer />
+    </>
   );
 }
 
@@ -87,7 +95,6 @@ const SettingsContainer = styled.div`
   flex-direction: column;
   align-items: center;
   padding-top: ${({ theme }) => theme.spacing['20']};
-  background-color: #f9fafa;
   min-height: calc(100vh - 60px);
   box-sizing: border-box;
   width: 100%;
