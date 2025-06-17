@@ -3,11 +3,18 @@ package com.fithealth.backend.entity;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.enums.CommonEnums;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "PAYMENT")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Payment {
 
     @Id
@@ -16,8 +23,8 @@ public class Payment {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "REQUEST_NAME", nullable = false)
-    private Member requestMember;
+    @JoinColumn(name = "USER_EMAIL", nullable = false)
+    private Member userMember;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RESPONSE_NAME", nullable = false)

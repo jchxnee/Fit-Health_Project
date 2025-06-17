@@ -1,10 +1,7 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import TitleBar from '../../components/TitleBar';
 import { FaCamera } from 'react-icons/fa';
-import betaImg from '../../assets/beta_user_img.png';
 import { GoTriangleDown } from 'react-icons/go';
 import { Link, useNavigate } from 'react-router-dom'; // useNavigate 훅 임포트 추가
 
@@ -14,7 +11,6 @@ function CommunityPostCreationPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [imageCount, setImageCount] = useState(0);
-  const [user] = useState({ name: '김현아', img: betaImg });
   const contentTextareaRef = useRef(null);
   const [isContentFocused, setIsContentFocused] = useState(false);
 
@@ -74,7 +70,6 @@ function CommunityPostCreationPage() {
   return (
     <>
       <PageContainer>
-        <Header user={user} />
         <TitleBar title="커뮤니티 글등록" />
         <ContentWrapper>
           <TopSection>
@@ -137,7 +132,6 @@ function CommunityPostCreationPage() {
           </ContentTextareaContainer>
         </ContentWrapper>
       </PageContainer>
-      <Footer />
     </>
   );
 }

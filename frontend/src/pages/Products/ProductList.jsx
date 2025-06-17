@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import styled from 'styled-components';
 import ProductCategory from '../../components/Products/ProductCategory';
 import TitleBar from '../../components/TitleBar';
@@ -74,11 +72,6 @@ const ProductList = () => {
       'https://www.coupang.com/vp/products/6204369926?itemId=12329742710&vendorItemId=79599736984&q=%EB%B9%84%EA%B1%B4+%ED%94%84%EB%A1%9C%ED%8B%B4+%EB%B0%94&searchId=5fefae2a191355&sourceType=search&itemsCount=36&searchRank=3&rank=3',
     product6:
       'https://www.coupang.com/vp/products/275970916?itemId=130994412&vendorItemId=3275273068&sourceType=srp_product_ads&clickEventId=dfff87a0-4804-11f0-a344-4c9d943214dd&korePlacement=15&koreSubPlacement=1&clickEventId=dfff87a0-4804-11f0-a344-4c9d943214dd&korePlacement=15&koreSubPlacement=1',
-  };
-
-  const userInfo = {
-    name: '이주찬',
-    image: '../../../public/img/minju.png',
   };
 
   const [products, setProducts] = useState([]);
@@ -166,7 +159,6 @@ const ProductList = () => {
 
   return (
     <>
-      <Header user={userInfo} />
       <PageWrapper>
         <ContentWrapper>
           <TitleBarContainer>
@@ -182,7 +174,6 @@ const ProductList = () => {
           </ProductsSectionWrapper>
         </ContentWrapper>
       </PageWrapper>
-      <Footer />
     </>
   );
 };

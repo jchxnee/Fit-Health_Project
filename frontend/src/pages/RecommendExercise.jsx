@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import Routine from '../components/RecommendExercise/Routine.jsx';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
@@ -7,7 +6,6 @@ import CategoryMenu from '../components/CategoryMenu.jsx';
 import BMICalculator from '../components/RecommendExercise/BMICalculator.jsx';
 import RecommendRoutine from '../components/RecommendExercise/RecommendRoutine.jsx';
 import styled from 'styled-components';
-import betaImg from '../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const HeaderContainer = styled.div`
   width: 100%;
@@ -41,10 +39,8 @@ const ContentWrapper = styled.div`
 `;
 
 function RecommendExercise() {
-  const [user] = useState({ name: '김현아', img: betaImg });
   return (
     <>
-      <Header user={user} />
       <HeaderContainer>
         <TitleBar title="운동 추천" />
       </HeaderContainer>
@@ -58,7 +54,6 @@ function RecommendExercise() {
           <RecommendRoutine />
         </ContentWrapper>
       </MainRow>
-      <Footer />
     </>
   );
 }

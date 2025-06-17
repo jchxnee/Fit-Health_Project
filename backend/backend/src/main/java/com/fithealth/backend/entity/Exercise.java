@@ -1,9 +1,15 @@
 package com.fithealth.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "EXERCISE")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Exercise {
 
     @Id

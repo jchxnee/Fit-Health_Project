@@ -70,19 +70,20 @@ public class Member {
     private LocalDateTime modifyDate;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<PAYMENT> payments = new ArrayList<>();
+    private List<Payment> payments = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<COMMENT> comments = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
+
+    //1 : N 연관관계 주인 = Board
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Board> boards = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<BOARD> boards = new ArrayList<>();
+    private List<Notice> notices = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<NOTICE> notices = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<REVIEW> reviews = new ArrayList<>();
+    private List<Review> reviews = new ArrayList<>();
 
     public enum Gender {
         M, F

@@ -1,15 +1,11 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import TitleBar from '../../components/TitleBar';
 import { FaCamera, FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
-import betaImg from '../../assets/beta_user_img.png';
 
 function ReviewCreationPage() {
   const [content, setContent] = useState('');
   const [imageCount, setImageCount] = useState(0);
-  const [user] = useState({ name: '김현아', img: betaImg });
   const [information] = useState({ coachName: '김성은', round: 2 });
   const contentTextareaRef = useRef(null); // textarea 참조
   const [isContentFocused, setIsContentFocused] = useState(false); // textarea 포커스 상태
@@ -135,7 +131,6 @@ function ReviewCreationPage() {
   return (
     <>
       <PageContainer>
-        <Header user={user} />
         <TitleBar title="리뷰 등록" />
         <ContentWrapper>
           <TopSection>
@@ -187,7 +182,6 @@ function ReviewCreationPage() {
           </ContentTextareaContainer>
         </ContentWrapper>
       </PageContainer>
-      <Footer />
     </>
   );
 }

@@ -13,6 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
+@Table(name = "REVIEW")
 public class Review {
 
     @Id

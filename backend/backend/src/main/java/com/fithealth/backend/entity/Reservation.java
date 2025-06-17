@@ -3,15 +3,38 @@ package com.fithealth.backend.entity;
 import com.fithealth.backend.entity.Payment;
 import com.fithealth.backend.enums.CommonEnums;
 import jakarta.persistence.*;
+<<<<<<< HEAD
+import lombok.*;
+=======
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+>>>>>>> a33b1be39a972e588d1536c925062ab69a8e170c
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "RESERVATION")
+<<<<<<< HEAD
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+=======
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+>>>>>>> a33b1be39a972e588d1536c925062ab69a8e170c
 public class Reservation {
 
     @Id
-    @OneToOne
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "RESERVATION_NO")
+    private Long reservationNo;
+
+    @ManyToOne
     @JoinColumn(name = "PAYMENT_ID", nullable = false)
     private Payment payment;
 

@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "HEALTH")
 @DynamicInsert
 public class Health {
+
     @Id
     @Column(name = "USER_EMAIL", length = 254)
     private String userEmail;

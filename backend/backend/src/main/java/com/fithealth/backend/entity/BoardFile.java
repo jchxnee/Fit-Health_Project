@@ -9,13 +9,12 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "TRAINER_FILE")
-public class TrainerFile {
+public class BoardFile {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TRAINER_NO")
-    private Trainer trainer;
+    @JoinColumn(name = "BOARD_NO")
+    private Board board;
 
     @Column(name = "ORIGIN_NAME", nullable = false)
     private String originName;
