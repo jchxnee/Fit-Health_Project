@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSignUpForm } from '../../hooks/useSignUpForm';
 
 function SignUpPage() {
-  const { register, handleSubmit, errors, isSubmitting } = useSignUpForm();
+  const { register, handleSubmit, onsubmit, errors, isSubmitting } = useSignUpForm();
   const navigate = useNavigate();
 
   const [agreeService, setAgreeService] = useState(false);
@@ -27,6 +27,7 @@ function SignUpPage() {
       return;
     }
     console.log('Form Data:', data);
+    onsubmit(data);
   };
 
   const handleEmailAuthClick = () => {
@@ -51,7 +52,7 @@ function SignUpPage() {
   return (
     <SignupContainer>
       <LogoImage src={logoSrc} alt="FIT:HEALTH 로고" />
-      <SignupForm onSubmit={handleSubmit}>
+      <SignupForm onSubmit={handleSubmit(onSubmitHandler)}>
         <FormTitle>회원가입</FormTitle>
 
         <InputGroup>
@@ -85,7 +86,6 @@ function SignUpPage() {
             </VerifyAuthCodeButton>
           </AuthCodeInputGroup>
         )}
-        {/* --- 여기까지 새로 추가된 부분 --- */}
 
         <InputGroup>
           <Label htmlFor="password">비밀번호*</Label>
@@ -279,43 +279,40 @@ const SectionTitle = styled.h2`
 
 const InputGroup = styled.div`
   display: flex;
-  /* flex-direction: column;  // 이 부분 제거 */
-  flex-wrap: wrap; /* 내용이 길어지면 다음 줄로 넘어가도록 설정 */
-  align-items: flex-start; /* 라벨과 인풋의 시작점을 맞춤 */
-  margin-bottom: ${({ theme }) => theme.spacing['4']}; /* 기본 하단 마진 */
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: ${({ theme }) => theme.spacing['4']};
   width: 100%;
   max-width: 480px;
-  /* 에러가 있을 경우 하단 패딩을 추가하여 에러 메시지 공간을 확보 */
   padding-bottom: ${({ theme, $hasError }) => ($hasError ? theme.spacing['4'] : '0')};
-  position: relative; /* 자식 요소의 절대 위치 지정을 위해 */
+  position: relative;
 
-  /* 약관 동의 체크박스 그룹에서 사용 시 마진 조정 */
   &:has(label > input[type='checkbox']) {
-    margin-bottom: ${({ theme }) => theme.spacing['2']}; /* 체크박스 그룹은 마진을 조금 줄임 */
+    margin-bottom: ${({ theme }) => theme.spacing['2']};
     padding-bottom: ${({ theme, $hasError }) => ($hasError ? theme.spacing['4'] : '0')};
   }
 `;
 
 const Label = styled.label`
-  flex-basis: 120px; /* 라벨의 너비를 고정 */
-  min-width: 120px; /* 최소 너비도 고정 */
+  flex-basis: 120px;
+  min-width: 120px;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.gray['700']};
-  text-align: left; /* 텍스트 왼쪽 정렬 */
-  margin-right: ${({ theme }) => theme.spacing['3']}; /* 라벨과 입력 필드 사이 간격 */
+  text-align: left;
+  margin-right: ${({ theme }) => theme.spacing['3']};
   font-weight: ${({ theme }) => theme.fontWeights.normal};
-  padding-top: ${({ theme }) => theme.spacing['3']}; /* 인풋 필드와 높이 맞추기 위해 패딩 추가 */
+  padding-top: ${({ theme }) => theme.spacing['3']};
 `;
 
 const Input = styled.input`
-  flex-grow: 1; /* 남은 공간을 모두 차지하도록 */
+  flex-grow: 1;
   padding: ${({ theme }) => theme.spacing['3']};
   border: 1px solid ${({ theme }) => theme.colors.gray['300']};
   border-radius: 6px;
   font-size: ${({ theme }) => theme.fontSizes.base};
   color: ${({ theme }) => theme.colors.gray['800']};
   box-sizing: border-box;
-  width: auto; /* flex-grow가 있으므로 auto */
+  width: auto;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -359,42 +356,18 @@ const EmailAuthButton = styled(ButtonStyle)`
   }
 `;
 
-const AuthCodeInputGroup = styled(Input)`
+const AuthCodeInputGroup = styled(InputGroup)`
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 480px; /* InputGroup과 동일한 최대 너비 */
-  margin-top: ${({ theme }) => theme.spacing['3']}; /* 이메일 입력 그룹과의 간격 */
+
   margin-bottom: ${({ theme }) => theme.spacing['4']};
-  padding-left: 120px; /* 라벨 너비만큼 들여쓰기하여 이메일 인풋과 정렬 */
-  box-sizing: border-box;
+  padding-left: 132px;
 `;
 
-const AuthCodeInput = styled(Input)`
-  flex-grow: 1;
-  margin-right: ${({ theme }) => theme.spacing['2']};
-  width: auto;
-`;
+const AuthCodeInput = styled(EmailAuthInput)``;
 
-const VerifyAuthCodeButton = styled(ButtonStyle)`
-  height: 44px;
-  padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['4']};
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  background-color: ${({ theme }) => theme.colors.primary};
-  border-color: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.white};
-  border-radius: 6px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease;
-
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.primaryDark};
-    border-color: ${({ theme }) => theme.colors.primaryDark};
-  }
-
+const VerifyAuthCodeButton = styled(EmailAuthButton)`
   &:disabled {
     background-color: ${({ theme }) => theme.colors.gray['400']};
     border-color: ${({ theme }) => theme.colors.gray['400']};
@@ -405,13 +378,13 @@ const VerifyAuthCodeButton = styled(ButtonStyle)`
 const ErrorMessage = styled.p`
   color: red;
   font-size: 0.85em;
-  margin-top: ${({ theme }) => theme.spacing['1']}; /* 위 요소와의 작은 간격 */
-  margin-left: 140px; /* 라벨 너비만큼 들여쓰기하여 인풋 아래에 맞춤 */
+  margin-top: ${({ theme }) => theme.spacing['1']};
+  margin-left: 140px;
   text-align: left;
-  width: calc(100% - 120px); /* 라벨 너비만큼 제외하고 나머지 너비 사용 */
+  width: calc(100% - 120px);
   box-sizing: border-box;
-  position: relative; /* InputGroup 내에서 일반 흐름에 맞춤 */
-  flex-basis: 100%; /* 새로운 줄로 내려가도록 강제 */
+  position: relative;
+  flex-basis: 100%;
 `;
 
 const TermsAndConditionsGroup = styled.div`
