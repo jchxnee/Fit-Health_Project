@@ -3,30 +3,18 @@ package com.fithealth.backend.entity;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.enums.CommonEnums;
 import jakarta.persistence.*;
-<<<<<<< HEAD
-import lombok.*;
-=======
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
->>>>>>> a33b1be39a972e588d1536c925062ab69a8e170c
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "PAYMENT")
-<<<<<<< HEAD
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-=======
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
->>>>>>> a33b1be39a972e588d1536c925062ab69a8e170c
 public class Payment {
 
     @Id
@@ -35,11 +23,11 @@ public class Payment {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "REQUEST_NAME", nullable = false)
-    private Member requestMember;
+    @JoinColumn(name = "USER_EMAIL", nullable = false)
+    private Member userMember;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "RESPONSE_NAME ", nullable = false)
+    @JoinColumn(name = "RESPONSE_NAME", nullable = false)
     private Member responseMember;
 
     @Column(name = "TRANSACTION_ID", length = 100)

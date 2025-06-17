@@ -70,7 +70,7 @@ public class Member {
     private LocalDateTime modifyDate;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<PAYMENT> payments = new ArrayList<>();
+    private List<Payment> payments = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
@@ -83,7 +83,7 @@ public class Member {
     private List<Notice> notices = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<REVIEW> reviews = new ArrayList<>();
+    private List<Review> reviews = new ArrayList<>();
 
     public enum Gender {
         M, F

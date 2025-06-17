@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
+
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import SelectBar from '../../components/selectbar/BasicSelectBar';
@@ -8,8 +7,6 @@ import UserTable from '../../components/UserTable';
 import theme from '../../styles/theme';
 import { FaSearch } from 'react-icons/fa';
 import Pagination from '../../components/Pagination';
-import HistoryModal from '../../components/modal/HistoryModal';
-import MatchingApprove from '../../components/modal/MatchingApprove.jsx';
 import MatchingRefuse from '../../components/modal/MatchingRefuse.jsx';
 
 const allMatchingData = [
@@ -243,11 +240,6 @@ const SearchIcon = styled(FaSearch)`
 `;
 
 const MatchingList = () => {
-  const userInfo = {
-    name: '이주찬',
-    img: '../../assets/beta_user_img.png',
-  };
-
   const selectBarOptions = [
     { label: '전체', value: 'all' },
     { label: '완료됨', value: '완료됨' },
@@ -320,7 +312,6 @@ const MatchingList = () => {
 
   return (
     <>
-      <Header user={userInfo} />
       <PageWrapper>
         <TitleBar title={'신청내역'} />
         <ContentWrapper>
@@ -336,7 +327,6 @@ const MatchingList = () => {
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </ContentWrapper>
       </PageWrapper>
-      <Footer />
 
       {selectedRowData && (
         <MatchingRefuse

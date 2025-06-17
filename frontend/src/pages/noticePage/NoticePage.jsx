@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import TitleBar from '../../components/TitleBar';
 // FaChevronLeft, FaChevronRight는 Pagination 컴포넌트 내부에서 사용하므로 여기서는 필요 없음
-import betaImg from '../../assets/beta_user_img.png'; // Header에서 사용될 이미지 (경로에 맞게 수정)
 import CustomCategoryMenu from '../../components/CustomCategoryMenu'; // CustomCategoryMenu 임포트
 import Pagination from '../../components/Pagination'; // Pagination 컴포넌트 임포트
 
@@ -77,7 +74,6 @@ const noticesData = [
 const ITEMS_PER_PAGE = 10;
 
 function NoticePage() {
-  const [user] = useState({ name: '김현아', img: betaImg }); // Header에 전달할 사용자 정보
   const [activeCategory, setActiveCategory] = useState('전체'); // 현재 선택된 카테고리
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
 
@@ -101,7 +97,6 @@ function NoticePage() {
   return (
     <>
       <PageContainer>
-        <Header user={user} />
         <TitleBar title="공지사항" />
         <ContentWrapper>
           <CustomCategoryMenu
@@ -146,7 +141,6 @@ function NoticePage() {
           </NoticeContent>
         </ContentWrapper>
       </PageContainer>
-      <Footer />
     </>
   );
 }

@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react'; // useEffect import 추가
 import styled from 'styled-components';
-import Header from '../../components/Header'; // Header 컴포넌트 경로에 맞게 수정
-import Footer from '../../components/Footer'; // Footer 컴포넌트 경로에 맞게 수정
-import betaImg from '../../assets/beta_user_img.png'; // 더미 사용자 프로필 이미지 및 후기 내 등 사진으로 사용
 import GeneralPostsList from '../../components/GeneralPostsList';
 import BasicFilter from '../../components/filter/BasicFilter';
 import TitleBar from '../../components/TitleBar';
@@ -105,7 +102,6 @@ const TabButton = styled(Link)`
 `;
 
 function MyPostsPage() {
-  const [user] = useState({ name: '김현아', img: betaImg }); // 실제 이미지 경로로 수정
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [filters, setFilters] = useState({
     search: '',
@@ -186,7 +182,6 @@ function MyPostsPage() {
   return (
     <>
       <PageContainer>
-        <Header user={user} />
         <MainContentArea>
           <TitleBar title="내가 작성한 게시물/댓글" />
           <Container>
@@ -203,7 +198,6 @@ function MyPostsPage() {
           <GeneralPostsList posts={filteredPosts} />
         </MainContentArea>
       </PageContainer>
-      <Footer />
     </>
   );
 }
