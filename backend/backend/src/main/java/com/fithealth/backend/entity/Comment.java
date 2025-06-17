@@ -1,0 +1,34 @@
+package com.fithealth.backend.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+public class Comment {
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long commentNo;
+
+    @Column(name = "COMMNETCONTENT", nullable = false)
+    private String commentContent;
+
+
+    @Column(name = "CREATED_DATE")
+    private LocalDateTime createdDate;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdDate = LocalDateTime.now();
+    }
+
+
+}
