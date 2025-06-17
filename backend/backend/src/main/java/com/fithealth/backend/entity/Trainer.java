@@ -20,6 +20,9 @@ public class Trainer {
     @Column(name = "TRAINER_NO", nullable = false)
     private Long trainerNo;
 
+    @OneToOne(mappedBy = "trainer", fetch = FetchType.LAZY)
+    private Member member;
+
     @Column(name = "WISH_AREA", nullable = false)
     private String wishArea;
 

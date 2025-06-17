@@ -45,7 +45,6 @@ public class Reservation {
 
     @PrePersist
     public void prePersist() {
-        this.selectDate = LocalDate.now();
         this.createDate = LocalDate.now();
 
         if(this.status == null) {

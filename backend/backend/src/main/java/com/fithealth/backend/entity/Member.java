@@ -26,6 +26,7 @@ public class Member {
     @Column(name = "USER_PWD", length = 100, nullable = false)
     private String userPwd;
 
+    //회원 : 트레이너 (1 : 1)
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "TRAINER_NO", unique = true)
     private Trainer trainer;
