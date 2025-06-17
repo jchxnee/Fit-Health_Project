@@ -42,14 +42,16 @@ import ChangePwdPage from './pages/myPage/ChangePwdPage';
 import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import { useState } from 'react';
 
 function App() {
+  const [user] = useState({ name: '김현아', img: '/public/img/hanuel.png' });
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
 
       <Router>
-        <Header user={null} />
+        <Header user={user} />
 
         <Routes>
           {/* 공통 */}
