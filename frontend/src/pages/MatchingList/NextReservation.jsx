@@ -53,7 +53,7 @@ const NextReservation = () => {
   };
 
   const [selectedDate, setSelectedDate] = useState(getTodayDateString());
-  const [selectedTime, setSelectedTime] = useState(null);DD
+  const [selectedTime, setSelectedTime] = useState(null);
 
   const [trainerId, setTrainerId] = useState(1);
   const [trainerInfo, setTrainerInfo] = useState(null);
