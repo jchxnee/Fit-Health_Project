@@ -26,6 +26,9 @@ public class Board {
     @Column(name = "BOARD_CONTENT", nullable = false)
     private String boardContent;
 
+    @Column(name = "BOARD_CATEGORY_NAME", nullable = false)
+    private String boardCategoryName;
+
     @Column(name = "COUNT", nullable = false)
     private Long count;
 
@@ -43,8 +46,11 @@ public class Board {
     @JoinColumn(name = "USER_EMAIL")
     private Member member;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BoardFile> boardPhoto = new ArrayList<>();
 
 
     @PrePersist

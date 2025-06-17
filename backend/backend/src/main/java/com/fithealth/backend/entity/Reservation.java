@@ -3,11 +3,18 @@ package com.fithealth.backend.entity;
 import com.fithealth.backend.entity.Payment;
 import com.fithealth.backend.enums.CommonEnums;
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "RESERVATION")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Reservation {
 
     @Id
