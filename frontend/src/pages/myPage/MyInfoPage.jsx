@@ -243,7 +243,6 @@ const MyInfoPage = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false); // 지역 모달 상태
   const [selected, setSelected] = useState('근력향상');
-  const [user] = useState({ name: '김현아', img: betaImg });
 
   const handleProvinceSelect = (province) => {
     setSelectedProvince(province);
@@ -348,7 +347,7 @@ const MyInfoPage = () => {
                 <List>
                   {categories.map((cat) => (
                     <Item key={cat} selected={selected === cat} onClick={() => setSelected(cat)}>
-                      <Label>{cat}</Label>
+                      {cat}
                     </Item>
                   ))}
                 </List>

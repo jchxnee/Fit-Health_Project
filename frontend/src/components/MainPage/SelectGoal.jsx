@@ -30,7 +30,6 @@ const CategoryBtn = styled.button`
     border: 1.5px solid ${({ theme }) => theme.colors.gray[300]};
     background: ${({ selected, theme }) => (selected ? theme.colors.secondary : 'transparent')};
     color: ${({ selected, theme }) => (selected ? theme.colors.white : theme.colors.primary)};
-    font-family: 'SUITE', sans-serif;
     font-size: ${({ theme }) => theme.fontSizes.base};
     font-weight: ${({ theme }) => theme.fontWeights.medium};
     cursor: pointer;
