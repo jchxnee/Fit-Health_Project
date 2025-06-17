@@ -1,14 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import { FaHeart, FaRegHeart, FaEllipsisV, FaShareAlt } from 'react-icons/fa'; // 좋아요, 더보기, 공유 아이콘
 import { RiMessage2Fill } from 'react-icons/ri'; // 댓글 아이콘
 import { FaPaperPlane } from 'react-icons/fa'; // 댓글 전송 아이콘
 import betaImg from '../../assets/beta_user_img.png'; // 더미 사용자 이미지 (경로 수정 필요)
 
 function CommunityPostDetailPage() {
-  const [user] = useState({ name: '김현아', img: betaImg }); // 현재 로그인 사용자 정보 (더미)
   const [isLiked, setIsLiked] = useState(false); // 좋아요 상태
   const [likesCount, setLikesCount] = useState(120); // 좋아요 수
   const [commentInput, setCommentInput] = useState(''); // 댓글 입력창 상태
@@ -91,7 +88,6 @@ function CommunityPostDetailPage() {
   return (
     <>
       <PageContainer>
-        <Header user={user} />
         <MainContentWrapper>
           <PostHeader>
             <PostCategory>커뮤니티 &gt; {post.category}</PostCategory>
@@ -182,7 +178,6 @@ function CommunityPostDetailPage() {
           </CommentSection>
         </MainContentWrapper>
       </PageContainer>
-      <Footer />
     </>
   );
 }

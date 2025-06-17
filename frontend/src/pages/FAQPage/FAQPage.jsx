@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import styled, { keyframes, css } from 'styled-components'; // keyframes와 css 임포트
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import TitleBar from '../../components/TitleBar';
 import CustomCategoryMenu from '../../components/CustomCategoryMenu';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import betaImg from '../../assets/beta_user_img.png';
 
 // 더미 데이터
 const faqData = [
@@ -72,7 +69,6 @@ const faqData = [
 ];
 
 function FAQPage() {
-  const [user] = useState({ name: '김현아', img: betaImg });
   const [activeCategory, setActiveCategory] = useState('전체');
   const [openQuestionId, setOpenQuestionId] = useState(null);
   const [keyForAnimation, setKeyForAnimation] = useState(0); // FAQContent의 애니메이션을 위한 키
@@ -93,7 +89,6 @@ function FAQPage() {
   return (
     <>
       <PageContainer>
-        <Header user={user} />
         <TitleBar title="자주 묻는 질문" />
         <ContentWrapper>
           <CustomCategoryMenu
@@ -128,7 +123,6 @@ function FAQPage() {
           </FAQContent>
         </ContentWrapper>
       </PageContainer>
-      <Footer />
     </>
   );
 }

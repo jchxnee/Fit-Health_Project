@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import TitleBar from '../../components/TitleBar';
 import { FaChevronDown, FaStar, FaStarHalfAlt, FaRegStar, FaThumbsUp, FaRegThumbsUp } from 'react-icons/fa';
 import betaImg from '../../assets/beta_user_img.png'; // 사용자 이미지 (Header에서 사용)
@@ -45,7 +43,6 @@ const myReviewsData = [
 ];
 
 function MyReviewsPage() {
-  const [user] = useState({ name: '김현아', img: betaImg }); // Header에 전달할 사용자 정보
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const [reviews, setReviews] = useState(myReviewsData); // 리뷰 목록 상태
   const [sortCriteria, setSortCriteria] = useState('highestRating'); // 초기 정렬 기준: 높은순
@@ -170,7 +167,6 @@ function MyReviewsPage() {
   return (
     <>
       <PageContainer>
-        <Header user={user} />
         <TitleBar title="내가 쓴 리뷰" />
         <ContentWrapper>
           <ReviewListSection>
@@ -249,7 +245,6 @@ function MyReviewsPage() {
           </ReviewListSection>
         </ContentWrapper>
       </PageContainer>
-      <Footer />
     </>
   );
 }

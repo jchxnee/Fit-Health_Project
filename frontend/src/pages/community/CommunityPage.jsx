@@ -2,17 +2,13 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FaPencilAlt, FaThumbsUp, FaEye } from 'react-icons/fa';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import { RiMessage2Fill } from 'react-icons/ri';
-import betaImg from '../../assets/beta_user_img.png';
 import CustomCategoryMenu from '../../components/CustomCategoryMenu';
 import GeneralPostsList from '../../components/GeneralPostsList';
 import { Link } from 'react-router-dom'; // Link 컴포넌트 import
 import Pagination from '../../components/Pagination';
 
 function CommunityPage() {
-  const [user] = useState({ name: '김현아', img: betaImg });
   const [activeCategory, setActiveCategory] = useState('전체');
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 10;
@@ -216,7 +212,6 @@ function CommunityPage() {
   return (
     <>
       <PageContainer>
-        <Header user={user} />
         <MainContentArea>
           <SidebarWrapper>
             <CustomCategoryMenu
@@ -303,7 +298,6 @@ function CommunityPage() {
           </MainContentWrapper>
         </MainContentArea>
       </PageContainer>
-      <Footer />
     </>
   );
 }
