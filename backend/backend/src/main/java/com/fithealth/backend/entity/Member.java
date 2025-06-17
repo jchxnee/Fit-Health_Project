@@ -44,7 +44,7 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 1)
-    private Gender gender;
+    private CommonEnums.Gender gender;
 
     @Column(name = "HEIGHT")
     private double height;
@@ -61,7 +61,7 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 1, nullable = false)
-    private Grade grade;
+    private CommonEnums.Grade grade;
 
     @Column(name = "ENROLL_DATE", nullable = false)
     private LocalDateTime enrollDate;
@@ -85,17 +85,6 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
 
-    public enum Gender {
-        M, F
-    }
-
-    public enum Status {
-        Y, N
-    }
-
-    public enum Grade {
-        A, U, C
-    }
 
     @PrePersist
     public void prePersist() {
@@ -107,7 +96,7 @@ public class Member {
         }
 
         if(this.grade == null) {
-            this.grade = Grade.U;
+            this.grade = CommonEnums.Grade.U;
         }
     }
 

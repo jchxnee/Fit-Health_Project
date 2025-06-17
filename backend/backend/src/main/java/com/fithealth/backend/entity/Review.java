@@ -47,8 +47,11 @@ public class Review {
 
 
     @PrePersist
-    protected void onCreate() {
+    protected void prePersist() {
         this.createdDate = LocalDateTime.now();
+        if(this.status == null) {
+            this.status = CommonEnums.Status.Y;
+        }
     }
 
 }

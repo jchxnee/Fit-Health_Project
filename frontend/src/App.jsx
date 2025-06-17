@@ -1,12 +1,16 @@
 import { ThemeProvider } from 'styled-components';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
-import theme from './styles/theme';
 import GlobalStyle from './styles/GlobalStyle';
+
+// Header/Footer
+import Header from './components/Header';
+import Footer from './components/Footer';
+
+// 페이지 컴포넌트
 import MainPage from './pages/MainPage.jsx';
-import RecommendedExerciseSection from './pages/RecommendExercise.jsx';
-import CoachDetail from './pages/coach/CoachDetail';
 import RecommendExercise from './pages/RecommendExercise.jsx';
+import CoachDetail from './pages/coach/CoachDetail';
 import CoachRegister from './pages/coach/CoachRegister';
 import RegionSelect from './components/RegionSelect.jsx';
 import CoachCalendar from './components/CoachDetails/CoachCalendar.jsx';
@@ -40,14 +44,35 @@ import FAQPage from './pages/FAQPage/FAQPage';
 import MyInfoPage from './pages/myPage/MyInfoPage';
 import ChangePwdPage from './pages/myPage/ChangePwdPage';
 import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
-import Header from './components/Header';
-import Footer from './components/Footer';
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const hideHeader = ['/signup'];
+  const isHeaderHidden = hideHeader.includes(location.pathname);
+
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyle />
+    <>
+      {!isHeaderHidden && <Header user={null} />}
+      <Routes>
+        {/* 공통 */}
+        <Route path="/" element={<MainPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/accountSettingPage" element={<AccountSettingsPage />} />
+        <Route path="/myInfoPage" element={<MyInfoPage />} />
+        <Route path="/changePwdPage" element={<ChangePwdPage />} />
+        <Route path="/deleteMemberPage" element={<DeleteMemberPage />} />
+        <Route path="/exercise" element={<RecommendExercise />} />
+        <Route path="/productList" element={<ProductList />} />
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/termOfServicePage" element={<TermOfServicePage />} />
+        <Route path="/operatingPolicy" element={<OperatingPolicyPage />} />
+        <Route path="/privacyPolicy" element={<PrivacyPolicyPage />} />
+        <Route path="/introduce" element={<CompanyIntroducionPage />} />
+        <Route path="/recruitmentInfo" element={<RecruitmentInfoPage />} />
 
+<<<<<<< HEAD
       <Router>
         <Header user={null} /> {/* 알림 2차 */}
         <Routes>
@@ -93,7 +118,35 @@ function App() {
         <Footer />
       </Router>
     </ThemeProvider>
+=======
+        {/* 코치 */}
+        <Route path="/coachList" element={<CoachList />} />
+        <Route path="/coachRegister" element={<CoachRegister />} />
+        <Route path="/coach/:id" element={<CoachDetail />} />
+        <Route path="/coachMatching" element={<CoachMatching />} />
+        <Route path="/nextReservation" element={<NextReservation />} />
+        <Route path="/coachReview" element={<CoachReview />} />
+        <Route path="/paymentPage" element={<PaymentPage />} />
+        <Route path="/coachmatchingList" element={<CoachCalendar />} />
+
+        {/* 커뮤니티 */}
+        <Route path="/community" element={<CommunityPage />} />
+        <Route path="/communityPostCreationPage" element={<CommunityPostCreationPage />} />
+        <Route path="/reviewCreationPage" element={<ReviewCreationPage />} />
+        <Route path="/communityDetailPage/:id" element={<CommunityPostDetailPage />} />
+        <Route path="/notice" element={<NoticePage />} />
+        <Route path="/faqPage" element={<FAQPage />} />
+        <Route path="/myPostsPage" element={<MyPostsPage />} />
+        <Route path="/myCommentsPage" element={<MyCommentsPage />} />
+        <Route path="/myReviewsPage" element={<MyReviewsPage />} />
+
+        {/* 고객 */}
+        <Route path="/matchingList" element={<MatchingList />} />
+      </Routes>
+      {!isHeaderHidden && <Footer user={null} />}
+    </>
+>>>>>>> 0f5b37962c6fd6194876bec79446840e20b86277
   );
 }
 
-export default App;
+export default AppContent;
