@@ -4,10 +4,10 @@ import ButtonStyle from '../../styles/common/Button';
 import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import { useLoginForm } from '../../hooks/member/useLoginForm';
 
 function LoginPage() {
-  const [useremail, setUserEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { register, handleSubmit, errors, isLoading } = useLoginForm();
   const [user] = useState({ name: '김현아', img: betaImg });
   return (
     <>
@@ -18,23 +18,11 @@ function LoginPage() {
         <LoginFormBox>
           <InputGroup>
             <StyledLabel htmlFor="useremail">이메일</StyledLabel>
-            <StyledInput
-              type="email"
-              id="useremail"
-              required
-              value={useremail}
-              onChange={(e) => setUserEmail(e.target.value)}
-            />
+            <StyledInput type="email" id="useremail" required {...register('email')} $error={errors.email} />
           </InputGroup>
           <InputGroup>
             <StyledLabel htmlFor="password">비밀번호</StyledLabel>
-            <StyledInput
-              type="password"
-              id="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <StyledInput type="password" id="password" required {...register('password')} $error={errors.password} />
           </InputGroup>
 
           <LoginRememberMeOption>
@@ -42,7 +30,7 @@ function LoginPage() {
             <label htmlFor="remember-me">아이디저장</label>
           </LoginRememberMeOption>
 
-          <LoginButton>로그인</LoginButton>
+          <LoginButton disabled={isLoading}>로그인</LoginButton>
 
           <LoginLinksContainer>
             <OptionLink href="#">아이디 찾기</OptionLink>
