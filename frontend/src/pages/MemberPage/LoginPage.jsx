@@ -6,7 +6,7 @@ import Header from '../../components/Header';
 import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 function LoginPage() {
-  const [username, setUsername] = useState('');
+  const [useremail, setUserEmail] = useState('');
   const [password, setPassword] = useState('');
   const [user] = useState({ name: '김현아', img: betaImg });
   return (
@@ -17,13 +17,13 @@ function LoginPage() {
         <LoginTitle>로그인</LoginTitle>
         <LoginFormBox>
           <InputGroup>
-            <StyledLabel htmlFor="username">아이디</StyledLabel>
+            <StyledLabel htmlFor="useremail">이메일</StyledLabel>
             <StyledInput
-              type="text"
-              id="username"
+              type="email"
+              id="useremail"
               required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={useremail}
+              onChange={(e) => setUserEmail(e.target.value)}
             />
           </InputGroup>
           <InputGroup>
@@ -37,7 +37,6 @@ function LoginPage() {
             />
           </InputGroup>
 
-          {/* Only the "아이디 저장" checkbox div here, ABOVE LoginButton */}
           <LoginRememberMeOption>
             <input type="checkbox" id="remember-me" />
             <label htmlFor="remember-me">아이디저장</label>
@@ -45,7 +44,6 @@ function LoginPage() {
 
           <LoginButton>로그인</LoginButton>
 
-          {/* LoginLinksContainer is moved back BELOW LoginButton */}
           <LoginLinksContainer>
             <OptionLink href="#">아이디 찾기</OptionLink>
             <LinkSeparator>|</LinkSeparator>
@@ -75,8 +73,8 @@ const LoginContainer = styled.div`
   flex-direction: column;
   align-items: center;
   min-height: 93vh;
-  padding-top: ${({ theme }) => theme.spacing[20]}; /* 80px from theme.spacing */
-  background-color: #fdfafa; /* Light background */
+  padding-top: ${({ theme }) => theme.spacing[20]};
+  background-color: #fdfafa;
   width: 100%;
   box-sizing: border-box;
 
@@ -88,16 +86,16 @@ const LoginContainer = styled.div`
 `;
 
 const LoginTitle = styled.h1`
-  font-size: ${({ theme }) => theme.fontSizes['3xl']}; /* 24px */
+  font-size: ${({ theme }) => theme.fontSizes['3xl']};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
-  margin-bottom: ${({ theme }) => theme.spacing[8]}; /* 32px */
+  margin-bottom: ${({ theme }) => theme.spacing[8]};
   color: ${({ theme }) => theme.colors.primary};
 `;
 
 const LoginFormBox = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
-  padding: ${({ theme }) => theme.spacing[10]}; /* 40px */
-  border-radius: ${({ theme }) => theme.borderRadius.ten}; /* 8px */
+  padding: ${({ theme }) => theme.spacing[10]};
+  border-radius: ${({ theme }) => theme.borderRadius.ten};
   box-shadow: ${({ theme }) => theme.shadows.base};
   width: 100%;
   max-width: 534px;
@@ -109,39 +107,38 @@ const LoginFormBox = styled.div`
 `;
 
 const InputGroup = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacing[5]}; /* 20px */
+  margin-bottom: ${({ theme }) => theme.spacing[5]};
   width: 350px;
 `;
 
 const StyledLabel = styled.label`
-  display: block; /* 라벨을 블록 요소로 만들어 인풋 위에 위치시키고 왼쪽 정렬 */
-  margin-bottom: ${({ theme }) => theme.spacing[1]}; /* 4px */
-  font-size: ${({ theme }) => theme.fontSizes.sm}; /* 14px */
-  color: ${({ theme }) => theme.colors.gray[700]}; /* 라벨 색상은 어두운 회색 */
-  font-weight: ${({ theme }) => theme.fontWeights.medium}; /* 살짝 두껍게 */
-  text-align: left; /* 명시적으로 왼쪽 정렬 */
+  display: block;
+  margin-bottom: ${({ theme }) => theme.spacing[1]};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.gray[700]};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
+  text-align: left;
 `;
 
 const StyledInput = styled.input`
   width: 100%;
-  border: none; /* 모든 기본 테두리 제거 */
-  border-bottom: 2px solid ${({ theme }) => theme.colors.gray[300]}; /* 아래쪽 테두리만 */
-  padding: ${({ theme }) => theme.spacing[2]} 0; /* 상하 패딩만 주고 좌우 패딩은 0 */
-  font-size: ${({ theme }) => theme.fontSizes.base}; /* 16px */
-  color: ${({ theme }) => theme.colors.primary}; /* 인풋 텍스트 색상: primary */
-  background-color: transparent; /* 배경색 투명 (아래쪽 선만 보이도록) */
-  box-sizing: border-box; /* padding이 너비에 포함되도록 */
-  transition: border-bottom-color 0.2s ease; /* 포커스 시 테두리 색상 변경을 위한 트랜지션 */
-  outline: none; /* 기본 아웃라인 제거 */
-  border-radius: 0; /* 테두리가 바닥에만 있을 때 모서리 둥글게 할 필요가 없으므로 0 */
+  border: none;
+  border-bottom: 2px solid ${({ theme }) => theme.colors.gray[300]};
+  padding: ${({ theme }) => theme.spacing[2]} 0;
+  font-size: ${({ theme }) => theme.fontSizes.base};
+  color: ${({ theme }) => theme.colors.primary};
+  background-color: transparent;
+  box-sizing: border-box;
+  transition: border-bottom-color 0.2s ease;
+  outline: none;
+  border-radius: 0;
 
   &:focus {
-    border-bottom-color: ${({ theme }) => theme.colors.gray[400]}; /* 포커스 시 border 색상 primary로 */
-    /* box-shadow는 아래 테두리만 있을 때는 어색할 수 있어 제거했습니다. 필요시 추가 */
+    border-bottom-color: ${({ theme }) => theme.colors.gray[400]};
   }
 
   &::placeholder {
-    color: ${({ theme }) => theme.colors.gray[400]}; /* placeholder 색상 */
+    color: ${({ theme }) => theme.colors.gray[400]};
   }
 `;
 
@@ -190,7 +187,7 @@ const LoginOptions = styled.div`
 
   input[type='checkbox'] {
     vertical-align: middle;
-    margin-right: ${({ theme }) => theme.spacing[2]}; /* 8px */
+    margin-right: ${({ theme }) => theme.spacing[2]};
   }
 
   label {
@@ -199,7 +196,7 @@ const LoginOptions = styled.div`
 `;
 
 const LoginLinksContainer = styled.div`
-  margin-top: ${({ theme }) => theme.spacing[5]}; /* 20px - space below login button */
+  margin-top: ${({ theme }) => theme.spacing[5]};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -212,19 +209,19 @@ const OptionLink = styled(Link)`
   text-decoration: none;
 
   &:hover {
-    color: ${({ theme }) => theme.colors.secondary}; /* Highlight on hover */
+    color: ${({ theme }) => theme.colors.secondary};
   }
 `;
 
 const LinkSeparator = styled.span`
-  color: ${({ theme }) => theme.colors.gray[400]}; /* A lighter gray for the separator */
-  font-size: ${({ theme }) => theme.fontSizes.sm}; /* Same font size as links */
+  color: ${({ theme }) => theme.colors.gray[400]};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
 `;
 
 const SNSLoginDivider = styled.div`
   text-align: center;
-  margin-top: ${({ theme }) => theme.spacing[8]}; /* 32px */
-  margin-bottom: ${({ theme }) => theme.spacing[1]}; /* 20px */
+  margin-top: ${({ theme }) => theme.spacing[8]};
+  margin-bottom: ${({ theme }) => theme.spacing[1]};
   color: ${({ theme }) => theme.colors.gray[500]};
   position: relative;
 
@@ -234,13 +231,13 @@ const SNSLoginDivider = styled.div`
     top: 50%;
     left: 0;
     right: 0;
-    border-top: 1px solid ${({ theme }) => theme.colors.gray[200]}; /* Lighter gray line */
+    border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
     z-index: 1;
   }
 
   span {
     background-color: ${({ theme }) => theme.colors.white};
-    padding: 0 ${({ theme }) => theme.spacing[2]}; /* 8px */
+    padding: 0 ${({ theme }) => theme.spacing[2]};
     position: relative;
     z-index: 2;
     font-size: ${({ theme }) => theme.fontSizes.sm};
@@ -250,14 +247,14 @@ const SNSLoginDivider = styled.div`
 const SNSLoginIcons = styled.div`
   display: flex;
   justify-content: center;
-  gap: ${({ theme }) => theme.spacing[4]}; /* 16px */
-  margin-top: ${({ theme }) => theme.spacing[3]}; /* 20px */
+  gap: ${({ theme }) => theme.spacing[4]};
+  margin-top: ${({ theme }) => theme.spacing[3]};
 `;
 
 const SNSIcon = styled.img`
-  width: ${({ theme }) => theme.spacing[10]}; /* 40px */
-  height: ${({ theme }) => theme.spacing[10]}; /* 40px */
-  border-radius: ${({ theme }) => theme.borderRadius.full}; /* Circular */
+  width: ${({ theme }) => theme.spacing[10]};
+  height: ${({ theme }) => theme.spacing[10]};
+  border-radius: ${({ theme }) => theme.borderRadius.full};
   cursor: pointer;
   box-shadow: ${({ theme }) => theme.shadows.sm};
   transition:
@@ -265,7 +262,7 @@ const SNSIcon = styled.img`
     box-shadow 0.2s ease;
 
   &:hover {
-    transform: translateY(-${({ theme }) => theme.spacing[1]}); /* -4px */
+    transform: translateY(-${({ theme }) => theme.spacing[1]});
     box-shadow: ${({ theme }) => theme.shadows.md};
   }
 `;

@@ -3,38 +3,50 @@ import styled from 'styled-components';
 import logoSrc from '../../assets/header_icon.png';
 import ButtonStyle from '../../styles/common/Button';
 import { useNavigate } from 'react-router-dom';
+import { useSignUpForm } from '../../hooks/useSignUpForm';
 
 function SignUpPage() {
-  const [id, setId] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [birthdate, setBirthdate] = useState('');
-  const [phone, setPhone] = useState('');
+  const { register, handleSubmit, errors, isSubmitting } = useSignUpForm();
+  const navigate = useNavigate();
+
   const [agreeService, setAgreeService] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
 
-  const navigate = useNavigate();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // 유효성 검사
-    if (!email || !password || password !== passwordConfirm || !agreeService || !agreePrivacy) {
-      alert('모든 필수 항목을 입력하고 약관에 동의해야 합니다.');
-      return;
-    }
-
-    // 회원가입 처리 로직 (ex: API 호출)
-    // await axios.post(...);
-
-    navigate('/login');
-  };
+  const [birthdate, setBirthdate] = useState('');
 
   // 약관 내용 토글 상태
   const [showServiceTerms, setShowServiceTerms] = useState(false);
   const [showPrivacyTerms, setShowPrivacyTerms] = useState(false);
+
+  const [showAuthCodeInput, setShowAuthCodeInput] = useState(false);
+  const [authCode, setAuthCode] = useState('');
+
+  const onSubmitHandler = (data) => {
+    if (!agreeService || !agreePrivacy) {
+      alert('필수 약관에 모두 동의해야 회원가입을 할 수 있습니다.');
+      return;
+    }
+    console.log('Form Data:', data);
+  };
+
+  const handleEmailAuthClick = () => {
+    // 여기에 이메일 인증번호 발송 API 호출 로직을 추가할 수 있습니다.
+    // 성공적으로 발송되었다고 가정하고 인증 코드 입력 필드를 표시합니다.
+    setShowAuthCodeInput(true);
+    alert('인증번호가 이메일로 발송되었습니다. 확인해주세요.');
+  };
+
+  const handleVerifyAuthCode = () => {
+    // 여기에 인증 번호 확인 API 호출 로직을 추가할 수 있습니다.
+    console.log('입력된 인증번호:', authCode);
+    if (authCode === '123456') {
+      // 예시: 실제로는 서버에서 확인
+      alert('인증번호가 확인되었습니다!');
+      // 인증 성공 시 추가 로직 (예: 이메일 필드 비활성화, 다음 단계 진행 등)
+    } else {
+      alert('인증번호가 올바르지 않습니다.');
+    }
+  };
 
   return (
     <SignupContainer>
@@ -49,12 +61,31 @@ function SignUpPage() {
               type="email"
               id="email"
               placeholder="이메일 주소 입력"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...register('email')}
+              $error={errors.email}
             />
-            <EmailAuthButton type="button">이메일 인증</EmailAuthButton>
+            <EmailAuthButton type="button" onClick={handleEmailAuthClick}>
+              이메일 인증
+            </EmailAuthButton>
           </EmailAuthContainer>
+          {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
         </InputGroup>
+
+        {/* --- 새로 추가된 인증 번호 입력 영역 --- */}
+        {showAuthCodeInput && (
+          <AuthCodeInputGroup>
+            <AuthCodeInput
+              type="text"
+              placeholder="인증번호 6자리 입력"
+              value={authCode}
+              onChange={(e) => setAuthCode(e.target.value)}
+            />
+            <VerifyAuthCodeButton type="button" onClick={handleVerifyAuthCode}>
+              확인
+            </VerifyAuthCodeButton>
+          </AuthCodeInputGroup>
+        )}
+        {/* --- 여기까지 새로 추가된 부분 --- */}
 
         <InputGroup>
           <Label htmlFor="password">비밀번호*</Label>
@@ -62,9 +93,10 @@ function SignUpPage() {
             type="password"
             id="password"
             placeholder="비밀번호 8~16자 (영문, 숫자, 특수문자 포함)"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            {...register('password')}
+            $error={errors.password}
           />
+          {errors.password && <ErrorMessage>{errors.password.message}</ErrorMessage>}
         </InputGroup>
 
         <InputGroup>
@@ -73,14 +105,16 @@ function SignUpPage() {
             type="password"
             id="passwordConfirm"
             placeholder="비밀번호 재입력"
-            value={passwordConfirm}
-            onChange={(e) => setPasswordConfirm(e.target.value)}
+            {...register('passwordConfirm')}
+            $error={errors.passwordConfirm}
           />
+          {errors.passwordConfirm && <ErrorMessage>{errors.passwordConfirm.message}</ErrorMessage>}
         </InputGroup>
 
         <InputGroup>
-          <Label htmlFor="name">이름*</Label>
-          <Input type="text" id="name" placeholder="이름 입력" value={name} onChange={(e) => setName(e.target.value)} />
+          <Label htmlFor="username">이름*</Label>
+          <Input type="text" id="username" placeholder="이름 입력" {...register('username')} $error={errors.username} />
+          {errors.username && <ErrorMessage>{errors.username.message}</ErrorMessage>}
         </InputGroup>
 
         <InputGroup>
@@ -89,9 +123,10 @@ function SignUpPage() {
             type="tel"
             id="phone"
             placeholder="하이픈 없이 숫자만 입력해주세요."
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            {...register('phone')}
+            $error={errors.phone}
           />
+          {errors.phone && <ErrorMessage>{errors.phone.message}</ErrorMessage>}
         </InputGroup>
 
         <InputGroup>
@@ -244,31 +279,43 @@ const SectionTitle = styled.h2`
 
 const InputGroup = styled.div`
   display: flex;
-  align-items: center;
-  margin-bottom: ${({ theme }) => theme.spacing['4']};
+  /* flex-direction: column;  // 이 부분 제거 */
+  flex-wrap: wrap; /* 내용이 길어지면 다음 줄로 넘어가도록 설정 */
+  align-items: flex-start; /* 라벨과 인풋의 시작점을 맞춤 */
+  margin-bottom: ${({ theme }) => theme.spacing['4']}; /* 기본 하단 마진 */
   width: 100%;
   max-width: 480px;
+  /* 에러가 있을 경우 하단 패딩을 추가하여 에러 메시지 공간을 확보 */
+  padding-bottom: ${({ theme, $hasError }) => ($hasError ? theme.spacing['4'] : '0')};
+  position: relative; /* 자식 요소의 절대 위치 지정을 위해 */
+
+  /* 약관 동의 체크박스 그룹에서 사용 시 마진 조정 */
+  &:has(label > input[type='checkbox']) {
+    margin-bottom: ${({ theme }) => theme.spacing['2']}; /* 체크박스 그룹은 마진을 조금 줄임 */
+    padding-bottom: ${({ theme, $hasError }) => ($hasError ? theme.spacing['4'] : '0')};
+  }
 `;
 
 const Label = styled.label`
-  flex-basis: 120px;
-  min-width: 120px;
+  flex-basis: 120px; /* 라벨의 너비를 고정 */
+  min-width: 120px; /* 최소 너비도 고정 */
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.gray['700']};
-  text-align: left;
-  margin-right: ${({ theme }) => theme.spacing['3']};
+  text-align: left; /* 텍스트 왼쪽 정렬 */
+  margin-right: ${({ theme }) => theme.spacing['3']}; /* 라벨과 입력 필드 사이 간격 */
   font-weight: ${({ theme }) => theme.fontWeights.normal};
+  padding-top: ${({ theme }) => theme.spacing['3']}; /* 인풋 필드와 높이 맞추기 위해 패딩 추가 */
 `;
 
 const Input = styled.input`
-  flex-grow: 1;
+  flex-grow: 1; /* 남은 공간을 모두 차지하도록 */
   padding: ${({ theme }) => theme.spacing['3']};
   border: 1px solid ${({ theme }) => theme.colors.gray['300']};
   border-radius: 6px;
   font-size: ${({ theme }) => theme.fontSizes.base};
   color: ${({ theme }) => theme.colors.gray['800']};
   box-sizing: border-box;
-  width: 100%;
+  width: auto; /* flex-grow가 있으므로 auto */
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -312,6 +359,61 @@ const EmailAuthButton = styled(ButtonStyle)`
   }
 `;
 
+const AuthCodeInputGroup = styled(Input)`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 480px; /* InputGroup과 동일한 최대 너비 */
+  margin-top: ${({ theme }) => theme.spacing['3']}; /* 이메일 입력 그룹과의 간격 */
+  margin-bottom: ${({ theme }) => theme.spacing['4']};
+  padding-left: 120px; /* 라벨 너비만큼 들여쓰기하여 이메일 인풋과 정렬 */
+  box-sizing: border-box;
+`;
+
+const AuthCodeInput = styled(Input)`
+  flex-grow: 1;
+  margin-right: ${({ theme }) => theme.spacing['2']};
+  width: auto;
+`;
+
+const VerifyAuthCodeButton = styled(ButtonStyle)`
+  height: 44px;
+  padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['4']};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  background-color: ${({ theme }) => theme.colors.primary};
+  border-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.white};
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.primaryDark};
+    border-color: ${({ theme }) => theme.colors.primaryDark};
+  }
+
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.gray['400']};
+    border-color: ${({ theme }) => theme.colors.gray['400']};
+    cursor: not-allowed;
+  }
+`;
+
+const ErrorMessage = styled.p`
+  color: red;
+  font-size: 0.85em;
+  margin-top: ${({ theme }) => theme.spacing['1']}; /* 위 요소와의 작은 간격 */
+  margin-left: 140px; /* 라벨 너비만큼 들여쓰기하여 인풋 아래에 맞춤 */
+  text-align: left;
+  width: calc(100% - 120px); /* 라벨 너비만큼 제외하고 나머지 너비 사용 */
+  box-sizing: border-box;
+  position: relative; /* InputGroup 내에서 일반 흐름에 맞춤 */
+  flex-basis: 100%; /* 새로운 줄로 내려가도록 강제 */
+`;
+
 const TermsAndConditionsGroup = styled.div`
   width: 100%;
   max-width: 480px;
@@ -322,7 +424,7 @@ const TermsAndConditionsGroup = styled.div`
 
 const TermLabel = styled.label`
   display: flex;
-  align-items: center; /* 자식 요소들을 수직 중앙 정렬 */
+  align-items: center;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.gray['700']};
   margin-bottom: ${({ theme }) => theme.spacing['2']};
@@ -355,7 +457,7 @@ const TermsContent = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.xs};
   color: ${({ theme }) => theme.colors.primary};
   line-height: 1.5;
-  max-height: ${(props) => (props.$isOpen ? '200px' : '0')}; /* $isOpen에 따라 높이 변경 */
+  max-height: ${(props) => (props.$isOpen ? '200px' : '0')};
   overflow-y: auto;
   opacity: ${(props) => (props.$isOpen ? 1 : 0)};
   visibility: ${(props) => (props.$isOpen ? 'visible' : 'hidden')};

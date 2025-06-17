@@ -30,7 +30,7 @@ export const Item = styled.button`
   border-radius: 24px;
   border: 1.5px solid #cdcdcd;
   background: ${({ selected, theme }) => (selected ? theme.colors.button : 'transparent')};
-  color: ${({ selected, theme }) => (selected ? '#fff' : theme.colors.primary)};
+  color: ${({ selected, theme }) => (selected ? theme.colors.white : theme.colors.primary)};
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: 500;
   text-align: center;
