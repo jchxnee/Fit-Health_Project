@@ -49,8 +49,7 @@ function App() {
       <GlobalStyle />
 
       <Router>
-        <Header user={null} />
-
+        <Header user={null} /> {/* 알림 2차 */}
         <Routes>
           {/* 공통 */}
           <Route path="/" element={<MainPage />} /> {/* 메인페이지 */}
@@ -61,7 +60,7 @@ function App() {
           <Route path="/myInfoPage" element={<MyInfoPage />} /> {/* 내 정보 관리 */}
           <Route path="/changePwdPage" element={<ChangePwdPage />} /> {/* 비밀번호 변경 */}
           <Route path="/deleteMemberPage" element={<DeleteMemberPage />} /> {/* 회원탈퇴 */}
-          <Route path="/exercise" element={<RecommendExercise />} /> {/* 추천 운동 */}
+          <Route path="/exercise" element={<RecommendExercise />} /> {/* 추천 운동 */} {/* 2차 */}
           <Route path="/productList" element={<ProductList />} /> {/* 건강 상품 리스트 */}
           <Route path="/chat" element={<ChatPage />} /> {/* 채팅 */}
           <Route path="/termOfServicePage" element={<TermOfServicePage />} /> {/* 이용약관 */}
@@ -77,7 +76,7 @@ function App() {
           <Route path="/nextReservation" element={<NextReservation />} /> {/* 다음 회차 예약 */}
           <Route path="/coachReview" element={<CoachReview />} /> {/* 코치 리뷰 */}
           <Route path="/paymentPage" element={<PaymentPage />} /> {/* 결제페이지 */}
-          <Route path="/coachmatchingList" element={<CoachCalendar />} /> {/* 결제페이지 */}
+          <Route path="/coachmatchingList" element={<CoachCalendar />} /> {/* 매칭내역 */}
           {/* 커뮤니티 */}
           <Route path="/community" element={<CommunityPage />} /> {/* 커뮤니티 */}
           <Route path="/communityPostCreationPage" element={<CommunityPostCreationPage />} /> {/* 커뮤니티 글등록 */}
