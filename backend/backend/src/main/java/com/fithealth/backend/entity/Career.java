@@ -18,9 +18,9 @@ public class Career {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TRAINER_NO")
+    @JoinColumn(name = "TRAINER_NO", nullable = false)
     private Trainer trainer;
 
-    @Column(name = "CONTENT")
+    @Column(name = "CONTENT", nullable = false)
     private String content;
 }
