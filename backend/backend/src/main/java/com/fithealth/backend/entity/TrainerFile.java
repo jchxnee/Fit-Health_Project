@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@Table(name = "TRAINER_FILE")
 public class TrainerFile {
 
     @Id

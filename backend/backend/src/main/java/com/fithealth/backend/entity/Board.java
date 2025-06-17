@@ -1,5 +1,6 @@
 package com.fithealth.backend.entity;
 
+import com.fithealth.backend.enums.CommonEnums;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
+@Table(name = "BOARD")
 public class Board {
 
     @Id

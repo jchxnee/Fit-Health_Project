@@ -11,9 +11,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
-@Table(name = "MEMBER")
+@Table(name = "HEALTH")
 @DynamicInsert
 public class Health {
+
     @Id
     @Column(name = "USER_EMAIL", length = 254)
     private String userEmail;

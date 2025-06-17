@@ -3,6 +3,7 @@ package com.fithealth.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import javax.naming.Name;
 import java.time.LocalDateTime;
 
 @Getter
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
+@Table(name = "COMMENT")
 public class Comment {
 
 
