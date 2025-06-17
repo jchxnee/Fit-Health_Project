@@ -37,12 +37,9 @@ import TermOfServicePage from './pages/InformationPage/TermOfServicePage';
 import PrivacyPolicyPage from './pages/InformationPage/PrivacyPolicyPage';
 import CompanyIntroducionPage from './pages/InformationPage/CompanyIntroducionPage';
 import FAQPage from './pages/FAQPage/FAQPage';
-<<<<<<< HEAD:src/App.jsx
 import MyInfoPage from './pages/myPage/MyInfoPage';
 import ChangePwdPage from './pages/myPage/ChangePwdPage';
-=======
 import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
->>>>>>> 7f4bc9ba59c633c29ead104485789d9a0a385039:frontend/src/App.jsx
 
 function App() {
   return (
