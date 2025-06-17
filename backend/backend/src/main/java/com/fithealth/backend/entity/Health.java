@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
-@Table(name = "MEMBER")
+@Table(name = "HEALTH")
 @DynamicInsert
 public class Health {
     @Id
