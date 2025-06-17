@@ -485,7 +485,7 @@ export const GenderButton = styled.button`
   border: 1.5px solid #cdcdcd; /* Consistent with Item's border */
 
   /* Apply background and color based on $isSelected, similar to Item's 'selected' prop */
-  background: ${({ $isSelected, theme }) => ($isSelected ? theme.colors.button : 'transparent')};
+    background: ${({ selected, theme }) => (selected ? theme.colors.secondary : 'transparent')};
   color: ${({ $isSelected, theme }) => ($isSelected ? '#fff' : theme.colors.primary)};
 
   font-size: ${({ theme }) => theme.fontSizes.sm}; /* Consistent font-size, or base if preferred for buttons */
@@ -499,7 +499,7 @@ export const GenderButton = styled.button`
   box-shadow: none;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.button}; /* Consistent hover effect */
+    background: ${({ theme }) => theme.colors.secondary}; /* Consistent hover effect */
     color: #fff; /* Consistent hover effect */
   }
 `;
