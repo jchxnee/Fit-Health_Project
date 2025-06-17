@@ -12,6 +12,7 @@ export const Wrapper = styled.section`
 export const Button = styled.div`
   width: 100%;
   display: flex;
+    
 `;
 
 export const List = styled.div`
@@ -27,10 +28,10 @@ export const Item = styled.button`
   min-width: auto;
   height: auto;
   padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['3']};
-  border-radius: 24px;
-  border: 1.5px solid #cdcdcd;
-  background: ${({ selected, theme }) => (selected ? theme.colors.button : 'transparent')};
-  color: ${({ selected, theme }) => (selected ? theme.colors.white : theme.colors.primary)};
+    border-radius: ${({ theme }) => theme.borderRadius['3xl']};
+    border: 1.5px solid ${({ theme }) => theme.colors.gray[300]};
+    background: ${({ selected, theme }) => (selected ? theme.colors.secondary : 'transparent')};
+    color: ${({ selected, theme }) => (selected ? theme.colors.white : theme.colors.primary)};
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: 500;
   text-align: center;
@@ -41,8 +42,8 @@ export const Item = styled.button`
   outline: none;
   box-shadow: none;
   &:hover {
-    background: ${({ theme }) => theme.colors.button}; /* primary hover color */
-    color: #fff;
+      background: ${({ theme }) => theme.colors.secondary};
+      color: ${({ theme }) => theme.colors.white};
   }
 `;
 

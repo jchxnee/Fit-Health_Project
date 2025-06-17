@@ -55,7 +55,7 @@ const LoginContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 93vh;
+  min-height: 100vh;
   padding-top: ${({ theme }) => theme.spacing[20]};
   background-color: #fdfafa;
   width: 100%;

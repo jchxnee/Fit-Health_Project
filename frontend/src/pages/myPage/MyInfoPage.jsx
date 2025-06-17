@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
 import { Button, Item, List, Wrapper } from '../../styles/common/SelectGoal';
-import * as S from '../../styles/common/SelectGoal';
-import RegionSection from '../../components/CoachRegister/RegionSection';
 import RegionSelect from '../../components/RegionSelect';
 
 const categories = [
@@ -91,7 +89,7 @@ const MyInfoPage = () => {
                 <List>
                   {categories.map((cat) => (
                     <Item key={cat} selected={selected === cat} onClick={() => setSelected(cat)}>
-                      <Label>{cat}</Label>
+                      {cat}
                     </Item>
                   ))}
                 </List>
@@ -188,28 +186,26 @@ export const GenderSelection = styled.div`
 
 export const GenderButton = styled.button`
   flex: 1;
-  /* Use the same padding and border-radius as Item for consistency */
   padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['3']};
-  border-radius: 24px; /* Consistent with Item's border-radius */
-  border: 1.5px solid #cdcdcd; /* Consistent with Item's border */
+  border-radius: 24px;
+  border: 1.5px solid #cdcdcd;
 
-  /* Apply background and color based on $isSelected, similar to Item's 'selected' prop */
-  background: ${({ $isSelected, theme }) => ($isSelected ? theme.colors.button : 'transparent')};
+  background: ${({ selected, theme }) => (selected ? theme.colors.secondary : 'transparent')};
   color: ${({ $isSelected, theme }) => ($isSelected ? '#fff' : theme.colors.primary)};
 
-  font-size: ${({ theme }) => theme.fontSizes.sm}; /* Consistent font-size, or base if preferred for buttons */
-  font-weight: 500; /* Consistent font-weight */
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-weight: 500;
   text-align: center;
   cursor: pointer;
   transition:
     background 0.2s,
-    color 0.2s; /* Consistent transition */
+    color 0.2s;
   outline: none;
   box-shadow: none;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.button}; /* Consistent hover effect */
-    color: #fff; /* Consistent hover effect */
+    background: ${({ theme }) => theme.colors.secondary};
+    color: #fff;
   }
 `;
 
@@ -229,116 +225,8 @@ const InputWithUnit = styled.div`
   }
 `;
 
-const RegionSelectionBox = styled.div`
-  width: 100%;
-  max-width: 480px;
-  padding: ${({ theme }) => theme.spacing['3']};
-  border: 1px solid ${({ theme }) => theme.colors.gray['300']};
-  border-radius: ${({ theme }) => theme.borderRadius.sm};
-  background-color: ${({ theme }) => theme.colors.white};
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  color: ${({ theme }) => theme.colors.primary};
-  box-sizing: border-box;
-  margin-top: ${({ theme }) => theme.spacing['2']};
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.gray['400']};
-  }
-`;
-
-const SelectedRegionText = styled.span`
-  color: ${({ theme, $hasSelected }) => ($hasSelected ? theme.colors.gray['800'] : theme.colors.gray['500'])};
-`;
-
-// --- 지역 선택 모달 관련 Styled Components ---
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5); /* 반투명 오버레이 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000; /* 다른 요소보다 위에 오도록 설정 */
-`;
-
-const RegionModalContent = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  max-width: 500px; /* 모달의 최대 너비 */
-  height: 400px; /* 모달의 높이 */
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* 내부 컨텐츠 스크롤 처리 */
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: ${({ theme }) => theme.spacing['4']};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['200']};
-  font-size: ${({ theme }) => theme.fontSizes.lg};
-  font-weight: ${({ theme }) => theme.fontWeights.medium};
-  color: ${({ theme }) => theme.colors.primary};
-`;
-
-const ResetButton = styled.button`
-  background: none;
-  border: none;
-  color: ${({ theme }) => theme.colors.gray['500']};
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  cursor: pointer;
-  &:hover {
-    color: ${({ theme }) => theme.colors.primary};
-  }
-`;
-
-const ModalBody = styled.div`
-  display: flex;
-  flex-grow: 1; /* 남은 공간을 채우도록 함 */
-  overflow: hidden;
-`;
-
-const ProvinceList = styled.div`
-  flex-basis: 35%; /* 이미지처럼 왼쪽 목록 너비 조정 */
-  border-right: 1px solid ${({ theme }) => theme.colors.gray['200']};
-  overflow-y: auto; /* 내용이 넘치면 스크롤 */
-  background-color: ${({ theme }) => theme.colors.gray['100']}; /* 왼쪽 배경색 */
-`;
-
-const CityList = styled.div`
-  flex-basis: 65%; /* 이미지처럼 오른쪽 목록 너비 조정 */
-  overflow-y: auto; /* 내용이 넘치면 스크롤 */
-`;
-
-const ListItem = styled.div`
-  padding: ${({ theme }) => theme.spacing['3']} ${({ theme }) => theme.spacing['4']};
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  color: ${({ theme }) => theme.colors.primary};
-  cursor: pointer;
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.gray['200']};
-  }
-  background-color: ${({ theme, $isSelected }) => ($isSelected ? theme.colors.gray['200'] : 'transparent')};
-  font-weight: ${({ theme, $isSelected }) => ($isSelected ? theme.fontWeights.semibold : theme.fontWeights.normal)};
-`;
-
 const SubmitButton = styled(ButtonStyle)`
   width: 80%;
   align-self: center;
   margin-top: ${({ theme }) => theme.spacing['8']};
-`;
-
-const Section = styled.section`
-  width: 100%;
-  padding: 0 12px;
 `;
