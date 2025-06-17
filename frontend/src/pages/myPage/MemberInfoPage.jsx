@@ -1,0 +1,140 @@
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import ButtonStyle from '../../styles/common/Button';
+import Header from '../../components/Header';
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+
+const ChangePwdPage = () => {
+  const [phoneNumber, setPhoneNumber] = useState('010-1234-5678'); // 더미 데이터
+  const [email, setEmail] = useState('user@example.com'); // 더미 데이터
+  const [currentPassword, setCurrentPassword] = useState(''); // 더미 데이터
+  const [newPassword, setNewPassword] = useState(''); // 더미 데이터
+  const [confirmNewPassword, setConfirmNewPassword] = useState(''); // 더미 데이터
+  const [user] = useState({ name: '김현아', img: betaImg });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    alert('개인 정보 변경 처리');
+    // 여기에 개인 정보 변경 로직 (API 호출 등) 추가
+  };
+
+  return (
+    <>
+      <Header user={user} />
+      <PersonalInfoContainer>
+        <PersonalInfoForm onSubmit={handleSubmit}>
+          <PageTitle>비밀번호 변경</PageTitle>
+
+          <InputGroup>
+            <Label htmlFor="currentPassword">현재 비밀번호</Label>
+            <Input
+              type="password"
+              id="currentPassword"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="현재 비밀번호 입력"
+            />
+          </InputGroup>
+
+          <InputGroup>
+            <Label htmlFor="newPassword">새 비밀번호</Label>
+            <Input
+              type="password"
+              id="newPassword"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="새 비밀번호 (8~16자, 영문/숫자/특수문자)"
+            />
+          </InputGroup>
+
+          <InputGroup>
+            <Label htmlFor="confirmNewPassword">비밀번호 확인</Label>
+            <Input
+              type="password"
+              id="confirmNewPassword"
+              value={confirmNewPassword}
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
+              placeholder="새 비밀번호 다시 입력"
+            />
+          </InputGroup>
+
+          <SubmitButton type="submit">비밀번호 변경</SubmitButton>
+        </PersonalInfoForm>
+      </PersonalInfoContainer>
+    </>
+  );
+};
+
+export default ChangePwdPage;
+
+const PersonalInfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: ${({ theme }) => theme.spacing['20']};
+  background-color: #f9fafa;
+  min-height: calc(100vh - 60px);
+  box-sizing: border-box;
+  width: 100%;
+`;
+
+const PersonalInfoForm = styled.div`
+  background-color: ${({ theme }) => theme.colors.white};
+  padding: ${({ theme }) => theme.spacing[10]};
+  border-radius: ${({ theme }) => theme.borderRadius.ten};
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const PageTitle = styled.h1`
+  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-weight: ${({ theme }) => theme.fontWeights.semibold};
+  color: ${({ theme }) => theme.colors.gray['800']};
+  margin-bottom: ${({ theme }) => theme.spacing['10']};
+  text-align: center;
+`;
+
+const InputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: ${({ theme }) => theme.spacing['6']};
+  width: 100%;
+  max-width: 480px;
+  text-align: left;
+`;
+
+const Label = styled.label`
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.primary};
+  font-weight: ${({ theme }) => theme.fontWeights.normal};
+  margin-bottom: ${({ theme }) => theme.spacing['2']};
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: ${({ theme }) => theme.spacing['2']} 0;
+  border: none;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['300']};
+  font-size: ${({ theme }) => theme.fontSizes.base};
+  color: ${({ theme }) => theme.colors.gray['800']};
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s ease;
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.gray['400']};
+  }
+
+  &:focus {
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+const SubmitButton = styled(ButtonStyle)`
+  width: 80%;
+  margin-top: ${({ theme }) => theme.spacing['8']};
+`;

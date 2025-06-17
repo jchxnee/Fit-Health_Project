@@ -37,8 +37,12 @@ import TermOfServicePage from './pages/InformationPage/TermOfServicePage';
 import PrivacyPolicyPage from './pages/InformationPage/PrivacyPolicyPage';
 import CompanyIntroducionPage from './pages/InformationPage/CompanyIntroducionPage';
 import FAQPage from './pages/FAQPage/FAQPage';
+<<<<<<< HEAD:src/App.jsx
 import MyInfoPage from './pages/myPage/MyInfoPage';
 import ChangePwdPage from './pages/myPage/ChangePwdPage';
+=======
+import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
+>>>>>>> 7f4bc9ba59c633c29ead104485789d9a0a385039:frontend/src/App.jsx
 
 function App() {
   return (
@@ -62,8 +66,7 @@ function App() {
           <Route path="/operatingPolicy" element={<OperatingPolicyPage />} /> {/* 운영정책 */}
           <Route path="/privacyPolicy" element={<PrivacyPolicyPage />} /> {/* 개인정보처리방침 */}
           <Route path="/introduce" element={<CompanyIntroducionPage />} /> {/* 회사소개 */}
-          <Route path="/introduce" element={<CompanyIntroducionPage />} /> {/* 회사소개 */}
-          <Route path="/introduce" element={<CompanyIntroducionPage />} /> {/* 회사소개 */}
+          <Route path="/recruitmentInfo" element={<RecruitmentInfoPage />} /> {/* 채용공고 */}
           {/* 코치 */}
           <Route path="/coachList" element={<CoachList />} /> {/* 핏코치 매칭 */}
           <Route path="/coachRegister" element={<CoachRegister />} /> {/* 코치 등록 */}
@@ -72,6 +75,7 @@ function App() {
           <Route path="/nextReservation" element={<NextReservation />} /> {/* 다음 회차 예약 */}
           <Route path="/coachReview" element={<CoachReview />} /> {/* 코치 리뷰 */}
           <Route path="/paymentPage" element={<PaymentPage />} /> {/* 결제페이지 */}
+          <Route path="/coachmatchingList" element={<CoachCalendar />} /> {/* 결제페이지 */}
           {/* 커뮤니티 */}
           <Route path="/community" element={<CommunityPage />} /> {/* 커뮤니티 */}
           <Route path="/communityPostCreationPage" element={<CommunityPostCreationPage />} /> {/* 커뮤니티 글등록 */}
