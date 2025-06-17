@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 
 function AccountSettingsPage() {
   // Dummy data for user information
+  const [userEmail] = useState('user01@naver.com'); // Example name
   const [userName, setUserName] = useState('김민수'); // Example name
   const [userBirthdate, setUserBirthdate] = useState('1990-05-15'); // Example birthdate
   const [profileImgSrc, setProfileImgSrc] = useState('https://via.placeholder.com/100'); // Placeholder image
@@ -62,6 +63,14 @@ function AccountSettingsPage() {
           {/* 이름 InputGroup */}
           <InputGroup>
             <LabelWrapper>
+              <Label>이메일</Label>
+            </LabelWrapper>
+            <DisplayText>{userEmail}</DisplayText>
+          </InputGroup>
+
+          {/* 이름 InputGroup */}
+          <InputGroup>
+            <LabelWrapper>
               <Label>이름</Label>
               <ActionLink onClick={handleNameEdit}>수정</ActionLink>
             </LabelWrapper>
@@ -78,8 +87,8 @@ function AccountSettingsPage() {
           </InputGroup>
 
           <ButtonGroup>
-            <SettingsButton to="/memberInfoPage">개인 정보 관리</SettingsButton>
-            <SettingsButton to="/customInfoPage">맞춤 정보 관리</SettingsButton>
+            <SettingsButton to="/myInfoPage">내 정보 관리</SettingsButton>
+            <SettingsButton to="/changePwdPage">비밀번호 변경</SettingsButton>
             <SettingsButton to="/deleteMemberPage">회원 탈퇴</SettingsButton>
           </ButtonGroup>
         </SettingsForm>

@@ -4,7 +4,7 @@ import ButtonStyle from '../../styles/common/Button';
 import Header from '../../components/Header';
 import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
-const MemberInfoPage = () => {
+const ChangePwdPage = () => {
   const [phoneNumber, setPhoneNumber] = useState('010-1234-5678'); // 더미 데이터
   const [email, setEmail] = useState('user@example.com'); // 더미 데이터
   const [currentPassword, setCurrentPassword] = useState(''); // 더미 데이터
@@ -23,29 +23,7 @@ const MemberInfoPage = () => {
       <Header user={user} />
       <PersonalInfoContainer>
         <PersonalInfoForm onSubmit={handleSubmit}>
-          <PageTitle>개인 정보 관리</PageTitle>
-
-          <InputGroup>
-            <Label htmlFor="phoneNumber">전화번호</Label>
-            <Input
-              type="tel"
-              id="phoneNumber"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="하이픈 없이 숫자만 입력"
-            />
-          </InputGroup>
-
-          <InputGroup>
-            <Label htmlFor="email">이메일</Label>
-            <Input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="이메일 주소 입력"
-            />
-          </InputGroup>
+          <PageTitle>비밀번호 변경</PageTitle>
 
           <InputGroup>
             <Label htmlFor="currentPassword">현재 비밀번호</Label>
@@ -80,52 +58,52 @@ const MemberInfoPage = () => {
             />
           </InputGroup>
 
-          <SubmitButton type="submit">개인 정보 변경</SubmitButton>
+          <SubmitButton type="submit">비밀번호 변경</SubmitButton>
         </PersonalInfoForm>
       </PersonalInfoContainer>
     </>
   );
 };
 
-export default MemberInfoPage;
+export default ChangePwdPage;
 
 const PersonalInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: ${({ theme }) => theme.spacing['20']}; /* Top padding for the content below header */
+  padding-top: ${({ theme }) => theme.spacing['20']};
   background-color: #f9fafa;
-  min-height: calc(100vh - 60px); /* Adjust for header height if it's 60px */
+  min-height: calc(100vh - 60px);
   box-sizing: border-box;
   width: 100%;
 `;
 
 const PersonalInfoForm = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
-  padding: ${({ theme }) => theme.spacing[10]}; /* 40px */
+  padding: ${({ theme }) => theme.spacing[10]};
   border-radius: ${({ theme }) => theme.borderRadius.ten};
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   width: 100%;
-  max-width: 700px; /* Consistent with other forms */
+  max-width: 700px;
   display: flex;
   flex-direction: column;
   align-items: center;
 `;
 
 const PageTitle = styled.h1`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']}; /* 24px */
+  font-size: ${({ theme }) => theme.fontSizes['2xl']};
   font-weight: ${({ theme }) => theme.fontWeights.semibold};
   color: ${({ theme }) => theme.colors.gray['800']};
-  margin-bottom: ${({ theme }) => theme.spacing['10']}; /* Space below title */
+  margin-bottom: ${({ theme }) => theme.spacing['10']};
   text-align: center;
 `;
 
 const InputGroup = styled.div`
   display: flex;
-  flex-direction: column; /* Label and Input are stacked */
-  margin-bottom: ${({ theme }) => theme.spacing['6']}; /* Space between input groups */
+  flex-direction: column;
+  margin-bottom: ${({ theme }) => theme.spacing['6']};
   width: 100%;
-  max-width: 480px; /* Consistent input width */
+  max-width: 480px;
   text-align: left;
 `;
 
@@ -133,18 +111,18 @@ const Label = styled.label`
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.primary};
   font-weight: ${({ theme }) => theme.fontWeights.normal};
-  margin-bottom: ${({ theme }) => theme.spacing['2']}; /* Space between label and input */
+  margin-bottom: ${({ theme }) => theme.spacing['2']};
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: ${({ theme }) => theme.spacing['2']} 0; /* 상하 패딩, 좌우 0 */
-  border: none; /* No border initially */
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['300']}; /* Only bottom border */
+  padding: ${({ theme }) => theme.spacing['2']} 0;
+  border: none;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['300']};
   font-size: ${({ theme }) => theme.fontSizes.base};
   color: ${({ theme }) => theme.colors.gray['800']};
   box-sizing: border-box;
-  outline: none; /* Remove outline on focus */
+  outline: none;
   transition: border-color 0.2s ease;
 
   &::placeholder {
@@ -152,11 +130,11 @@ const Input = styled.input`
   }
 
   &:focus {
-    border-color: ${({ theme }) => theme.colors.primary}; /* Primary color on focus */
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 const SubmitButton = styled(ButtonStyle)`
   width: 80%;
-  margin-top: ${({ theme }) => theme.spacing['8']}; /* Margin above button */
+  margin-top: ${({ theme }) => theme.spacing['8']};
 `;

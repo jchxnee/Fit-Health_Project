@@ -28,9 +28,7 @@ import CommunityPostCreationPage from './pages/community/CommunityPostCreationPa
 import AccountSettingsPage from './pages/myPage/AccountSettingPage';
 import MyPostsPage from './pages/myselfWrite/MyPostsPage';
 import MyReviewsPage from './pages/myselfWrite/MyReviewsPage';
-import MemberInfoPage from './pages/myPage/MemberInfoPage';
 import DeleteMemberPage from './pages/myPage/DeleteMemberPage';
-import CustomInfoPage from './pages/myPage/CustomInfoPage';
 import MyCommentsPage from './pages/myselfWrite/MyCommentsPage';
 import CommunityPostDetailPage from './pages/community/CommunityPostDetailPage';
 import ReviewCreationPage from './pages/community/ReviewCreationPage';
@@ -39,6 +37,8 @@ import TermOfServicePage from './pages/InformationPage/TermOfServicePage';
 import PrivacyPolicyPage from './pages/InformationPage/PrivacyPolicyPage';
 import CompanyIntroducionPage from './pages/InformationPage/CompanyIntroducionPage';
 import FAQPage from './pages/FAQPage/FAQPage';
+import MyInfoPage from './pages/myPage/MyInfoPage';
+import ChangePwdPage from './pages/myPage/ChangePwdPage';
 
 function App() {
   return (
@@ -52,8 +52,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} /> {/* 로그인 */}
           <Route path="/mypage" element={<MyPage />} /> {/* 마이페이지 */}
           <Route path="/accountSettingPage" element={<AccountSettingsPage />} /> {/* 계정설정 */}
-          <Route path="/memberInfoPage" element={<MemberInfoPage />} /> {/* 개인 정보 관리 */}
-          <Route path="/customInfoPage" element={<CustomInfoPage />} /> {/* 맞춤 정보 관리 */}
+          <Route path="/myInfoPage" element={<MyInfoPage />} /> {/* 내 정보 관리 */}
+          <Route path="/changePwdPage" element={<ChangePwdPage />} /> {/* 비밀번호 변경 */}
           <Route path="/deleteMemberPage" element={<DeleteMemberPage />} /> {/* 회원탈퇴 */}
           <Route path="/exercise" element={<RecommendExercise />} /> {/* 추천 운동 */}
           <Route path="/productList" element={<ProductList />} /> {/* 건강 상품 리스트 */}

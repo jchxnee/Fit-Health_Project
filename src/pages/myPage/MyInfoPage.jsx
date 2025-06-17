@@ -237,10 +237,10 @@ const regions = {
   제주특별자치도: ['제주시', '서귀포시'],
 };
 
-const CustomInfoPage = () => {
+const MyInfoPage = () => {
   const [selectedGender, setSelectedGender] = useState('');
   const [height, setHeight] = useState('');
-  const [weight, setWeight] = useState('');
+  const [phone, setPhone] = useState('');
   const [selectedProvince, setSelectedProvince] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false); // 지역 모달 상태
@@ -269,7 +269,7 @@ const CustomInfoPage = () => {
     console.log({
       selectedGender,
       height,
-      weight,
+      phone,
       selectedProvince,
       selectedCity,
     });
@@ -281,7 +281,15 @@ const CustomInfoPage = () => {
       <Header user={user} />
       <CustomInfoContainer>
         <CustomInfoForm onSubmit={handleSubmit}>
-          <PageTitle>맞춤 정보 관리</PageTitle>
+          <PageTitle>내 정보 관리</PageTitle>
+
+          {/* 전화번호 섹션 */}
+          <InputGroup>
+            <Label htmlFor="phone">전화번호</Label>
+            <InputWithUnit>
+              <StyledInput type="text" id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            </InputWithUnit>
+          </InputGroup>
 
           {/* 주소 섹션 */}
           <InputGroup>
@@ -335,21 +343,6 @@ const CustomInfoPage = () => {
             </InputWithUnit>
           </InputGroup>
 
-          {/* 몸무게 섹션 */}
-          <InputGroup>
-            <Label htmlFor="weight">몸무게</Label>
-            <InputWithUnit>
-              <StyledInput
-                type="number"
-                id="weight"
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-                placeholder="예) 65"
-              />
-              <UnitText>kg</UnitText>
-            </InputWithUnit>
-          </InputGroup>
-
           {/* 목표 섹션 (컴포넌트가 있다고 가정) */}
           <InputGroup>
             <Label>목표</Label>
@@ -366,7 +359,7 @@ const CustomInfoPage = () => {
             </Wrapper>
           </InputGroup>
 
-          <SubmitButton type="submit">맞춤 정보 변경</SubmitButton>
+          <SubmitButton type="submit">내 정보 변경</SubmitButton>
         </CustomInfoForm>
 
         {/* 지역 선택 모달 */}
@@ -408,7 +401,7 @@ const CustomInfoPage = () => {
   );
 };
 
-export default CustomInfoPage;
+export default MyInfoPage;
 
 const CustomInfoContainer = styled.div`
   display: flex;
