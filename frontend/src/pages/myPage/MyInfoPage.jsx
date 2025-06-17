@@ -243,7 +243,6 @@ const MyInfoPage = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false); // 지역 모달 상태
   const [selected, setSelected] = useState('근력향상');
-  const [user] = useState({ name: '김현아', img: betaImg });
 
   const handleProvinceSelect = (province) => {
     setSelectedProvince(province);
@@ -348,7 +347,7 @@ const MyInfoPage = () => {
                 <List>
                   {categories.map((cat) => (
                     <Item key={cat} selected={selected === cat} onClick={() => setSelected(cat)}>
-                      <Label>{cat}</Label>
+                      {cat}
                     </Item>
                   ))}
                 </List>
@@ -486,7 +485,7 @@ export const GenderButton = styled.button`
   border: 1.5px solid #cdcdcd; /* Consistent with Item's border */
 
   /* Apply background and color based on $isSelected, similar to Item's 'selected' prop */
-  background: ${({ $isSelected, theme }) => ($isSelected ? theme.colors.button : 'transparent')};
+    background: ${({ selected, theme }) => (selected ? theme.colors.secondary : 'transparent')};
   color: ${({ $isSelected, theme }) => ($isSelected ? '#fff' : theme.colors.primary)};
 
   font-size: ${({ theme }) => theme.fontSizes.sm}; /* Consistent font-size, or base if preferred for buttons */
@@ -500,7 +499,7 @@ export const GenderButton = styled.button`
   box-shadow: none;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.button}; /* Consistent hover effect */
+    background: ${({ theme }) => theme.colors.secondary}; /* Consistent hover effect */
     color: #fff; /* Consistent hover effect */
   }
 `;

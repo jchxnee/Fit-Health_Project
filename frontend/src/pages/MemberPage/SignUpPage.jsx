@@ -2,50 +2,83 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import logoSrc from '../../assets/header_icon.png';
 import ButtonStyle from '../../styles/common/Button';
-import { useNavigate } from 'react-router-dom';
-import { useSignUpForm } from '../../hooks/useSignUpForm';
+import { toast } from 'react-toastify';
+import { useSignUpForm } from '../../hooks/member/useSignUpForm';
 
 function SignUpPage() {
-  const { register, handleSubmit, onsubmit, errors, isSubmitting } = useSignUpForm();
-  const navigate = useNavigate();
+  const { register, handleSubmit, onsubmit: handleFormSubmit, errors, isSubmitting, trigger, watch } = useSignUpForm(); // watch 추가 (email 값 읽기 위함)
 
   const [agreeService, setAgreeService] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
-
   const [birthdate, setBirthdate] = useState('');
-
-  // 약관 내용 토글 상태
   const [showServiceTerms, setShowServiceTerms] = useState(false);
   const [showPrivacyTerms, setShowPrivacyTerms] = useState(false);
 
   const [showAuthCodeInput, setShowAuthCodeInput] = useState(false);
   const [authCode, setAuthCode] = useState('');
 
+  const [isEmailVerified, setIsEmailVerified] = useState(false); // 이메일 인증 성공 여부
+  const [emailAuthMessage, setEmailAuthMessage] = useState(''); // 이메일 인증 관련 메시지
+
+  // email 필드의 현재 값을 가져옵니다.
+  const emailValue = watch('email');
+
   const onSubmitHandler = (data) => {
     if (!agreeService || !agreePrivacy) {
-      alert('필수 약관에 모두 동의해야 회원가입을 할 수 있습니다.');
+      toast.error('필수 약관에 모두 동의해야 회원가입을 할 수 있습니다.');
       return;
     }
+
+    if (!isEmailVerified) {
+      toast.error('이메일 인증을 진행해주세요.');
+      return;
+    }
+
     console.log('Form Data:', data);
-    onsubmit(data);
+    handleFormSubmit(data);
   };
 
-  const handleEmailAuthClick = () => {
-    // 여기에 이메일 인증번호 발송 API 호출 로직을 추가할 수 있습니다.
-    // 성공적으로 발송되었다고 가정하고 인증 코드 입력 필드를 표시합니다.
+  // ★ handleEmailAuthClick 함수 수정
+  const handleEmailAuthClick = async () => {
+    // 1. 이메일 필드의 유효성 검사를 수동으로 트리거합니다.
+    const isValid = await trigger('email');
+
+    // 2. 유효성 검사가 실패하면 에러 메시지를 설정하고 함수를 종료합니다.
+    if (!isValid) {
+      // errors.email에 Yup 스키마에서 정의한 에러 메시지가 이미 있습니다.
+      // emailAuthMessage 상태를 업데이트하여 해당 에러 메시지를 표시합니다.
+      setEmailAuthMessage(errors.email?.message || '유효한 이메일 주소를 입력해주세요.'); // errors.email이 없을 경우 대비
+      setIsEmailVerified(false); // 인증 실패 상태로 초기화
+      setShowAuthCodeInput(false); // 인증 코드 입력창 숨김 (필요시)
+      return;
+    }
+
+    // 3. 이메일 필드가 유효하면 인증번호 발송 로직을 진행합니다.
+    // 기존 인증 상태 및 메시지 초기화
+    setIsEmailVerified(false);
+    setEmailAuthMessage(''); // 에러가 없으면 메시지 초기화
+
+    // 여기에 이메일 인증번호 발송 API 호출 로직을 추가
+    // 이메일 주소를 서버로 보내 인증번호 발송 요청
+    console.log(`인증번호 발송 요청: ${emailValue}`); // watch로 가져온 emailValue 사용
+
+    // API 호출 성공 시
     setShowAuthCodeInput(true);
     alert('인증번호가 이메일로 발송되었습니다. 확인해주세요.');
+    setEmailAuthMessage('인증번호가 발송되었습니다. 이메일을 확인해주세요.'); // 발송 성공 메시지
   };
 
   const handleVerifyAuthCode = () => {
-    // 여기에 인증 번호 확인 API 호출 로직을 추가할 수 있습니다.
     console.log('입력된 인증번호:', authCode);
     if (authCode === '123456') {
       // 예시: 실제로는 서버에서 확인
-      alert('인증번호가 확인되었습니다!');
-      // 인증 성공 시 추가 로직 (예: 이메일 필드 비활성화, 다음 단계 진행 등)
+      setIsEmailVerified(true); // 인증 성공 상태로 변경
+      setEmailAuthMessage('이메일 인증이 성공하였습니다.'); // 성공 메시지 설정
+      // 이메일 필드를 읽기 전용으로 만들거나 비활성화
+      // 이메일 인증이 성공했으므로, 이메일 주소 변경을 막을 수 있음
     } else {
-      alert('인증번호가 올바르지 않습니다.');
+      setIsEmailVerified(false); // 인증 실패 상태 (혹시 성공했다가 실패할 경우 대비)
+      setEmailAuthMessage('인증번호가 올바르지 않습니다.'); // 실패 메시지 설정
     }
   };
 
@@ -55,7 +88,7 @@ function SignUpPage() {
       <SignupForm onSubmit={handleSubmit(onSubmitHandler)}>
         <FormTitle>회원가입</FormTitle>
 
-        <InputGroup>
+        <InputGroup $hasError={errors.email}>
           <Label htmlFor="email">이메일*</Label>
           <EmailAuthContainer>
             <EmailAuthInput
@@ -64,11 +97,18 @@ function SignUpPage() {
               placeholder="이메일 주소 입력"
               {...register('email')}
               $error={errors.email}
+              disabled={isEmailVerified} // 인증 성공 시 비활성화
             />
-            <EmailAuthButton type="button" onClick={handleEmailAuthClick}>
-              이메일 인증
+            {/* ★ 변경: EmailAuthButton에서 register 제거 */}
+            <EmailAuthButton
+              type="button"
+              onClick={handleEmailAuthClick}
+              disabled={isEmailVerified} // 인증 성공 시 비활성화
+            >
+              {isEmailVerified ? '인증 완료' : '이메일 인증'}
             </EmailAuthButton>
           </EmailAuthContainer>
+          {/* React Hook Form의 이메일 유효성 에러 메시지 (errors.email이 있을 때만 표시) */}
           {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
         </InputGroup>
 
@@ -81,13 +121,19 @@ function SignUpPage() {
               value={authCode}
               onChange={(e) => setAuthCode(e.target.value)}
             />
-            <VerifyAuthCodeButton type="button" onClick={handleVerifyAuthCode}>
+            <VerifyAuthCodeButton type="button" onClick={handleVerifyAuthCode} disabled={isEmailVerified}>
               확인
             </VerifyAuthCodeButton>
+            {/* 인증 번호 입력 후 메시지 */}
+            {emailAuthMessage && showAuthCodeInput && (
+              <EmailMessage $isSuccess={isEmailVerified}>{emailAuthMessage}</EmailMessage>
+            )}
           </AuthCodeInputGroup>
         )}
 
-        <InputGroup>
+        {/* ... (나머지 폼 요소들) ... */}
+
+        <InputGroup $hasError={errors.password}>
           <Label htmlFor="password">비밀번호*</Label>
           <Input
             type="password"
@@ -99,7 +145,7 @@ function SignUpPage() {
           {errors.password && <ErrorMessage>{errors.password.message}</ErrorMessage>}
         </InputGroup>
 
-        <InputGroup>
+        <InputGroup $hasError={errors.passwordConfirm}>
           <Label htmlFor="passwordConfirm">비밀번호 확인*</Label>
           <Input
             type="password"
@@ -111,13 +157,13 @@ function SignUpPage() {
           {errors.passwordConfirm && <ErrorMessage>{errors.passwordConfirm.message}</ErrorMessage>}
         </InputGroup>
 
-        <InputGroup>
+        <InputGroup $hasError={errors.username}>
           <Label htmlFor="username">이름*</Label>
           <Input type="text" id="username" placeholder="이름 입력" {...register('username')} $error={errors.username} />
           {errors.username && <ErrorMessage>{errors.username.message}</ErrorMessage>}
         </InputGroup>
 
-        <InputGroup>
+        <InputGroup $hasError={errors.phone}>
           <Label htmlFor="phone">전화번호*</Label>
           <Input
             type="tel"
@@ -354,6 +400,11 @@ const EmailAuthButton = styled(ButtonStyle)`
   &:hover {
     background-color: ${({ theme }) => theme.colors.gray['700']};
   }
+
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.gray['400']};
+    border-color: ${({ theme }) => theme.colors.gray['400']};
+  }
 `;
 
 const AuthCodeInputGroup = styled(InputGroup)`
@@ -367,13 +418,7 @@ const AuthCodeInputGroup = styled(InputGroup)`
 
 const AuthCodeInput = styled(EmailAuthInput)``;
 
-const VerifyAuthCodeButton = styled(EmailAuthButton)`
-  &:disabled {
-    background-color: ${({ theme }) => theme.colors.gray['400']};
-    border-color: ${({ theme }) => theme.colors.gray['400']};
-    cursor: not-allowed;
-  }
-`;
+const VerifyAuthCodeButton = styled(EmailAuthButton)``;
 
 const ErrorMessage = styled.p`
   color: red;
@@ -439,4 +484,9 @@ const TermsContent = styled.div`
     opacity 0.3s ease,
     transform 0.3s ease,
     visibility 0.3s ease;
+`;
+
+const EmailMessage = styled(ErrorMessage)`
+  color: ${({ theme, $isSuccess }) => ($isSuccess ? theme.colors.success : theme.colors.danger)};
+  margin-left: 8px;
 `;
