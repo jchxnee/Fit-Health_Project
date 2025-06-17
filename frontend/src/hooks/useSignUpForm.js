@@ -70,7 +70,8 @@ export const useSignUpForm = () => {
   //컴포넌트에서 사용할 값들 반환
   return {
     register,
-    handleSubmit: handleSubmit(onsubmit),
+    handleSubmit,
+    onsubmit,
     errors,
     isSubmitting,
     watch,
