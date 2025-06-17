@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
+import Header from '../../components/Header';
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import Footer from '../../components/Footer';
 
 // Mock job data (replace with actual API call in a real application)
 const ALL_JOB_LISTINGS = [
@@ -64,6 +67,7 @@ const ALL_JOB_LISTINGS = [
 ];
 
 const RecruitmentInfoPage = () => {
+  const [user] = useState({ name: '김현아', img: betaImg });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedExperience, setSelectedExperience] = useState('');
   const [selectedEmploymentType, setSelectedEmploymentType] = useState('');
@@ -96,50 +100,54 @@ const RecruitmentInfoPage = () => {
   };
 
   return (
-    <PageContainer>
-      <MainContent>
-        <TitleBar title={'채용 공고'} />
-        <PageHeading>
-          저희 FIT:HEALTH와 함께 성장해나갈 <br />
-          소중한 인재를 모집합니다!
-        </PageHeading>
+    <>
+      <Header user={user} />
+      <PageContainer>
+        <MainContent>
+          <TitleBar title={'채용 공고'} />
+          <PageHeading>
+            저희 FIT:HEALTH와 함께 성장해나갈 <br />
+            소중한 인재를 모집합니다!
+          </PageHeading>
 
-        <SearchBarContainer>
-          <SearchInput type="text" placeholder="직군 검색" value={searchTerm} onChange={handleSearchChange} />
-          <SelectDropdown value={selectedExperience} onChange={handleExperienceChange}>
-            <option value="">경력사항</option>
-            <option value="경력 무관">경력 무관</option>
-            <option value="경력 3년 이상">3년 이상</option>
-            <option value="경력 4년 이상">4년 이상</option>
-            <option value="경력 5년 이상">5년 이상</option>
-            <option value="경력 7년 이상">7년 이상</option>
-            <option value="경력 10년 이상">10년 이상</option>
-          </SelectDropdown>
-          <SelectDropdown value={selectedEmploymentType} onChange={handleEmploymentTypeChange}>
-            <option value="">고용형태</option>
-            <option value="정규직">정규직</option>
-            <option value="계약직">계약직</option>
-          </SelectDropdown>
-        </SearchBarContainer>
+          <SearchBarContainer>
+            <SearchInput type="text" placeholder="직군 검색" value={searchTerm} onChange={handleSearchChange} />
+            <SelectDropdown value={selectedExperience} onChange={handleExperienceChange}>
+              <option value="">경력사항</option>
+              <option value="경력 무관">경력 무관</option>
+              <option value="경력 3년 이상">3년 이상</option>
+              <option value="경력 4년 이상">4년 이상</option>
+              <option value="경력 5년 이상">5년 이상</option>
+              <option value="경력 7년 이상">7년 이상</option>
+              <option value="경력 10년 이상">10년 이상</option>
+            </SelectDropdown>
+            <SelectDropdown value={selectedEmploymentType} onChange={handleEmploymentTypeChange}>
+              <option value="">고용형태</option>
+              <option value="정규직">정규직</option>
+              <option value="계약직">계약직</option>
+            </SelectDropdown>
+          </SearchBarContainer>
 
-        <JobListingGrid>
-          {filteredJobListings.length > 0 ? (
-            filteredJobListings.map((job) => (
-              <JobCard key={job.id}>
-                <JobTitle>{job.title}</JobTitle>
-                <JobDetails>
-                  {job.category} | {job.experience} | {job.employmentType} | FIT:HEALTH
-                </JobDetails>
-              </JobCard>
-            ))
-          ) : (
-            <NoResultsText>검색 결과가 없습니다.</NoResultsText>
-          )}
-        </JobListingGrid>
+          <JobListingGrid>
+            {filteredJobListings.length > 0 ? (
+              filteredJobListings.map((job) => (
+                <JobCard key={job.id}>
+                  <JobTitle>{job.title}</JobTitle>
+                  <JobDetails>
+                    {job.category} | {job.experience} | {job.employmentType} | FIT:HEALTH
+                  </JobDetails>
+                </JobCard>
+              ))
+            ) : (
+              <NoResultsText>검색 결과가 없습니다.</NoResultsText>
+            )}
+          </JobListingGrid>
 
-        <MoreInfoText>이 외에 추가 채용은 추후 공지 예정입니다.</MoreInfoText>
-      </MainContent>
-    </PageContainer>
+          <MoreInfoText>이 외에 추가 채용은 추후 공지 예정입니다.</MoreInfoText>
+        </MainContent>
+      </PageContainer>
+      <Footer />
+    </>
   );
 };
 
@@ -158,7 +166,6 @@ const PageContainer = styled.div`
 const MainContent = styled.main`
   width: 100%;
   max-width: ${({ theme }) => theme.width.lg}; /* 컨텐츠 최대 너비 */
-  padding: ${({ theme }) => theme.spacing['8']} ${({ theme }) => theme.spacing['5']}; /* 상하 32px, 좌우 20px */
   display: flex;
   flex-direction: column;
   align-items: center; /* 내부 요소들을 중앙에 정렬 */

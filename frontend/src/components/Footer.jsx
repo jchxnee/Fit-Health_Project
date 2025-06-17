@@ -277,7 +277,7 @@ export default function Footer() {
                 <Link to="/introduce">회사소개</Link>
               </li>
               <li>
-                <Link to="">채용안내</Link>
+                <Link to="/recruitmentInfo">채용안내</Link>
               </li>
             </FooterMenuGroup>
             <FooterMenuGroup>
