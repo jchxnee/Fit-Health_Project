@@ -18,7 +18,11 @@ import java.time.LocalDateTime;
 public class Reservation {
 
     @Id
-    @OneToOne
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "RESERVATION_NO")
+    private Long reservationNo;
+
+    @ManyToOne
     @JoinColumn(name = "PAYMENT_ID", nullable = false)
     private Payment payment;
 

@@ -23,12 +23,12 @@ public class Payment {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "REQUEST_NAME", nullable = false)
-    private Member requestMember;
+    @JoinColumn(name = "USER_EMAIL", nullable = false)
+    private Member userMember;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "RESPONSE_NAME", nullable = false)
-    private Member responseMember;
+    @JoinColumn(name = "USER_EMAIL", nullable = false)
+    private Member trainerMember;
 
     @Column(name = "TRANSACTION_ID", length = 100)
     private String transactionId;
