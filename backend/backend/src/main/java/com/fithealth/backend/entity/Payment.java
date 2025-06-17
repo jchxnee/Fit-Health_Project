@@ -1,8 +1,10 @@
 package com.fithealth.backend.entity;
 
 import com.fithealth.backend.entity.Member;
+import com.fithealth.backend.enums.CommonEnums;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "PAYMENT")
@@ -27,8 +29,8 @@ public class Payment {
     @Column(name = "PAYMENT_METHOD", nullable = false, length = 10)
     private String paymentMethod;
 
-    @Column(name = "PAYMENT_STATUS", nullable = false, length = 10)
-    private String paymentStatus;
+    @Column(name = "STATUS", nullable = false, length = 10)
+    private CommonEnums.Status status;
 
     @Column(name = "PAYMENT_AT", nullable = false)
     private LocalDate paymentAt;
@@ -44,4 +46,15 @@ public class Payment {
 
     @Column(name = "FIRST_RESERVATION", nullable = false)
     private LocalDate firstReservation;
+
+
+    @PrePersist
+    public void prePersist() {
+        this.firstReservation = LocalDate.now();
+        this.paymentAt = LocalDate.now();
+
+        if(this.status == null) {
+            this.status = CommonEnums.Status.Y;
+        }
+    }
 }

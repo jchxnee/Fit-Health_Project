@@ -4,6 +4,7 @@ import com.fithealth.backend.entity.Payment;
 import com.fithealth.backend.enums.CommonEnums;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "RESERVATION")
@@ -25,4 +26,14 @@ public class Reservation {
 
     @Column(name = "STATUS", nullable = false, length = 10)
     private CommonEnums.Status status;;
+
+    @PrePersist
+    public void prePersist() {
+        this.selectDate = LocalDate.now();
+        this.createDate = LocalDate.now();
+
+        if(this.status == null) {
+            this.status = CommonEnums.Status.Y;
+        }
+    }
 }
