@@ -9,7 +9,7 @@ const Wrapper = styled.section`
   display: flex;
   justify-content: center;
   background: ${({ theme }) => theme.colors.white};
-  margin: ${({ theme }) => `${theme.spacing[12]} 0 ${theme.spacing[24]} 0`};
+  margin: ${({ theme }) => `${theme.spacing[24]} 0 ${theme.spacing[24]} 0`};
 `;
 const Container = styled.div`
   width: ${({ theme }) => theme.width.lg};
