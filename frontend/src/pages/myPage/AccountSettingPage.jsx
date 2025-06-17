@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { CiCamera } from 'react-icons/ci';
 import ButtonStyle from '../../styles/common/Button';
 import Header from '../../components/Header';
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 import Footer from '../../components/Footer';
 import { Link } from 'react-router-dom';
 
@@ -14,7 +13,6 @@ function AccountSettingsPage() {
   const [userBirthdate, setUserBirthdate] = useState('1990-05-15'); // Example birthdate
   const [profileImgSrc, setProfileImgSrc] = useState('https://via.placeholder.com/100'); // Placeholder image
 
-  const [user] = useState({ name: '김현아', img: betaImg });
   // Functions to handle "수정" clicks (these would open modals or navigate)
   const handleNameEdit = () => {
     alert('이름 수정 기능');
@@ -48,7 +46,6 @@ function AccountSettingsPage() {
 
   return (
     <>
-      <Header user={user} />
       <SettingsContainer>
         <SettingsForm>
           <PageTitle>계정 설정</PageTitle>
@@ -93,7 +90,6 @@ function AccountSettingsPage() {
           </ButtonGroup>
         </SettingsForm>
       </SettingsContainer>
-      <Footer />
     </>
   );
 }

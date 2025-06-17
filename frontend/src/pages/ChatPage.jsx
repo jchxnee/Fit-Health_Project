@@ -4,11 +4,9 @@ import { MdSend } from 'react-icons/md';
 import styled from 'styled-components';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import betaImg from '../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 import TitleBar from '../components/TitleBar';
 
 const ChatPage = () => {
-  const [user] = useState({ name: '김현아', img: betaImg });
   // 예시 데이터 (실제로는 API에서 가져옴)
   const chatRooms = [
     {
@@ -91,7 +89,6 @@ const ChatPage = () => {
 
   return (
     <>
-      <Header user={user} />
       <ChatPageContainer>
         <TitleBar title="1:1 채팅" />
 
@@ -175,7 +172,6 @@ const ChatPage = () => {
           </ChatWindowSection>
         </ChatContentBox>
       </ChatPageContainer>
-      <Footer />
     </>
   );
 };

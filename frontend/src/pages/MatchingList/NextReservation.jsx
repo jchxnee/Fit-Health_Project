@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
 import ReservationCalendar from '../../components/CoachMatching/ReservationCalendar';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import TitleBar from '../../components/TitleBar';
 import theme from '../../styles/theme';
 
@@ -38,11 +36,6 @@ const SubmitButton = styled.button`
 
 const NextReservation = () => {
   const navigate = useNavigate(); // useNavigate 훅 사용
-
-  const userInfo = {
-    name: '이주찬',
-    img: '../../assets/beta_user_img.png',
-  };
 
   const getTodayDateString = () => {
     const today = new Date();
@@ -98,7 +91,6 @@ const NextReservation = () => {
 
   return (
     <>
-      <Header user={userInfo} />
       <PageWrapper>
         <TitleBar title={'다음 회차예약'} />
       </PageWrapper>
@@ -112,7 +104,6 @@ const NextReservation = () => {
       <SubmitButton onClick={handleSubmit} disabled={!selectedDate || !selectedTime}>
         신청하기
       </SubmitButton>
-      <Footer />
     </>
   );
 };

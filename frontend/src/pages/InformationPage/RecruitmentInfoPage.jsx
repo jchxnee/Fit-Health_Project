@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import Header from '../../components/Header';
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 import Footer from '../../components/Footer';
 
 // Mock job data (replace with actual API call in a real application)
@@ -67,7 +66,6 @@ const ALL_JOB_LISTINGS = [
 ];
 
 const RecruitmentInfoPage = () => {
-  const [user] = useState({ name: '김현아', img: betaImg });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedExperience, setSelectedExperience] = useState('');
   const [selectedEmploymentType, setSelectedEmploymentType] = useState('');
@@ -101,7 +99,6 @@ const RecruitmentInfoPage = () => {
 
   return (
     <>
-      <Header user={user} />
       <PageContainer>
         <MainContent>
           <TitleBar title={'채용 공고'} />
@@ -146,7 +143,6 @@ const RecruitmentInfoPage = () => {
           <MoreInfoText>이 외에 추가 채용은 추후 공지 예정입니다.</MoreInfoText>
         </MainContent>
       </PageContainer>
-      <Footer />
     </>
   );
 };

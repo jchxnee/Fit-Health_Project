@@ -3,16 +3,12 @@ import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
 import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 function LoginPage() {
   const [useremail, setUserEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [user] = useState({ name: '김현아', img: betaImg });
   return (
     <>
-      <Header user={user} />
-
       <LoginContainer>
         <LoginTitle>로그인</LoginTitle>
         <LoginFormBox>

@@ -66,7 +66,6 @@ const bodyMetrics = [
 const MyPage = () => {
   const [chartData, setChartData] = useState(bodyMetrics);
   const [isHealthInputModalOpen, setIsHealthInputModalOpen] = useState(false); // 모달 상태 추가
-  const [user] = useState({ name: '김현아', img: betaImg });
 
   // 모달 입력 필드 상태 추가
   const [healthDataInput, setHealthDataInput] = useState({
@@ -126,7 +125,6 @@ const MyPage = () => {
 
   return (
     <>
-      <Header user={user} />
       <PageContainer>
         <TitleBar title={'마이페이지'} />
 
@@ -351,7 +349,6 @@ const MyPage = () => {
           </ModalOverlay>
         )}
       </PageContainer>
-      <Footer />
     </>
   );
 };

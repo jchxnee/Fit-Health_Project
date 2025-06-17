@@ -40,12 +40,17 @@ import FAQPage from './pages/FAQPage/FAQPage';
 import MyInfoPage from './pages/myPage/MyInfoPage';
 import ChangePwdPage from './pages/myPage/ChangePwdPage';
 import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
+import Header from './components/Header';
+import Footer from './components/Footer';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
+
       <Router>
+        <Header user={null} />
+
         <Routes>
           {/* 공통 */}
           <Route path="/" element={<MainPage />} /> {/* 메인페이지 */}
@@ -86,6 +91,7 @@ function App() {
           {/* 고객 */}
           <Route path="/matchingList" element={<MatchingList />} /> {/* 신청 내역 */}
         </Routes>
+        <Footer />
       </Router>
     </ThemeProvider>
   );

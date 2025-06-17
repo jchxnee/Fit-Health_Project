@@ -9,12 +9,10 @@ import ReviewList from '../components/MainPage/ReviewList.jsx';
 import Footer from '../components/Footer.jsx';
 import MainTitle from '../components/MainPage/MainTitle.jsx';
 import Header from '../components/Header.jsx';
-import betaImg from '../assets/beta_user_img.png'; // 사용자 이미지 (Header에서 사용)
 
 function MainPage() {
   return (
     <>
-      <Header user={null} />
       <MainTitle />
       <SelectExercise />
       <AdBanner />
@@ -22,7 +20,6 @@ function MainPage() {
       <PopularPosts />
       <SelectGoal />
       <ReviewList />
-      <Footer />
     </>
   );
 }

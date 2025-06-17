@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
 import Header from '../../components/Header';
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const ChangePwdPage = () => {
   const [phoneNumber, setPhoneNumber] = useState('010-1234-5678'); // 더미 데이터
@@ -10,7 +9,6 @@ const ChangePwdPage = () => {
   const [currentPassword, setCurrentPassword] = useState(''); // 더미 데이터
   const [newPassword, setNewPassword] = useState(''); // 더미 데이터
   const [confirmNewPassword, setConfirmNewPassword] = useState(''); // 더미 데이터
-  const [user] = useState({ name: '김현아', img: betaImg });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -20,7 +18,6 @@ const ChangePwdPage = () => {
 
   return (
     <>
-      <Header user={user} />
       <PersonalInfoContainer>
         <PersonalInfoForm onSubmit={handleSubmit}>
           <PageTitle>비밀번호 변경</PageTitle>

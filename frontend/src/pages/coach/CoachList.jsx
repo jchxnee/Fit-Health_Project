@@ -8,7 +8,6 @@ import Header from '../../components/Header';
 import BasicFilter from '../../components/filter/BasicFilter';
 import CoachListItem from '../../components/CoachMatching/CoachListItem';
 import theme from '../../styles/theme';
-import betaImg from '../../assets/beta_user_img.png';
 import { Link } from 'react-router-dom';
 
 const PageWrapper = styled.div`
@@ -75,7 +74,6 @@ const CoachListContainer = styled.div`
 `;
 
 const CoachList = () => {
-  const [user] = useState({ name: '김현아', img: betaImg });
   const [filters, setFilters] = useState({
     search: '',
     status: '전체',
@@ -188,8 +186,6 @@ const CoachList = () => {
 
   return (
     <>
-      <Header user={user} />
-
       <PageWrapper>
         <RecommendedExerciseSection title={'핏코치 매칭'} />
         <ContentContainer>
@@ -213,7 +209,6 @@ const CoachList = () => {
           </MainContentWrapper>
         </ContentContainer>
       </PageWrapper>
-      <Footer />
     </>
   );
 };

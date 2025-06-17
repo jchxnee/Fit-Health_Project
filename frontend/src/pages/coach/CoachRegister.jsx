@@ -10,9 +10,7 @@ import CareerSection from '../../components/CoachRegister/CareerSection.jsx';
 import AgreementSection from '../../components/CoachRegister/AgreementSection.jsx';
 import SubmitSection from '../../components/CoachRegister/SubmitSection.jsx';
 import TitleBar from '../../components/TitleBar.jsx';
-import React, { useState } from 'react';
 import styled from 'styled-components';
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const MainContainer = styled.section`
   max-width: 1008px;
@@ -27,10 +25,8 @@ const MainContainer = styled.section`
 `;
 
 function CoachRegister() {
-  const [user] = useState({ name: '김현아', img: betaImg });
   return (
     <>
-      <Header user={user} />
       <MainContainer>
         <TitleBar title="핏코치 등록" />
         <FieldSection />
@@ -43,7 +39,6 @@ function CoachRegister() {
         <AgreementSection />
         <SubmitSection />
       </MainContainer>
-      <Footer />
     </>
   );
 }

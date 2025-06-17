@@ -5,8 +5,6 @@ import 'moment/locale/ko';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './CalendarStyles.css'; // 캘린더 전용 스타일
 import CoachSubBar from './CoachSubBar.jsx';
-import Header from '../Header.jsx';
-import Footer from '../Footer.jsx';
 import CoachMatchingList from './CoachMatchingList.jsx';
 import styled from 'styled-components';
 
@@ -206,11 +204,6 @@ const CustomToolbar = ({ label, onNavigate, onView, view }) => {
 };
 
 function CoachCalendar() {
-  const userInfo = {
-    name: '이주찬',
-    img: '../src/assets/beta_user_img.png', // 이미지 경로 확인 필요
-  };
-
   // 초기 뷰를 'list'로 설정
   const [view, setView] = useState('list'); // <-- 이 부분 변경: 'month' -> 'list'
   const [currentDate, setCurrentDate] = useState(moment().toDate()); // 캘린더의 현재 날짜
@@ -307,7 +300,6 @@ function CoachCalendar() {
 
   return (
     <>
-      <Header user={userInfo} />
       <ContentWrapper>
         <TitleBar title="매칭 내역" />
         {/* <CoachSubBarWrapper> // 이 부분은 삭제했습니다.
@@ -371,7 +363,6 @@ function CoachCalendar() {
           )}
         </TransitionGroup>
       </CalendarContainer>
-      <Footer />
     </>
   );
 }

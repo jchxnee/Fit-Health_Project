@@ -3,11 +3,9 @@ import styled from 'styled-components';
 import heroImage from '/public/img/introduce.jpg';
 import Footer from '../../components/Footer';
 import Header from '../../components/Header';
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 import { Link } from 'react-router-dom';
 
 const CompanyIntroducionPage = () => {
-  const [user] = useState({ name: '김현아', img: betaImg });
   const introductionSectionRef = useRef(null); // 소개 섹션으로 스크롤하기 위한 ref
   const scrollToIntroduction = () => {
     introductionSectionRef.current.scrollIntoView({
@@ -17,7 +15,6 @@ const CompanyIntroducionPage = () => {
   };
   return (
     <>
-      <Header user={user} />
       <LandingPageContainer>
         {/* 히어로 섹션: 페이지 상단의 메인 비주얼 및 핵심 메시지 영역 */}
         <HeroSection style={{ backgroundImage: `url(${heroImage})` }}>
@@ -119,7 +116,6 @@ const CompanyIntroducionPage = () => {
           </FeatureGrid>
         </FeatureSection>
       </LandingPageContainer>
-      <Footer />
     </>
   );
 };

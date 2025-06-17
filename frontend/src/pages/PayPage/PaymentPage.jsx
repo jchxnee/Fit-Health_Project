@@ -17,10 +17,8 @@ import {
 import TitleBar from '../../components/TitleBar';
 import Footer from '../../components/Footer';
 import Header from '../../components/Header';
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const PaymentPage = () => {
-  const [user] = useState({ name: '김현아', img: betaImg });
   const [agreements, setAgreements] = useState({
     rule: false, // 예약 이용규칙 및 취소/환불 동의
     privacyCollect: false, // 개인정보 수집 및 이용 동의
@@ -64,7 +62,6 @@ const PaymentPage = () => {
 
   return (
     <>
-      <Header user={user} />
       <PaymentContainer>
         <TitleBar title={'결제'} />
         <PaymentContentBox>
@@ -215,7 +212,6 @@ const PaymentPage = () => {
           <PaymentButton to="/matchingList">237,500원 결제하기</PaymentButton>
         </PaymentContentBox>
       </PaymentContainer>
-      <Footer />
     </>
   );
 };

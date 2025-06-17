@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import theme from '../../styles/theme';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import TitleBar from '../../components/TitleBar';
 
 import SelectCourse from '../../components/CoachMatching/SelectCourse';
@@ -86,11 +84,6 @@ const SelectedDateTimeDisplay = styled.div`
 `;
 
 const CoachMatching = () => {
-  const [userInfo] = useState({
-    name: '이주찬',
-    img: '../../assets/beta_user_img.png',
-  });
-
   const [courseQuantity, setCourseQuantity] = useState(4);
 
   // **** 여기를 수정합니다. ****
@@ -147,7 +140,6 @@ const CoachMatching = () => {
 
   return (
     <>
-      <Header user={userInfo} />
       <PageWrapper>
         <TitleBar title={'신청'} />
         <ContentContainer>
@@ -182,7 +174,6 @@ const CoachMatching = () => {
           신청하기
         </SubmitButton>
       </PageWrapper>
-      <Footer />
     </>
   );
 };

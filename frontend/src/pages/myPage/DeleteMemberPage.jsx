@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
 import Header from '../../components/Header';
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const DeleteMemberPage = () => {
   const [currentPassword, setCurrentPassword] = useState('');
-  const [user] = useState({ name: '김현아', img: betaImg });
 
   const handleWithdraw = (e) => {
     e.preventDefault();
@@ -34,7 +32,6 @@ const DeleteMemberPage = () => {
 
   return (
     <>
-      <Header user={user} />
       <WithdrawContainer>
         <WithdrawForm onSubmit={handleWithdraw}>
           <PageTitle>회원 탈퇴</PageTitle>

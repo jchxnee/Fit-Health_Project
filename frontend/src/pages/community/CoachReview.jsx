@@ -2,12 +2,10 @@ import React, { useState, useRef, useEffect, useMemo } from 'react'; // useMemo 
 import styled from 'styled-components';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import betaImg from '../../assets/beta_user_img.png';
 import { FaChevronDown, FaThumbsUp, FaRegThumbsUp, FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import TitleBar from '../../components/TitleBar'; // TitleBar 컴포넌트 경로 확인
 
 function CoachReview() {
-  const [user] = useState({ name: '김현아', img: betaImg }); // 현재 로그인 사용자 정보 (더미)
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const [sortCriteria, setSortCriteria] = useState('highestRating'); // 초기 정렬 기준: 높은순
   const sortMenuRef = useRef(null);
@@ -161,7 +159,6 @@ function CoachReview() {
   return (
     <>
       <PageContainer>
-        <Header user={user} />
         <TitleBar title="코치 후기" /> {/* TitleBar 컴포넌트 사용 */}
         <MainContentWrapper>
           <CoachInfoSection>
@@ -225,7 +222,6 @@ function CoachReview() {
           ))}
         </MainContentWrapper>
       </PageContainer>
-      <Footer />
     </>
   );
 }

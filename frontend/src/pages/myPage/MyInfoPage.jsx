@@ -3,8 +3,6 @@ import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
 import { Button, Item, List, Wrapper } from '../../styles/common/SelectGoal';
 import * as S from '../../styles/common/SelectGoal';
-import Header from '../../components/Header';
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 const categories = [
   '체형교정·가벼운통증',
@@ -278,7 +276,6 @@ const MyInfoPage = () => {
 
   return (
     <>
-      <Header user={user} />
       <CustomInfoContainer>
         <CustomInfoForm onSubmit={handleSubmit}>
           <PageTitle>내 정보 관리</PageTitle>
