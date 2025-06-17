@@ -28,6 +28,14 @@ public class Notice {
     @Column(name = "CREATED_DATE")
     private LocalDateTime createdDate;
 
+    @Column(length = 1)
+    @Enumerated(EnumType.STRING)
+    private CommonEnums.Status status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_EMAIL")
+    private Member member;
+
     @PrePersist
     public void prePersist() {
         this.createdDate = LocalDateTime.now();

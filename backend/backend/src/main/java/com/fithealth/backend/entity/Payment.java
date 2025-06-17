@@ -27,8 +27,8 @@ public class Payment {
     private Member userMember;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_EMAIL", nullable = false)
-    private Member trainerMember;
+    @JoinColumn(name = "RESPONSE_NAME", nullable = false)
+    private Member responseMember;
 
     @Column(name = "TRANSACTION_ID", length = 100)
     private String transactionId;

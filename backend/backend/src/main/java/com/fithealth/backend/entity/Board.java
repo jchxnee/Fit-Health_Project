@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,10 +27,13 @@ public class Board {
     @Column(name = "BOARD_CONTENT", nullable = false)
     private String boardContent;
 
-    @Column(name = "COUNT")
+    @Column(name = "BOARD_CATEGORY_NAME", nullable = false)
+    private String boardCategoryName;
+
+    @Column(name = "COUNT", nullable = false)
     private Long count;
 
-    @Column(name = "HEART")
+    @Column(name = "HEART",nullable = false)
     private Long heart;
 
     @Column(name = "CREATED_DATE")
@@ -37,6 +42,17 @@ public class Board {
     @Column(length = 1)
     @Enumerated(EnumType.STRING)
     private CommonEnums.Status status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_EMAIL")
+    private Member member;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BoardFile> boardPhoto = new ArrayList<>();
+
 
     @PrePersist
     public void prePersist() {
