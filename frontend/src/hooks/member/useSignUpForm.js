@@ -4,6 +4,7 @@ import * as yup from 'yup';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { memberService } from '../../api/member';
 
 // 회원가입 폼의 유효성 검사 스키마
 const signUpSchema = yup.object().shape({
@@ -53,7 +54,7 @@ export const useSignUpForm = () => {
       //setError('email', {});
 
       //회원가입 API 호출
-      await userService.signUp({
+      await memberService.signUp({
         username: data.username,
         email: data.email,
         password: data.password,
