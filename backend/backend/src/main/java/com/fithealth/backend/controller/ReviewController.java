@@ -18,8 +18,8 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping
-    public ResponseEntity<String> createReview(@ModelAttribute ReviewCreateDto.Create reviewCreate) throws IOException {
-        return ResponseEntity.ok(reviewService.createReview());
-    }
+//    @PostMapping
+//    public ResponseEntity<String> createReview(@ModelAttribute ReviewCreateDto.Create reviewCreate) throws IOException {
+//        return ResponseEntity.ok(reviewService.createReview());
+//    }
 }
