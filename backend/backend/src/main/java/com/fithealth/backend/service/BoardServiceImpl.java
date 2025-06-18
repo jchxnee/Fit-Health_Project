@@ -2,7 +2,7 @@ package com.fithealth.backend.service;
 
 import com.fithealth.backend.dto.Board.BoardCreateDto;
 import com.fithealth.backend.entity.Board;
-import com.fithealth.backend.entity.BoardFile; // BoardFile 임포트 확인
+import com.fithealth.backend.entity.BoardFile;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.repository.BoardRepository;
 import com.fithealth.backend.repository.MemberRepository;
@@ -10,9 +10,11 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile; // MultipartFile 임포트
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List; // List 임포트
 import java.util.UUID;
 
 @Service
@@ -25,40 +27,37 @@ public class BoardServiceImpl implements BoardService {
     private final String UPLOAD_PATH = "C:\\dev_tool";
 
     @Override
-    public Long createBoard(BoardCreateDto.Create boardDto) throws IOException {
-        Member member = memberRepository.findOne(boardDto.getUser_id())
+    public Long createBoard(BoardCreateDto.Create boardDto, List<MultipartFile> files) throws IOException {
+        Member member = memberRepository.findOne(boardDto.getUser_email())
                 .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));
 
-        String originName = null;
-        String changeName = null;
-        if(boardDto.getFile() != null && !boardDto.getFile().isEmpty()){
-            originName = boardDto.getFile()
-                    .getOriginalFilename();
-            changeName = UUID.randomUUID()
-                    .toString() + "_" + originName;
-
-            File upLoadDir = new File(UPLOAD_PATH);
-            if(!upLoadDir.exists()){
-                upLoadDir.mkdirs();
-            }
-
-            boardDto.getFile()
-                    .transferTo(new File(UPLOAD_PATH + changeName));
-        }
-
         Board board = boardDto.toEntity();
-        board.changeMember(member); // 작성자 설정
+        board.changeMember(member); // 작성자 연결 (양방향 관계)
 
-        // BoardFile 객체를 생성하고 Board 엔티티의 리스트에 추가해야 합니다.
-        if (originName != null && changeName != null) {
-            BoardFile boardFile = BoardFile.builder()
-                    .originName(originName)
-                    .changeName(changeName)
-                    .build();
-            boardFile.setBoard(board);
+        if(files != null && !files.isEmpty()){
+            for (MultipartFile file : files) { // 각 파일마다 처리
+                if (!file.isEmpty()) { // 빈 파일이 아닌 경우에만 처리
+                    String originName = file.getOriginalFilename();
+                    String changeName = UUID.randomUUID().toString() + "_" + originName;
+
+                    File uploadDir = new File(UPLOAD_PATH);
+                    if(!uploadDir.exists()){
+                        uploadDir.mkdirs();
+                    }
+
+                    file.transferTo(new File(UPLOAD_PATH + File.separator + changeName));
+
+                    BoardFile boardFile = BoardFile.builder()
+                            .originName(originName)
+                            .changeName(changeName)
+                            .build();
+                    board.addBoardFile(boardFile); // Board 엔티티의 편의 메서드 호출
+                }
+            }
         }
 
-        Long savedBoardNo = boardRepository.save(board);
-        return savedBoardNo;
+        Long BoardNo = boardRepository.save(board);
+        return BoardNo;
     }
+
 }
