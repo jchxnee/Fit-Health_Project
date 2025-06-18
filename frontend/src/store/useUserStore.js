@@ -11,9 +11,16 @@ const useUserStore = create(
       login: (userData) => {
         set({
           user: {
-            email: userData.email,
-            username: userData.username,
-            role: userData.role,
+            email: userData.useremail,
+            name: userData.username,
+            birth: userData.birth,
+            phone: userData.phone,
+            address: userData.address,
+            gender: userData.gender,
+            height: userData.height,
+            goal: userData.goal,
+            img: userData.profileimage,
+            grade: userData.grade,
           },
           isAuthenticated: true,
         });

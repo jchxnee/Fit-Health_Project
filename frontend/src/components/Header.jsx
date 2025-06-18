@@ -1,8 +1,9 @@
-import React, { useState } from 'react'; // useState import
+import React, { useState, useEffect, useRef } from 'react'; // useRef와 useEffect import 추가
 import styled from 'styled-components'; // css import
 import headerIcon from '../assets/header_icon.png';
-import { FaBell, FaChevronDown, FaChevronUp, FaSyncAlt } from 'react-icons/fa'; // FaChevronDown, FaChevronUp import
+import { FaBell, FaChevronDown, FaChevronUp, FaSyncAlt } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import useUserStore from '../store/useUserStore';
 
 // NotificationList 컴포넌트 (제공된 코드)
 function NotificationList() {
@@ -27,7 +28,9 @@ function NotificationList() {
 }
 
 // UserMenu 컴포넌트 (제공된 코드)
-function UserMenu() {
+function UserMenu({ onMenuItemClick }) {
+  const logout = useUserStore((state) => state.logout);
+
   const menuItems = [
     { name: '마이페이지', to: '/mypage' },
     { name: '신청 내역', to: '/matchingList' },
@@ -36,21 +39,31 @@ function UserMenu() {
       to: '/coachRegister',
       icon: <StyledFaSyncAlt />,
     },
-    { name: '로그아웃', action: () => console.log('로그아웃 클릭') },
+    { name: '로그아웃', action: logout },
   ];
 
   return (
     <UserMenuContainer>
       {menuItems.map((item) =>
         item.to ? (
-          <NavItem key={item.name} to={item.to}>
+          <NavItem key={item.name} to={item.to} onClick={onMenuItemClick}>
+            {' '}
+            {/* onClick 추가 */}
             <UserMenuItem>
               {item.name}
               {item.icon && item.icon}
             </UserMenuItem>
           </NavItem>
         ) : (
-          <UserMenuItem key={item.name} onClick={item.action}>
+          <UserMenuItem
+            key={item.name}
+            onClick={() => {
+              item.action();
+              onMenuItemClick();
+            }}
+          >
+            {' '}
+            {/* onClick 추가 */}
             {item.name}
             {item.icon && item.icon}
           </UserMenuItem>
@@ -64,8 +77,14 @@ function Header({ user }) {
   const [showNotification, setShowNotification] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
-  // 더미 알림 상태 (실제로는 API에서 받아올 알림 데이터의 존재 여부에 따라 결정)
-  const hasNotifications = true; // 알림이 있다면 true, 없다면 false
+  // 알림 모달과 유저 메뉴 모달을 참조할 ref 생성
+  const notificationRef = useRef(null);
+  const userMenuRef = useRef(null);
+  const bellIconRef = useRef(null); // 알림 아이콘 ref
+  const profileWrapperRef = useRef(null); // 프로필 래퍼 ref
+
+  // 더미 알림 상태
+  const hasNotifications = true;
 
   const handleNotificationClick = () => {
     setShowNotification((prev) => !prev);
@@ -76,6 +95,40 @@ function Header({ user }) {
     setShowUserMenu((prev) => !prev);
     setShowNotification(false); // 다른 모달 닫기
   };
+
+  // UserMenu 내의 아이템을 클릭했을 때 호출될 함수
+  const handleUserMenuItemClick = () => {
+    setShowUserMenu(false); // UserMenu 닫기
+  };
+
+  // 외부 클릭 감지 로직
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // 알림 모달 외부 클릭 감지
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target) &&
+        bellIconRef.current && // 벨 아이콘이 클릭된 것이 아니라면
+        !bellIconRef.current.contains(event.target)
+      ) {
+        setShowNotification(false);
+      }
+      // 유저 메뉴 모달 외부 클릭 감지
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target) &&
+        profileWrapperRef.current && // 프로필 래퍼가 클릭된 것이 아니라면
+        !profileWrapperRef.current.contains(event.target)
+      ) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []); // 빈 배열을 넣어 컴포넌트 마운트 시 한 번만 실행되도록 함
 
   return (
     <HeaderComponent>
@@ -95,25 +148,33 @@ function Header({ user }) {
         {user !== null ? (
           <HeaderRight>
             <HeaderNavRight>
-              <NotificationWrapper onClick={handleNotificationClick}>
+              <NotificationWrapper onClick={handleNotificationClick} ref={bellIconRef}>
+                {' '}
+                {/* ref 추가 */}
                 <FaBell />
-                {hasNotifications && <RedDot />} {/* 알림이 있을 경우 빨간 점 표시 */}
+                {hasNotifications && <RedDot />}
               </NotificationWrapper>
               <NavItem to="/chat">채팅</NavItem>
-              <ProfileWrapper onClick={handleUserMenuClick}>
+              <ProfileWrapper onClick={handleUserMenuClick} ref={profileWrapperRef}>
+                {' '}
+                {/* ref 추가 */}
                 <ProfileImg src={user.img} alt="profileIcon" />
                 <span>{user.name}님</span>
                 {showUserMenu ? <FaChevronUp size="14px" /> : <FaChevronDown size="14px" />}
               </ProfileWrapper>
             </HeaderNavRight>
             {showNotification && (
-              <NotificationListContainer>
+              <NotificationListContainer ref={notificationRef}>
+                {' '}
+                {/* ref 추가 */}
                 <NotificationList />
               </NotificationListContainer>
             )}
             {showUserMenu && (
-              <UserMenuContainerWrapper>
-                <UserMenu />
+              <UserMenuContainerWrapper ref={userMenuRef}>
+                {' '}
+                {/* ref 추가 */}
+                <UserMenu onMenuItemClick={handleUserMenuItemClick} /> {/* prop 전달 */}
               </UserMenuContainerWrapper>
             )}
           </HeaderRight>

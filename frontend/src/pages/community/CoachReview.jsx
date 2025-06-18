@@ -4,6 +4,7 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { FaChevronDown, FaThumbsUp, FaRegThumbsUp, FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import TitleBar from '../../components/TitleBar'; // TitleBar 컴포넌트 경로 확인
+import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 
 function CoachReview() {
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
