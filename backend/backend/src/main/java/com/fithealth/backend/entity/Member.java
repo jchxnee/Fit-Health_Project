@@ -74,7 +74,7 @@ public class Member {
     private List<Payment> payments = new ArrayList<>();
 
     @OneToMany(mappedBy = "responseMember", cascade = CascadeType.ALL)
-    private List<Payment> respondedPayments = new ArrayList<>();
+    private List<Payment> payments2 = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
