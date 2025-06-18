@@ -30,8 +30,9 @@ export const useLoginForm = () => {
   const onsubmit = async (data) => {
     try {
       setIsLoading(true);
+      console.log('loginService 보내는 중', data);
       //로그인 API 호출
-      const user = await memberService.login(data.useremail, data.userpwd);
+      const user = await memberService.login(data);
 
       if (!user) {
         throw new Error('이메일 또는 비밀번호 불일치');
@@ -39,9 +40,16 @@ export const useLoginForm = () => {
 
       //로그인 성공시 store에 로그인 정보를 저장
       login({
-        email: user.useremail,
-        username: user.username,
-        role: user.role,
+        useremail: user.user_email,
+        username: user.user_name,
+        birth: user.birth,
+        phone: user.phone,
+        address: user.address,
+        gender: user.gender,
+        height: user.height,
+        goal: user.goal,
+        profileimage: user.profile_image,
+        grade: user.grade,
       });
       toast.success('로그인 성공!');
       navigate('/');
