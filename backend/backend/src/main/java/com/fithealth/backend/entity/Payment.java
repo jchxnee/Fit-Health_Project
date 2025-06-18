@@ -21,10 +21,9 @@ public class Payment {
     @Column(name = "PAYMENT_ID")
     private Long paymentId;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_EMAIL", nullable = false)
-    private Member userMember;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RESPONSE_NAME", nullable = false)

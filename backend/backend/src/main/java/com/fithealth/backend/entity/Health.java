@@ -16,8 +16,9 @@ import java.time.LocalDateTime;
 public class Health {
 
     @Id
-    @Column(name = "USER_EMAIL", length = 254)
-    private String userEmail;
+    @Column(name = "HEALTH_NO")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long healthNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_EMAIL", nullable = false)
