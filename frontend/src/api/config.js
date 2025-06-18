@@ -11,7 +11,8 @@ export const API_CONFIG = {
 };
 
 export const API_ENDPOINTS = {
-  PRODUCTS: {
-    BASE: '/products',
+  MEMBER: {
+    BASE: '/api/members',
+    LOGIN: '/api/members/login',
   },
 };

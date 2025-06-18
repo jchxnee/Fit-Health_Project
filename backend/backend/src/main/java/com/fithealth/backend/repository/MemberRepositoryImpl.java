@@ -6,6 +6,8 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Transactional
 @Repository
 public class MemberRepositoryImpl implements MemberRepository{
@@ -17,4 +19,10 @@ public class MemberRepositoryImpl implements MemberRepository{
     public void save(Member member) {
         em.persist(member);
     }
+
+    @Override
+    public Optional<Member> findOne(String userEmail) {
+        return Optional.ofNullable(em.find(Member.class, userEmail));
+    }
+
 }

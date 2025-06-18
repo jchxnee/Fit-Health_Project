@@ -8,9 +8,9 @@ import { memberService } from '../../api/member';
 
 // 회원가입 폼의 유효성 검사 스키마
 const signUpSchema = yup.object().shape({
-  email: yup.string().email('유효한 이메일 주소를 입력해주세요.').required('이메일을 입력해주세요.'),
+  useremail: yup.string().email('유효한 이메일 주소를 입력해주세요.').required('이메일을 입력해주세요.'),
 
-  password: yup
+  userpwd: yup
     .string()
     .min(8, '비밀번호는 8자 이상이어야 합니다.')
     .matches(/^[a-zA-Z\\d`~!@#$%^&*()-_=+]{8,24}$/, '비밀번호는 영문자와 숫자를 모두 포함해야 합니다.')
@@ -18,7 +18,7 @@ const signUpSchema = yup.object().shape({
 
   passwordConfirm: yup
     .string()
-    .oneOf([yup.ref('password'), null], '비밀번호가 일치하지 않습니다.')
+    .oneOf([yup.ref('userpwd'), null], '비밀번호가 일치하지 않습니다.')
     .required('비밀번호 확인을 입력해주세요.'),
 
   username: yup
@@ -54,11 +54,13 @@ export const useSignUpForm = () => {
       //setError('email', {});
 
       //회원가입 API 호출
+      console.log('memberService 보내는 중 ', data);
       await memberService.signUp({
+        useremail: data.useremail,
+        userpwd: data.userpwd,
         username: data.username,
-        email: data.email,
-        password: data.password,
-        role: 'user',
+        phone: data.phone,
+        birth: data.birth,
       });
 
       toast.success('회원가입 완료!');

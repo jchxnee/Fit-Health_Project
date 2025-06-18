@@ -5,10 +5,11 @@ export const memberService = {
   //회원가입
   signUp: async (memberData) => {
     try {
-      const { data } = await api.post(API_ENDPOINTS.USERS.BASE, {
-        useremail: memberData.email,
-        password: memberData.password,
-        username: memberData.username,
+      console.log('post 보내는 중 ', memberData);
+      const { data } = await api.post(API_ENDPOINTS.MEMBER.BASE, {
+        user_email: memberData.useremail,
+        user_pwd: memberData.userpwd,
+        user_name: memberData.username,
         phone: memberData.phone,
         birth: memberData.birth,
       });
@@ -25,7 +26,10 @@ export const memberService = {
   },
   login: async (email, password) => {
     try {
-      const { data } = await api.get(API_ENDPOINTS.USERS.LOGIN(email, password));
+      const { data } = await api.postForm(API_ENDPOINTS.MEMBER.LOGIN, {
+        user_email: email,
+        user_pwd: password,
+      });
       return data[0];
     } catch (error) {
       if (error.response) {
