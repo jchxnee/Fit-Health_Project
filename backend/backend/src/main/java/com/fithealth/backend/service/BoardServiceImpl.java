@@ -1,9 +1,17 @@
 package com.fithealth.backend.service;
 
+import com.fithealth.backend.dto.Board.BoardCreateDto;
+import com.fithealth.backend.entity.Board;
+import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.repository.BoardRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -11,4 +19,33 @@ import org.springframework.transaction.annotation.Transactional;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
+
+    @Override
+    public Long createBoard(BoardCreateDto.Create boardDto) throws IOException {
+        Member member = memberRepository.findOne(boardDto.getUser_id())
+                .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));
+
+        String originName = null;
+        String changeName = null;
+        if(boardDto.getFile() != null && !boardDto.getFile().isEmpty()){
+            originName = boardDto.getFile()
+                    .getOriginalFilename();
+            changeName = UUID.randomUUID()
+                    .toString() + "_" + originName;
+
+            File upLoadDir = new File(UPLOAD_PATH);
+            if(!upLoadDir.exists()){
+                upLoadDir.mkdirs();
+            }
+
+            boardDto.getFile()
+                    .transferTo(new File(UPLOAD_PATH + changeName));
+        }
+        Board board = boardDto.toEntity();
+        board.changeMember(member);
+        board.changeFile(originName, changeName);
+
+
+        return boardRepository.save(board).getBoardNo();
+    }
 }
