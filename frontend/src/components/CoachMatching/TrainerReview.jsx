@@ -88,7 +88,7 @@ const StatsTime = styled.div`
   align-items: center;
   justify-content: flex-end;
   color: ${({ theme }) => theme.colors.gray[400]};
-  font-size: ${({ theme }) => theme.fontSizes.xxs};
+  font-size: ${({ theme }) => theme.fontSizes.xs};
 `;
 
 const MoreInfoBox = styled.div`
