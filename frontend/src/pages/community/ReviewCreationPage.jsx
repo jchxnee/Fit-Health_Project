@@ -6,7 +6,7 @@ import { FaCamera, FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 function ReviewCreationPage() {
   const [content, setContent] = useState('');
   const [imageCount, setImageCount] = useState(0);
-  const [information] = useState({ coachName: '김성은', round: 2 });
+  const [information] = useState({ coachName: '김성은' });
   const contentTextareaRef = useRef(null); // textarea 참조
   const [isContentFocused, setIsContentFocused] = useState(false); // textarea 포커스 상태
 
@@ -134,9 +134,7 @@ function ReviewCreationPage() {
         <TitleBar title="리뷰 등록" />
         <ContentWrapper>
           <TopSection>
-            <CategorySelect>
-              {information.coachName} 트레이너 {information.round}회차
-            </CategorySelect>
+            <CategorySelect>{information.coachName} 트레이너</CategorySelect>
             {/* 별점 컨테이너를 SubmitButtonWrapper 바로 왼쪽에 배치 */}
             <StarRatingContainer
               ref={starRatingRef}
