@@ -9,6 +9,21 @@ import java.time.LocalDateTime;
 public class LoginDto {
     @Getter
     @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class Find {
+        private String user_email;
+
+        public static Find toDto(Member member){
+            return Find.builder()
+                    .user_email(member.getUserEmail())
+                    .build();
+        }
+    }
+
+    @Getter
+    @Setter
     public static class Request {
         private String user_email;
         private String user_pwd;

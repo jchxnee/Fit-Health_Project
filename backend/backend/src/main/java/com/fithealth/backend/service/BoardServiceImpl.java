@@ -2,8 +2,10 @@ package com.fithealth.backend.service;
 
 import com.fithealth.backend.dto.Board.BoardCreateDto;
 import com.fithealth.backend.entity.Board;
+import com.fithealth.backend.entity.BoardFile; // BoardFile 임포트 확인
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.repository.BoardRepository;
+import com.fithealth.backend.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ import java.util.UUID;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
+    private final MemberRepository memberRepository;
+    private final String UPLOAD_PATH = "C:\\dev_tool";
 
     @Override
     public Long createBoard(BoardCreateDto.Create boardDto) throws IOException {
@@ -41,11 +45,20 @@ public class BoardServiceImpl implements BoardService {
             boardDto.getFile()
                     .transferTo(new File(UPLOAD_PATH + changeName));
         }
+
         Board board = boardDto.toEntity();
-        board.changeMember(member);
-        board.changeFile(originName, changeName);
+        //board.changeMember(member); // 작성자 설정
 
+        // BoardFile 객체를 생성하고 Board 엔티티의 리스트에 추가해야 합니다.
+        if (originName != null && changeName != null) {
+            BoardFile boardFile = BoardFile.builder()
+                    .originName(originName)
+                    .changeName(changeName)
+                    .build();
+            boardFile.setBoard(board);
+        }
 
-        return boardRepository.save(board).getBoardNo();
+        Long savedBoardNo = boardRepository.save(board);
+        return savedBoardNo;
     }
 }

@@ -13,11 +13,13 @@ function LoginPage() {
         <LoginFormBox onSubmit={handleSubmit(onsubmit)}>
           <InputGroup>
             <StyledLabel htmlFor="useremail">이메일</StyledLabel>
-            <StyledInput type="email" id="useremail" required {...register('useremail')} $error={errors.useremail} />
+            <StyledInput type="email" id="useremail" {...register('useremail')} $error={errors.useremail} />
+            {errors.useremail && <ErrorMessage>{errors.useremail.message}</ErrorMessage>}
           </InputGroup>
           <InputGroup>
             <StyledLabel htmlFor="userpwd">비밀번호</StyledLabel>
-            <StyledInput type="password" id="userpwd" required {...register('userpwd')} $error={errors.userpwd} />
+            <StyledInput type="password" id="userpwd" {...register('userpwd')} $error={errors.userpwd} />
+            {errors.userpwd && <ErrorMessage>{errors.userpwd.message}</ErrorMessage>}
           </InputGroup>
 
           <LoginRememberMeOption>
@@ -94,6 +96,7 @@ const LoginFormBox = styled.form`
 const InputGroup = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing[5]};
   width: 350px;
+  position: relative;
 `;
 
 const StyledLabel = styled.label`
@@ -222,4 +225,16 @@ const SNSIcon = styled.img`
     transform: translateY(-${({ theme }) => theme.spacing[1]});
     box-shadow: ${({ theme }) => theme.shadows.md};
   }
+`;
+
+const ErrorMessage = styled.p`
+  color: red;
+  font-size: 0.85em;
+  margin-top: ${({ theme }) => theme.spacing['1']};
+  margin-left: 0px;
+  text-align: left;
+  width: calc(100% - 120px);
+  box-sizing: border-box;
+  position: relative;
+  flex-basis: 100%;
 `;

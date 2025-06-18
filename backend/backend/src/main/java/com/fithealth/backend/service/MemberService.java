@@ -5,5 +5,6 @@ import com.fithealth.backend.dto.member.SignupDto;
 
 public interface MemberService {
     String createMember(SignupDto.Create createDto);
-    LoginDto.Response findMember(LoginDto.Request requestDto);
+    LoginDto.Response loginMember(LoginDto.Request requestDto);
+    Boolean findMember(String userEmail);
 }
