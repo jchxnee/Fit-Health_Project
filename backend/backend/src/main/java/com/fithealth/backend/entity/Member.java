@@ -73,6 +73,9 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Payment> payments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "responseMember", cascade = CascadeType.ALL)
+    private List<Payment> respondedPayments = new ArrayList<>();
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 
