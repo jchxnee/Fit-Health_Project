@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { FaMapMarkerAlt, FaRegEnvelope } from 'react-icons/fa';
 import { FaInstagram } from 'react-icons/fa';
-import theme from '../../styles/theme';
+import theme from '../../styles/theme'; // theme 파일 경로 확인
 import { RiKakaoTalkFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 
@@ -73,14 +73,28 @@ const SocialMediaLinks = styled.div`
   margin-bottom: ${theme.spacing['4']};
 `;
 
-const SocialLink = styled.span`
+// SocialLink 컴포넌트의 기반 태그를 span에서 a로 변경합니다.
+const SocialLink = styled.a`
+  // <-- 여기를 styled.a 로 변경했습니다.
   display: flex;
   align-items: center;
   gap: ${theme.spacing.xs};
   cursor: pointer;
+  text-decoration: none; /* 링크 밑줄 제거 */
+  color: inherit; /* 부모 요소의 텍스트 색상 상속 */
+
   &:hover {
     color: ${theme.colors.primary};
   }
+  margin-right: 10px;
+`;
+
+const SocialTextSpan = styled.span`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.xs};
+  color: inherit;
+  margin-right: 10px;
 `;
 
 const Specialty = styled.span`
@@ -138,6 +152,7 @@ const StyledKakaoIcon = styled(RiKakaoTalkFill)`
   user-select: none;
   border-radius: 50%;
   padding: 2px;
+  margin-right: 7px;
 `;
 
 const StyledInstagramIcon = styled(FaInstagram)`
@@ -145,6 +160,7 @@ const StyledInstagramIcon = styled(FaInstagram)`
   color: white;
   border-radius: 4px;
   padding: 2px;
+  margin-right: 7px;
 `;
 
 const NavItem = styled(Link)`
@@ -157,6 +173,16 @@ const BackDiv = styled.div`
 `;
 
 const TrainerProfile = ({ trainer }) => {
+  const getInstagramProfileUrl = (instagramId) => {
+    if (!instagramId) return '#';
+    return `https://www.instagram.com/${instagramId}/`;
+  };
+
+  // 카카오톡 오픈채팅방 URL (trainer 객체에 kakaoOpenChatUrl 필드가 있다고 가정)
+  const getKakaoOpenChatUrl = (kakaoOpenChatUrl) => {
+    return kakaoOpenChatUrl;
+  };
+
   return (
     <ProfileCard>
       <ProfileImageWrapper>
@@ -171,15 +197,30 @@ const TrainerProfile = ({ trainer }) => {
           <NameAndSNS>
             <TrainerName>{trainer.name} 트레이너</TrainerName>
             <SocialMediaLinks>
-              {trainer.kakaoId && (
-                <SocialLink>
-                  <StyledKakaoIcon size={16} />
-                  {trainer.kakaoId}
-                </SocialLink>
-              )}
+              {trainer.kakaoId &&
+                (trainer.kakaoOpenChatUrl ? (
+                  <SocialLink
+                    href={getKakaoOpenChatUrl(trainer.kakaoOpenChatUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <StyledKakaoIcon size={22} />
+                    {trainer.kakaoId} (오픈채팅)
+                  </SocialLink>
+                ) : (
+                  <SocialTextSpan>
+                    {' '}
+                    <StyledKakaoIcon size={22} />
+                    {trainer.kakaoId}
+                  </SocialTextSpan>
+                ))}
               {trainer.instagramId && (
-                <SocialLink>
-                  <StyledInstagramIcon size={16} />@{trainer.instagramId}
+                <SocialLink
+                  href={getInstagramProfileUrl(trainer.instagramId)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <StyledInstagramIcon size={20} />@{trainer.instagramId}
                 </SocialLink>
               )}
             </SocialMediaLinks>

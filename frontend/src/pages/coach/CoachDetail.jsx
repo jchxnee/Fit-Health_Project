@@ -64,7 +64,7 @@ const CoachDetail = () => {
     name: '김성은',
     specialty: '헬스 전문',
     kakaoId: 'asd1234',
-    instagramId: 'asd1234',
+    instagramId: 'intae_0802',
     location: '서울특별시 강남구',
     introduction:
       '안녕하세요. 김성은 트레이너입니다! 여러분들의 몸과 마음을\n건강하게 만들어드리겠습니다! 운동은 나랑같이해요~~~',
