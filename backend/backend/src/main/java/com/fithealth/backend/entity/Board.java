@@ -61,4 +61,11 @@ public class Board {
             this.status = CommonEnums.Status.Y;
         }
     }
+
+    public void changeMember(Member member) {
+        this.member = member;
+        if(!member.getBoards().contains(this)) {
+            member.getBoards().add(this);
+        }
+    }
 }
