@@ -22,7 +22,6 @@ public class BoardServiceImpl implements BoardService {
 
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
-    private final MemberRepository memberRepository;
     private final String UPLOAD_PATH = "C:\\dev_tool";
 
     @Override
