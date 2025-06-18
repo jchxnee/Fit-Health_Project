@@ -47,12 +47,13 @@ import ChangePwdPage from './pages/myPage/ChangePwdPage';
 import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
 import betaImg from './assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 import { useState } from 'react';
+import useUserStore from './store/useUserStore';
 
 function AppContent() {
   const location = useLocation();
   const hideHeader = ['/signup'];
   const isHeaderHidden = hideHeader.includes(location.pathname);
-  const [user] = useState({ name: '김현아', img: betaImg });
+  const { user } = useUserStore();
 
   return (
     <>

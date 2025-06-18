@@ -24,13 +24,14 @@ export const memberService = {
       throw new Error('서버 통실 불량');
     }
   },
-  login: async (email, password) => {
+  login: async (memberData) => {
     try {
-      const { data } = await api.postForm(API_ENDPOINTS.MEMBER.LOGIN, {
-        user_email: email,
-        user_pwd: password,
+      console.log('post 보내는 중 ', memberData);
+      const { data } = await api.post(API_ENDPOINTS.MEMBER.LOGIN, {
+        user_email: memberData.useremail,
+        user_pwd: memberData.userpwd,
       });
-      return data[0];
+      return data;
     } catch (error) {
       if (error.response) {
         const message = error.response?.data?.message || '로그인에 실패했습니다.';

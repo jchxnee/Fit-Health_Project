@@ -17,13 +17,14 @@ public class MemberController {
     //회원 등록 API
     @PostMapping
     public ResponseEntity<String> addMember(@RequestBody SignupDto.Create createDto) {
-        String userEmail = memberService.createMember(createDto);
-        return ResponseEntity.ok(userEmail);
+        return ResponseEntity.ok(memberService.createMember(createDto));
     }
 
-    //회원 조회 API
+    //로그인 API
     @PostMapping("/login")
     public ResponseEntity<LoginDto.Response> login(@RequestBody LoginDto.Request requestDto) {
+        System.out.println(requestDto.getUser_email());
+        System.out.println(requestDto.getUser_pwd());
         return ResponseEntity.ok(memberService.findMember(requestDto));
     }
 }

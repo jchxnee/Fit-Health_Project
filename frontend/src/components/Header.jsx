@@ -3,6 +3,7 @@ import styled from 'styled-components'; // css import
 import headerIcon from '../assets/header_icon.png';
 import { FaBell, FaChevronDown, FaChevronUp, FaSyncAlt } from 'react-icons/fa'; // FaChevronDown, FaChevronUp import
 import { Link } from 'react-router-dom';
+import useUserStore from '../store/useUserStore';
 
 // NotificationList 컴포넌트 (제공된 코드)
 function NotificationList() {
@@ -28,6 +29,8 @@ function NotificationList() {
 
 // UserMenu 컴포넌트 (제공된 코드)
 function UserMenu() {
+  const logout = useUserStore((state) => state.logout);
+
   const menuItems = [
     { name: '마이페이지', to: '/mypage' },
     { name: '신청 내역', to: '/matchingList' },
@@ -36,7 +39,7 @@ function UserMenu() {
       to: '/coachRegister',
       icon: <StyledFaSyncAlt />,
     },
-    { name: '로그아웃', action: () => console.log('로그아웃 클릭') },
+    { name: '로그아웃', action: logout },
   ];
 
   return (
