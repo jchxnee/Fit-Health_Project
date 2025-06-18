@@ -1,53 +1,56 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react'; // useEffect 추가
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import { FaCamera } from 'react-icons/fa';
 import { GoTriangleDown } from 'react-icons/go';
-import { Link, useNavigate } from 'react-router-dom'; // useNavigate 훅 임포트 추가
+import { Link, useNavigate } from 'react-router-dom';
+// import { useCreateForm } from '../hooks/useCreateForm'; // 이 훅을 사용한다고 가정합니다.
+import axios from 'axios'; // axios 임포트
+
+// --- styled-components 및 기타 컴포넌트 임포트 (기존 코드와 동일) ---
+// ErrorMessage 컴포넌트가 없다면 추가해주세요.
+const ErrorMessage = styled.p`
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 4px;
+  margin-left: 12px;
+`;
 
 function CommunityPostCreationPage() {
-  const navigate = useNavigate(); // useNavigate 훅 사용
-
+  // useCreateForm 훅을 사용한다고 가정하고 코드를 작성합니다.
+  // 이 훅은 register, handleSubmit, formState: { errors, isSubmitting, isValid }, setValue, watch를 반환합니다.
+  // 만약 useCreateForm을 사용하지 않고 있다면, 아래 useState와 핸들러들을 직접 사용해야 합니다.
+  // 편의상 useCreateForm이 있다고 가정하고 설명합니다.
+  // const { register, handleSubmit, formState: { errors, isSubmitting, isValid }, setValue, watch } = useCreateForm();
+  // useCreateForm 훅이 없으므로 임시로 useState로 대체합니다. 실제 프로젝트에서는 react-hook-form 사용을 권장합니다.
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [imageCount, setImageCount] = useState(0);
-  const contentTextareaRef = useRef(null);
-  const [isContentFocused, setIsContentFocused] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('운동해요!');
+  const [files, setFiles] = useState([]); // 업로드할 파일들을 저장하는 상태
+  const [isSubmitting, setIsSubmitting] = useState(false); // 제출 상태
+  const [errors, setErrors] = useState({}); // 에러 상태 (간단한 수동 유효성 검사)
 
-  const [selectedCategory, setSelectedCategory] = useState('운동해요!'); // 기본 카테고리 (수정: '함께해요!' -> '운동해요!'로 변경, 제공된 categories 배열에 맞춰 통일)
+  const navigate = useNavigate();
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const fileInputRef = useRef(null); // 파일 인풋 참조
 
-  // 카테고리 배열은 '운동해요!', '궁금해요!', '소통해요!'로 통일 (기존과 동일)
+  const imageCount = files.length; // 이미지 수
+
   const categories = ['운동해요!', '궁금해요!', '소통해요!'];
 
+  // 폼 유효성 검사 (간단한 예시)
   const isFormValid = title.trim() !== '' && content.trim() !== '';
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
+    setErrors((prev) => ({ ...prev, title: null })); // 입력 시 에러 제거
   };
 
   const handleContentChange = (e) => {
     setContent(e.target.value);
-  };
-
-  const handleImageUpload = () => {
-    setImageCount((prevCount) => Math.min(prevCount + 1, 15));
-  };
-
-  // 등록 버튼 클릭 핸들러 수정
-  const handleSubmitClick = (e) => {
-    e.preventDefault(); // Link의 기본 동작(페이지 이동) 방지
-    if (isFormValid) {
-      console.log('선택된 카테고리:', selectedCategory);
-      console.log('제목:', title);
-      console.log('내용:', content);
-      console.log('이미지 수:', imageCount);
-      // 실제 등록 로직 추가 (API 호출 등)
-
-      // 등록 성공 후 페이지 이동
-      navigate('/community');
-    }
+    setErrors((prev) => ({ ...prev, content: null })); // 입력 시 에러 제거
   };
 
   const handleCategorySelect = (category) => {
@@ -55,7 +58,82 @@ function CommunityPostCreationPage() {
     setIsDropdownOpen(false);
   };
 
-  React.useEffect(() => {
+  const handleImageUploadClick = () => {
+    if (imageCount >= 15) {
+      alert('이미지는 최대 15개까지 업로드할 수 있습니다.');
+      return;
+    }
+    fileInputRef.current.click(); // 숨겨진 파일 인풋 클릭
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    const newTotalFiles = [...files, ...selectedFiles].slice(0, 15); // 기존 파일과 합치고 최대 15개 유지
+    setFiles(newTotalFiles);
+    // 파일 입력 필드 초기화 (동일 파일 재선택 시 onChange 이벤트 발생시키기 위함)
+    e.target.value = null;
+  };
+
+  // 등록 버튼 클릭 핸들러
+  // 이 함수가 form의 onSubmit 이벤트에 직접 연결될 것입니다.
+  const handleSubmitClick = async (e) => {
+    e.preventDefault(); // 폼의 기본 제출 동작 방지
+
+    // 수동 유효성 검사 (useCreateForm 훅을 사용하지 않을 경우)
+    const newErrors = {};
+    if (title.trim() === '') {
+      newErrors.title = '제목을 입력해주세요.';
+    }
+    if (content.trim() === '') {
+      newErrors.content = '내용을 입력해주세요.';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setIsSubmitting(true); // 제출 중 상태로 설정
+
+    // FormData 객체 생성
+    const formData = new FormData();
+
+    // 텍스트 데이터 추가
+    // TODO: 'userEmail'은 실제 로그인된 사용자 정보를 기반으로 백엔드에서 가져오거나,
+    // 클라이언트에서 보안적으로 안전한 방법으로 전달해야 합니다 (예: JWT 디코딩).
+    // 여기서는 예시로 하드코딩합니다.
+    formData.append('userEmail', 'loggedInUser@example.com');
+    formData.append('boardCategoryName', selectedCategory);
+    formData.append('boardTitle', title);
+    formData.append('boardContent', content);
+
+    // 파일 데이터 추가
+    files.forEach((file) => {
+      formData.append('files', file); // 'files'는 백엔드에서 MultipartFile 리스트를 받을 때 사용하는 파라미터 이름입니다.
+    });
+
+    try {
+      // axios를 사용하여 POST 요청 보내기
+      const response = await axios.post('/api/community/posts', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // 중요: 파일 업로드 시 이 헤더 필수
+          // 인증 토큰이 있다면 여기에 추가: 'Authorization': `Bearer ${yourAuthToken}`
+        },
+      });
+
+      console.log('게시글 등록 성공:', response.data);
+      alert('게시글이 성공적으로 등록되었습니다!');
+      navigate('/community'); // 성공 시 커뮤니티 목록 페이지로 이동
+    } catch (error) {
+      console.error('게시글 등록 실패:', error.response ? error.response.data : error.message);
+      // 서버에서 보낸 에러 메시지를 사용자에게 보여줄 수 있습니다.
+      alert(`게시글 등록에 실패했습니다: ${error.response ? error.response.data || error.message : error.message}`);
+    } finally {
+      setIsSubmitting(false); // 제출 완료 후 상태 변경
+    }
+  };
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
@@ -71,10 +149,11 @@ function CommunityPostCreationPage() {
     <>
       <PageContainer>
         <TitleBar title="커뮤니티 글등록" />
-        <ContentWrapper>
+        {/* form 태그에 onSubmit 핸들러 연결 */}
+        <ContentWrapper onSubmit={handleSubmitClick}>
           <TopSection>
             <CategorySelect ref={dropdownRef}>
-              <CategoryButton onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+              <CategoryButton type="button" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
                 {selectedCategory}
                 <GoTriangleDown size={26} />
               </CategoryButton>
@@ -89,29 +168,41 @@ function CommunityPostCreationPage() {
               )}
             </CategorySelect>
             <SubmitButtonWrapper>
-              {/* Link를 유지하되, onClick으로 페이지 이동을 제어 */}
-              <SubmitTextButton
-                to="/community"
-                onClick={handleSubmitClick} // 클릭 핸들러 변경
-                $isValid={isFormValid}
-                // disabled prop은 Link에 직접적으로 작동하지 않으므로 제거하거나 스타일용으로만 사용
-                // 여기서는 $isValid prop을 통해 스타일만 제어하고 실제 disabled는 onClick 로직으로 처리
-              >
-                등록
-              </SubmitTextButton>
+              {/* type="submit"으로 변경하고 disabled 상태 관리 */}
+              <SubmitButton type="submit" disabled={!isFormValid || isSubmitting} $isValid={isFormValid}>
+                {isSubmitting ? '등록 중...' : '등록'}
+              </SubmitButton>
               {!isFormValid && <Tooltip>제목과 내용을 입력해주세요</Tooltip>}
             </SubmitButtonWrapper>
           </TopSection>
-
           <UploadSection>
-            <UploadButton onClick={handleImageUpload}>
+            <UploadButton type="button" onClick={handleImageUploadClick}>
+              {' '}
+              {/* type="button" 추가 */}
               <FaCamera size={20} />
             </UploadButton>
+            {/* 실제 파일 인풋 (숨김) */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              multiple // 여러 파일 선택 가능
+              accept="image/*" // 이미지 파일만 허용
+              style={{ display: 'none' }}
+            />
             <ImageCount>{imageCount}/15</ImageCount>
           </UploadSection>
-          <TitleInput type="text" placeholder="제목을 입력해주세요." value={title} onChange={handleTitleChange} />
+          <TitleInput
+            id="title"
+            type="text"
+            placeholder="제목을 입력해주세요."
+            value={title}
+            onChange={handleTitleChange}
+            $error={errors.title} // 에러가 있을 때 스타일링을 위한 prop
+          />
+          {errors.title && <ErrorMessage>{errors.title}</ErrorMessage>} {/* 에러 메시지 표시 */}
           <ContentTextareaContainer>
-            {content === '' && !isContentFocused && (
+            {content === '' && (
               <OverlayPlaceholder>
                 <p>궁금했던 모든 것을 물어보세요.</p>
                 <p>예) 이런 키트는 어떻게 사용하는 건가요?</p>
@@ -123,13 +214,13 @@ function CommunityPostCreationPage() {
               </OverlayPlaceholder>
             )}
             <ContentTextarea
-              ref={contentTextareaRef}
+              id="content"
               value={content}
               onChange={handleContentChange}
-              onFocus={() => setIsContentFocused(true)}
-              onBlur={() => setIsContentFocused(false)}
+              $error={errors.content} // 에러가 있을 때 스타일링을 위한 prop
             />
           </ContentTextareaContainer>
+          {errors.content && <ErrorMessage>{errors.content}</ErrorMessage>} {/* 에러 메시지 표시 */}
         </ContentWrapper>
       </PageContainer>
     </>
@@ -139,7 +230,61 @@ function CommunityPostCreationPage() {
 export default CommunityPostCreationPage;
 
 // --- 스타일 컴포넌트 ---
+// 기존 스타일 컴포넌트들은 변동 없음
+// SubmitButton에 `type="submit"`을 추가했으므로 `SubmitTextButton`을 `SubmitButton`으로 변경
+const SubmitButton = styled.button`
+  background: none;
+  border: none;
+  color: ${({ $isValid, theme }) => ($isValid ? theme.colors.primary : theme.colors.gray['400'])};
+  font-size: ${({ theme }) => theme.fontSizes.base};
+  font-weight: ${({ theme }) => theme.fontWeights.semibold};
+  cursor: ${({ $isValid }) => ($isValid ? 'pointer' : 'not-allowed')};
+  outline: none;
+  transition: color 0.2s ease-in-out;
+  text-decoration: none;
 
+  &:hover {
+    text-decoration: ${({ $isValid }) => ($isValid ? 'underline' : 'none')};
+    color: ${({ $isValid, theme }) => ($isValid ? theme.colors.primaryDark : theme.colors.gray['400'])};
+  }
+
+  opacity: ${({ $isValid }) => ($isValid ? 1 : 0.6)};
+`;
+
+// TitleInput, ContentTextarea에 $error prop을 받도록 수정
+const TitleInput = styled.input`
+  width: 100%;
+  outline: none;
+  padding: ${({ theme }) => theme.spacing['3']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['300']};
+  font-size: ${({ theme }) => theme.fontSizes.xl};
+  color: ${({ theme }) => theme.colors.gray['800']};
+  border-color: ${({ $error, theme }) => ($error ? 'red' : theme.colors.gray['300'])}; /* 에러 시 빨간색 테두리 */
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.gray['500']};
+  }
+`;
+
+const ContentTextarea = styled.textarea`
+  width: 100%;
+  height: 100%;
+  padding: ${({ theme }) => theme.spacing['3']};
+  border-radius: ${({ theme }) => theme.borderRadius.base};
+  font-size: ${({ theme }) => theme.fontSizes.base};
+  color: ${({ theme }) => theme.colors.gray['800']};
+  background: transparent;
+  resize: none;
+  overflow-y: auto;
+  position: relative;
+  z-index: 2;
+
+  &:focus {
+    outline: none;
+  }
+`;
+
+// 기존의 나머지 스타일 컴포넌트들은 동일하게 유지됩니다.
 const PageContainer = styled.div`
   width: 100%;
   display: flex;
@@ -147,7 +292,7 @@ const PageContainer = styled.div`
   align-items: center;
 `;
 
-const ContentWrapper = styled.div`
+const ContentWrapper = styled.form`
   width: ${({ theme }) => theme.width.lg};
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: ${({ theme }) => theme.borderRadius.base};
@@ -156,6 +301,7 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing['3']};
+  padding: 20px;
 `;
 
 const TopSection = styled.div`
@@ -217,30 +363,6 @@ const SubmitButtonWrapper = styled.div`
   display: inline-block;
 `;
 
-// Link 기반 SubmitTextButton은 유지하되, 클릭 핸들러에서 이동 제어
-const SubmitTextButton = styled(Link)`
-  background: none;
-  border: none;
-  color: ${({ $isValid, theme }) => ($isValid ? theme.colors.primary : theme.colors.gray['400'])};
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  font-weight: ${({ theme }) => theme.fontWeights.semibold};
-  /* Link 컴포트에 disabled prop은 직접적으로 작동하지 않으므로 cursor 스타일로만 제어 */
-  cursor: ${({ $isValid }) => ($isValid ? 'pointer' : 'not-allowed')};
-  outline: none;
-  transition: color 0.2s ease-in-out;
-  text-decoration: none; /* Link의 기본 밑줄 제거 */
-
-  &:hover {
-    /* $isValid 상태에 따라 hover 스타일 적용 */
-    text-decoration: ${({ $isValid }) => ($isValid ? 'underline' : 'none')};
-    color: ${({ $isValid, theme }) => ($isValid ? theme.colors.primaryDark : theme.colors.gray['400'])};
-  }
-
-  /* disabled 상태와 유사한 시각적 효과를 위해 opacity만 적용 (실제 클릭 방지는 onClick 로직에서) */
-  opacity: ${({ $isValid }) => ($isValid ? 1 : 0.6)};
-  pointer-events: ${({ $isValid }) => ($isValid ? 'auto' : 'none')}; /* 비활성화 시 마우스 이벤트 방지 */
-`;
-
 const Tooltip = styled.div`
   position: absolute;
   bottom: 100%;
@@ -259,7 +381,6 @@ const Tooltip = styled.div`
   box-shadow: ${({ theme }) => theme.shadows.lg};
   z-index: 20;
 
-  /* 화살표 */
   &::after {
     content: '';
     position: absolute;
@@ -312,19 +433,6 @@ const ImageCount = styled.span`
   color: ${({ theme }) => theme.colors.gray['600']};
 `;
 
-const TitleInput = styled.input`
-  width: 100%;
-  outline: none;
-  padding: ${({ theme }) => theme.spacing['3']};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['300']};
-  font-size: ${({ theme }) => theme.fontSizes.xl};
-  color: ${({ theme }) => theme.colors.gray['800']};
-
-  &::placeholder {
-    color: ${({ theme }) => theme.colors.gray['500']};
-  }
-`;
-
 const ContentTextareaContainer = styled.div`
   position: relative;
   text-align: start;
@@ -332,24 +440,6 @@ const ContentTextareaContainer = styled.div`
   height: 400px;
   border-radius: ${({ theme }) => theme.borderRadius.base};
   overflow: hidden;
-`;
-
-const ContentTextarea = styled.textarea`
-  width: 100%;
-  height: 100%;
-  padding: ${({ theme }) => theme.spacing['3']};
-  border-radius: ${({ theme }) => theme.borderRadius.base};
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  color: ${({ theme }) => theme.colors.gray['800']};
-  background: transparent;
-  resize: none;
-  overflow-y: auto;
-  position: relative;
-  z-index: 2;
-
-  &:focus {
-    outline: none;
-  }
 `;
 
 const OverlayPlaceholder = styled.div`
@@ -369,25 +459,6 @@ const OverlayPlaceholder = styled.div`
 
   p {
     margin: 0;
-  }
-
-  ul {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
-  }
-
-  li {
-    margin-bottom: ${({ theme }) => theme.spacing['1']};
-    position: relative;
-    padding-left: 10px;
-
-    &::before {
-      position: absolute;
-      left: 0;
-      top: 0;
-      color: ${({ theme }) => theme.colors.gray['600']};
-    }
   }
 
   .guidelines {

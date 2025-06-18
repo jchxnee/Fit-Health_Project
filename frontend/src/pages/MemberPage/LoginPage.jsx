@@ -10,14 +10,14 @@ function LoginPage() {
     <>
       <LoginContainer>
         <LoginTitle>로그인</LoginTitle>
-        <LoginFormBox>
+        <LoginFormBox onSubmit={handleSubmit}>
           <InputGroup>
             <StyledLabel htmlFor="useremail">이메일</StyledLabel>
-            <StyledInput type="email" id="useremail" required {...register('email')} $error={errors.email} />
+            <StyledInput type="email" id="useremail" required {...register('useremail')} $error={errors.useremail} />
           </InputGroup>
           <InputGroup>
-            <StyledLabel htmlFor="password">비밀번호</StyledLabel>
-            <StyledInput type="password" id="password" required {...register('password')} $error={errors.password} />
+            <StyledLabel htmlFor="userpwd">비밀번호</StyledLabel>
+            <StyledInput type="password" id="userpwd" required {...register('userpwd')} $error={errors.userpwd} />
           </InputGroup>
 
           <LoginRememberMeOption>
@@ -25,7 +25,9 @@ function LoginPage() {
             <label htmlFor="remember-me">아이디저장</label>
           </LoginRememberMeOption>
 
-          <LoginButton disabled={isLoading}>로그인</LoginButton>
+          <LoginButton type="submit" disabled={isLoading}>
+            로그인
+          </LoginButton>
 
           <LoginLinksContainer>
             <OptionLink href="#">아이디 찾기</OptionLink>

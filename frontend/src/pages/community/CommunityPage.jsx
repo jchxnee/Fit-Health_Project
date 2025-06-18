@@ -14,7 +14,7 @@ function CommunityPage() {
   const postsPerPage = 10;
 
   const notices = [{ id: 1, title: '공지: 핏헬스 가이드라인', icon: '>', link: '#' }];
-  const communityCategories = [{ name: '전체' }, { name: '운동해요!' }, { name: '궁금해요!' }, { name: '소통해요!' }];
+  const Categories = [{ name: '전체' }, { name: '운동해요!' }, { name: '궁금해요!' }, { name: '소통해요!' }];
 
   const topPosts = [
     { id: 1, title: '왜진왜진 이거 살 잘빠지더라고요', views: 3500, comments: 10 },
@@ -215,7 +215,7 @@ function CommunityPage() {
         <MainContentArea>
           <SidebarWrapper>
             <CustomCategoryMenu
-              categories={communityCategories}
+              categories={Categories}
               selectedCategory={activeCategory}
               onSelectCategory={(category) => {
                 setActiveCategory(category);
