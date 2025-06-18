@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaSearch } from 'react-icons/fa';
+import theme from '/src/styles/theme.js'; // theme import 추가
 
 export const FilterButton = styled.button`
   display: flex;
@@ -21,7 +22,6 @@ export const FilterButton = styled.button`
   &:hover {
     background-color: ${({ theme }) => theme.colors.gray[100]};
   }
-
   &::after {
     content: '▼';
     font-size: ${({ theme }) => theme.fontSizes.xs};
@@ -63,7 +63,8 @@ export const DropdownItem = styled.li`
   }
 `;
 
-export function DropdownFilterButton({ label, options, onSelect }) {
+// DropdownFilterButton에 currentSelectedValue prop 추가
+export function DropdownFilterButton({ label, options, onSelect, currentSelectedValue }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -85,9 +86,12 @@ export function DropdownFilterButton({ label, options, onSelect }) {
     setIsOpen(false);
   };
 
+  // 현재 선택된 값에 해당하는 label을 찾아서 버튼에 표시
+  const displayLabel = options.find((option) => option.value === currentSelectedValue)?.label || label;
+
   return (
     <FilterButton onClick={() => setIsOpen((prev) => !prev)} $isOpen={isOpen} ref={dropdownRef}>
-      {label}
+      {displayLabel} {/* 현재 선택된 값 또는 기본 label 표시 */}
       {isOpen && (
         <DropdownMenu>
           {options.map((option, index) => (
@@ -168,18 +172,24 @@ const FilterWrapper = styled.div`
   }
 `;
 
-export default function BasicFilter({ filterOptions, onFilterChange }) {
+// BasicFilter 컴포넌트에 currentSearch, currentStatus prop 추가
+export default function BasicFilter({ filterOptions, onFilterChange, currentSearch, currentStatus }) {
   const handleSearchChange = (event) => {
-    if (onFilterChange) {
-      onFilterChange('search', event.target.value);
-    }
+    // BasicFilter 내부에서 직접 검색어 상태를 관리하지 않고, 부모로부터 받은 onFilterChange 호출
+    onFilterChange('search', event.target.value);
   };
 
   return (
     <SearchFilterContainer>
       <SearchInputWrapper>
         <SearchIcon />
-        <SearchInput type="text" placeholder="이름 검색" onChange={handleSearchChange} />
+        {/* value prop을 추가하여 외부에서 관리되는 검색어 상태와 동기화 */}
+        <SearchInput
+          type="text"
+          placeholder="이름 검색"
+          onChange={handleSearchChange}
+          value={currentSearch} // 이 부분이 중요!
+        />
       </SearchInputWrapper>
       <FilterWrapper>
         {filterOptions.map((filter, index) => (
@@ -188,6 +198,8 @@ export default function BasicFilter({ filterOptions, onFilterChange }) {
             label={filter.label}
             options={filter.options}
             onSelect={(value) => onFilterChange(filter.key, value)}
+            // 필터의 key에 따라 적절한 현재 선택된 값을 전달
+            currentSelectedValue={filter.key === 'status' ? currentStatus : undefined}
           />
         ))}
       </FilterWrapper>

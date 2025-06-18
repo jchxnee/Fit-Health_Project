@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
-function CategoryMenu() {
-  const [selectedCategory, setSelectedCategory] = useState('헬스');
-
+// CategoryMenu 컴포넌트 수정
+// props로 selectedCategory와 onSelectCategory를 받도록 변경
+function CategoryMenu({ selectedCategory, onSelectCategory }) {
   const categories = [{ name: '전체' }, { name: '헬스' }, { name: '요가' }, { name: '도수' }, { name: '재활' }];
 
   return (
@@ -12,7 +12,7 @@ function CategoryMenu() {
         <MenuItem
           key={category.name}
           isSelected={selectedCategory === category.name}
-          onClick={() => setSelectedCategory(category.name)}
+          onClick={() => onSelectCategory(category.name)} // 클릭 시 props 함수 호출
         >
           {category.name}
         </MenuItem>
@@ -23,6 +23,7 @@ function CategoryMenu() {
 
 export default CategoryMenu;
 
+// 스타일 코드는 동일합니다.
 const MenuContainer = styled.div`
   width: 190px;
   box-sizing: border-box;
