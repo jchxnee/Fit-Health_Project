@@ -45,15 +45,18 @@ import FAQPage from './pages/FAQPage/FAQPage';
 import MyInfoPage from './pages/myPage/MyInfoPage';
 import ChangePwdPage from './pages/myPage/ChangePwdPage';
 import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
+import betaImg from './assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import { useState } from 'react';
 
 function AppContent() {
   const location = useLocation();
   const hideHeader = ['/signup'];
   const isHeaderHidden = hideHeader.includes(location.pathname);
+  const [user] = useState({ name: '김현아', img: betaImg });
 
   return (
     <>
-      {!isHeaderHidden && <Header user={null} />}
+      {!isHeaderHidden && <Header user={user} />}
       <Routes>
         {/* 공통 */}
         <Route path="/" element={<MainPage />} />

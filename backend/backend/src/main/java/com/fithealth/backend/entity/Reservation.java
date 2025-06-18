@@ -34,8 +34,8 @@ public class Reservation {
     @Column(name = "SELECT_DATE", nullable = false)
     private LocalDate selectDate;
 
-    @Column(name = "CREATE_DATE", nullable = false)
-    private LocalDate createDate;
+    @Column(name = "CREATED_DATE", nullable = false)
+    private LocalDate createdDate;
 
     @Column(name = "REJECT_COMMENT", length = 50)
     private String rejectComment;
@@ -45,7 +45,7 @@ public class Reservation {
 
     @PrePersist
     public void prePersist() {
-        this.createDate = LocalDate.now();
+        this.createdDate = LocalDate.now();
 
         if(this.status == null) {
             this.status = CommonEnums.Status.Y;

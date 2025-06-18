@@ -44,27 +44,51 @@ const ChatPage = () => {
     // ... 추가 채팅방
   ];
 
-  const messages = [
+  // 메시지 데이터에 'read' 상태 추가
+  const [messages, setMessages] = useState([
     {
       id: 'm1',
       text: '안녕하세요.',
       time: '오후 3:33',
       isSent: false, // 받은 메시지
+      read: true, // 읽음
     },
     {
       id: 'm2',
       text: '안녕하세요.',
       time: '오후 3:33',
       isSent: true, // 보낸 메시지
+      read: true, // 읽음
     },
     {
       id: 'm3',
       text: '잘 부탁드립니다!',
       time: '오후 3:33',
       isSent: true,
+      read: false, // 안읽음
     },
-    // ... 추가 메시지
-  ];
+    {
+      id: 'm4', // 중복 ID 수정
+      text: '잘 부탁드립니다!',
+      time: '오후 3:34',
+      isSent: true,
+      read: false, // 안읽음
+    },
+    {
+      id: 'm5', // 중복 ID 수정
+      text: '잘 부탁드립니다!',
+      time: '오후 3:35',
+      isSent: true,
+      read: false, // 안읽음
+    },
+    {
+      id: 'm6', // 중복 ID 수정
+      text: '잘 부탁드립니다!',
+      time: '오후 3:36',
+      isSent: true,
+      read: false, // 안읽음
+    },
+  ]);
 
   const [activeChatId, setActiveChatId] = useState('1'); // 현재 활성화된 채팅방
   const [messageInput, setMessageInput] = useState('');
@@ -72,7 +96,17 @@ const ChatPage = () => {
 
   const handleSendMessage = () => {
     if (messageInput.trim() === '') return;
-    // 메시지 전송 로직 (예: API 호출, messages 배열 업데이트)
+
+    // 새 메시지 객체 생성 (기본적으로 읽지 않은 상태로 전송)
+    const newMessage = {
+      id: `m${Date.now()}`, // 고유 ID 생성
+      text: messageInput,
+      time: new Date().toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true }),
+      isSent: true,
+      read: false, // 보낸 메시지는 처음에는 읽지 않은 상태
+    };
+
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
     console.log('Sending message:', messageInput);
     setMessageInput('');
   };
@@ -86,6 +120,19 @@ const ChatPage = () => {
   });
 
   const activeChatRoom = chatRooms.find((chat) => chat.id === activeChatId);
+
+  // 메시지 스크롤이 가장 아래로 내려갈 때 메시지를 읽음 처리
+  const handleScrollToBottom = (e) => {
+    const { scrollHeight, scrollTop, clientHeight } = e.target;
+    // 사용자가 스크롤을 거의 끝까지 내렸을 때 (예: 20px 이내)
+    if (scrollHeight - scrollTop - clientHeight < 20) {
+      setMessages((prevMessages) =>
+        prevMessages.map((message) =>
+          message.isSent === false && message.read === false ? { ...message, read: true } : message
+        )
+      );
+    }
+  };
 
   return (
     <>
@@ -132,11 +179,12 @@ const ChatPage = () => {
               )}
             </ChatWindowHeader>
 
-            <ChatMessagesContainer>
+            <ChatMessagesContainer onScroll={handleScrollToBottom}>
               {messages.map((message) => (
                 <MessageWrapper key={message.id} $isSent={message.isSent}>
                   {message.isSent ? (
                     <>
+                      {!message.read && <UnreadIndicator>1</UnreadIndicator>} {/* 안읽었으면 '1' 표시 */}
                       <MessageTime $isSent={true}>{message.time}</MessageTime>
                       <SentMessageBubble>{message.text}</SentMessageBubble>
                     </>
@@ -144,6 +192,7 @@ const ChatPage = () => {
                     <>
                       <ReceivedMessageBubble>{message.text}</ReceivedMessageBubble>
                       <MessageTime $isSent={false}>{message.time}</MessageTime>
+                      {/* 받은 메시지에 대한 읽음 확인은 보통 보낸 사람이 확인하므로 이 부분은 필요 없을 수 있습니다. */}
                     </>
                   )}
                 </MessageWrapper>
@@ -152,6 +201,8 @@ const ChatPage = () => {
             <ChatInputArea>
               <InputIcons>
                 <FiPaperclip title="파일 첨부" />
+                <FiCamera title="사진 첨부" />
+                <FiSmile title="이모티콘" />
               </InputIcons>
               <InputField
                 placeholder="메시지를 입력해주세요..."
@@ -395,6 +446,14 @@ const MessageWrapper = styled.div`
       margin-left: ${({ theme }) => theme.spacing[1]}; /* 버블과 시간 사이 간격 */
     }
   `}
+`;
+
+// 안읽음 표시 '1' 스타일
+const UnreadIndicator = styled.span`
+  font-size: ${({ theme }) => theme.fontSizes.xs};
+  color: ${({ theme }) => theme.colors.success}; /* 읽지 않은 메시지 표시 색상 (예: 초록색) */
+  margin-right: 4px; /* 시간과 '1' 사이 간격 */
+  font-weight: ${({ theme }) => theme.fontWeights.semibold};
 `;
 
 // 메시지 입력 영역
