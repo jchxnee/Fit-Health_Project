@@ -5,12 +5,12 @@ import { Link } from 'react-router-dom';
 import { useLoginForm } from '../../hooks/member/useLoginForm';
 
 function LoginPage() {
-  const { register, handleSubmit, errors, isLoading } = useLoginForm();
+  const { register, handleSubmit, onsubmit, errors, isLoading } = useLoginForm();
   return (
     <>
       <LoginContainer>
         <LoginTitle>로그인</LoginTitle>
-        <LoginFormBox onSubmit={handleSubmit}>
+        <LoginFormBox onSubmit={handleSubmit(onsubmit)}>
           <InputGroup>
             <StyledLabel htmlFor="useremail">이메일</StyledLabel>
             <StyledInput type="email" id="useremail" required {...register('useremail')} $error={errors.useremail} />
@@ -77,7 +77,7 @@ const LoginTitle = styled.h1`
   color: ${({ theme }) => theme.colors.primary};
 `;
 
-const LoginFormBox = styled.div`
+const LoginFormBox = styled.form`
   background-color: ${({ theme }) => theme.colors.white};
   padding: ${({ theme }) => theme.spacing[10]};
   border-radius: ${({ theme }) => theme.borderRadius.ten};
@@ -141,34 +141,6 @@ const LoginRememberMeOption = styled.div`
 
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.gray[600]};
-
-  input[type='checkbox'] {
-    vertical-align: middle;
-    margin-right: ${({ theme }) => theme.spacing[2]};
-  }
-
-  label {
-    vertical-align: middle;
-  }
-`;
-
-const LoginOptions = styled.div`
-  margin-top: ${({ theme }) => theme.spacing[2]};
-  margin-bottom: ${({ theme }) => theme.spacing[5]};
-
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: ${({ theme }) => theme.colors.gray[600]};
-  width: 400px;
-
-  display: flex;
-  flex-direction: column;
-
-  & > div:first-of-type {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-  }
 
   input[type='checkbox'] {
     vertical-align: middle;

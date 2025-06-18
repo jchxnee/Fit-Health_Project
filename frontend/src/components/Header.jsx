@@ -3,6 +3,7 @@ import styled from 'styled-components'; // css import
 import headerIcon from '../assets/header_icon.png';
 import { FaBell, FaChevronDown, FaChevronUp, FaSyncAlt } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import useUserStore from '../store/useUserStore';
 
 // NotificationList 컴포넌트 (제공된 코드)
 function NotificationList() {
@@ -27,8 +28,9 @@ function NotificationList() {
 }
 
 // UserMenu 컴포넌트 (제공된 코드)
-// onMenuItemClick prop을 추가하여 메뉴 아이템 클릭 시 부모 컴포넌트에 알릴 수 있도록 함
 function UserMenu({ onMenuItemClick }) {
+  const logout = useUserStore((state) => state.logout);
+
   const menuItems = [
     { name: '마이페이지', to: '/mypage' },
     { name: '신청 내역', to: '/matchingList' },
@@ -37,7 +39,7 @@ function UserMenu({ onMenuItemClick }) {
       to: '/coachRegister',
       icon: <StyledFaSyncAlt />,
     },
-    { name: '로그아웃', action: () => console.log('로그아웃 클릭') },
+    { name: '로그아웃', action: logout },
   ];
 
   return (
