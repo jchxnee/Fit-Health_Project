@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import CategoryMenu from '/src/components/CategoryMenu';
-import RegionFilter from '/src/components/filter/RegionFilter';
+import RegionFilterComponent from '/src/components/filter/RegionFilter';
 import RecommendedExerciseSection from '../../components/TitleBar';
 import styled from 'styled-components';
-import Footer from '../../components/Footer';
-import Header from '../../components/Header';
 import BasicFilter from '../../components/filter/BasicFilter';
 import CoachListItem from '../../components/CoachMatching/CoachListItem';
 import theme from '../../styles/theme';
 import { Link } from 'react-router-dom';
 
+// --- (Styled Components remain unchanged) ---
 const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -72,50 +71,41 @@ const CoachListContainer = styled.div`
     }
   }
 `;
+// --- (End of Styled Components) ---
 
 const CoachList = () => {
-  const [filters, setFilters] = useState({
-    search: '',
-    status: '전체',
-    region: '전체',
-  });
+  // Category filter state
+  const [selectedCategory, setSelectedCategory] = useState('전체');
 
-  const filterOptions = [
+  // Region filter state
+  const [selectedRegion, setSelectedRegion] = useState('전체');
+
+  // BasicFilter states (search and status)
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('전체'); // Corresponds to the '상태' filter
+
+  // `BasicFilter`에 전달할 필터 옵션 정의
+  // '상태' 필터는 여기서 그대로 사용하고, '지역'은 별도의 RegionFilterComponent에서 관리합니다.
+  const basicFilterOptions = [
     {
       label: '상태',
-      key: 'status',
+      key: 'status', // 이 key를 사용하여 onFilterChange에서 상태를 업데이트합니다.
       options: [
         { label: '전체', value: '전체' },
         { label: '활동중', value: 'active' },
         { label: '휴면', value: 'inactive' },
       ],
     },
-    {
-      label: '지역',
-      key: 'region',
-      options: [
-        { label: '전체', value: '전체' },
-        { label: '서울', value: '서울' },
-        { label: '경기도', value: '경기도' },
-        { label: '인천', value: '인천' },
-        { label: '강원도', value: '강원도' },
-        { label: '충북', value: '충북' },
-        { label: '충남', value: '충남' },
-        { label: '전북', value: '전북' },
-        { label: '전남', value: '전남' },
-        { label: '경북', value: '경북' },
-        { label: '경남', value: '경남' },
-        { label: '제주', value: '제주' },
-      ],
-    },
   ];
 
-  const handleFilterChange = (filterKey, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [filterKey]: value,
-    }));
-    console.log(`필터 변경: ${filterKey} = ${value}, 현재 필터 상태:`, { ...filters, [filterKey]: value });
+  // `BasicFilter`의 `onFilterChange` 핸들러
+  const handleBasicFilterChange = (filterKey, value) => {
+    if (filterKey === 'search') {
+      setSearchQuery(value);
+    } else if (filterKey === 'status') {
+      setSelectedStatus(value);
+    }
+    // console.log(`BasicFilter 변경: ${filterKey} = ${value}`); // 디버깅용
   };
 
   const coaches = [
@@ -124,6 +114,7 @@ const CoachList = () => {
       name: '김성은',
       specialization: '헬스 전문',
       location: '서울특별시 강남구',
+      status: '활동중',
       rating: 3.8,
       reviews: 1795,
       imageUrl: 'https://via.placeholder.com/64x64?text=Coach1',
@@ -131,8 +122,9 @@ const CoachList = () => {
     {
       id: 2,
       name: '김성은',
-      specialization: '폭식 전문',
+      specialization: '헬스 전문',
       location: '인천시 연수구',
+      status: '활동중',
       rating: 3.8,
       reviews: 1795,
       imageUrl: 'https://via.placeholder.com/64x64?text=Coach2',
@@ -142,6 +134,7 @@ const CoachList = () => {
       name: '김민주',
       specialization: '요가 전문',
       location: '강원도 강릉시',
+      status: '휴면',
       rating: 3.8,
       reviews: 1795,
       imageUrl: '/public/img/minju.png',
@@ -149,8 +142,9 @@ const CoachList = () => {
     {
       id: 4,
       name: '진유나',
-      specialization: '요가/헬스 전문',
+      specialization: '요가 전문',
       location: '충북 청주시',
+      status: '활동중',
       rating: 3.8,
       reviews: 1795,
       imageUrl: 'https://via.placeholder.com/64x64?text=Coach4',
@@ -160,6 +154,7 @@ const CoachList = () => {
       name: '원하늘',
       specialization: '도수 전문',
       location: '경기도 화성시',
+      status: '활동중',
       rating: 3.8,
       reviews: 1795,
       imageUrl: '/public/img/hanuel.png',
@@ -167,8 +162,9 @@ const CoachList = () => {
     {
       id: 6,
       name: '최예찬',
-      specialization: '도수/재활 전문',
+      specialization: '재활 전문',
       location: '경북 경주시',
+      status: '휴면',
       rating: 3.9,
       reviews: 1786,
       imageUrl: 'https://via.placeholder.com/64x64?text=Coach6',
@@ -176,13 +172,32 @@ const CoachList = () => {
     {
       id: 7,
       name: '이재명',
-      specialization: '김장 전문',
+      specialization: '도수 전문',
       location: '전남 여수시',
+      status: '활동중',
       rating: 3.6,
       reviews: 1786,
       imageUrl: 'https://via.placeholder.com/64x64?text=Coach7',
     },
   ];
+
+  // 모든 필터를 적용하는 로직
+  const filteredCoaches = coaches.filter((coach) => {
+    // 1. Category Filter
+    const matchesCategory = selectedCategory === '전체' || coach.specialization.startsWith(selectedCategory);
+
+    // 2. Region Filter
+    const matchesRegion = selectedRegion === '전체' || coach.location.startsWith(selectedRegion);
+
+    // 3. Search Filter (by name)
+    const matchesSearch = searchQuery === '' || coach.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // 4. Status Filter
+    const matchesStatus =
+      selectedStatus === '전체' || coach.status === (selectedStatus === 'active' ? '활동중' : '휴면');
+
+    return matchesCategory && matchesRegion && matchesSearch && matchesStatus;
+  });
 
   return (
     <>
@@ -190,17 +205,22 @@ const CoachList = () => {
         <RecommendedExerciseSection title={'핏코치 매칭'} />
         <ContentContainer>
           <SidebarWrapper>
-            <CategoryMenu />
+            <CategoryMenu selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
           </SidebarWrapper>
 
           <MainContentWrapper>
-            <RegionFilter />
+            <RegionFilterComponent selectedRegion={selectedRegion} onSelectRegion={setSelectedRegion} />
 
             <FilterAndSearchContainer>
-              <BasicFilter filterOptions={filterOptions} onFilterChange={handleFilterChange} />
+              <BasicFilter
+                filterOptions={basicFilterOptions} // '상태' 필터만 전달
+                onFilterChange={handleBasicFilterChange}
+                currentSearch={searchQuery} // 현재 검색어 값을 BasicFilter에 전달하여 Input에 반영
+                currentStatus={selectedStatus} // 현재 상태 값을 BasicFilter에 전달하여 Dropdown에 반영
+              />
             </FilterAndSearchContainer>
             <CoachListContainer>
-              {coaches.map((coach) => (
+              {filteredCoaches.map((coach) => (
                 <Link key={coach.id} to={`/coach/${coach.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <CoachListItem coach={coach} />
                 </Link>
