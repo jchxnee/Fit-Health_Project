@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react'; // useState는 이제 필요 없습니다.
 import styled from 'styled-components';
 import theme from '/src/styles/theme.js';
 
@@ -68,12 +68,13 @@ const FilterContainer = styled.div`
   }
 `;
 
-const RegionFilterComponent = () => {
+// RegionFilterComponent를 props를 받도록 수정
+const RegionFilterComponent = ({ selectedRegion, onSelectRegion }) => {
   const regions = ['전체', '서울', '경기도', '인천', '강원도', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
-  const [selectedRegion, setSelectedRegion] = useState('전체');
+  // const [selectedRegion, setSelectedRegion] = useState('전체'); // 이 줄은 제거합니다.
 
   const handleRegionClick = (region) => {
-    setSelectedRegion(region);
+    onSelectRegion(region); // props로 받은 함수를 호출합니다.
     console.log(`Selected region: ${region}`);
   };
 
