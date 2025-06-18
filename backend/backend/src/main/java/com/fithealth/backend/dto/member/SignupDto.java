@@ -1,4 +1,4 @@
-package com.fithealth.backend.dto.Member;
+package com.fithealth.backend.dto.member;
 
 import com.fithealth.backend.entity.Member;
 import lombok.AllArgsConstructor;
@@ -17,8 +17,8 @@ public class SignupDto {
         private String user_email;
         private String user_pwd;
         private String user_name;
-        private LocalDateTime birth;
         private String phone;
+        private LocalDateTime birth;
 
 
         public Member toEntity(){
@@ -26,8 +26,8 @@ public class SignupDto {
                     .userEmail(this.user_email)
                     .userPwd(this.user_pwd)
                     .userName(this.user_name)
-                    .birth(this.birth)
                     .phone(this.phone)
+                    .birth(this.birth)
                     .build();
         }
     }

@@ -95,8 +95,8 @@ function SignUpPage() {
               type="email"
               id="useremail"
               placeholder="이메일 주소 입력"
-              {...register('email')}
-              $error={errors.email}
+              {...register('useremail')}
+              $error={errors.useremail}
               disabled={isEmailVerified} // 인증 성공 시 비활성화
             />
             {/* ★ 변경: EmailAuthButton에서 register 제거 */}
@@ -109,7 +109,7 @@ function SignUpPage() {
             </EmailAuthButton>
           </EmailAuthContainer>
           {/* React Hook Form의 이메일 유효성 에러 메시지 (errors.email이 있을 때만 표시) */}
-          {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
+          {errors.useremail && <ErrorMessage>{errors.useremail.message}</ErrorMessage>}
         </InputGroup>
 
         {/* --- 새로 추가된 인증 번호 입력 영역 --- */}
@@ -139,10 +139,10 @@ function SignUpPage() {
             type="password"
             id="userpwd"
             placeholder="비밀번호 8~16자 (영문, 숫자, 특수문자 포함)"
-            {...register('password')}
-            $error={errors.password}
+            {...register('userpwd')}
+            $error={errors.userpwd}
           />
-          {errors.password && <ErrorMessage>{errors.password.message}</ErrorMessage>}
+          {errors.password && <ErrorMessage>{errors.userpwd.message}</ErrorMessage>}
         </InputGroup>
 
         <InputGroup>
