@@ -105,3 +105,10 @@ sketch
 *_BASE_*.txt
 *_LOCAL_*.txt
 *_REMOTE_*.txt
+
+# H2 Database files
+db.mv.db
+db.trace.db
+
+# Spring Boot application configuration
+/src/main/resources/application.yml
