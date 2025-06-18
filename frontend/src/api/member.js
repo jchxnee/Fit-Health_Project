@@ -1,17 +1,16 @@
 import api from './axios';
 import { API_ENDPOINTS } from './config';
 
-export const userService = {
+export const memberService = {
   //회원가입
-  signUp: async (userData) => {
+  signUp: async (memberData) => {
     try {
       const { data } = await api.post(API_ENDPOINTS.USERS.BASE, {
-        email: userData.email,
-        password: userData.password,
-        username: userData.username,
-        role: 'user',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        useremail: memberData.email,
+        password: memberData.password,
+        username: memberData.username,
+        phone: memberData.phone,
+        birth: memberData.birth,
       });
 
       return data;

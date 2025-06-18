@@ -88,12 +88,12 @@ function SignUpPage() {
       <SignupForm onSubmit={handleSubmit(onSubmitHandler)}>
         <FormTitle>회원가입</FormTitle>
 
-        <InputGroup $hasError={errors.email}>
-          <Label htmlFor="email">이메일*</Label>
+        <InputGroup>
+          <Label htmlFor="useremail">이메일*</Label>
           <EmailAuthContainer>
             <EmailAuthInput
               type="email"
-              id="email"
+              id="useremail"
               placeholder="이메일 주소 입력"
               {...register('email')}
               $error={errors.email}
@@ -133,11 +133,11 @@ function SignUpPage() {
 
         {/* ... (나머지 폼 요소들) ... */}
 
-        <InputGroup $hasError={errors.password}>
-          <Label htmlFor="password">비밀번호*</Label>
+        <InputGroup>
+          <Label htmlFor="userpwd">비밀번호*</Label>
           <Input
             type="password"
-            id="password"
+            id="userpwd"
             placeholder="비밀번호 8~16자 (영문, 숫자, 특수문자 포함)"
             {...register('password')}
             $error={errors.password}
@@ -145,7 +145,7 @@ function SignUpPage() {
           {errors.password && <ErrorMessage>{errors.password.message}</ErrorMessage>}
         </InputGroup>
 
-        <InputGroup $hasError={errors.passwordConfirm}>
+        <InputGroup>
           <Label htmlFor="passwordConfirm">비밀번호 확인*</Label>
           <Input
             type="password"
@@ -176,8 +176,8 @@ function SignUpPage() {
         </InputGroup>
 
         <InputGroup>
-          <Label htmlFor="birthdate">생년월일</Label>
-          <Input type="date" id="birthdate" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
+          <Label htmlFor="birth">생년월일</Label>
+          <Input type="date" id="birth" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
         </InputGroup>
 
         <TermsAndConditionsGroup>
