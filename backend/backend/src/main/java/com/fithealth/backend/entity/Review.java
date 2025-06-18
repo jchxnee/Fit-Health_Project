@@ -32,6 +32,7 @@ public class Review {
     @JoinColumn(name = "PAYMENT_ID", nullable = false, unique = true) // 1대1 관계이므로 unique = true 필수
     private Payment payment;
 
+    @Lob
     @Column(name = "REVIEW_CONTENT", nullable = false)
     private String reviewContent;
 

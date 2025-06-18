@@ -4,6 +4,7 @@ import com.fithealth.backend.dto.Board.BoardCreateDto;
 import com.fithealth.backend.entity.Board;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.repository.BoardRepository;
+import com.fithealth.backend.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Transactional
 public class BoardServiceImpl implements BoardService {
 
+    private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
 
     @Override

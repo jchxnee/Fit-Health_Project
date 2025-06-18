@@ -1,4 +1,4 @@
-package com.fithealth.backend.dto.TrainerDto;
+package com.fithealth.backend.dto.Trainer;
 
 import lombok.*;
 
