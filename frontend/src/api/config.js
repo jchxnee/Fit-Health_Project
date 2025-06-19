@@ -23,4 +23,7 @@ export const API_ENDPOINTS = {
     BASE: '/api/healths',
     FINDDATE: '/api/healths/date',
   },
+  REVIEW: {
+    CREATE: '/api/review',
+  },
 };

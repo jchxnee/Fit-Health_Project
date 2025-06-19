@@ -54,7 +54,7 @@ const PriceInput = styled.input`
   text-align: center;
 `;
 
-function PriceDiscountSection() {
+function PriceDiscountSection({ price, setPrice, discount3, setDiscount3, discount5, setDiscount5, discount10, setDiscount10 }) {
   return (
     <Section>
       <Label>희망금액 및 할인율</Label>
@@ -66,10 +66,10 @@ function PriceDiscountSection() {
         <TableHeader>10회 이상</TableHeader>
       </TableHeaderRow>
       <TableRow>
-        <PriceInput type="text" placeholder="50,000원" />
-        <PriceInput type="text" placeholder="3%" />
-        <PriceInput type="text" placeholder="5%" />
-        <PriceInput type="text" placeholder="10%" />
+        <PriceInput type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+        <PriceInput type="number" value={discount3} onChange={(e) => setDiscount3(e.target.value)} />
+        <PriceInput type="number" value={discount5} onChange={(e) => setDiscount5(e.target.value)} />
+        <PriceInput type="number" value={discount10} onChange={(e) => setDiscount10(e.target.value)} />
       </TableRow>
     </Section>
   );

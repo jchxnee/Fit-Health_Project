@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "styled-components";
-import RegionSelect from "../RegionSelect.jsx";
+import React from 'react';
+import styled from 'styled-components';
+import RegionSelect from '../RegionSelect.jsx';
 
 const Section = styled.section`
     width: 100%;
@@ -26,15 +26,22 @@ const Label = styled.div`
     width: 90px;
 `;
 
-function RegionSection() {
-    return (
-        <Section>
-            <Row>
-                <Label>희망지역</Label>
-                <RegionSelect className="Select" />
-            </Row>
-        </Section>
-    );
+function RegionSection({ wishArea, setWishArea }) {
+  // wishArea는 '시/도 구/군' 형태의 문자열로 저장
+  const handleRegionChange = (province, city) => {
+    if (province && city) setWishArea(`${province} ${city}`);
+    else if (province) setWishArea(province);
+    else setWishArea('');
+  };
+
+  return (
+    <Section>
+      <Row>
+        <Label>희망지역</Label>
+        <RegionSelect value={wishArea} onChange={handleRegionChange} />
+      </Row>
+    </Section>
+  );
 }
 
 export default RegionSection;

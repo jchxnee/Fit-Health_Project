@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @Table(name = "MEMBER")
 @DynamicInsert
 @DynamicUpdate
@@ -87,8 +88,6 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Notice> notices = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Health> healths = new ArrayList<>();
