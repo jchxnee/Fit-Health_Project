@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const regions = {
@@ -340,25 +340,40 @@ const ListItem = styled.div`
   font-weight: ${({ theme, $isSelected }) => ($isSelected ? theme.fontWeights.semibold : theme.fontWeights.normal)};
 `;
 
-const RegionSelect = () => {
+const RegionSelect = ({ value, onChange }) => {
   const [selectedProvince, setSelectedProvince] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
 
+  // value가 바뀌면 내부 선택값도 동기화
+  useEffect(() => {
+    if (value) {
+      const [province, city] = value.split(' ');
+      setSelectedProvince(province || '');
+      setSelectedCity(city || '');
+    } else {
+      setSelectedProvince('');
+      setSelectedCity('');
+    }
+  }, [value]);
+
   const handleProvinceSelect = (province) => {
     setSelectedProvince(province);
     setSelectedCity(''); // 도가 바뀌면 시/군/구 초기화
+    if (onChange) onChange(province, '');
   };
 
   const handleCitySelect = (city) => {
     setSelectedCity(city);
     setIsRegionModalOpen(false); // 시/군/구 선택하면 모달 닫기
+    if (onChange) onChange(selectedProvince, city);
   };
 
   const handleRegionReset = () => {
     setSelectedProvince('');
     setSelectedCity('');
     setIsRegionModalOpen(false); // 모달 닫기
+    if (onChange) onChange('', '');
   };
 
   return (

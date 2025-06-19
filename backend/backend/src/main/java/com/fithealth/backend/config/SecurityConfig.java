@@ -25,6 +25,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors()
+                .and()
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         // cors() 호출하지 않음
 

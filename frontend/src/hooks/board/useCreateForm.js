@@ -39,7 +39,7 @@ export const useCreateForm = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting }, //유효성 에러 및 제출중 상태
-    setError,
+    setErroxr,
     watch,
     trigger,
   } = useForm({
