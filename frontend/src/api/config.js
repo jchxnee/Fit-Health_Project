@@ -15,4 +15,7 @@ export const API_ENDPOINTS = {
     BASE: '/api/members',
     LOGIN: '/api/members/login',
   },
+  REVIEW: {
+    CREATE: '/api/review',
+  },
 };
