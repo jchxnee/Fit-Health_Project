@@ -25,9 +25,10 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.createReview(reviewCreateDto));
     }
 
-    @GetMapping("/{trainerEmail}")
-    public ResponseEntity<List<ReviewSelectDto.Select>> select(@PathVariable String trainerEmail) {
-        List<ReviewSelectDto.Select> reviews = reviewService.selectReview(trainerEmail);
+    @GetMapping("/{trainerNo}") // 1. PathVariable 이름 변경: {trainerNo}
+    public ResponseEntity<List<ReviewSelectDto.Select>> select(@PathVariable Long trainerNo) { // 2. @PathVariable 타입 및 변수명 변경: Long trainerNo
+        System.out.println("ReviewController: Received request for trainer No: " + trainerNo); // 디버깅 로그 추가
+        List<ReviewSelectDto.Select> reviews = reviewService.selectByTrainerNo(trainerNo); // 3. 서비스 메서드 호출명 변경
         return ResponseEntity.ok(reviews);
     }
 

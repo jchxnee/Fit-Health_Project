@@ -24,7 +24,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
-    public List<Long> findbyTrainerEmail(String trainerEmail) {
+    public List<Long> findByResponseEmail(String trainerEmail) {
         return em.createQuery(
                         "SELECT p.paymentId FROM Payment p WHERE p.responseMember.userEmail = :trainerEmail", Long.class)
                 .setParameter("trainerEmail", trainerEmail)

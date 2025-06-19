@@ -25,7 +25,7 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 
 
     @Override
-    public List<Review> findReviews(List<Long> paymentIds) {
+    public List<Review> findByPaymentId(List<Long> paymentIds) {
         return em.createQuery(
                         "SELECT r FROM Review r WHERE r.payment.paymentId IN :paymentIds ORDER BY r.createdDate DESC", Review.class)
                 .setParameter("paymentIds", paymentIds)
