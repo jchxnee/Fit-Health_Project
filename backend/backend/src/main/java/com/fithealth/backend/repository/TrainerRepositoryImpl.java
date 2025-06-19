@@ -1,15 +1,20 @@
 package com.fithealth.backend.repository;
 
+import com.fithealth.backend.entity.Trainer;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
-import com.fithealth.backend.entity.Trainer;
 
-import java.util.Optional;
-
-@Transactional
 @Repository
+@Transactional
 public class TrainerRepositoryImpl implements TrainerRepository {
 
+    @PersistenceContext
+    private EntityManager em;
+
+    @Override
+    public void save(Trainer trainer) {
+        em.persist(trainer);
+    }
 }

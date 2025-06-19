@@ -1,10 +1,7 @@
 package com.fithealth.backend.repository;
 
-import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
-
+import com.fithealth.backend.entity.Trainer;
 
 public interface TrainerRepository {
+    void save(Trainer trainer);
 }

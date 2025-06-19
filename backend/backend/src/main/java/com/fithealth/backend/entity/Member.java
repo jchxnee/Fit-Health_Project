@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @Table(name = "MEMBER")
 @DynamicInsert
 @DynamicUpdate
@@ -107,9 +108,5 @@ public class Member {
     @PreUpdate
     public void preUpdate() {
         this.modifyDate = LocalDateTime.now();
-    }
-
-    public void changeGradeToTrainer() {
-        this.grade = com.fithealth.backend.enums.CommonEnums.Grade.C;
     }
 }

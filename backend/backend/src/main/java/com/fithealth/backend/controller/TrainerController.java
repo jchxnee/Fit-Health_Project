@@ -6,18 +6,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @RequestMapping("/api/trainer")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5176")
+@CrossOrigin(origins = "http://localhost:5173")
 public class TrainerController {
 
     private final TrainerService trainerService;
 
-
-    @PostMapping
-    public ResponseEntity<String> addTrainer(@RequestBody addTrainerDto addTrainerDto) {
-        return ResponseEntity.ok(TrainerService.createTrainer(addTrainerDto));
+    @PostMapping("/addTrainer")
+    public ResponseEntity<String> addTrainer(@RequestBody addTrainerDto.Request requestDto) {
+        return ResponseEntity.ok(trainerService.createTrainer(requestDto));
     }
 }
