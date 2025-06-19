@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import FieldSection from '../../components/CoachRegister/FieldSection.jsx';
 import RegionSection from '../../components/CoachRegister/RegionSection.jsx';
 import IdSection from '../../components/CoachRegister/IdSection.jsx';
@@ -10,6 +10,7 @@ import AgreementSection from '../../components/CoachRegister/AgreementSection.js
 import SubmitSection from '../../components/CoachRegister/SubmitSection.jsx';
 import TitleBar from '../../components/TitleBar.jsx';
 import styled from 'styled-components';
+import useCoachRegisterForm from '../../hooks/coach/Form';
 
 const MainContainer = styled.section`
   max-width: 1008px;
@@ -24,27 +25,38 @@ const MainContainer = styled.section`
 `;
 
 function CoachRegister() {
-  const [photos, setPhotos] = useState([]);
-  const [careers, setCareers] = useState([]);
-  const [kakaoId, setKakaoId] = useState('');
-  const [instaId, setInstaId] = useState('');
-  const [price, setPrice] = useState('');
-  const [discount3, setDiscount3] = useState('');
-  const [discount5, setDiscount5] = useState('');
-  const [discount10, setDiscount10] = useState('');
-  const [intro, setIntro] = useState('');
+  const {
+    photos, setPhotos,
+    careers, setCareers,
+    kakaoId, setKakaoId,
+    instaId, setInstaId,
+    price, setPrice,
+    discount3, setDiscount3,
+    discount5, setDiscount5,
+    discount10, setDiscount10,
+    intro, setIntro,
+    majorName, setMajorName,
+    wishArea, setWishArea,
+    loading, error,
+    submitForm,
+  } = useCoachRegisterForm();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert('코치 등록이 완료됐습니다!');
+    const ok = await submitForm();
+    if (ok) {
+      alert('코치 등록이 완료됐습니다!');
+    } else {
+      alert('등록 실패: ' + (error?.message || '오류'));
+    }
   };
 
   return (
     <>
       <MainContainer>
         <TitleBar title="핏코치 등록" />
-        <FieldSection />
-        <RegionSection />
+        <FieldSection majorName={majorName} setMajorName={setMajorName} />
+        <RegionSection wishArea={wishArea} setWishArea={setWishArea} />
         <IdSection
           kakaoId={kakaoId}
           setKakaoId={setKakaoId}

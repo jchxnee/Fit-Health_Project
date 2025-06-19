@@ -65,8 +65,17 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Long registerTrainer(addTrainerDto.Create trainerDto, List<MultipartFile> files) throws IOException {
-        // 예시: 회원 찾기, 트레이너 엔티티 생성 등
         Trainer trainer = trainerDto.toEntity();
+        // Career 추가
+        if (trainerDto.getCareers() != null) {
+            for (String content : trainerDto.getCareers()) {
+                Career career = Career.builder()
+                        .content(content)
+                        .trainer(trainer)
+                        .build();
+                trainer.getCareers().add(career);
+            }
+        }
         // 파일 저장 경로
         String UPLOAD_PATH = "E:\\test";
         if(files != null && !files.isEmpty()){
