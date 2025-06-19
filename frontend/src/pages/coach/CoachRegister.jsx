@@ -1,5 +1,3 @@
-import Header from '../../components/Header.jsx';
-import Footer from '../../components/Footer.jsx';
 import FieldSection from '../../components/CoachRegister/FieldSection.jsx';
 import RegionSection from '../../components/CoachRegister/RegionSection.jsx';
 import IdSection from '../../components/CoachRegister/IdSection.jsx';
@@ -13,15 +11,15 @@ import TitleBar from '../../components/TitleBar.jsx';
 import styled from 'styled-components';
 
 const MainContainer = styled.section`
-  max-width: 1008px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 80px;
+    max-width: 1008px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
 
-  button {
-    outline: none;
-  }
+    button {
+        outline: none;
+    }
 `;
 
 function CoachRegister() {

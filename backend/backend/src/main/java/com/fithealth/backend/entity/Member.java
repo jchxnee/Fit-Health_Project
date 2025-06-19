@@ -108,4 +108,8 @@ public class Member {
     public void preUpdate() {
         this.modifyDate = LocalDateTime.now();
     }
+
+    public void changeGradeToTrainer() {
+        this.grade = com.fithealth.backend.enums.CommonEnums.Grade.C;
+    }
 }

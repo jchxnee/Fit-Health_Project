@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Row = styled.div`
@@ -7,7 +6,7 @@ const Row = styled.div`
   justify-content: flex-end;
   width: 100%;
 `;
-const SubmitButton = styled(Link)`
+const SubmitButton = styled.button`
   background: #2563eb;
   color: #fff;
   border: none;
@@ -23,10 +22,10 @@ const SubmitButton = styled(Link)`
   }
 `;
 
-function SubmitSection() {
+function SubmitSection({ onSubmit }) {
   return (
     <Row>
-      <SubmitButton to="/" type="submit">
+      <SubmitButton type="button" onClick={onSubmit}>
         등록하기
       </SubmitButton>
     </Row>
