@@ -126,17 +126,17 @@ function GeneralPostsList({ posts }) {
     <GeneralPostsContainer>
       {posts.map((post) => (
         // Link 컴포넌트로 GeneralPostItem 내용을 감싸고, to 프롭에 경로 지정
-        <StyledLink to={`/communityDetailPage/${post.id}`} key={post.id}>
-          <GeneralPostCategory>{post.category}</GeneralPostCategory>
-          <GeneralPostTitle>{post.title}</GeneralPostTitle>
-          <GeneralPostContent>{post.content}</GeneralPostContent>
+        <StyledLink to={`/communityDetailPage/${post.board_no}`} key={post.board_no}>
+          <GeneralPostCategory>{post.board_category_name}</GeneralPostCategory>
+          <GeneralPostTitle>{post.board_title}</GeneralPostTitle>
+          <GeneralPostContent>{post.board_content}</GeneralPostContent>
           <PostMeta>
             <PostHeartComment>
               <span>
                 <FaThumbsUp /> {post.heart}
               </span>
               <span>
-                <RiMessage2Fill /> {post.comments}
+                <RiMessage2Fill /> {post.comments_count}
               </span>
             </PostHeartComment>
             <TimeAgoReview>{post.timeAgo}</TimeAgoReview>

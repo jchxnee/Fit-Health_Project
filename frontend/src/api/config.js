@@ -16,6 +16,7 @@ export const API_ENDPOINTS = {
     LOGIN: '/api/members/login',
   },
   BOARD: {
+    ALL: 'api/board/all',
     CREATE: '/api/board',
   },
 };
