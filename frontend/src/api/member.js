@@ -21,7 +21,7 @@ export const memberService = {
         throw new Error(message);
       }
 
-      throw new Error('서버 통실 불량');
+      throw new Error('서버 통살 불량');
     }
   },
   login: async (memberData) => {

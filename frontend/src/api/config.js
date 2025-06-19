@@ -16,7 +16,7 @@ export const API_ENDPOINTS = {
     LOGIN: '/api/members/login',
     FIND: '/api/members/email',
   },
-  BOARD: {
-    CREATE: '/api/board',
+  REVIEW: {
+    CREATE: '/api/review',
   },
 };
