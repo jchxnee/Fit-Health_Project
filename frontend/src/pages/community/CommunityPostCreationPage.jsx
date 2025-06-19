@@ -1,14 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react'; // useEffect 추가
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import { FaCamera } from 'react-icons/fa';
 import { GoTriangleDown } from 'react-icons/go';
 import { Link, useNavigate } from 'react-router-dom';
-// import { useCreateForm } from '../hooks/useCreateForm'; // 이 훅을 사용한다고 가정합니다.
-import axios from 'axios'; // axios 임포트
+import useUserStore from '../../store/useUserStore'; // useUserStore 임포트
+import { API_ENDPOINTS } from '../../api/config';
+import api from '../../api/axios';
 
-// --- styled-components 및 기타 컴포넌트 임포트 (기존 코드와 동일) ---
-// ErrorMessage 컴포넌트가 없다면 추가해주세요.
 const ErrorMessage = styled.p`
   color: red;
   font-size: 0.875rem;
@@ -17,12 +16,8 @@ const ErrorMessage = styled.p`
 `;
 
 function CommunityPostCreationPage() {
-  // useCreateForm 훅을 사용한다고 가정하고 코드를 작성합니다.
-  // 이 훅은 register, handleSubmit, formState: { errors, isSubmitting, isValid }, setValue, watch를 반환합니다.
-  // 만약 useCreateForm을 사용하지 않고 있다면, 아래 useState와 핸들러들을 직접 사용해야 합니다.
-  // 편의상 useCreateForm이 있다고 가정하고 설명합니다.
-  // const { register, handleSubmit, formState: { errors, isSubmitting, isValid }, setValue, watch } = useCreateForm();
-  // useCreateForm 훅이 없으므로 임시로 useState로 대체합니다. 실제 프로젝트에서는 react-hook-form 사용을 권장합니다.
+  const { user } = useUserStore();
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('운동해요!');
@@ -63,23 +58,19 @@ function CommunityPostCreationPage() {
       alert('이미지는 최대 15개까지 업로드할 수 있습니다.');
       return;
     }
-    fileInputRef.current.click(); // 숨겨진 파일 인풋 클릭
+    fileInputRef.current.click();
   };
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    const newTotalFiles = [...files, ...selectedFiles].slice(0, 15); // 기존 파일과 합치고 최대 15개 유지
-    setFiles(newTotalFiles);
-    // 파일 입력 필드 초기화 (동일 파일 재선택 시 onChange 이벤트 발생시키기 위함)
+    const newFiles = [...files, ...selectedFiles].slice(0, 15);
+    setFiles(newFiles);
     e.target.value = null;
   };
 
-  // 등록 버튼 클릭 핸들러
-  // 이 함수가 form의 onSubmit 이벤트에 직접 연결될 것입니다.
   const handleSubmitClick = async (e) => {
-    e.preventDefault(); // 폼의 기본 제출 동작 방지
+    e.preventDefault();
 
-    // 수동 유효성 검사 (useCreateForm 훅을 사용하지 않을 경우)
     const newErrors = {};
     if (title.trim() === '') {
       newErrors.title = '제목을 입력해주세요.';
@@ -93,43 +84,40 @@ function CommunityPostCreationPage() {
       return;
     }
 
-    setIsSubmitting(true); // 제출 중 상태로 설정
+    if (!user || !user.email) {
+      alert('로그인 후에 게시글을 작성할 수 있습니다.');
+      navigate('/login');
+      return;
+    }
 
-    // FormData 객체 생성
+    setIsSubmitting(true);
+
     const formData = new FormData();
 
-    // 텍스트 데이터 추가
-    // TODO: 'userEmail'은 실제 로그인된 사용자 정보를 기반으로 백엔드에서 가져오거나,
-    // 클라이언트에서 보안적으로 안전한 방법으로 전달해야 합니다 (예: JWT 디코딩).
-    // 여기서는 예시로 하드코딩합니다.
-    formData.append('userEmail', 'loggedInUser@example.com');
-    formData.append('boardCategoryName', selectedCategory);
-    formData.append('boardTitle', title);
-    formData.append('boardContent', content);
+    formData.append('user_email', user.email);
+    formData.append('board_category_name', selectedCategory);
+    formData.append('board_title', title);
+    formData.append('board_content', content);
 
-    // 파일 데이터 추가
     files.forEach((file) => {
-      formData.append('files', file); // 'files'는 백엔드에서 MultipartFile 리스트를 받을 때 사용하는 파라미터 이름입니다.
+      formData.append('files', file);
     });
 
     try {
-      // axios를 사용하여 POST 요청 보내기
-      const response = await axios.post('/api/community/posts', formData, {
+      const response = await api.post(API_ENDPOINTS.BOARD.CREATE, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data', // 중요: 파일 업로드 시 이 헤더 필수
-          // 인증 토큰이 있다면 여기에 추가: 'Authorization': `Bearer ${yourAuthToken}`
+          'Content-Type': 'multipart/form-data',
         },
       });
 
       console.log('게시글 등록 성공:', response.data);
       alert('게시글이 성공적으로 등록되었습니다!');
-      navigate('/community'); // 성공 시 커뮤니티 목록 페이지로 이동
+      navigate('/community');
     } catch (error) {
       console.error('게시글 등록 실패:', error.response ? error.response.data : error.message);
-      // 서버에서 보낸 에러 메시지를 사용자에게 보여줄 수 있습니다.
       alert(`게시글 등록에 실패했습니다: ${error.response ? error.response.data || error.message : error.message}`);
     } finally {
-      setIsSubmitting(false); // 제출 완료 후 상태 변경
+      setIsSubmitting(false);
     }
   };
 
@@ -149,7 +137,6 @@ function CommunityPostCreationPage() {
     <>
       <PageContainer>
         <TitleBar title="커뮤니티 글등록" />
-        {/* form 태그에 onSubmit 핸들러 연결 */}
         <ContentWrapper onSubmit={handleSubmitClick}>
           <TopSection>
             <CategorySelect ref={dropdownRef}>
@@ -168,7 +155,6 @@ function CommunityPostCreationPage() {
               )}
             </CategorySelect>
             <SubmitButtonWrapper>
-              {/* type="submit"으로 변경하고 disabled 상태 관리 */}
               <SubmitButton type="submit" disabled={!isFormValid || isSubmitting} $isValid={isFormValid}>
                 {isSubmitting ? '등록 중...' : '등록'}
               </SubmitButton>
@@ -177,20 +163,25 @@ function CommunityPostCreationPage() {
           </TopSection>
           <UploadSection>
             <UploadButton type="button" onClick={handleImageUploadClick}>
-              {' '}
-              {/* type="button" 추가 */}
               <FaCamera size={20} />
             </UploadButton>
-            {/* 실제 파일 인풋 (숨김) */}
             <input
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
-              multiple // 여러 파일 선택 가능
-              accept="image/*" // 이미지 파일만 허용
+              multiple
+              accept="image/*"
               style={{ display: 'none' }}
             />
             <ImageCount>{imageCount}/15</ImageCount>
+            {files.map((file, index) => (
+              <img
+                key={index}
+                src={URL.createObjectURL(file)}
+                alt={`preview-${index}`}
+                style={{ width: '60px', height: '60px', objectFit: 'cover', margin: '2px', borderRadius: '6px' }}
+              />
+            ))}
           </UploadSection>
           <TitleInput
             id="title"
@@ -198,9 +189,9 @@ function CommunityPostCreationPage() {
             placeholder="제목을 입력해주세요."
             value={title}
             onChange={handleTitleChange}
-            $error={errors.title} // 에러가 있을 때 스타일링을 위한 prop
+            $error={errors.title}
           />
-          {errors.title && <ErrorMessage>{errors.title}</ErrorMessage>} {/* 에러 메시지 표시 */}
+          {errors.title && <ErrorMessage>{errors.title}</ErrorMessage>}
           <ContentTextareaContainer>
             {content === '' && (
               <OverlayPlaceholder>
@@ -213,14 +204,9 @@ function CommunityPostCreationPage() {
                 </div>
               </OverlayPlaceholder>
             )}
-            <ContentTextarea
-              id="content"
-              value={content}
-              onChange={handleContentChange}
-              $error={errors.content} // 에러가 있을 때 스타일링을 위한 prop
-            />
+            <ContentTextarea id="content" value={content} onChange={handleContentChange} $error={errors.content} />
           </ContentTextareaContainer>
-          {errors.content && <ErrorMessage>{errors.content}</ErrorMessage>} {/* 에러 메시지 표시 */}
+          {errors.content && <ErrorMessage>{errors.content}</ErrorMessage>}
         </ContentWrapper>
       </PageContainer>
     </>
@@ -229,9 +215,7 @@ function CommunityPostCreationPage() {
 
 export default CommunityPostCreationPage;
 
-// --- 스타일 컴포넌트 ---
-// 기존 스타일 컴포넌트들은 변동 없음
-// SubmitButton에 `type="submit"`을 추가했으므로 `SubmitTextButton`을 `SubmitButton`으로 변경
+// --- 스타일 컴포넌트 (변경 없음) ---
 const SubmitButton = styled.button`
   background: none;
   border: none;
@@ -251,7 +235,6 @@ const SubmitButton = styled.button`
   opacity: ${({ $isValid }) => ($isValid ? 1 : 0.6)};
 `;
 
-// TitleInput, ContentTextarea에 $error prop을 받도록 수정
 const TitleInput = styled.input`
   width: 100%;
   outline: none;
@@ -259,7 +242,7 @@ const TitleInput = styled.input`
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray['300']};
   font-size: ${({ theme }) => theme.fontSizes.xl};
   color: ${({ theme }) => theme.colors.gray['800']};
-  border-color: ${({ $error, theme }) => ($error ? 'red' : theme.colors.gray['300'])}; /* 에러 시 빨간색 테두리 */
+  border-color: ${({ $error, theme }) => ($error ? 'red' : theme.colors.gray['300'])};
 
   &::placeholder {
     color: ${({ theme }) => theme.colors.gray['500']};
@@ -284,7 +267,6 @@ const ContentTextarea = styled.textarea`
   }
 `;
 
-// 기존의 나머지 스타일 컴포넌트들은 동일하게 유지됩니다.
 const PageContainer = styled.div`
   width: 100%;
   display: flex;

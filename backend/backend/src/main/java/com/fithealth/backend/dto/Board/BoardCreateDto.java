@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.util.List; // List 임포트
 
 public class BoardCreateDto {
 
@@ -14,14 +14,15 @@ public class BoardCreateDto {
     public static class Create{
         private String board_title;
         private String board_content;
-        private String user_id;
-        private MultipartFile file;
-        private List<String> tags;
+        private String board_category_name;
+        private String user_email;
+        private List<MultipartFile> files;
 
         public Board toEntity() {
             return Board.builder()
                     .boardTitle(this.board_title)
                     .boardContent(this.board_content)
+                    .boardCategoryName(this.board_category_name)
                     .build();
         }
     }
