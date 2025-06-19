@@ -4,6 +4,7 @@ import headerIcon from '../assets/header_icon.png';
 import { FaBell, FaChevronDown, FaChevronUp, FaSyncAlt } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import useUserStore from '../store/useUserStore';
+import basicProfile from '../../public/img/basicProfile.jpg';
 
 // NotificationList 컴포넌트 (제공된 코드)
 function NotificationList() {
@@ -158,7 +159,7 @@ function Header({ user }) {
               <ProfileWrapper onClick={handleUserMenuClick} ref={profileWrapperRef}>
                 {' '}
                 {/* ref 추가 */}
-                <ProfileImg src={user.img} alt="profileIcon" />
+                <ProfileImg src={user.img ? user.img : basicProfile} alt="profileIcon" />
                 <span>{user.name}님</span>
                 {showUserMenu ? <FaChevronUp size="14px" /> : <FaChevronDown size="14px" />}
               </ProfileWrapper>

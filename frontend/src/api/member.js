@@ -5,7 +5,6 @@ export const memberService = {
   //회원가입
   signUp: async (memberData) => {
     try {
-      console.log('post 보내는 중 ', memberData);
       const { data } = await api.post(API_ENDPOINTS.MEMBER.BASE, {
         user_email: memberData.useremail,
         user_pwd: memberData.userpwd,
@@ -24,9 +23,10 @@ export const memberService = {
       throw new Error('서버 통실 불량');
     }
   },
+
+  //로그인
   login: async (memberData) => {
     try {
-      console.log('post 보내는 중 ', memberData);
       const { data } = await api.post(API_ENDPOINTS.MEMBER.LOGIN, {
         user_email: memberData.useremail,
         user_pwd: memberData.userpwd,
@@ -41,10 +41,10 @@ export const memberService = {
       throw new Error('서버 통실 불량');
     }
   },
+
+  //이메일 중복 확인
   checkEmailExists: async (email) => {
     try {
-      console.log('GET 보내는 중 ', email);
-
       const { data } = await api.get(API_ENDPOINTS.MEMBER.FIND, {
         params: {
           userEmail: email,

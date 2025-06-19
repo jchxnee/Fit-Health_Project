@@ -1,126 +1,89 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
-import UserProfileImage from '/public/img/minju.png';
 import kakaotalkIcon from '/public/img/kakaotalk.png';
 import { FaBell } from 'react-icons/fa';
 import { LuClipboardList } from 'react-icons/lu';
 import { AiOutlineTool } from 'react-icons/ai';
 import { ResponsiveLine } from '@nivo/line';
 import { MdOutlineHealthAndSafety } from 'react-icons/md';
-import { CiCircleInfo } from 'react-icons/ci';
 import ButtonStyle from '../../styles/common/Button';
-import Footer from '../../components/Footer';
-import Header from '../../components/Header';
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 import { Link } from 'react-router-dom';
-
-const bodyMetrics = [
-  {
-    id: '체중 (kg)',
-    data: [
-      { x: '2022.09.23', y: 65.7 },
-      { x: '2022.11.09', y: 68.6 },
-      { x: '2022.12.08', y: 70.6 },
-      { x: '2023.05.16', y: 70.9 },
-      { x: '2023.08.07', y: 72.2 },
-      { x: '2023.10.05', y: 76.3 },
-      { x: '2023.12.30', y: 73.0 },
-      { x: '2024.03.15', y: 72.5 },
-      { x: '2024.06.20', y: 71.0 },
-      { x: '2024.09.01', y: 70.2 },
-    ],
-  },
-  {
-    id: '골격근량 (kg)',
-    data: [
-      { x: '2022.09.23', y: 29.3 },
-      { x: '2022.11.09', y: 31.2 },
-      { x: '2022.12.08', y: 32.5 },
-      { x: '2023.05.16', y: 34.8 },
-      { x: '2023.08.07', y: 35.2 },
-      { x: '2023.10.05', y: 35.7 },
-      { x: '2023.12.30', y: 34.1 },
-      { x: '2024.03.15', y: 34.5 },
-      { x: '2024.06.20', y: 34.0 },
-      { x: '2024.09.01', y: 33.5 },
-    ],
-  },
-  {
-    id: '체지방량 (kg)',
-    data: [
-      { x: '2022.09.23', y: 13.4 },
-      { x: '2022.11.09', y: 13.2 },
-      { x: '2022.12.08', y: 13.2 },
-      { x: '2023.05.16', y: 9.7 },
-      { x: '2023.08.07', y: 10.5 },
-      { x: '2023.10.05', y: 13.8 },
-      { x: '2023.12.30', y: 13.1 },
-      { x: '2024.03.15', y: 12.8 },
-      { x: '2024.06.20', y: 12.0 },
-      { x: '2024.09.01', y: 11.5 },
-    ],
-  },
-];
+import useUserStore from '../../store/useUserStore';
+import basicProfile from '../../../public/img/basicProfile.jpg';
+import emailIcon from '../../../public/img/email.png';
+import { useHealthForm } from '../../hooks/member/useHealthForm';
+import { healthService } from '../../api/health';
+import { toast } from 'react-toastify';
 
 const MyPage = () => {
-  const [chartData, setChartData] = useState(bodyMetrics);
-  const [isHealthInputModalOpen, setIsHealthInputModalOpen] = useState(false); // 모달 상태 추가
+  const { user } = useUserStore();
 
-  // 모달 입력 필드 상태 추가
-  const [healthDataInput, setHealthDataInput] = useState({
-    weight: '',
-    bodyFatMass: '',
-    skeletalMuscleMass: '',
+  // raw 데이터 → 차트용 데이터 변환
+  const transformHealthData = (rawData) => {
+    console.log(rawData);
+    const weightData = [];
+    const skeletalMuscleData = [];
+    const bodyFatData = [];
+
+    rawData.forEach((item) => {
+      const date = new Date(item.create_date); // 소문자 필드명
+      const formattedDate = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(
+        date.getDate()
+      ).padStart(2, '0')}`;
+
+      weightData.push({ x: formattedDate, y: item.weight });
+      skeletalMuscleData.push({ x: formattedDate, y: item.skeletal_muscle });
+      bodyFatData.push({ x: formattedDate, y: item.body_fat });
+    });
+
+    return [
+      { id: '체중 (kg)', data: weightData },
+      { id: '골격근량 (kg)', data: skeletalMuscleData },
+      { id: '체지방량 (kg)', data: bodyFatData },
+    ];
+  };
+
+  // 차트 데이터 상태
+  const [chartData, setChartData] = useState([]);
+  const [isHealthInputModalOpen, setIsHealthInputModalOpen] = useState(false);
+
+  // 🧾 건강 정보 입력 폼 Hook
+  const { register, handleSubmit, onSubmit, errors, isLoading, reset } = useHealthForm({
+    useremail: user.email,
+    onSuccess: async () => {
+      try {
+        const freshData = await healthService.getHealthData(user.email);
+        const transformed = transformHealthData(freshData);
+        setChartData(transformed); // 최신 데이터 반영
+      } catch (err) {
+        toast.error('차트 데이터 업데이트에 실패했습니다.');
+        console.error(err);
+      } finally {
+        closeHealthInputModal();
+      }
+    },
   });
+
+  // 페이지 로딩 시 차트 데이터 불러오기
+  useEffect(() => {
+    const fetchHealthData = async () => {
+      try {
+        const raw = await healthService.getHealthData(user.email);
+        const converted = transformHealthData(raw);
+        setChartData(converted);
+      } catch (err) {
+        console.error('건강 정보 조회 실패', err);
+      }
+    };
+
+    fetchHealthData();
+  }, [user.email]);
 
   const openHealthInputModal = () => setIsHealthInputModalOpen(true);
   const closeHealthInputModal = () => {
     setIsHealthInputModalOpen(false);
-    // 모달 닫을 때 입력 필드 초기화
-    setHealthDataInput({
-      weight: '',
-      bodyFatMass: '',
-      skeletalMuscleMass: '',
-    });
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    // 숫자만 입력 가능하도록 필터링 (소수점 포함)
-    const numericValue = value.replace(/[^0-9.]/g, '');
-    setHealthDataInput((prev) => ({
-      ...prev,
-      [name]: numericValue,
-    }));
-  };
-
-  const handleSubmitHealthData = () => {
-    // 실제 데이터 처리 로직 (예: API 호출, 차트 데이터 업데이트)
-    console.log('입력된 건강 정보:', healthDataInput);
-    // 여기에 차트 데이터 업데이트 로직을 추가할 수 있습니다.
-    // 예: 새로운 날짜로 데이터 추가
-    // const newDate = new Date().toISOString().slice(0, 10).replace(/-/g, '.'); // 오늘 날짜
-    // setChartData((prevData) => {
-    //   const updatedData = [...prevData];
-    //   // 체중 데이터 업데이트
-    //   const weightIndex = updatedData.findIndex(item => item.id === '체중 (kg)');
-    //   if (weightIndex !== -1) {
-    //     updatedData[weightIndex].data.push({ x: newDate, y: parseFloat(healthDataInput.weight) });
-    //   }
-    //   // 골격근량 데이터 업데이트
-    //   const muscleIndex = updatedData.findIndex(item => item.id === '골격근량 (kg)');
-    //   if (muscleIndex !== -1) {
-    //     updatedData[muscleIndex].data.push({ x: newDate, y: parseFloat(healthDataInput.skeletalMuscleMass) });
-    //   }
-    //   // 체지방량 데이터 업데이트
-    //   const bodyFatIndex = updatedData.findIndex(item => item.id === '체지방량 (kg)');
-    //   if (bodyFatIndex !== -1) {
-    //     updatedData[bodyFatIndex].data.push({ x: newDate, y: parseFloat(healthDataInput.bodyFatMass) });
-    //   }
-    //   return updatedData;
-    // });
-    closeHealthInputModal();
+    reset();
   };
 
   return (
@@ -129,12 +92,12 @@ const MyPage = () => {
         <TitleBar title={'마이페이지'} />
 
         <ProfileSection>
-          <ProfileImage src={UserProfileImage} alt="Coach Avatar" />
+          <ProfileImage src={user.img ? user.img : basicProfile} alt="User Profile" />
           <ProfileInfo>
-            <ProfileName>김현아님</ProfileName>
+            <ProfileName>{user.name}님</ProfileName>
             <ProfileEmail>
-              <ProfileIcon src={kakaotalkIcon} alt="KakaoTalk" />
-              haha020911@naver.com
+              <ProfileIcon src={emailIcon} alt="email" />
+              {user.email}
             </ProfileEmail>
           </ProfileInfo>
           <SettingButton to="/accountSettingPage">계정 설정</SettingButton>
@@ -304,47 +267,53 @@ const MyPage = () => {
                 <ModalTitle>건강 정보 입력</ModalTitle>
                 <CloseButton onClick={closeHealthInputModal}>&times;</CloseButton>
               </ModalHeader>
-              <FormGroup>
-                {' '}
-                {/* 폼 그룹 추가 */}
+
+              {/* react-hook-form으로 제출 */}
+              <FormGroup onSubmit={handleSubmit(onSubmit)}>
                 <InputContainer>
                   <InputLabel htmlFor="weight">몸무게 (kg)</InputLabel>
                   <InputField
-                    type="number" // 숫자만 입력 받도록
+                    type="number"
                     id="weight"
-                    name="weight"
-                    value={healthDataInput.weight}
-                    onChange={handleInputChange}
+                    {...register('weight')}
+                    $error={errors.weight}
                     placeholder="예: 70.5"
-                    step="0.1" // 소수점 입력 가능
+                    step="0.1"
                   />
+                  {errors.weight && <ErrorMessage>{errors.weight.message}</ErrorMessage>}
                 </InputContainer>
+
                 <InputContainer>
-                  <InputLabel htmlFor="bodyFatMass">체지방량 (kg)</InputLabel>
+                  <InputLabel htmlFor="bodyFat">체지방량 (kg)</InputLabel>
                   <InputField
                     type="number"
-                    id="bodyFatMass"
-                    name="bodyFatMass"
-                    value={healthDataInput.bodyFatMass}
-                    onChange={handleInputChange}
+                    id="bodyFat"
+                    {...register('bodyFat')}
+                    $error={errors.bodyFat}
                     placeholder="예: 15.2"
                     step="0.1"
                   />
+                  {errors.bodyFat && <ErrorMessage>{errors.bodyFat.message}</ErrorMessage>}
                 </InputContainer>
+
                 <InputContainer>
-                  <InputLabel htmlFor="skeletalMuscleMass">골격근량 (kg)</InputLabel>
+                  <InputLabel htmlFor="skeletalMuscle">골격근량 (kg)</InputLabel>
                   <InputField
                     type="number"
-                    id="skeletalMuscleMass"
-                    name="skeletalMuscleMass"
-                    value={healthDataInput.skeletalMuscleMass}
-                    onChange={handleInputChange}
+                    id="skeletalMuscle"
+                    {...register('skeletalMuscle')}
+                    $error={errors.skeletalMuscle}
                     placeholder="예: 30.1"
                     step="0.1"
                   />
+                  {errors.skeletalMuscle && <ErrorMessage>{errors.skeletalMuscle.message}</ErrorMessage>}
                 </InputContainer>
+
+                {/* ✅ form 내부의 submit 버튼 */}
+                <ModalSelectButton type="submit" disabled={isLoading}>
+                  확인
+                </ModalSelectButton>
               </FormGroup>
-              <ModalSelectButton onClick={handleSubmitHealthData}>확인</ModalSelectButton>
             </ModalContent>
           </ModalOverlay>
         )}
@@ -382,34 +351,34 @@ const ProfileSection = styled.div`
   @media (max-width: ${({ theme }) => theme.width.sm}) {
     flex-direction: column;
     text-align: center;
-    gap: ${({ theme }) => theme.spacing['3']}; /* Smaller gap on mobile */
-    align-items: flex-start; /* Align text left within column flow for profile info */
+    gap: ${({ theme }) => theme.spacing['3']};
+    align-items: flex-start;
   }
 `;
 
 const ProfileImage = styled.img`
-  width: 80px; /* Fixed size for avatar */
+  width: 80px;
   height: 80px;
-  border-radius: ${({ theme }) => theme.borderRadius.full}; /* Circular image */
+  border-radius: ${({ theme }) => theme.borderRadius.full};
   object-fit: cover;
-  flex-shrink: 0; /* Prevent shrinking */
+  flex-shrink: 0;
 
   @media (max-width: ${({ theme }) => theme.width.sm}) {
     width: 60px;
     height: 60px;
-    margin-bottom: ${({ theme }) => theme.spacing['2']}; /* Add space below image on mobile */
+    margin-bottom: ${({ theme }) => theme.spacing['2']};
   }
 `;
 
 const ProfileInfo = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Align text to the left */
-  flex-grow: 1; /* Allow to take available space */
+  align-items: flex-start;
+  flex-grow: 1;
   gap: ${({ theme }) => theme.spacing['0']};
 
   @media (max-width: ${({ theme }) => theme.width.sm}) {
-    align-items: center; /* Center text when column layout */
+    align-items: center;
   }
 `;
 
@@ -619,7 +588,7 @@ const CloseButton = styled.button`
 `;
 
 // 모달 내 폼 그룹
-const FormGroup = styled.div`
+const FormGroup = styled.form`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing['3']}; /* 입력 필드 사이 간격 */
@@ -630,6 +599,7 @@ const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start; /* 라벨과 인풋을 왼쪽 정렬 */
+  position: relative;
 `;
 
 // 입력 필드 라벨
@@ -653,27 +623,37 @@ const InputField = styled.input`
 
   &:focus {
     outline: none;
-    border-color: ${({ theme }) => theme.colors.secondary}; /* 포커스 시 색상 변경 */
+    border-color: ${({ theme }) => theme.colors.secondary};
   }
 
   &::placeholder {
     color: ${({ theme }) => theme.colors.gray['400']};
   }
 
-  /* 화살표 버튼 숨기기 (type="number" 기본 UI) */
   &::-webkit-outer-spin-button,
   &::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
-  -moz-appearance: textfield; /* Firefox */
+  -moz-appearance: textfield;
 `;
 
-// 모달 확인 버튼 (가운데 정렬)
 const ModalSelectButton = styled(ButtonStyle)`
   padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['4']};
   font-size: ${({ theme }) => theme.fontSizes.base};
 
-  display: block; /* 블록 요소로 만들어 margin: auto 적용 가능하게 함 */
-  margin: ${({ theme }) => theme.spacing['4']} auto 0 auto; /* 상단 여백 및 좌우 자동 마진으로 중앙 정렬 */
+  display: block;
+  margin: ${({ theme }) => theme.spacing['4']} auto 0 auto;
+`;
+
+const ErrorMessage = styled.p`
+  color: red;
+  font-size: 0.85em;
+  margin-top: ${({ theme }) => theme.spacing['1']};
+  margin-left: 5px;
+  text-align: left;
+  width: calc(100% - 120px);
+  box-sizing: border-box;
+  position: relative;
+  flex-basis: 100%;
 `;

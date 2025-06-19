@@ -16,4 +16,8 @@ export const API_ENDPOINTS = {
     LOGIN: '/api/members/login',
     FIND: '/api/members/email',
   },
+  HEALTH: {
+    BASE: '/api/healths',
+    FINDDATE: '/api/healths/date',
+  },
 };
