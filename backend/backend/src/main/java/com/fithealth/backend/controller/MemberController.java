@@ -22,9 +22,15 @@ public class MemberController {
 
     //로그인 API
     @PostMapping("/login")
-    public ResponseEntity<LoginDto.Response> login(@RequestBody LoginDto.Request requestDto) {
+    public ResponseEntity<LoginDto.Response> loginMember(@RequestBody LoginDto.Request requestDto) {
         System.out.println(requestDto.getUser_email());
         System.out.println(requestDto.getUser_pwd());
-        return ResponseEntity.ok(memberService.findMember(requestDto));
+        return ResponseEntity.ok(memberService.loginMember(requestDto));
+    }
+
+    //중복 이메일 찾기 API
+    @GetMapping("/email")
+    public ResponseEntity<Boolean> findMember(@RequestParam String userEmail) {
+        return ResponseEntity.ok(memberService.findMember(userEmail));
     }
 }

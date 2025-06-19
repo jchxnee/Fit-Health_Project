@@ -41,4 +41,25 @@ export const memberService = {
       throw new Error('서버 통실 불량');
     }
   },
+  checkEmailExists: async (email) => {
+    try {
+      console.log('GET 보내는 중 ', email);
+
+      const { data } = await api.get(API_ENDPOINTS.MEMBER.FIND, {
+        params: {
+          userEmail: email,
+        },
+      });
+
+      // 이메일이 존재하면 true 반환
+      return data;
+    } catch (error) {
+      if (error.response) {
+        const message = error.response?.data?.message || '이메일을 가져오는데 실패하였습니다.';
+        throw new Error(message);
+      }
+
+      throw new Error('서버 통신 불량');
+    }
+  },
 };

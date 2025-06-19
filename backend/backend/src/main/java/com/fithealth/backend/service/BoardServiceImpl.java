@@ -2,7 +2,7 @@ package com.fithealth.backend.service;
 
 import com.fithealth.backend.dto.Board.BoardCreateDto;
 import com.fithealth.backend.entity.Board;
-import com.fithealth.backend.entity.BoardFile; // BoardFile 임포트 확인
+import com.fithealth.backend.entity.BoardFile;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.repository.BoardRepository;
 import com.fithealth.backend.repository.MemberRepository;
