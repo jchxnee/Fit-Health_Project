@@ -33,6 +33,16 @@ const useUserStore = create(
           isAuthenticated: false,
         });
       },
+
+      // 유저 정보 업데이트
+      updateUser: (updatedFields) => {
+        set((state) => ({
+          user: {
+            ...state.user,
+            ...updatedFields,
+          },
+        }));
+      },
     }),
     {
       name: 'user-storage',

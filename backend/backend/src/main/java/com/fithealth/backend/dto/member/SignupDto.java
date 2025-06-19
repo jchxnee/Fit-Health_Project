@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class SignupDto {
@@ -18,7 +19,7 @@ public class SignupDto {
         private String user_pwd;
         private String user_name;
         private String phone;
-        private LocalDateTime birth;
+        private LocalDate birth;
 
 
         public Member toEntity(){

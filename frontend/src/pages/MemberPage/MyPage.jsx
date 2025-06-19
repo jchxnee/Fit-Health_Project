@@ -309,7 +309,7 @@ const MyPage = () => {
                   {errors.skeletalMuscle && <ErrorMessage>{errors.skeletalMuscle.message}</ErrorMessage>}
                 </InputContainer>
 
-                {/* ✅ form 내부의 submit 버튼 */}
+                {/* form 내부의 submit 버튼 */}
                 <ModalSelectButton type="submit" disabled={isLoading}>
                   확인
                 </ModalSelectButton>

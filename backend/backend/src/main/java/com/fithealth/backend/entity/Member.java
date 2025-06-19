@@ -36,7 +36,7 @@ public class Member {
     private String userName;
 
     @Column(name = "BIRTH")
-    private LocalDateTime birth;
+    private LocalDate birth;
 
     @Column(length = 11)
     private String phone;
@@ -112,4 +112,25 @@ public class Member {
     public void preUpdate() {
         this.modifyDate = LocalDateTime.now();
     }
+
+    public void changeName(String userName) {
+        this.userName = userName;
+    }
+
+    public void changeBirth(LocalDate birth) {
+        this.birth = birth;
+    }
+
+    public void changeInfo(String phone, String address, CommonEnums.Gender gender, Double height, String goal) {
+        this.phone = phone;
+        this.address = address;
+        this.gender = gender;
+        this.height = height;
+        this.goal = goal;
+    }
+
+    public void changePwd(String userPwd) {
+        this.userPwd = userPwd;
+    }
+
 }

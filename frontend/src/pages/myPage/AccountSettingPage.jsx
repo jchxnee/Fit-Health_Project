@@ -1,47 +1,104 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { CiCamera } from 'react-icons/ci';
-import ButtonStyle from '../../styles/common/Button';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import { Link } from 'react-router-dom';
+import useUserStore from '../../store/useUserStore';
+import basicProfile from '../../../public/img/basicProfile.jpg';
+import * as yup from 'yup';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
+import { memberService } from '../../api/member';
+import { BeatLoader } from 'react-spinners';
+
+// 이름 전용 yup 스키마
+const nameSchema = yup.object({
+  username: yup
+    .string()
+    .required('이름을 입력하세요')
+    .min(2, '사용자 이름은 2자 이상 입력해주세요.')
+    .max(20, '사용자 이름은 20자 이하 입력해주세요.')
+    .test('is-different', '변경할 정보를 입력해주세요', function (value) {
+      const { original } = this.options.context || {};
+      return value !== original;
+    }),
+});
+
+// 생년월일 전용 yup 스키마
+const birthSchema = yup.object({
+  birth: yup
+    .date()
+    .required('생일을 입력하세요')
+    .max(new Date(), '미래 날짜는 선택할 수 없습니다.')
+    .test('is-different', '변경할 정보를 입력해주세요', function (value) {
+      const { original } = this.options.context || {};
+      return value !== original;
+    }),
+});
 
 function AccountSettingsPage() {
-  // Dummy data for user information
-  const [userEmail] = useState('user01@naver.com'); // Example name
-  const [userName, setUserName] = useState('김민수'); // Example name
-  const [userBirthdate, setUserBirthdate] = useState('1990-05-15'); // Example birthdate
-  const [profileImgSrc, setProfileImgSrc] = useState('https://via.placeholder.com/100'); // Placeholder image
+  const { user, updateUser } = useUserStore();
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Functions to handle "수정" clicks (these would open modals or navigate)
-  const handleNameEdit = () => {
-    alert('이름 수정 기능');
-    // 여기에 이름 수정 모달 또는 페이지 전환 로직 추가
+  const {
+    register,
+    getValues,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      username: user.name,
+      birth: user.birth,
+    },
+  });
+
+  const handleNameEdit = async () => {
+    try {
+      setIsLoading(true);
+      await nameSchema.validate({ username: getValues('username') }, { context: { original: user.name } });
+
+      await memberService.updateName(user.email, getValues('username'));
+
+      toast.success('이름 변경 완료!');
+      updateUser({ name: getValues('username') });
+      clearErrors('username');
+    } catch (err) {
+      // yup ValidationError인지 확인 (그렇지 않으면 네트워크 에러 등)
+      if (err.name === 'ValidationError') {
+        setError('username', { type: 'manual', message: err.message });
+        toast.error(err.message);
+      } else {
+        toast.error('이름 변경 중 문제가 발생했습니다.');
+        console.error(err);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleBirthdateEdit = () => {
-    alert('생년월일 수정 기능');
-    // 여기에 생년월일 수정 모달 또는 페이지 전환 로직 추가
-  };
+  const handleBirthEdit = async () => {
+    try {
+      setIsLoading(true);
+      // 기존 생일과 비교해서 변경 없으면 에러 뜨게 하려면 context 전달
+      await birthSchema.validate({ birth: getValues('birth') }, { context: { original: user.birth } });
 
-  const handleProfileImageChange = () => {
-    alert('프로필 사진 변경 기능');
-    // 여기에 프로필 사진 업로드/변경 로직 추가
-  };
+      // 예: 서버에 생일 변경 요청 (memberService.updateBirth 등)
+      await memberService.updateBirth(user.email, getValues('birth'));
 
-  const handlePersonalDataManagement = () => {
-    alert('개인 정보 관리 페이지로 이동');
-    // Navigate to personal data management page
-  };
-
-  const handleCustomDataManagement = () => {
-    alert('맞춤 정보 관리 페이지로 이동');
-    // Navigate to custom data management page
-  };
-
-  const handleWithdrawal = () => {
-    alert('회원 탈퇴 처리');
-    // Trigger user withdrawal process
+      toast.success('생년월일 변경 완료!');
+      updateUser({ birth: getValues('birth') });
+      clearErrors('birth');
+    } catch (err) {
+      if (err.name === 'ValidationError') {
+        setError('birth', { type: 'manual', message: err.message });
+        toast.error(err.message);
+      } else {
+        toast.error('생년월일 변경 중 문제가 발생했습니다.');
+        console.error(err);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,8 +107,8 @@ function AccountSettingsPage() {
         <SettingsForm>
           <PageTitle>계정 설정</PageTitle>
 
-          <ProfileImageWrapper onClick={handleProfileImageChange}>
-            <ProfileImage src={profileImgSrc} alt="프로필 이미지" />
+          <ProfileImageWrapper>
+            <ProfileImage src={user.img ? user.img : basicProfile} alt="프로필 이미지" />
             <CameraIcon>
               <StyledCameraIcon />
             </CameraIcon>
@@ -62,25 +119,29 @@ function AccountSettingsPage() {
             <LabelWrapper>
               <Label>이메일</Label>
             </LabelWrapper>
-            <DisplayText>{userEmail}</DisplayText>
+            <DisplayText>{user.email}</DisplayText>
           </InputGroup>
 
           {/* 이름 InputGroup */}
           <InputGroup>
             <LabelWrapper>
               <Label>이름</Label>
-              <ActionLink onClick={handleNameEdit}>수정</ActionLink>
+              <ActionLink onClick={handleNameEdit} disabled={isLoading}>
+                {isLoading ? <BeatLoader /> : '수정'}
+              </ActionLink>
             </LabelWrapper>
-            <DisplayText>{userName}</DisplayText>
+            <DisplayInput type="text" {...register('username')} />
           </InputGroup>
 
           {/* 생년월일 InputGroup */}
           <InputGroup>
             <LabelWrapper>
               <Label>생년월일</Label>
-              <ActionLink onClick={handleBirthdateEdit}>수정</ActionLink>
+              <ActionLink onClick={handleBirthEdit} disabled={isLoading}>
+                {isLoading ? <BeatLoader /> : '수정'}
+              </ActionLink>
             </LabelWrapper>
-            <DisplayText>{userBirthdate}</DisplayText>
+            <DisplayInput type="date" {...register('birth')} />
           </InputGroup>
 
           <ButtonGroup>
@@ -200,6 +261,17 @@ const Label = styled.label`
 `;
 
 const DisplayText = styled.span`
+  flex-grow: 1; /* 남은 공간을 채우도록 함 */
+  padding: ${({ theme }) => theme.spacing['2']} 0; /* 상하 패딩, 좌우 0 */
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['300']};
+  font-size: ${({ theme }) => theme.fontSizes.base};
+  color: ${({ theme }) => theme.colors.primary};
+  box-sizing: border-box;
+  width: 100%; /* 너비 100% */
+  text-align: left;
+`;
+
+const DisplayInput = styled.input`
   flex-grow: 1; /* 남은 공간을 채우도록 함 */
   padding: ${({ theme }) => theme.spacing['2']} 0; /* 상하 패딩, 좌우 0 */
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray['300']};

@@ -73,6 +73,8 @@ export const useSignUpForm = () => {
       // 에러 발생 시 알림
       toast.error('회원가입 중 문제가 발생하였습니다.');
       console.error('회원가입 에러 : ', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 

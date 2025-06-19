@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react'; // useRef와 useEffe
 import styled from 'styled-components'; // css import
 import headerIcon from '../assets/header_icon.png';
 import { FaBell, FaChevronDown, FaChevronUp, FaSyncAlt } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useUserStore from '../store/useUserStore';
 import basicProfile from '../../public/img/basicProfile.jpg';
+import { toast } from 'react-toastify';
 
 // NotificationList 컴포넌트 (제공된 코드)
 function NotificationList() {
@@ -31,6 +32,13 @@ function NotificationList() {
 // UserMenu 컴포넌트 (제공된 코드)
 function UserMenu({ onMenuItemClick }) {
   const logout = useUserStore((state) => state.logout);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout(); // 상태 초기화
+    toast.success('로그아웃되었습니다.');
+    navigate('/'); // 메인 페이지로 이동
+  };
 
   const menuItems = [
     { name: '마이페이지', to: '/mypage' },
@@ -40,7 +48,7 @@ function UserMenu({ onMenuItemClick }) {
       to: '/coachRegister',
       icon: <StyledFaSyncAlt />,
     },
-    { name: '로그아웃', action: logout },
+    { name: '로그아웃', action: handleLogout },
   ];
 
   return (

@@ -69,6 +69,8 @@ export const useHealthForm = ({ useremail, onSuccess }) => {
     } catch (err) {
       toast.error('건강 정보 저장 중 오류가 발생했습니다.');
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
