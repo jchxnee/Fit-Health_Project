@@ -25,7 +25,7 @@ const SubmitButton = styled.button`
 function SubmitSection({ onSubmit }) {
   return (
     <Row>
-      <SubmitButton type="button" onClick={onSubmit}>
+      <SubmitButton type="submit" onClick={onSubmit}>
         등록하기
       </SubmitButton>
     </Row>

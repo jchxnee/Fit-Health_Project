@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "styled-components";
-import RegionSelect from "../RegionSelect.jsx";
+import React from 'react';
+import styled from 'styled-components';
+import RegionSelect from '../RegionSelect.jsx';
 
 const Section = styled.section`
     width: 100%;
@@ -26,15 +26,15 @@ const Label = styled.div`
     width: 90px;
 `;
 
-function RegionSection() {
-    return (
-        <Section>
-            <Row>
-                <Label>희망지역</Label>
-                <RegionSelect className="Select" />
-            </Row>
-        </Section>
-    );
+function RegionSection({ value, onChange }) {
+  return (
+    <Section>
+      <Row>
+        <Label>희망지역</Label>
+        <RegionSelect className="Select" value={value} onChange={onChange} />
+      </Row>
+    </Section>
+  );
 }
 
 export default RegionSection;

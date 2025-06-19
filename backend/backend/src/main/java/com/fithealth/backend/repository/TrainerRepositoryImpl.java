@@ -14,7 +14,8 @@ public class TrainerRepositoryImpl implements TrainerRepository {
     private EntityManager em;
 
     @Override
-    public void save(Trainer trainer) {
+    public Long save(Trainer trainer) {
         em.persist(trainer);
+        return trainer.getTrainerNo();
     }
 }

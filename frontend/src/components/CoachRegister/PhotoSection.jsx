@@ -78,7 +78,7 @@ function PhotoSection({ photos, setPhotos }) {
       formData.append("file", file);
 
       try {
-        const res = await axios.post(`${API_BASE}/api/file/upload`, formData, {
+        const res = await axios.post(`${API_BASE}/api/trainer/register`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
 

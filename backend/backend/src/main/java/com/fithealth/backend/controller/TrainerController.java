@@ -5,6 +5,9 @@ import com.fithealth.backend.service.TrainerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/trainer")
@@ -17,5 +20,13 @@ public class TrainerController {
     @PostMapping("/addTrainer")
     public ResponseEntity<String> addTrainer(@RequestBody addTrainerDto.Request requestDto) {
         return ResponseEntity.ok(trainerService.createTrainer(requestDto));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Long> registerTrainer(
+            @ModelAttribute addTrainerDto.Create trainerDto,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files
+    ) throws IOException {
+        return ResponseEntity.ok(trainerService.registerTrainer(trainerDto, files));
     }
 }

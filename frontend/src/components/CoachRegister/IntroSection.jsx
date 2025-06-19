@@ -26,13 +26,18 @@ const Textarea = styled.input`
   resize: none;
 `;
 
-function IntroSection() {
+function IntroSection({ value, onChange }) {
   return (
     <Section>
       <Label>인삿말 / 한 줄 소개</Label>
-      <Textarea placeholder="예) 안녕하세요. 김성은 트레이너입니다! 여러분들의 몸과 마음을 건강하게 만들어드리겠습니다! 믿어 보실?" />
+      <Textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="예) 안녕하세요. 김성은 트레이너입니다!"
+      />
     </Section>
   );
 }
 
-export default IntroSection; 
+
+export default IntroSection;

@@ -55,4 +55,9 @@ public class Trainer {
 
     @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TrainerFile> trainerPhoto = new ArrayList<>();
+
+    public void addTrainerFile(TrainerFile trainerFile) {
+        this.trainerPhoto.add(trainerFile);
+        trainerFile.setTrainer(this);
+    }
 }

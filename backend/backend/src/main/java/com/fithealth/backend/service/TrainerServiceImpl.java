@@ -11,6 +11,11 @@ import com.fithealth.backend.repository.TrainerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -56,5 +61,33 @@ public class TrainerServiceImpl implements TrainerService {
         member.setGrade(CommonEnums.Grade.C);
 
         return "트레이너 등록 성공";
+    }
+
+    @Override
+    public Long registerTrainer(addTrainerDto.Create trainerDto, List<MultipartFile> files) throws IOException {
+        // 예시: 회원 찾기, 트레이너 엔티티 생성 등
+        Trainer trainer = trainerDto.toEntity();
+        // 파일 저장 경로
+        String UPLOAD_PATH = "E:\\test";
+        if(files != null && !files.isEmpty()){
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    String originName = file.getOriginalFilename();
+                    String changeName = UUID.randomUUID().toString() + "_" + originName;
+                    File uploadDir = new File(UPLOAD_PATH);
+                    if(!uploadDir.exists()){
+                        uploadDir.mkdirs();
+                    }
+                    file.transferTo(new File(UPLOAD_PATH + File.separator + changeName));
+                    TrainerFile trainerFile = TrainerFile.builder()
+                            .originName(originName)
+                            .changeName(changeName)
+                            .build();
+                    trainer.addTrainerFile(trainerFile);
+                }
+            }
+        }
+        Long trainerNo = trainerRepository.save(trainer);
+        return trainerNo;
     }
 }
