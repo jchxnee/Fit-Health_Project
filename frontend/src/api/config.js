@@ -14,6 +14,7 @@ export const API_ENDPOINTS = {
   MEMBER: {
     BASE: '/api/members',
     LOGIN: '/api/members/login',
+    FIND: '/api/members/email',
   },
   BOARD: {
     CREATE: '/api/board',

@@ -4,13 +4,14 @@ import logoSrc from '../../assets/header_icon.png';
 import ButtonStyle from '../../styles/common/Button';
 import { toast } from 'react-toastify';
 import { useSignUpForm } from '../../hooks/member/useSignUpForm';
+import { memberService } from '../../api/member';
 
 function SignUpPage() {
-  const { register, handleSubmit, onsubmit: handleFormSubmit, errors, isSubmitting, trigger, watch } = useSignUpForm(); // watch 추가 (email 값 읽기 위함)
+  const { register, handleSubmit, onsubmit: handleFormSubmit, errors, trigger, watch, setError } = useSignUpForm(); // watch 추가 (email 값 읽기 위함)
 
   const [agreeService, setAgreeService] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
-  const [birthdate, setBirthdate] = useState('');
+
   const [showServiceTerms, setShowServiceTerms] = useState(false);
   const [showPrivacyTerms, setShowPrivacyTerms] = useState(false);
 
@@ -19,9 +20,6 @@ function SignUpPage() {
 
   const [isEmailVerified, setIsEmailVerified] = useState(false); // 이메일 인증 성공 여부
   const [emailAuthMessage, setEmailAuthMessage] = useState(''); // 이메일 인증 관련 메시지
-
-  // email 필드의 현재 값을 가져옵니다.
-  const emailValue = watch('email');
 
   const onSubmitHandler = (data) => {
     if (!agreeService || !agreePrivacy) {
@@ -38,34 +36,49 @@ function SignUpPage() {
     handleFormSubmit(data);
   };
 
-  // ★ handleEmailAuthClick 함수 수정
   const handleEmailAuthClick = async () => {
     // 1. 이메일 필드의 유효성 검사를 수동으로 트리거합니다.
-    const isValid = await trigger('email');
+    const isValid = await trigger('useremail'); // ← 'email' → 'useremail'으로 수정 (폼 필드명과 일치해야 함)
 
-    // 2. 유효성 검사가 실패하면 에러 메시지를 설정하고 함수를 종료합니다.
+    // 2. 유효성 검사 실패 시 에러 메시지 설정 후 종료
     if (!isValid) {
-      // errors.email에 Yup 스키마에서 정의한 에러 메시지가 이미 있습니다.
-      // emailAuthMessage 상태를 업데이트하여 해당 에러 메시지를 표시합니다.
-      setEmailAuthMessage(errors.email?.message || '유효한 이메일 주소를 입력해주세요.'); // errors.email이 없을 경우 대비
-      setIsEmailVerified(false); // 인증 실패 상태로 초기화
-      setShowAuthCodeInput(false); // 인증 코드 입력창 숨김 (필요시)
+      setEmailAuthMessage(errors.useremail?.message || '유효한 이메일 주소를 입력해주세요.');
+      setIsEmailVerified(false);
+      setShowAuthCodeInput(false);
       return;
     }
 
-    // 3. 이메일 필드가 유효하면 인증번호 발송 로직을 진행합니다.
-    // 기존 인증 상태 및 메시지 초기화
-    setIsEmailVerified(false);
-    setEmailAuthMessage(''); // 에러가 없으면 메시지 초기화
+    const email = watch('useremail');
 
-    // 여기에 이메일 인증번호 발송 API 호출 로직을 추가
-    // 이메일 주소를 서버로 보내 인증번호 발송 요청
-    console.log(`인증번호 발송 요청: ${emailValue}`); // watch로 가져온 emailValue 사용
+    try {
+      // 3. 서버에 이메일 중복 확인 요청
+      const exists = await memberService.checkEmailExists(email);
 
-    // API 호출 성공 시
-    setShowAuthCodeInput(true);
-    alert('인증번호가 이메일로 발송되었습니다. 확인해주세요.');
-    setEmailAuthMessage('인증번호가 발송되었습니다. 이메일을 확인해주세요.'); // 발송 성공 메시지
+      if (exists) {
+        // 이메일 중복 시 에러 메시지 표시
+        setError('useremail', {
+          type: 'manual',
+          message: '이미 존재하는 이메일입니다.',
+        });
+        setEmailAuthMessage('이미 존재하는 이메일입니다.');
+        setIsEmailVerified(false);
+        setShowAuthCodeInput(false);
+        return;
+      }
+
+      // 4. 중복이 아닌 경우: 기존 상태 초기화 및 인증번호 요청 진행
+      setIsEmailVerified(false);
+      setEmailAuthMessage('');
+      setShowAuthCodeInput(true);
+
+      // 인증번호 발송 API 호출 (여기서 실제 서버 요청 필요)
+      console.log(`인증번호 발송 요청: ${email}`);
+      alert('인증번호가 이메일로 발송되었습니다. 확인해주세요.');
+      setEmailAuthMessage('인증번호가 발송되었습니다. 이메일을 확인해주세요.');
+    } catch (error) {
+      console.error('이메일 확인 중 오류:', error);
+      setEmailAuthMessage('이메일 확인 중 문제가 발생했습니다.');
+    }
   };
 
   const handleVerifyAuthCode = () => {
@@ -142,7 +155,7 @@ function SignUpPage() {
             {...register('userpwd')}
             $error={errors.userpwd}
           />
-          {errors.password && <ErrorMessage>{errors.userpwd.message}</ErrorMessage>}
+          {errors.userpwd && <ErrorMessage>{errors.userpwd.message}</ErrorMessage>}
         </InputGroup>
 
         <InputGroup>
@@ -177,7 +190,8 @@ function SignUpPage() {
 
         <InputGroup>
           <Label htmlFor="birth">생년월일</Label>
-          <Input type="date" id="birth" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
+          <Input type="date" id="birth" {...register('birth')} />
+          {errors.birth && <ErrorMessage>{errors.birth.message}</ErrorMessage>}
         </InputGroup>
 
         <TermsAndConditionsGroup>
