@@ -29,7 +29,7 @@ public class Payment {
     private Member member; // 결제자 Member
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "RESPONSE_EMAIL", nullable = false, referencedColumnName = "USER_EMAIL") // RESPONSE_NAME이 Member의 USER_EMAIL을 참조
+    @JoinColumn(name = "RESPONSE_EMAIL", nullable = false, referencedColumnName = "USER_EMAIL")
     private Member responseMember; // 응답자 (트레이너의 Member 정보)
 
     // Review와의 OneToOne 양방향 매핑 (mappedBy로 연관 관계의 주인이 아님을 명시)

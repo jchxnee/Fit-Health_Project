@@ -25,7 +25,7 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.createReview(reviewCreateDto));
     }
 
-    @GetMapping("/coach/{trainerEmail}")
+    @GetMapping("/{trainerEmail}")
     public ResponseEntity<List<ReviewSelectDto.Select>> select(@PathVariable String trainerEmail) {
         List<ReviewSelectDto.Select> reviews = reviewService.selectReview(trainerEmail);
         return ResponseEntity.ok(reviews);

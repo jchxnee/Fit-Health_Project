@@ -18,5 +18,6 @@ export const API_ENDPOINTS = {
   },
   REVIEW: {
     CREATE: '/api/review',
+    SELECT: '/api/review/',
   },
 };

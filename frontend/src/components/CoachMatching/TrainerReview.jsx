@@ -1,8 +1,9 @@
+// src/components/CoachMatching/TrainerReview.jsx
 import React from 'react';
 import styled from 'styled-components';
 import { FiMessageCircle } from 'react-icons/fi';
 import { FaRegEye, FaStar, FaRegStar, FaStarHalfAlt } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Link 컴포넌트 임포트
 
 const Wrapper = styled.section`
   width: 100%;
@@ -124,59 +125,47 @@ const StarRating = ({ rating = 0 }) => {
   return <StarWrapper>{stars}</StarWrapper>;
 };
 
-const posts = [
-  {
-    writer: '김현아',
-    profileUrl:
-      'https://i.namu.wiki/i/Iha7pt4ahAfLRN22YiVjcl24Xeigb3nNv84nfKZ8r-Y2LhWQBy6gAz0zatiWz8_iFhq-ZP5V-JXrXMAiZwIWzw.webp',
-    content:
-      '안녕하세요. 저는 서울사는 김현아라고 하고 저는 진격거를 좋아합니다. 특히, 한지를 제일 좋아합니다. 트레이너분이 진격거를 좋아하면 좋겠습니다.',
-    time: '방금 전',
-    rate: 4.5,
-  },
-  {
-    writer: '이주찬',
-    profileUrl: 'https://via.placeholder.com/24x24?text=LC',
-    content:
-      '안녕하세요. 저는 서울사는 김현아라고 하고 저는 진격거를 좋아합니다. 특히, 한지를 제일 좋아합니다. 트레이너분이 진격거를 좋아하면 좋겠습니다.',
-    time: '방금 전',
-    rate: 5,
-  },
-  {
-    writer: '황인태',
-    profileUrl: 'https://via.placeholder.com/24x24?text=HT',
-    content:
-      '안녕하세요. 저는 서울사는 김현아라고 하고 저는 진격거를 좋아합니다. 특히, 한지를 제일 좋아합니다. 트레이너분이 진격거를 좋아하면 좋겠습니다.',
-    time: '방금 전',
-    rate: 3,
-  },
-];
+// 더미 데이터는 CoachReview.jsx에서 관리하고, 여기서는 props로 받아옵니다.
+// 이 컴포넌트 자체에서 API 호출을 할 필요는 없습니다.
+// TrainerReview는 CoachDetail의 일부로, 리뷰 목록의 요약본을 보여주는 역할입니다.
 
-const TrainerReview = () => (
+const TrainerReview = (
+  { trainerEmail, reviews = [] } // reviews prop 추가
+) => (
   <Wrapper>
     <Container>
       <Title>리뷰</Title>
       <ContentAndMoreWrapper>
         <PostsColumn>
-          {posts.slice(0, 3).map((p, i) => (
-            <PostBox key={i}>
+          {/* 받아온 reviews prop을 사용하고 slice는 여전히 3개만 보여주기 위함 */}
+          {reviews.slice(0, 3).map((p) => (
+            <PostBox key={p.reviewId}>
               <PostWriter>
-                <ProfileImg src={p.profileUrl} alt={`${p.writer}의 프로필`} />
-                {p.writer}
+                <ProfileImg
+                  src={p.userProfileImage || 'https://via.placeholder.com/24x24?text=User'} // 기본 이미지 설정
+                  alt={`${p.userName}의 프로필`}
+                />
+                {p.userName}
               </PostWriter>
               <PostRate>
-                <StarRating rating={p.rate} />
+                <StarRating rating={p.rating} />
               </PostRate>
-              <PostContent>{p.content}</PostContent>
-              <StatsTime>{p.time}</StatsTime>
+              <PostContent>{p.reviewContent}</PostContent>
+              <StatsTime>
+                {new Date(p.createdAt).toLocaleDateString()} {/* 간단한 날짜 포맷팅 */}
+              </StatsTime>
             </PostBox>
           ))}
         </PostsColumn>
-        <Link to="/coachReview">
-          <MoreInfoBox>
-            <MoreText>리뷰 더보기</MoreText>
-          </MoreInfoBox>
-        </Link>
+        {/* '리뷰 더보기' 클릭 시, props로 받은 trainerEmail을 URL 파라미터로 전달 */}
+        {/* trainerEmail이 있을 때만 Link를 렌더링하도록 조건부 렌더링 */}
+        {trainerEmail && (
+          <Link to={`/coachReview/${trainerEmail}`}>
+            <MoreInfoBox>
+              <MoreText>리뷰 더보기</MoreText>
+            </MoreInfoBox>
+          </Link>
+        )}
       </ContentAndMoreWrapper>
     </Container>
   </Wrapper>
