@@ -7,6 +7,7 @@ const Section = styled.section`
     width: 100%;
     padding: 0 12px;
 `;
+
 const Row = styled.div`
     display: flex;
     gap: 32px;
@@ -44,40 +45,40 @@ const IconCircle = styled.div`
 `;
 
 const Label = styled.span`
-  font-size: 16px;
-  font-weight: 500;
+    font-size: 16px;
+    font-weight: 500;
 `;
 
 const IdInput = styled.input`
-  border: none;
-  border-bottom: 1.5px solid #d1d5db;
-  border-radius: 0;
-  padding: 0 0 2px 0;
-  height: 36px;
-  font-size: 16px;
-  width: 160px;
-  background: transparent;
-  outline: none;
-  text-align: left;
+    border: none;
+    border-bottom: 1.5px solid #d1d5db;
+    border-radius: 0;
+    padding: 0 0 2px 0;
+    height: 36px;
+    font-size: 16px;
+    width: 160px;
+    background: transparent;
+    outline: none;
+    text-align: left;
 `;
 
-function IdSection() {
-    return (
-        <Section>
-            <Row>
-                <SocialBox>
-                    <IconCircle type="kakao"><RiKakaoTalkFill /></IconCircle>
-                    <Label>카카오톡 아이디 :</Label>
-                    <IdInput type="text" placeholder="" />
-                </SocialBox>
-                <SocialBox>
-                    <IconCircle type="instagram"><FaInstagram /></IconCircle>
-                    <Label>인스타 아이디 :</Label>
-                    <IdInput type="text" placeholder="" />
-                </SocialBox>
-            </Row>
-        </Section>
-    );
+function IdSection({ kakaoId, setKakaoId, instaId, setInstaId }) {
+  return (
+    <Section>
+      <Row>
+        <SocialBox>
+          <IconCircle type="kakao"><RiKakaoTalkFill /></IconCircle>
+          <Label>카카오톡 아이디 :</Label>
+          <IdInput type="text" value={kakaoId} onChange={(e) => setKakaoId(e.target.value)} />
+        </SocialBox>
+        <SocialBox>
+          <IconCircle type="instagram"><FaInstagram /></IconCircle>
+          <Label>인스타 아이디 :</Label>
+          <IdInput type="text" value={instaId} onChange={(e) => setInstaId(e.target.value)} />
+        </SocialBox>
+      </Row>
+    </Section>
+  );
 }
 
 export default IdSection;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 
 const Section = styled.section`
@@ -32,18 +32,17 @@ const FieldButton = styled.button`
 
 const fields = ["헬스", "요가", "도수", "재활"];
 
-function FieldSection() {
-  const [selected, setSelected] = useState(null);
+function FieldSection({ majorName, setMajorName }) {
   return (
     <Section>
       <Label>희망분야</Label>
       <ButtonRow>
-        {fields.map((field, idx) => (
+        {fields.map((field) => (
           <FieldButton
             key={field}
-            selected={selected === idx}
+            selected={majorName === field}
             type="button"
-            onClick={() => setSelected(idx)}
+            onClick={() => setMajorName(field)}
           >
             {field}
           </FieldButton>

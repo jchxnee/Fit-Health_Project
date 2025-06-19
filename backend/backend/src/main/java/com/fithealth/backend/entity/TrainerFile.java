@@ -13,6 +13,10 @@ import lombok.*;
 public class TrainerFile {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TRAINER_NO")
     private Trainer trainer;

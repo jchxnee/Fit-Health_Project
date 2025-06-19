@@ -38,23 +38,19 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 전역 CORS 설정 빈 등록
+    // 전역 CORS 설정 빈 등록 (Spring Security가 자동으로 사용)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // 현재 프론트엔드 포트 목록 (http://localhost:5175만 사용하고 있다면 하나만 있어도 됩니다)
-        config.setAllowedOrigins(List.of(
-                "http://localhost:5175", // 당신의 현재 React 앱 포트
-                "http://127.0.0.1:5175"  // 혹시 127.0.0.1로 접근할 경우를 대비
-        ));
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // 자격 증명 (쿠키, 인증 헤더 등) 허용
         config.setMaxAge(3600L); // Preflight 요청 결과 캐싱 시간 (1시간)
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config); // 모든 경로에 CORS 설정 적용
+        source.registerCorsConfiguration("/**", config);
 
         return source;
     }

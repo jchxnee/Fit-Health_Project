@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @Table(name = "MEMBER")
 @DynamicInsert
 @DynamicUpdate

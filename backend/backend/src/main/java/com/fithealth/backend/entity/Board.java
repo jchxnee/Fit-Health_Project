@@ -48,17 +48,24 @@ public class Board {
     private Member member;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<BoardFile> boardPhoto = new ArrayList<>();
-
 
     @PrePersist
     public void prePersist() {
         this.createdDate = LocalDateTime.now();
         if(this.status == null) {
             this.status = CommonEnums.Status.Y;
+        }
+        if (this.count == null) {
+            this.count = 0L;
+        }
+        if (this.heart == null) {
+            this.heart = 0L;
         }
     }
 
@@ -67,5 +74,10 @@ public class Board {
         if(!member.getBoards().contains(this)) {
             member.getBoards().add(this);
         }
+    }
+
+    public void addBoardFile(BoardFile boardFile) {
+        this.boardPhoto.add(boardFile);
+        boardFile.setBoard(this);
     }
 }
