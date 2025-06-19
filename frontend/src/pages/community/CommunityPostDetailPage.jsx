@@ -1,75 +1,102 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { FaHeart, FaRegHeart, FaEllipsisV, FaShareAlt } from 'react-icons/fa'; // 좋아요, 더보기, 공유 아이콘
-import { RiMessage2Fill } from 'react-icons/ri'; // 댓글 아이콘
-import { FaPaperPlane } from 'react-icons/fa'; // 댓글 전송 아이콘
-import betaImg from '../../assets/beta_user_img.png'; // 더미 사용자 이미지 (경로 수정 필요)
+import { FaHeart, FaRegHeart, FaEllipsisV, FaShareAlt } from 'react-icons/fa';
+import { RiMessage2Fill } from 'react-icons/ri';
+import { FaPaperPlane } from 'react-icons/fa';
+import betaImg from '../../assets/beta_user_img.png';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import api from '../../api/axios';
+import { API_ENDPOINTS } from '../../api/config';
+import useUserStore from '../../store/useUserStore';
 
 function CommunityPostDetailPage() {
-  const [isLiked, setIsLiked] = useState(false); // 좋아요 상태
-  const [likesCount, setLikesCount] = useState(120); // 좋아요 수
-  const [commentInput, setCommentInput] = useState(''); // 댓글 입력창 상태
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // 더보기 메뉴 드롭다운 상태
-  const menuRef = useRef(null); // 더보기 메뉴 외부 클릭 감지를 위한 ref
+  const { user } = useUserStore();
+  const { id } = useParams();
+  const boardNo = id;
 
-  // 더미 게시글 데이터 (실제 백엔드 데이터로 대체될 부분)
-  const post = {
-    id: 1,
-    category: '운동해요!',
-    title: '이거 어떻게 쓰는거에요?',
-    author: '김현아',
-    authorProfileImg: betaImg,
-    authorRegion: '서울',
-    authorRegionDetail: '강남구',
-    timeAgo: '1시간 전',
-    views: 12,
-    content: `아니 바 사니까 이것도 같이 딸려오는데 이게 뭔가요 악력 키우기인가요? 혹시 사용법 아시는 분 알려주시면 감사하겠습니다.`,
-    images: [betaImg, betaImg],
-    comments: [
-      {
-        id: 1,
-        author: '이우진',
-        authorType: '핏코치',
-        authorRegion: '서울',
-        authorRegionDetail: '강남구',
-        timeAgo: '5분 전',
-        text: '데드리프트 할 때 등 고정하는 악력 키우는 데 도움이 됩니다.',
-        profileImg: betaImg,
-      },
-      {
-        id: 2,
-        author: '최현우',
-        authorType: '일반사용자',
-        authorRegion: '서울',
-        authorRegionDetail: '강남구',
-        timeAgo: '4분 전',
-        text: '와~ 저는 저거 뭔지도 몰랐네요! 신기하다 ㅎㅎㅎ',
-        profileImg: betaImg,
-      },
-      {
-        id: 3,
-        author: '김현아',
-        authorType: '일반사용자',
-        authorRegion: '서울',
-        authorRegionDetail: '강남구',
-        timeAgo: '2분 전',
-        text: '네 맞아요! 저도 잘 모르고 샀는데 쓸만하더라고요~',
-        profileImg: betaImg,
-      },
-    ],
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [commentInput, setCommentInput] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  // ⭐ 임시 사용자 이메일 (실제 로그인 시스템과 연동 필요) ⭐
+  const currentUserEmail = user.email;
+
+  // 게시글 데이터 및 댓글 목록 불러오기
+  useEffect(() => {
+    const fetchPostDetail = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        // ⭐ userEmail 파라미터 추가 ⭐
+        const response = await api.get(`${API_ENDPOINTS.BOARD.DETAIL}/${boardNo}?userEmail=${currentUserEmail}`);
+        const fetchedPost = response.data;
+
+        setPost(fetchedPost);
+        setLikesCount(fetchedPost.heart || 0);
+        setIsLiked(fetchedPost.is_liked_by_user); // ⭐ 좋아요 상태 초기화 ⭐
+
+        // ⭐ 조회수 증가 API 호출 ⭐
+        await api.put(`/api/board/${boardNo}/view`);
+      } catch (err) {
+        console.error('게시글 상세 정보를 불러오는 중 오류 발생:', err);
+        setError('게시글 상세 정보를 불러오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (boardNo) {
+      fetchPostDetail();
+    }
+  }, [boardNo, currentUserEmail]); // currentUserEmail이 변경될 때도 다시 불러오도록 설정
+
+  const handleLikeToggle = async () => {
+    try {
+      // ⭐ 좋아요 토글 API 호출 ⭐
+      const response = await axios.post(`http://localhost:7961/api/board/${boardNo}/like`, currentUserEmail, {
+        headers: {
+          'Content-Type': 'application/json', // String을 JSON으로 보낼 때 필요
+        },
+      });
+      const newLikedStatus = response.data; // 백엔드에서 반환된 좋아요 상태 (true/false)
+
+      setIsLiked(newLikedStatus);
+      setLikesCount((prevCount) => (newLikedStatus ? prevCount + 1 : prevCount - 1));
+    } catch (err) {
+      console.error('좋아요 토글 중 오류 발생:', err);
+      alert('좋아요 처리에 실패했습니다.');
+    }
   };
 
-  const handleLikeToggle = () => {
-    setIsLiked(!isLiked);
-    setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
-  };
-
-  const handleCommentSubmit = (e) => {
+  const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (commentInput.trim() === '') return;
-    console.log('새 댓글:', commentInput);
-    // 실제 백엔드에 댓글 전송 로직 추가 필요
-    setCommentInput(''); // 입력창 초기화
+
+    try {
+      const newCommentData = {
+        board_no: boardNo,
+        commentContent: commentInput,
+        user_email: currentUserEmail, // ⭐ 임시 사용자 이메일 사용 ⭐
+      };
+      const response = await axios.post('http://localhost:7961/api/comment', newCommentData);
+
+      // 댓글 작성 후 게시글 데이터를 다시 불러와서 댓글 목록 업데이트
+      const updatedPostResponse = await axios.get(
+        `http://localhost:7961/api/board/${boardNo}?userEmail=${currentUserEmail}`
+      );
+      setPost(updatedPostResponse.data);
+      setCommentInput('');
+    } catch (err) {
+      console.error('댓글 작성 중 오류 발생:', err);
+      alert('댓글 작성에 실패했습니다.');
+    }
   };
 
   // 더보기 메뉴 외부 클릭 감지
@@ -85,25 +112,35 @@ function CommunityPostDetailPage() {
     };
   }, []);
 
+  if (loading) {
+    return <PageContainer>로딩 중...</PageContainer>;
+  }
+
+  if (error) {
+    return <PageContainer>오류: {error}</PageContainer>;
+  }
+
+  if (!post) {
+    return <PageContainer>게시글을 찾을 수 없습니다.</PageContainer>;
+  }
+
   return (
     <>
       <PageContainer>
         <MainContentWrapper>
           <PostHeader>
-            <PostCategory>커뮤니티 &gt; {post.category}</PostCategory>
-            <PostTitle>{post.title}</PostTitle>
-            <PostAuthorRegion>
-              {post.authorRegion} {post.authorRegionDetail}
-            </PostAuthorRegion>{' '}
+            <PostCategory>커뮤니티 &gt; {post.board_category_name}</PostCategory>
+            <PostTitle>{post.board_title}</PostTitle>
+            <PostAuthorRegion>{post.user_address}</PostAuthorRegion>
             <PostInfo>
               <AuthorInfo>
-                <ProfileImage src={post.authorProfileImg || betaImg} alt={post.author} />
+                <ProfileImage src={post.user_img} alt={post.user_name} />
                 <AuthorDetailsStyled>
-                  <AuthorName>{post.author}</AuthorName>
+                  <AuthorName>{post.user_name}</AuthorName>
                   <PostMeta>
-                    <TimeAgo>{post.timeAgo}</TimeAgo>
+                    <TimeAgo>{new Date(post.created_date).toLocaleString()}</TimeAgo>
                     <Separator>·</Separator>
-                    <ViewsCount>조회 {post.views}</ViewsCount>
+                    <ViewsCount>조회 {post.count}</ViewsCount>
                   </PostMeta>
                 </AuthorDetailsStyled>
               </AuthorInfo>
@@ -125,11 +162,16 @@ function CommunityPostDetailPage() {
           </PostHeader>
 
           <PostContent>
-            <p>{post.content}</p>
+            <p>{post.board_content}</p>
             <ImageGallery>
-              {post.images.map((imgSrc, index) => (
-                <ImageItem key={index} src={imgSrc} alt={`게시글 이미지 ${index + 1}`} />
-              ))}
+              {post.files &&
+                post.files.map((file, index) => (
+                  <ImageItem
+                    key={file.file_no}
+                    src={`http://localhost:7961/uploads/${file.change_name}`}
+                    alt={`게시글 이미지 ${index + 1}`}
+                  />
+                ))}
             </ImageGallery>
             <InteractionStats>
               <LikeButton onClick={handleLikeToggle}>
@@ -138,7 +180,7 @@ function CommunityPostDetailPage() {
               </LikeButton>
               <CommentCount>
                 <RiMessage2Fill color="#757575" />
-                <span>댓글 {post.comments.length}</span>
+                <span>댓글 {post.comments_count || 0}</span>
               </CommentCount>
             </InteractionStats>
           </PostContent>
@@ -156,24 +198,22 @@ function CommunityPostDetailPage() {
               </SendButton>
             </CommentInputContainer>
             <CommentList>
-              {post.comments.map((comment) => (
-                <CommentItem key={comment.id}>
-                  <CommentAuthorInfo>
-                    <ProfileImage src={comment.profileImg || betaImg} alt={comment.author} />
-                    <AuthorDetails>
-                      <AuthorDetailsSmall>
-                        <AuthorName>{comment.author}</AuthorName>
-                        <AuthorType>{comment.authorType}</AuthorType>
-                      </AuthorDetailsSmall>
-                      <CommentAuthorRegion>
-                        {comment.authorRegion} {comment.authorRegionDetail}
-                      </CommentAuthorRegion>{' '}
-                    </AuthorDetails>
-                  </CommentAuthorInfo>
-                  <CommentText>{comment.text}</CommentText>
-                  <CommentTime>{comment.timeAgo}</CommentTime>
-                </CommentItem>
-              ))}
+              {post.comments &&
+                post.comments.map((comment) => (
+                  <CommentItem key={comment.comment_no}>
+                    <CommentAuthorInfo>
+                      <ProfileImage src={betaImg} alt={comment.member.userName} />
+                      <AuthorDetails>
+                        <AuthorDetailsSmall>
+                          <AuthorName>{comment.member.userName}</AuthorName>
+                        </AuthorDetailsSmall>
+                        <CommentAuthorRegion></CommentAuthorRegion>
+                      </AuthorDetails>
+                    </CommentAuthorInfo>
+                    <CommentText>{comment.commentContent}</CommentText>
+                    <CommentTime>{new Date(comment.createdDate).toLocaleString()}</CommentTime>
+                  </CommentItem>
+                ))}
             </CommentList>
           </CommentSection>
         </MainContentWrapper>
@@ -185,7 +225,6 @@ function CommunityPostDetailPage() {
 export default CommunityPostDetailPage;
 
 // --- 스타일 컴포넌트 ---
-
 const PageContainer = styled.div`
   width: 100%;
   display: flex;
@@ -195,7 +234,7 @@ const PageContainer = styled.div`
 `;
 
 const MainContentWrapper = styled.div`
-  width: ${({ theme }) => theme.width.lg}; /* 1008px */
+  width: ${({ theme }) => theme.width.lg};
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: ${({ theme }) => theme.borderRadius.base};
   box-shadow: ${({ theme }) => theme.shadows.sm};
@@ -229,35 +268,32 @@ const PostTitle = styled.h1`
 `;
 
 const PostAuthorRegion = styled.span`
-  display: block; /* 줄바꿈을 위해 block 요소로 */
+  display: block;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.gray['500']};
-  margin-top: ${({ theme }) => theme.spacing['2']}; /* 글 제목과의 간격 */
-  margin-bottom: ${({ theme }) => theme.spacing['4']}; /* 아래 PostInfo와의 간격 */
+  margin-top: ${({ theme }) => theme.spacing['2']};
+  margin-bottom: ${({ theme }) => theme.spacing['4']};
 `;
 
 const PostInfo = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* margin-top: ${({ theme }) => theme.spacing['3']}; <- 위 PostAuthorRegion에 마진을 주면서 필요 없어짐 */
 `;
 
 const AuthorInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing['3']}; /* 프로필 사진과 이름/시간 간격 */
+  gap: ${({ theme }) => theme.spacing['3']};
 `;
 
 const AuthorDetailsStyled = styled.div`
-  /* 글쓴이 이름과 시간/조회수 묶음 */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 `;
 
 const PostMeta = styled.div`
-  /* 시간과 조회수 묶음 */
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing['1']};
@@ -271,15 +307,9 @@ const AuthorName = styled.span`
   color: ${({ theme }) => theme.colors.gray['700']};
 `;
 
-const TimeAgo = styled.span`
-  /* font-size: ${({ theme }) => theme.fontSizes.sm}; */
-  /* color: ${({ theme }) => theme.colors.gray['500']}; */
-`;
+const TimeAgo = styled.span``;
 
-const ViewsCount = styled.span`
-  /* font-size: ${({ theme }) => theme.fontSizes.sm}; */
-  /* color: ${({ theme }) => theme.colors.gray['500']}; */
-`;
+const ViewsCount = styled.span``;
 
 const Separator = styled.span`
   color: ${({ theme }) => theme.colors.gray['400']};
@@ -290,11 +320,10 @@ const PostActions = styled.div`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing['3']};
-  position: relative; /* 드롭다운 메뉴를 위한 상대 위치 */
+  position: relative;
 `;
 
 const ShareButton = styled.button`
-  /* 공유 버튼 스타일 */
   background: none;
   border: none;
   cursor: pointer;
@@ -329,7 +358,7 @@ const DropdownMenu = styled.div`
   box-shadow: ${({ theme }) => theme.shadows.md};
   z-index: 10;
   min-width: 100px;
-  overflow: hidden; /* 자식 요소의 border-radius를 위해 */
+  overflow: hidden;
 `;
 
 const DropdownMenuItem = styled.div`
@@ -355,28 +384,27 @@ const PostContent = styled.div`
 
 const ImageGallery = styled.div`
   display: flex;
-  overflow-x: auto; /* 이미지가 많을 경우 가로 스크롤 */
+  overflow-x: auto;
   gap: ${({ theme }) => theme.spacing['3']};
-  padding-bottom: ${({ theme }) => theme.spacing['2']}; /* 스크롤바 공간 확보 */
+  padding-bottom: ${({ theme }) => theme.spacing['2']};
   margin-bottom: ${({ theme }) => theme.spacing['4']};
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 
   &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera*/
+    display: none;
   }
 `;
 
 const ImageItem = styled.img`
-  width: 200px; /* 이미지 너비 고정 */
-  height: 200px; /* 이미지 높이 고정 */
+  width: 200px;
+  height: 200px;
   object-fit: cover;
   border-radius: ${({ theme }) => theme.borderRadius.ten};
-  flex-shrink: 0; /* 이미지들이 축소되지 않도록 */
+  flex-shrink: 0;
 `;
 
 const InteractionStats = styled.div`
-  /* 좋아요, 댓글 수를 포함하는 새로운 컨테이너 */
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing['4']};
@@ -493,13 +521,13 @@ const ProfileImage = styled.img`
 const AuthorDetails = styled.div`
   display: flex;
   align-items: start;
-  flex-direction: column; /* 이름과 유형을 한 줄로 */
+  flex-direction: column;
   gap: ${({ theme }) => theme.spacing['2']};
 `;
 
 const AuthorDetailsSmall = styled.div`
   display: flex;
-  flex-direction: row; /* 이름과 유형을 한 줄로 */
+  flex-direction: row;
   align-items: center;
   gap: ${({ theme }) => theme.spacing['1']};
 `;
@@ -517,15 +545,6 @@ const CommentTime = styled.span`
   color: ${({ theme }) => theme.colors.gray['500']};
   margin-top: ${({ theme }) => theme.spacing['1']};
   align-self: flex-start;
-`;
-
-const AuthorType = styled.span`
-  font-size: ${({ theme }) => theme.fontSizes.xs};
-  color: ${({ theme }) => theme.colors.primary}; /* 핏코치/일반사용자 구분 색상 */
-  background-color: ${({ theme }) => theme.colors.primaryLight}; /* 배경색 */
-  padding: 2px 6px;
-  border-radius: ${({ theme }) => theme.borderRadius.sm};
-  font-weight: ${({ theme }) => theme.fontWeights.semibold};
 `;
 
 const CommentAuthorRegion = styled.span`

@@ -22,5 +22,6 @@ export const API_ENDPOINTS = {
   BOARD: {
     ALL: 'api/board/all',
     CREATE: '/api/board',
+    DETAIL: '/api/board',
   },
 };

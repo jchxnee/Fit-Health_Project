@@ -1,14 +1,14 @@
 package com.fithealth.backend.dto.Board;
 
 import com.fithealth.backend.entity.Board;
-import com.fithealth.backend.entity.BoardFile; // BoardFile 임포트
+import com.fithealth.backend.entity.BoardFile;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors; // Collectors 임포트
+import java.util.stream.Collectors;
 
 public class BoardGetDto {
 
@@ -21,45 +21,45 @@ public class BoardGetDto {
         private String board_title;
         private String board_content;
         private LocalDateTime created_date;
-        private Long count; // 조회수 (COUNT)
-        private Long heart; // 추천수 (HEART)
+        private Long count;
+        private Long heart;
         private String user_email;
-        private String board_category_name;
         private String user_name;
+        private String user_img;
+        private String board_category_name;
+        private Long comments_count;
+        private List<BoardFileDto> files;
+        private Boolean is_liked_by_user; // ⭐ 추가된 필드 ⭐
 
-        // ⭐ 첨부 파일 목록을 위한 DTO 추가 ⭐
-        private List<BoardFileDto> files; // 게시글 파일 DTO 리스트
-
-        public static Response toDto(Board board) {
+        // ⭐ userEmail 파라미터 추가 ⭐
+        public static Response toDto(Board board, Boolean isLikedByUser) {
             return Response.builder()
                     .board_no(board.getBoardNo())
                     .board_title(board.getBoardTitle())
                     .board_content(board.getBoardContent())
                     .count(board.getCount())
-                    .heart(board.getHeart()) // HEART 필드 추가
+                    .heart(board.getHeart())
                     .created_date(board.getCreatedDate())
                     .user_email(board.getMember().getUserEmail())
                     .user_name(board.getMember().getUserName())
+                    .user_img(board.getMember().getProfileImage())
                     .board_category_name(board.getBoardCategoryName())
+                    .comments_count((long) board.getComments().size())
                     .files(board.getBoardPhoto().stream()
                             .map(BoardFileDto::toDto)
                             .collect(Collectors.toList()))
+                    .is_liked_by_user(isLikedByUser) // ⭐ 필드 값 설정 ⭐
                     .build();
         }
-
     }
 
-
-
-    // ⭐ BoardFile 정보를 담을 내부 DTO 클래스 ⭐
     @Getter
     @AllArgsConstructor
     @Builder
     public static class BoardFileDto {
-        private Long file_no; // 파일 번호
-        private String origin_name; // 원본 파일명
-        private String change_name; // 변경된 파일명 (저장된 실제 파일명)
-        // private String file_url; // 프론트에서 접근할 수 있는 파일 URL (필요하다면 추가)
+        private Long file_no;
+        private String origin_name;
+        private String change_name;
 
         public static BoardFileDto toDto(BoardFile boardFile) {
             return BoardFileDto.builder()

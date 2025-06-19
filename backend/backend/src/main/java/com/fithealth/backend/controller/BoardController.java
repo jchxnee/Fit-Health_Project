@@ -34,7 +34,7 @@ public class BoardController {
 
     @GetMapping("/all")
     public ResponseEntity<PageResponse<BoardGetDto.Response>> getBoards(
-            @RequestParam(defaultValue = "전체") String category, // "전체"를 기본값으로 설정
+            @RequestParam(defaultValue = "전체") String category,
             @PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
         PageResponse<BoardGetDto.Response> response = boardService.getBoardList(category, pageable);
@@ -42,7 +42,26 @@ public class BoardController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BoardGetDto.Response> getBoard(@PathVariable("id") Long boardNo) {
-        return ResponseEntity.ok(boardService.getBoardDetail(boardNo));
+    public ResponseEntity<BoardGetDto.Response> getBoard(
+            @PathVariable("id") Long boardNo,
+            @RequestParam(value = "userEmail", required = false) String userEmail // ⭐ userEmail 파라미터 추가 ⭐
+    ) {
+        return ResponseEntity.ok(boardService.getBoardDetail(boardNo, userEmail)); // ⭐ userEmail 전달 ⭐
+    }
+
+    @PutMapping("/{id}/view") // ⭐ 조회수 증가 엔드포인트 추가 ⭐
+    public ResponseEntity<Void> incrementViewCount(@PathVariable("id") Long boardNo) {
+        boardService.incrementBoardCount(boardNo);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/like") // ⭐ 좋아요 토글 엔드포인트 추가 ⭐
+    public ResponseEntity<Boolean> toggleLike(
+            @PathVariable("id") Long boardNo,
+            @RequestBody String userEmail // ⭐ userEmail을 요청 본문으로 받음 ⭐
+    ) {
+        String parsedUserEmail = userEmail.replace("\"", ""); // JSON 문자열로 넘어올 경우 따옴표 제거
+        boolean liked = boardService.toggleLike(boardNo, parsedUserEmail);
+        return ResponseEntity.ok(liked); // 좋아요 상태 반환 (true: 좋아요, false: 좋아요 취소)
     }
 }

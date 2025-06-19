@@ -7,7 +7,7 @@ import CustomCategoryMenu from '../../components/CustomCategoryMenu';
 import GeneralPostsList from '../../components/GeneralPostsList';
 import { Link } from 'react-router-dom';
 import Pagination from '../../components/Pagination';
-import api from '../../api/axios'; // axios 대신 api 인스턴스 사용
+import api from '../../api/axios';
 import { API_ENDPOINTS } from '../../api/config';
 
 function CommunityPage() {

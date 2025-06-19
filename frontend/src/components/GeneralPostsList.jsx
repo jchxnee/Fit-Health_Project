@@ -3,7 +3,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { FaThumbsUp } from 'react-icons/fa';
 import { RiMessage2Fill } from 'react-icons/ri';
-import { Link } from 'react-router-dom'; // Link 컴포넌트 import 추가
+import { Link } from 'react-router-dom';
+import { formatTimeAgo } from '../utils/timeAgo'; // ⭐ 새로 생성한 유틸리티 함수 임포트 ⭐
 
 const GeneralPostsContainer = styled.div`
   display: flex;
@@ -11,15 +12,13 @@ const GeneralPostsContainer = styled.div`
   gap: ${({ theme }) => theme.spacing[4]};
 `;
 
-// Link 컴포넌트에 스타일을 적용하기 위한 래퍼
-// 기존 GeneralPostItem의 스타일을 상속받고 Link의 기능 추가
 const StyledLink = styled(Link)`
-  text-decoration: none; // 기본 링크 밑줄 제거
-  color: inherit; // 부모 요소의 글자 색상 상속
+  text-decoration: none;
+  color: inherit;
   cursor: pointer;
-  display: flex; /* GeneralPostItem의 flex 속성을 유지 */
-  flex-direction: column; /* GeneralPostItem의 flex-direction 유지 */
-  gap: ${({ theme }) => theme.spacing[1]}; /* GeneralPostItem의 gap 유지 */
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing[1]};
 
   background-color: ${({ theme }) => theme.colors.white};
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
@@ -31,8 +30,8 @@ const StyledLink = styled(Link)`
 
   &:hover {
     background-color: ${({ theme }) => theme.colors.gray[50]};
-    transform: translateY(-2px); /* 약간 위로 올라가는 효과 */
-    box-shadow: ${({ theme }) => theme.shadows.sm}; /* 그림자 효과 추가 */
+    transform: translateY(-2px);
+    box-shadow: ${({ theme }) => theme.shadows.sm};
   }
 `;
 
@@ -113,11 +112,6 @@ const NoPostsMessage = styled.div`
 `;
 
 function GeneralPostsList({ posts }) {
-  // handlePostClick 함수는 Link 컴포넌트 사용으로 더 이상 필요 없습니다.
-  // const handlePostClick = (postId) => {
-  //   console.log(`게시글 클릭: ${postId}`);
-  // };
-
   if (!posts || posts.length === 0) {
     return <NoPostsMessage>게시물이 없습니다.</NoPostsMessage>;
   }
@@ -125,7 +119,6 @@ function GeneralPostsList({ posts }) {
   return (
     <GeneralPostsContainer>
       {posts.map((post) => (
-        // Link 컴포넌트로 GeneralPostItem 내용을 감싸고, to 프롭에 경로 지정
         <StyledLink to={`/communityDetailPage/${post.board_no}`} key={post.board_no}>
           <GeneralPostCategory>{post.board_category_name}</GeneralPostCategory>
           <GeneralPostTitle>{post.board_title}</GeneralPostTitle>
@@ -139,7 +132,8 @@ function GeneralPostsList({ posts }) {
                 <RiMessage2Fill /> {post.comments_count}
               </span>
             </PostHeartComment>
-            <TimeAgoReview>{post.timeAgo}</TimeAgoReview>
+            {/* ⭐ created_date를 formatTimeAgo 함수에 전달하여 변환된 시간 표시 ⭐ */}
+            <TimeAgoReview>{formatTimeAgo(post.created_date)}</TimeAgoReview>
           </PostMeta>
         </StyledLink>
       ))}
