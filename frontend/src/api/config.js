@@ -26,4 +26,9 @@ export const API_ENDPOINTS = {
   REVIEW: {
     CREATE: '/api/review',
   },
+  BOARD: {
+    ALL: 'api/board/all',
+    CREATE: '/api/board',
+    DETAIL: '/api/board',
+  },
 };

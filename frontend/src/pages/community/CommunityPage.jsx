@@ -1,213 +1,102 @@
 // CommunityPage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaPencilAlt, FaThumbsUp, FaEye } from 'react-icons/fa';
 import { RiMessage2Fill } from 'react-icons/ri';
 import CustomCategoryMenu from '../../components/CustomCategoryMenu';
 import GeneralPostsList from '../../components/GeneralPostsList';
-import { Link } from 'react-router-dom'; // Link 컴포넌트 import
+import { Link } from 'react-router-dom';
 import Pagination from '../../components/Pagination';
+import api from '../../api/axios';
+import { API_ENDPOINTS } from '../../api/config';
 
 function CommunityPage() {
   const [activeCategory, setActiveCategory] = useState('전체');
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 10;
+  const [postsPerPage] = useState(10); // postsPerPage를 상수로 만듦
+
+  const [generalPosts, setGeneralPosts] = useState([]);
+  const [topPosts, setTopPosts] = useState([]);
+  const [photoPosts, setPhotoPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // 백엔드에서 받은 전체 페이지 정보 (페이지네이션에 사용)
+  const [totalPostsCount, setTotalPostsCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const notices = [{ id: 1, title: '공지: 핏헬스 가이드라인', icon: '>', link: '#' }];
   const Categories = [{ name: '전체' }, { name: '운동해요!' }, { name: '궁금해요!' }, { name: '소통해요!' }];
 
-  const topPosts = [
-    { id: 1, title: '왜진왜진 이거 살 잘빠지더라고요', views: 3500, comments: 10 },
-    { id: 2, title: '아 그래요?', views: 3700, comments: 15 },
-    { id: 3, title: '와진짜 이거 살 잘빠지더라고요', views: 3900, comments: 12 },
-  ];
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await api.get(API_ENDPOINTS.BOARD.ALL, {
+          params: {
+            category: activeCategory, // 백엔드에서 "전체"를 처리하므로 그대로 전달
+            page: currentPage - 1, // 스프링 Pageable은 0부터 시작
+            size: postsPerPage,
+            sort: 'createdDate,desc', // 최신순 정렬 (백엔드 엔티티 필드명 기준)
+          },
+        });
 
-  const photoPosts = [
-    {
-      id: 1,
-      img: 'https://picsum.photos/300/200?random=1',
-      title: '이거 어떻게 쓰는 거예요?',
-      content: '아니 바 사니까 이것도 같이 딸려오는데 이게 뭔가요 악력키우기인가요?',
-      heart: 3700,
-      comments: 10,
-    },
-    {
-      id: 2,
-      img: 'https://picsum.photos/300/200?random=2',
-      title: '비타 300',
-      content: '비타300 이거 먹고 변비도 낫구 그냥 몸이 건강한 기분입니다~~!!',
-      heart: 3200,
-      comments: 10,
-    },
-    {
-      id: 3,
-      img: 'https://picsum.photos/300/200?random=3',
-      title: '새 운동복 자랑',
-      content: '새로 산 운동복인데 착용감이 정말 좋네요!',
-      heart: 1500,
-      comments: 5,
-    },
-    {
-      id: 4,
-      img: 'https://picsum.photos/300/200?random=4',
-      title: '헬스장 풍경',
-      content: '오늘도 운동하기 좋은 날씨! 다들 득근하세요!',
-      heart: 2000,
-      comments: 7,
-    },
-  ];
+        // ⭐ 여기서 수정합니다: response.data.content에 접근 ⭐
+        const fetchedPageResponse = response.data; // PageResponse 객체 전체
+        const allPostsContent = fetchedPageResponse.content; // 실제 게시글 배열
 
-  const allGeneralPosts = [
-    {
-      id: 1,
-      title: '광배 잘먹이는 방법..ㅠㅠ 아시는분',
-      content: '광배가 잘 안먹어요... 안먹을때 잘 먹게 하는 방법이 있을까요?',
-      category: '궁금해요!',
-      timeAgo: '5분 전',
-      heart: 3700,
-      comments: 10,
-    },
-    {
-      id: 2,
-      title: '요 앞에 고릴라헬스장에서 같이 퇴근헬스하실분!! ㅎㅎ',
-      content: '같이 운동할 분 찾아요!',
-      category: '운동해요!',
-      timeAgo: '10분 전',
-      heart: 3200,
-      comments: 8,
-    },
-    {
-      id: 3,
-      title: '닭가슴살 샐러드 맛집 추천해주세요',
-      content: '맛있고 질리지 않는 닭가슴살 샐러드 어디 없나요?',
-      category: '궁금해요!',
-      timeAgo: '15분 전',
-      heart: 2500,
-      comments: 12,
-    },
-    {
-      id: 4,
-      title: '요즘 핫한 운동 루틴 같이 공유해요!',
-      content: '저는 요즘 이 루틴으로 운동 중인데 효과 좋아요!',
-      category: '운동해요!',
-      timeAgo: '20분 전',
-      heart: 4000,
-      comments: 20,
-    },
-    {
-      id: 5,
-      title: '점심 뭐 먹을지 고민이네요',
-      content: '운동 후에는 뭘 먹어야 할까요?',
-      category: '소통해요!',
-      timeAgo: '25분 전',
-      heart: 1800,
-      comments: 5,
-    },
-    {
-      id: 6,
-      title: '새로운 헬스장 오픈! 후기 남겨요',
-      content: '시설도 좋고 트레이너분들도 친절하시네요.',
-      category: '소통해요!',
-      timeAgo: '30분 전',
-      heart: 3000,
-      comments: 15,
-    },
-    {
-      id: 7,
-      title: '운동하기 좋은 계절이네요',
-      content: '날씨도 좋고 운동하기 딱이네요.',
-      category: '운동해요!',
-      timeAgo: '35분 전',
-      heart: 2800,
-      comments: 7,
-    },
-    {
-      id: 8,
-      title: 'PT 어디서 받아야 하나요?',
-      content: '초보인데 PT를 받고 싶은데 어디가 좋을까요?',
-      category: '궁금해요!',
-      timeAgo: '40분 전',
-      heart: 2200,
-      comments: 9,
-    },
-    {
-      id: 9,
-      title: '오늘 운동 인증샷!',
-      content: '오늘도 뿌셨다!',
-      category: '소통해요!',
-      timeAgo: '45분 전',
-      heart: 4500,
-      comments: 25,
-    },
-    {
-      id: 10,
-      title: '운동 후 단백질 섭취는 필수!',
-      content: '어떤 단백질 보충제가 좋을까요?',
-      category: '궁금해요!',
-      timeAgo: '50분 전',
-      heart: 2000,
-      comments: 6,
-    },
-    {
-      id: 11,
-      title: '러닝 크루 찾습니다!',
-      content: '같이 한강에서 러닝하실 분!',
-      category: '운동해요!',
-      timeAgo: '1시간 전',
-      heart: 3100,
-      comments: 11,
-    },
-    {
-      id: 12,
-      title: '식단 공유해요',
-      content: '저는 이렇게 식단 관리하고 있어요.',
-      category: '소통해요!',
-      timeAgo: '1시간 5분 전',
-      heart: 2900,
-      comments: 13,
-    },
-    {
-      id: 13,
-      title: '운동 슬럼프 극복 방법?',
-      content: '운동이 너무 하기 싫은데 어떻게 해야 할까요?',
-      category: '궁금해요!',
-      timeAgo: '1시간 10분 전',
-      heart: 1900,
-      comments: 4,
-    },
-    {
-      id: 14,
-      title: '오늘의 운동 기록',
-      content: '벤치프레스 100kg 성공!',
-      category: '운동해요!',
-      timeAgo: '1시간 15분 전',
-      heart: 5000,
-      comments: 30,
-    },
-    {
-      id: 15,
-      title: '다이어트 중인데 너무 힘드네요',
-      content: '다이어터분들 힘내세요!',
-      category: '소통해요!',
-      timeAgo: '1시간 20분 전',
-      heart: 2700,
-      comments: 8,
-    },
-  ];
+        // 전체 게시글 수와 전체 페이지 수를 백엔드 응답에서 설정
+        setTotalPostsCount(fetchedPageResponse.totalCount);
+        setTotalPages(fetchedPageResponse.totalPage);
 
-  const filteredPosts =
-    activeCategory === '전체' ? allGeneralPosts : allGeneralPosts.filter((post) => post.category === activeCategory);
+        // 1. TOP 5 게시글: 조회수(count) 기준으로 내림차순 정렬 후 상위 5개
+        // 백엔드에서 이미 활성 게시글만 가져오므로 별도 필터링 불필요
+        // 만약 TOP 5를 따로 가져오는 API가 있다면 더 효율적입니다.
+        const sortedByViews = [...allPostsContent].sort((a, b) => b.count - a.count);
+        setTopPosts(sortedByViews.slice(0, 5));
 
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
+        // 2. 사진 게시글: 파일이 첨부된 게시글 중 최신 4개
+        const photoPostsData = [...allPostsContent]
+          .filter((post) => post.files && post.files.length > 0)
+          .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+        setPhotoPosts(photoPostsData.slice(0, 4));
 
-  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+        // 3. 일반 게시글 (현재 페이지의 데이터만):
+        // 백엔드에서 이미 현재 페이지에 맞는 데이터를 보내주므로 필터링 필요 없음
+        setGeneralPosts(allPostsContent); // 현재 페이지의 게시글만 설정
+      } catch (err) {
+        console.error('게시글 데이터를 불러오는 중 오류 발생:', err);
+        // network error가 아닌 경우 err.response.data 등을 통해 상세 에러 메시지를 얻을 수 있음
+        setError('게시글을 불러오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, [activeCategory, currentPage, postsPerPage]); // activeCategory, currentPage, postsPerPage 변경 시 다시 불러옴
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo(0, 0);
   };
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <div>게시글을 불러오는 중입니다...</div>
+      </PageContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageContainer>
+        <div>오류: {error}</div>
+      </PageContainer>
+    );
+  }
 
   return (
     <>
@@ -219,7 +108,7 @@ function CommunityPage() {
               selectedCategory={activeCategory}
               onSelectCategory={(category) => {
                 setActiveCategory(category);
-                setCurrentPage(1);
+                setCurrentPage(1); // 카테고리 변경 시 1페이지로 초기화
               }}
             />
           </SidebarWrapper>
@@ -243,44 +132,55 @@ function CommunityPage() {
               ))}
             </NoticeSection>
 
-            {activeCategory === '전체' && (
+            {activeCategory === '전체' && topPosts.length > 0 && (
               <>
                 <SectionTitleSmall>TOP 5 커뮤니티 글🔥</SectionTitleSmall>
                 <TopPostsGrid>
                   {topPosts.map((post) => (
-                    // TOP 5 게시물에 Link 추가
-                    <StyledPostLink key={post.id} to={`/communityDetailPage/${post.id}`}>
+                    <StyledPostLink key={post.board_no} to={`/communityDetailPage/${post.board_no}`}>
                       <PostCard>
-                        <PostCardTitle>{post.title}</PostCardTitle>
+                        <PostCardTitle>{post.board_title}</PostCardTitle>
                         <PostMeta>
                           <span>
-                            <FaEye /> {post.views}
+                            <FaEye /> {post.count}
                           </span>
                           <span>
-                            <RiMessage2Fill /> {post.comments}
+                            <RiMessage2Fill /> {post.comments_count || 0}
                           </span>
                         </PostMeta>
                       </PostCard>
                     </StyledPostLink>
                   ))}
                 </TopPostsGrid>
+              </>
+            )}
 
+            {activeCategory === '전체' && photoPosts.length > 0 && (
+              <>
                 <SectionTitleMini>고객님들의 최신 사진 게시글</SectionTitleMini>
                 <PhotoPostsGrid>
                   {photoPosts.map((post) => (
-                    // 사진 게시물에 Link 추가
-                    <StyledPostLink key={post.id} to={`/communityDetailPage/${post.id}`}>
+                    <StyledPostLink key={post.board_no} to={`/communityDetailPage/${post.board_no}`}>
                       <PhotoPostCard>
-                        <PhotoPostImage src={post.img} alt={post.title} />
+                        {/* file_url은 백엔드에서 제공하는 실제 파일 경로여야 합니다. */}
+                        {/* 예시: http://localhost:8080/files/ {post.files[0]?.change_name} 과 같이 백엔드에서 파일 제공하는 API 경로를 구성해야 합니다. */}
+                        <PhotoPostImage
+                          src={
+                            post.files[0]?.file_url ||
+                            `http://localhost:7961/files/${post.files[0]?.change_name}` ||
+                            'https://via.placeholder.com/300x200?text=No+Image'
+                          }
+                          alt={post.board_title}
+                        />
                         <PhotoPostContent>
-                          <PhotoPostTitle>{post.title}</PhotoPostTitle>
-                          <PhotoPostText>{post.content}</PhotoPostText>
+                          <PhotoPostTitle>{post.board_title}</PhotoPostTitle>
+                          <PhotoPostText>{post.board_content}</PhotoPostText>
                           <PostMeta>
                             <span>
                               <FaThumbsUp /> {post.heart}
                             </span>
                             <span>
-                              <RiMessage2Fill /> {post.comments}
+                              <RiMessage2Fill /> {post.comments_count || 0}
                             </span>
                           </PostMeta>
                         </PhotoPostContent>
@@ -291,9 +191,11 @@ function CommunityPage() {
               </>
             )}
 
-            {/* 일반 게시글 목록은 GeneralPostsList 컴포넌트 내에서 Link 처리 */}
-            <GeneralPostsList posts={currentPosts} />
+            {/* 일반 게시글 목록 */}
+            {/* 백엔드에서 이미 페이지네이션된 데이터를 주므로 generalPosts를 바로 전달 */}
+            <GeneralPostsList posts={generalPosts} />
 
+            {/* totalPages를 백엔드에서 받아온 값으로 사용 */}
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
           </MainContentWrapper>
         </MainContentArea>
@@ -305,8 +207,6 @@ function CommunityPage() {
 export default CommunityPage;
 
 // --- CommunityPage에 남겨둘 스타일 컴포넌트 ---
-// 기존 스타일 유지 (PostCard, PhotoPostCard 등)
-// Link 컴포넌트에 스타일을 적용하기 위한 StyledPostLink 추가
 const PageContainer = styled.div`
   width: 100%;
   min-height: 100vh;
@@ -440,19 +340,19 @@ const TopPostsGrid = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing[8]};
 `;
 
-// Link 컴포넌트에 스타일을 적용하기 위한 래퍼
 const StyledPostLink = styled(Link)`
-  text-decoration: none; // 기본 링크 밑줄 제거
-  color: inherit; // 부모 요소의 글자 색상 상속
+  text-decoration: none;
+  color: inherit;
   cursor: pointer;
+  border-radius: ${({ theme }) => theme.borderRadius.xl};
 
   &:hover {
-    opacity: 0.9; // 호버 시 약간의 투명도 변화
-    transform: translateY(-2px); // 약간 위로 올라가는 효과
-    box-shadow: ${({ theme }) => theme.shadows.md}; // 그림자 효과
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: ${({ theme }) => theme.shadows.md};
   }
 
-  transition: all 0.2s ease-in-out; // 부드러운 전환 효과
+  transition: all 0.2s ease-in-out;
 `;
 
 const PostCard = styled.div`
@@ -464,7 +364,7 @@ const PostCard = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%; // Link로 감싸도 높이 유지
+  height: 100%;
 `;
 
 const PostCardTitle = styled.h3`
@@ -501,7 +401,7 @@ const PhotoPostCard = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.gray[200]};
   border-radius: ${({ theme }) => theme.borderRadius.ten};
   overflow: hidden;
-  height: 100%; // Link로 감싸도 높이 유지
+  height: 100%;
 `;
 
 const PhotoPostImage = styled.img`
