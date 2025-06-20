@@ -85,8 +85,6 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
         }
     }
 
-}
-
     // findByUserEmail은 기존 findOne과 동일한 기능을 합니다.
     // 만약 userEmail이 PK가 아니라 다른 고유한 필드라면 이 방법을 사용하는 것이 더 명확합니다.
     // 하지만 이미 findOne에서 PK로 사용 중이므로, 이 메서드는 중복이거나
@@ -108,4 +106,7 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
             return Optional.empty();
         }
     }
+
 }
+
+
