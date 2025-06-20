@@ -12,4 +12,5 @@ public interface MemberService {
     Boolean updateBirth(UpdateDto.RequestBirth updateDto);
     Boolean updateInfo(UpdateDto.RequestInfo updateDto);
     Boolean updatePwd(UpdateDto.RequestPwd updateDto);
+    Boolean deleteMember(String userEmail);
 }

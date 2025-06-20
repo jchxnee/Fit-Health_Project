@@ -359,21 +359,21 @@ const RegionSelect = ({ value, onChange }) => {
 
   const handleProvinceSelect = (province) => {
     setSelectedProvince(province);
-    setSelectedCity(''); // 도가 바뀌면 시/군/구 초기화
-    if (onChange) onChange(province, '');
+    setSelectedCity('');
+    if (onChange) onChange(`${province}`); // 구는 아직 선택 안됨
   };
 
   const handleCitySelect = (city) => {
     setSelectedCity(city);
-    setIsRegionModalOpen(false); // 시/군/구 선택하면 모달 닫기
-    if (onChange) onChange(selectedProvince, city);
+    setIsRegionModalOpen(false);
+    if (onChange) onChange(`${selectedProvince} ${city}`); // 시 + 구 합쳐서 전달
   };
 
   const handleRegionReset = () => {
     setSelectedProvince('');
     setSelectedCity('');
-    setIsRegionModalOpen(false); // 모달 닫기
-    if (onChange) onChange('', '');
+    setIsRegionModalOpen(false);
+    if (onChange) onChange('');
   };
 
   return (

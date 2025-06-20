@@ -35,7 +35,11 @@ const signUpSchema = yup.object().shape({
     .matches(/^\d{11}$/, '전화번호는 11자리 숫자로만 입력해주세요.')
     .required('전화번호를 입력해주세요.'),
 
-  birth: yup.date().max(new Date(), '미래 날짜는 선택할 수 없습니다.'),
+  birth: yup
+    .date()
+    .nullable() // null 허용
+    .notRequired() // 필수 아님
+    .max(new Date(), '미래 날짜는 선택할 수 없습니다.'),
 });
 
 // 회원가입 폼 커스텀 훅 정의

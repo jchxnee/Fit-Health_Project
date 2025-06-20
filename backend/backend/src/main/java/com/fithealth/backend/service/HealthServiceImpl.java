@@ -37,7 +37,7 @@ public class HealthServiceImpl implements HealthService {
         List<Health> healthList = healthRepository.findHealth(userEmail);
 
         if (healthList.isEmpty()) {
-            throw new EntityNotFoundException("건강 정보를 찾을 수 없습니다.");
+            return null;
         }
 
         return healthList.stream()

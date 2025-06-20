@@ -5,6 +5,7 @@ import com.fithealth.backend.enums.CommonEnums;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException; // NoResultException은 JPQL getSingleResult()에서 사용
 import jakarta.persistence.TypedQuery; // TypedQuery 임포트 추가
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
@@ -70,6 +71,21 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
             return Optional.empty();
         }
     }
+    @Override
+    public Optional<Member> findOneStatusY(String userEmail, CommonEnums.Status status) {
+        String sql = "SELECT m FROM Member m WHERE m.userEmail = :userEmail AND m.status = :status";
+        try {
+            Member member = em.createQuery(sql, Member.class)
+                    .setParameter("userEmail", userEmail)
+                    .setParameter("status", status)
+                    .getSingleResult();
+            return Optional.of(member);
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
+    }
+
+}
 
     // findByUserEmail은 기존 findOne과 동일한 기능을 합니다.
     // 만약 userEmail이 PK가 아니라 다른 고유한 필드라면 이 방법을 사용하는 것이 더 명확합니다.

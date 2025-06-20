@@ -13,4 +13,5 @@ public interface MemberRepository {
     Optional<Member> findByUserEmail(String userEmail);
     void updateGradeAndTrainer(String userEmail, CommonEnums.Grade grade, Long trainerNo);
     List<Member> findTrainer();
+    Optional<Member> findOneStatusY(String userEmail, CommonEnums.Status status);
 }

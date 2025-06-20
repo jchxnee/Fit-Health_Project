@@ -199,7 +199,13 @@ function SignUpPage() {
 
         <InputGroup>
           <Label htmlFor="birth">생년월일</Label>
-          <Input type="date" id="birth" {...register('birth')} />
+          <Input
+            type="date"
+            id="birth"
+            {...register('birth', {
+              setValueAs: (value) => (value === '' ? null : new Date(value)), // 빈 문자열을 null로 변환
+            })}
+          />
           {errors.birth && <ErrorMessage>{errors.birth.message}</ErrorMessage>}
         </InputGroup>
 

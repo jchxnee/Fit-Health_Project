@@ -42,13 +42,16 @@ export const useHealthForm = ({ useremail, onSuccess }) => {
       const existingData = await healthService.getHealthData(useremail);
 
       // 오늘 등록된 데이터가 있는지 확인
-      const alreadyExists = existingData.some((item) => {
-        const itemDate = new Date(item.create_date);
+      let alreadyExists = false;
+
+      if (existingData) {
+        const itemDate = new Date(existingData.create_date);
         const itemDateString = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}-${String(
           itemDate.getDate()
         ).padStart(2, '0')}`;
-        return itemDateString === todayString;
-      });
+
+        alreadyExists = itemDateString === todayString;
+      }
 
       if (alreadyExists) {
         toast.error('오늘은 이미 건강 정보를 입력하셨습니다.');

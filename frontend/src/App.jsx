@@ -49,6 +49,7 @@ import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
 import betaImg from './assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 import { useState } from 'react';
 import useUserStore from './store/useUserStore';
+import RefundPage from './pages/PayPage/RefundPage';
 
 function AppContent() {
   const location = useLocation();
@@ -86,6 +87,7 @@ function AppContent() {
         <Route path="/nextReservation" element={<NextReservation />} />
         <Route path="/coachReview" element={<CoachReview />} />
         <Route path="/paymentPage" element={<PaymentPage />} />
+        <Route path="/refundPage" element={<RefundPage />} />
         <Route path="/coachmatchingList" element={<CoachCalendar />} />
 
         {/* 커뮤니티 */}

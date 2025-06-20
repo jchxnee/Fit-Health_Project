@@ -4,6 +4,7 @@ import com.fithealth.backend.dto.member.LoginDto;
 import com.fithealth.backend.dto.member.SignupDto;
 import com.fithealth.backend.dto.member.UpdateDto;
 import com.fithealth.backend.entity.Member;
+import com.fithealth.backend.enums.CommonEnums;
 import com.fithealth.backend.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -32,12 +33,12 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     public LoginDto.Response loginMember(LoginDto.Request requestDto) {
-        Member member = memberRepository.findOne(requestDto.getUser_email())
+        Member member = memberRepository.findOneStatusY(requestDto.getUser_email(), CommonEnums.Status.Y)
                 .orElseThrow(() -> new IllegalArgumentException("이메일이 존재하지 않습니다."));
 
         // 암호화된 비밀번호와 입력 비밀번호 비교
         if (!passwordEncoder.matches(requestDto.getUser_pwd(), member.getUserPwd())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            return null;
         }
 
         return LoginDto.Response.toDto(member);
@@ -45,7 +46,7 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     public Boolean findMember(String userEmail) {
-        return memberRepository.findOne(userEmail).isPresent();
+        return memberRepository.findOneStatusY(userEmail, CommonEnums.Status.Y).isPresent();
     }
 
     @Override
@@ -83,6 +84,15 @@ public class MemberServiceImpl implements MemberService{
         String encodedPassword = passwordEncoder.encode(updateDto.getUser_pwd());
 
         member.changePwd(encodedPassword);
+        return true;
+    }
+
+    @Override
+    public Boolean deleteMember(String userEmail) {
+        Member member = memberRepository.findOne(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("이메일이 존재하지 않습니다."));
+
+        member.changeStatus(CommonEnums.Status.N);
         return true;
     }
 

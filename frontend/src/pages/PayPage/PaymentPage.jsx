@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   InfoKey,
@@ -15,14 +15,51 @@ import {
   PaymentButton,
 } from '../../styles/common/Payment';
 import TitleBar from '../../components/TitleBar';
-import Footer from '../../components/Footer';
-import Header from '../../components/Header';
+import useUserStore from '../../store/useUserStore';
+import { paymentService } from '../../api/payment';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const PaymentPage = () => {
+  const { user } = useUserStore();
+  const navigate = useNavigate();
+  const [paymentData, setPaymentData] = useState(null); // <- 결제 정보 상태 저장
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const fetchPaymentData = async () => {
+      const data = await paymentService.getPaymentData(user.email);
+      console.log('API 응답:', data);
+      setPaymentData(data);
+    };
+
+    fetchPaymentData();
+  }, [user.email]);
+
+  const formatDateTime = (dateTimeStr) => {
+    if (!dateTimeStr) return '';
+    const date = new Date(dateTimeStr);
+
+    const year = date.getFullYear();
+    const month = `0${date.getMonth() + 1}`.slice(-2);
+    const day = `0${date.getDate()}`.slice(-2);
+
+    let hours = date.getHours();
+    const minutes = `0${date.getMinutes()}`.slice(-2);
+    const period = hours >= 12 ? 'PM' : 'AM';
+
+    if (hours > 12) hours -= 12;
+    if (hours === 0) hours = 12;
+
+    return `${year}.${month}.${day} ${period} ${hours}시 ${minutes}분`;
+  };
+
   const [agreements, setAgreements] = useState({
-    rule: false, // 예약 이용규칙 및 취소/환불 동의
-    privacyCollect: false, // 개인정보 수집 및 이용 동의
-    privacyThirdParty: false, // 개인정보 제 3자 제공 동의
+    rule: false,
+    privacyCollect: false,
+    privacyThirdParty: false,
   });
 
   const [termContentsOpen, setTermContentsOpen] = useState({
@@ -31,10 +68,10 @@ const PaymentPage = () => {
     privacyThirdParty: false,
   });
 
-  // Calculate if "전체 동의" should be checked
+  // 계산형 상태로 전체 동의 여부 판단
   const allAgreed = Object.values(agreements).every(Boolean);
 
-  // Handle "전체 동의" checkbox click
+  // 전체 동의 체크박스 변경 시 개별 항목 전체 반영
   const handleAllAgreeChange = (e) => {
     const isChecked = e.target.checked;
     setAgreements({
@@ -44,7 +81,7 @@ const PaymentPage = () => {
     });
   };
 
-  // Handle individual checkbox click (only when checkbox or text is clicked)
+  // 개별 약관 클릭 시 상태 업데이트 → allAgreed는 계산형이므로 자동 반영됨
   const handleIndividualAgreeChange = (termName) => {
     setAgreements((prev) => ({
       ...prev,
@@ -60,6 +97,31 @@ const PaymentPage = () => {
     }));
   };
 
+  const handlePayment = async () => {
+    if (!agreements.rule || !agreements.privacyCollect || !agreements.privacyThirdParty) {
+      toast.warning('모든 약관에 동의해주세요.');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await paymentService.goPayment(paymentData.payment_id);
+      console.log('결제 처리 결과:', response);
+
+      toast.success('결제가 완료되었습니다!');
+      navigate('/matchingList');
+    } catch (error) {
+      console.error('결제 에러:', error);
+      toast.error('결제 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!paymentData) {
+    return <div>결제 정보 불러오는 중...</div>;
+  }
+
   return (
     <>
       <PaymentContainer>
@@ -67,10 +129,10 @@ const PaymentPage = () => {
         <PaymentContentBox>
           {/* 레슨 정보 */}
           <section>
-            <SectionTitle>요가 레슨</SectionTitle>
+            <SectionTitle>{paymentData.product_name} 레슨</SectionTitle>
             <InfoStackedRow>
-              <InfoKey>김요가 트레이너</InfoKey>
-              <InfoValue>2025.06.12 PM 6시 30분</InfoValue>
+              <InfoKey>{paymentData.trainer_name} 트레이너</InfoKey>
+              <InfoValue>{formatDateTime(paymentData.first_reservation)}</InfoValue>
             </InfoStackedRow>
             <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
           </section>
@@ -79,8 +141,8 @@ const PaymentPage = () => {
           <section>
             <SectionTitle>예약자 정보</SectionTitle>
             <InfoRow className="horizontal-start">
-              <InfoKey>김현아</InfoKey>
-              <InfoValue>010-5028-0682</InfoValue>
+              <InfoKey>{paymentData.user_name}</InfoKey>
+              <InfoValue>{paymentData.user_phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}</InfoValue>
             </InfoRow>
             <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
           </section>
@@ -89,7 +151,7 @@ const PaymentPage = () => {
           <PaymentAmountSection>
             <SectionTitle>결제 정보</SectionTitle>
             <InfoRow>
-              <InfoKey>5회 핏헬스 회원가</InfoKey>
+              <InfoKey>{paymentData.total_count}회 핏헬스 회원가</InfoKey>
               <InfoValue>250,000원</InfoValue>
             </InfoRow>
             <InfoRow>
@@ -98,7 +160,7 @@ const PaymentPage = () => {
             </InfoRow>
             <TotalAmountRow>
               <TotalAmountKey>총 결제 금액</TotalAmountKey>
-              <TotalAmountValue $isRed>237,500원</TotalAmountValue>
+              <TotalAmountValue $isRed>{paymentData.product_price.toLocaleString()}원</TotalAmountValue>
             </TotalAmountRow>
             <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
           </PaymentAmountSection>
@@ -112,17 +174,19 @@ const PaymentPage = () => {
 
             <TermItem>
               <TermLabel>
-                <CheckboxAndText onClick={() => handleIndividualAgreeChange('rule')}>
+                <CheckboxAndText>
                   <TermCheckbox
                     type="checkbox"
                     checked={agreements.rule}
                     onChange={() => handleIndividualAgreeChange('rule')}
                   />
-                  <TermText>[필수] 예약 이용규칙 및 취소/환불 동의</TermText>
+                  <TermText onClick={() => handleIndividualAgreeChange('rule')}>
+                    [필수] 예약 이용규칙 및 취소/환불 동의
+                  </TermText>
                   <TermLink
                     onClick={(e) => {
-                      e.preventDefault(); // 기본 링크 동작 방지
-                      e.stopPropagation(); // 이벤트 버블링 방지
+                      e.preventDefault();
+                      e.stopPropagation();
                       handleToggleTermContent('rule');
                     }}
                   >
@@ -143,13 +207,15 @@ const PaymentPage = () => {
 
             <TermItem>
               <TermLabel>
-                <CheckboxAndText onClick={() => handleIndividualAgreeChange('privacyCollect')}>
+                <CheckboxAndText>
                   <TermCheckbox
                     type="checkbox"
                     checked={agreements.privacyCollect}
                     onChange={() => handleIndividualAgreeChange('privacyCollect')}
                   />
-                  <TermText>[필수] 개인정보 수집 및 이용 동의</TermText>
+                  <TermText onClick={() => handleIndividualAgreeChange('privacyCollect')}>
+                    [필수] 개인정보 수집 및 이용 동의
+                  </TermText>
                   <TermLink
                     onClick={(e) => {
                       e.preventDefault();
@@ -176,13 +242,15 @@ const PaymentPage = () => {
 
             <TermItem>
               <TermLabel>
-                <CheckboxAndText onClick={() => handleIndividualAgreeChange('privacyThirdParty')}>
+                <CheckboxAndText>
                   <TermCheckbox
                     type="checkbox"
                     checked={agreements.privacyThirdParty}
                     onChange={() => handleIndividualAgreeChange('privacyThirdParty')}
                   />
-                  <TermText>[필수] 개인정보 제 3자 제공 동의</TermText>
+                  <TermText onClick={() => handleIndividualAgreeChange('privacyThirdParty')}>
+                    [필수] 개인정보 제 3자 제공 동의
+                  </TermText>
                   <TermLink
                     onClick={(e) => {
                       e.preventDefault();
@@ -209,7 +277,9 @@ const PaymentPage = () => {
           </TermsAndConditionsGroup>
 
           {/* 결제하기 버튼 */}
-          <PaymentButton to="/matchingList">237,500원 결제하기</PaymentButton>
+          <PaymentButton onClick={handlePayment} disabled={isLoading}>
+            {paymentData.product_price.toLocaleString()}원 결제하기
+          </PaymentButton>
         </PaymentContentBox>
       </PaymentContainer>
     </>
