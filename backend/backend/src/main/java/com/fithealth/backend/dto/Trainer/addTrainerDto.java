@@ -43,7 +43,7 @@ public class addTrainerDto {
     public static class FileRequest {
         private String originName, changeName;
     }
-
+    
     @Getter
     @Setter
     @AllArgsConstructor
