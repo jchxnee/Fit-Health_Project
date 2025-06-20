@@ -24,4 +24,8 @@ export const API_ENDPOINTS = {
     CREATE: '/api/board',
     DETAIL: '/api/board',
   },
+  COMMENT: {
+    ALL: 'api/comment',
+    CREATE: '/api/comment',
+  },
 };

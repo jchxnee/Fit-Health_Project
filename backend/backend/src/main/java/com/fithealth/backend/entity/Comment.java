@@ -3,8 +3,8 @@ package com.fithealth.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import javax.naming.Name;
 import java.time.LocalDateTime;
+import java.util.ArrayList; // Board 엔티티의 comments 컬렉션 타입을 List로 가정
 
 @Getter
 @Setter
@@ -22,7 +22,6 @@ public class Comment {
     @Column(name = "COMMNETCONTENT", nullable = false)
     private String commentContent;
 
-
     @Column(name = "CREATED_DATE")
     private LocalDateTime createdDate;
 
@@ -39,5 +38,17 @@ public class Comment {
         this.createdDate = LocalDateTime.now();
     }
 
+    public void changeMember(Member member) {
+        this.member = member;
+        if (member != null && !member.getComments().contains(this)) { // null 체크 추가
+            member.getComments().add(this);
+        }
+    }
 
+    public void changeBoard(Board board) {
+        this.board = board;
+        if (board != null && !board.getComments().contains(this)) { // null 체크 추가
+            board.getComments().add(this);
+        }
+    }
 }
