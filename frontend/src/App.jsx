@@ -54,7 +54,7 @@ function AppContent() {
   const location = useLocation();
   const hideHeader = ['/signup'];
   const isHeaderHidden = hideHeader.includes(location.pathname);
-  const [user] = useState({ name: '김현아', img: betaImg });
+  const { user } = useUserStore();
 
   return (
     <>
