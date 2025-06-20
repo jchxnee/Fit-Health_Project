@@ -109,9 +109,9 @@ public class ReviewServiceImpl implements ReviewService {
                             // 만약 payment.getMember()가 이미 모든 정보를 로드한다면 이 단계는 생략 가능
                             Optional<Member> optionalMember = memberRepository.findByUserEmail(userEmail); // MemberRepository에 이 메서드 정의 필요
                             if (optionalMember.isPresent()) {
-                                Member member = optionalMember.get();
-                                userName = member.getUserName(); // Member 엔티티에 getUserName() 메서드 필요
-                                userProfileImage = member.getProfileImage(); // Member 엔티티에 getProfileImage() 메서드 필요
+                                Member usermember = optionalMember.get();
+                                userName = usermember.getUserName(); // Member 엔티티에 getUserName() 메서드 필요
+                                userProfileImage = usermember.getProfileImage(); // Member 엔티티에 getProfileImage() 메서드 필요
                             } else {
                                 userName = userEmail; // 멤버 정보가 없으면 이메일 표시 (폴백)
                             }
