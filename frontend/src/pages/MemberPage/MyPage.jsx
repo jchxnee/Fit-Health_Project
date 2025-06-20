@@ -118,123 +118,129 @@ const MyPage = () => {
             <HealthInfoInputButton onClick={openHealthInputModal}>건강정보 입력</HealthInfoInputButton>
           </HealthInfoSectionHeader>
           <ChartContainer>
-            <ResponsiveLine
-              data={chartData}
-              margin={{ top: 50, right: 140, bottom: 70, left: 50 }}
-              xScale={{ type: 'point' }}
-              yScale={{
-                type: 'linear',
-                min: 'auto',
-                max: 'auto',
-                stacked: false,
-                reverse: false,
-              }}
-              yFormat=" >-.2f"
-              axisTop={null}
-              axisRight={null}
-              axisBottom={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: -45,
-                legend: '날짜',
-                legendOffset: 50,
-                legendPosition: 'middle',
-                truncateTickAt: 0,
-                format: (value) => {
-                  const parts = value.split('.');
-                  return parts.length === 3 ? `${parts[1]}.${parts[2]}` : value;
-                },
-              }}
-              axisLeft={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: '값 (kg)',
-                legendOffset: -40,
-                legendPosition: 'middle',
-              }}
-              pointSize={10}
-              pointColor={{ theme: 'background' }}
-              pointBorderWidth={2}
-              pointBorderColor={{ from: 'serieColor' }}
-              pointLabelYOffset={-12}
-              useMesh={true}
-              colors={['#FF5733', '#3366FF', '#33CC33']}
-              theme={{
-                axis: {
-                  domain: {
-                    line: {
-                      stroke: '#d4d4d4',
-                      strokeWidth: 1,
+            <div style={{ height: '400px' }}>
+              {chartData.length === 0 || chartData.every((item) => item.data.length === 0) ? (
+                <p style={{ textAlign: 'center', padding: '2rem' }}>건강 데이터가 없습니다.</p>
+              ) : (
+                <ResponsiveLine
+                  data={chartData}
+                  margin={{ top: 50, right: 140, bottom: 70, left: 50 }}
+                  xScale={{ type: 'point' }}
+                  yScale={{
+                    type: 'linear',
+                    min: 'auto',
+                    max: 'auto',
+                    stacked: false,
+                    reverse: false,
+                  }}
+                  yFormat=" >-.2f"
+                  axisTop={null}
+                  axisRight={null}
+                  axisBottom={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: -45,
+                    legend: '날짜',
+                    legendOffset: 50,
+                    legendPosition: 'middle',
+                    truncateTickAt: 0,
+                    format: (value) => {
+                      const parts = value.split('.');
+                      return parts.length === 3 ? `${parts[1]}.${parts[2]}` : value;
                     },
-                  },
-                  ticks: {
-                    line: {
-                      stroke: '#d4d4d4',
-                      strokeWidth: 1,
-                    },
-                    text: {
-                      fontSize: 11,
-                      fill: '#333333',
-                    },
-                  },
-                  legend: {
-                    text: {
-                      fontSize: 12,
-                      fill: '#333333',
-                      fontWeight: 'bold',
-                    },
-                  },
-                },
-                grid: {
-                  line: {
-                    stroke: '#e0e0e0',
-                    strokeWidth: 1,
-                  },
-                },
-                legends: {
-                  text: {
-                    fontSize: 12,
-                    fill: '#333333',
-                  },
-                },
-                tooltip: {
-                  container: {
-                    background: 'white',
-                    color: '#333333',
-                    fontSize: 12,
-                    borderRadius: '4px',
-                    boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.1)',
-                  },
-                },
-              }}
-              legends={[
-                {
-                  anchor: 'bottom-right',
-                  direction: 'column',
-                  justify: false,
-                  translateX: 120,
-                  translateY: 0,
-                  itemsSpacing: 0,
-                  itemDirection: 'left-to-right',
-                  itemWidth: 80,
-                  itemHeight: 20,
-                  itemOpacity: 0.75,
-                  symbolSize: 12,
-                  symbolShape: 'circle',
-                  symbolBorderColor: 'rgba(0, 0, 0, .5)',
-                  effects: [
-                    {
-                      on: 'hover',
-                      style: {
-                        itemBackground: 'rgba(0, 0, 0, .03)',
-                        itemOpacity: 1,
+                  }}
+                  axisLeft={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    legend: '값 (kg)',
+                    legendOffset: -40,
+                    legendPosition: 'middle',
+                  }}
+                  pointSize={10}
+                  pointColor={{ theme: 'background' }}
+                  pointBorderWidth={2}
+                  pointBorderColor={{ from: 'serieColor' }}
+                  pointLabelYOffset={-12}
+                  useMesh={true}
+                  colors={['#FF5733', '#3366FF', '#33CC33']}
+                  theme={{
+                    axis: {
+                      domain: {
+                        line: {
+                          stroke: '#d4d4d4',
+                          strokeWidth: 1,
+                        },
+                      },
+                      ticks: {
+                        line: {
+                          stroke: '#d4d4d4',
+                          strokeWidth: 1,
+                        },
+                        text: {
+                          fontSize: 11,
+                          fill: '#333333',
+                        },
+                      },
+                      legend: {
+                        text: {
+                          fontSize: 12,
+                          fill: '#333333',
+                          fontWeight: 'bold',
+                        },
                       },
                     },
-                  ],
-                },
-              ]}
-            />
+                    grid: {
+                      line: {
+                        stroke: '#e0e0e0',
+                        strokeWidth: 1,
+                      },
+                    },
+                    legends: {
+                      text: {
+                        fontSize: 12,
+                        fill: '#333333',
+                      },
+                    },
+                    tooltip: {
+                      container: {
+                        background: 'white',
+                        color: '#333333',
+                        fontSize: 12,
+                        borderRadius: '4px',
+                        boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.1)',
+                      },
+                    },
+                  }}
+                  legends={[
+                    {
+                      anchor: 'bottom-right',
+                      direction: 'column',
+                      justify: false,
+                      translateX: 120,
+                      translateY: 0,
+                      itemsSpacing: 0,
+                      itemDirection: 'left-to-right',
+                      itemWidth: 80,
+                      itemHeight: 20,
+                      itemOpacity: 0.75,
+                      symbolSize: 12,
+                      symbolShape: 'circle',
+                      symbolBorderColor: 'rgba(0, 0, 0, .5)',
+                      effects: [
+                        {
+                          on: 'hover',
+                          style: {
+                            itemBackground: 'rgba(0, 0, 0, .03)',
+                            itemOpacity: 1,
+                          },
+                        },
+                      ],
+                    },
+                  ]}
+                />
+              )}
+            </div>
           </ChartContainer>
           <Divider />
         </HealthInfoContainer>

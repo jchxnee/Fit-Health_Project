@@ -31,7 +31,6 @@ public class UpdateDto {
     }
 
     @Getter
-    @Setter
     public static class RequestPwd {
         private String user_email;
         private String user_pwd;

@@ -8,7 +8,6 @@ import * as yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { toast } from 'react-toastify';
-import axios from 'axios';
 import { memberService } from '../../api/member';
 
 const categories = [

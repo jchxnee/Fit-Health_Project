@@ -114,7 +114,9 @@ const ChangePwdPage = () => {
             />
           </InputGroup>
 
-          <SubmitButton type="submit">비밀번호 변경</SubmitButton>
+          <SubmitButton type="submit" disabled={isLoading}>
+            비밀번호 변경
+          </SubmitButton>
         </PersonalInfoForm>
       </PersonalInfoContainer>
     </>

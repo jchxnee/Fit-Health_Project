@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
     UPDATENAME: '/api/members/name',
     UPDATEBIRTH: '/api/members/birth',
     UPDATEPWD: '/api/members/pwd',
+    DELETE: '/api/members/delete',
   },
   HEALTH: {
     BASE: '/api/healths',

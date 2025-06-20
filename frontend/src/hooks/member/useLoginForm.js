@@ -61,7 +61,7 @@ export const useLoginForm = () => {
       navigate('/'); // 홈으로 이동
     } catch (error) {
       // 네트워크 또는 기타 오류 처리
-      toast.error('이메일 또는 비밀번호가 일치하지 않습니다.');
+      toast.error('로그인 중 오류가 발생했습니다.');
       console.error('로그인 에러 : ', error);
     } finally {
       setIsLoading(false); // 로딩 종료

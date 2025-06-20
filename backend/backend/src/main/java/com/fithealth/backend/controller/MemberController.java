@@ -24,8 +24,6 @@ public class MemberController {
     //로그인 API
     @PostMapping("/login")
     public ResponseEntity<LoginDto.Response> loginMember(@RequestBody LoginDto.Request requestDto) {
-        System.out.println(requestDto.getUser_email());
-        System.out.println(requestDto.getUser_pwd());
         return ResponseEntity.ok(memberService.loginMember(requestDto));
     }
 
@@ -53,9 +51,15 @@ public class MemberController {
         return ResponseEntity.ok(memberService.updateInfo(updateDto));
     }
 
-    //내 정보 수정 API
+    //비밀번호 수정 API
     @PutMapping("/pwd")
     public ResponseEntity<Boolean> updatePwd(@RequestBody UpdateDto.RequestPwd updateDto) {
         return ResponseEntity.ok(memberService.updatePwd(updateDto));
+    }
+
+    //회원 탈퇴 API
+    @PutMapping("/delete")
+    public ResponseEntity<Boolean> DeleteMember(@RequestParam String userEmail) {
+        return ResponseEntity.ok(memberService.deleteMember(userEmail));
     }
 }

@@ -132,4 +132,8 @@ public class Member {
         this.userPwd = userPwd;
     }
 
+    public void changeStatus(CommonEnums.Status status){
+        this.status = status;
+    }
+
 }

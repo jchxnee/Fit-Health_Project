@@ -144,4 +144,24 @@ export const memberService = {
       throw new Error('서버 통신 불량');
     }
   },
+
+  //회원 탈퇴
+  deleteMember: async (useremail) => {
+    try {
+      const { data } = await api.put(API_ENDPOINTS.MEMBER.DELETE, null, {
+        params: {
+          userEmail: useremail,
+        },
+      });
+
+      return data;
+    } catch (error) {
+      if (error.response) {
+        const message = error.response?.data?.message || '회원 탈퇴하는데 실패하였습니다.';
+        throw new Error(message);
+      }
+
+      throw new Error('서버 통신 불량');
+    }
+  },
 };
