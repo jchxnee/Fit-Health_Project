@@ -32,12 +32,22 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
 
     @Override
     public void updateGradeAndTrainer(String userEmail, CommonEnums.Grade grade, Long trainerNo) {
-        em.createQuery("UPDATE Member m SET m.grade = :grade, m.trainerNo = :trainerNo WHERE m.userEmail = :userEmail")
+        em.createQuery("UPDATE Member m SET m.grade = :grade, m.trainer.trainerNo = :trainerNo WHERE m.userEmail = :userEmail")
                 .setParameter("grade", grade)
                 .setParameter("trainerNo", trainerNo)
                 .setParameter("userEmail", userEmail)
                 .executeUpdate();
         em.flush();
+    }
+
+    @Override
+    public List<Member> findTrainer() {
+        // GRADE가 'C' (코치)인 멤버들을 조회합니다.
+        // Member와 Trainer를 LEFT JOIN FETCH 하여 N+1 문제 방지
+        TypedQuery<Member> query = em.createQuery(
+                "SELECT m FROM Member m LEFT JOIN FETCH m.trainer t WHERE m.grade = :grade", Member.class);
+        query.setParameter("grade", CommonEnums.Grade.C);
+        return query.getResultList();
     }
 
 
@@ -48,7 +58,7 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
             // 결과가 0개 또는 1개일 것으로 예상되는 경우 getSingleResult()를 사용합니다.
             // 여러 개의 Member가 한 trainerNo를 가질 수도 있다면 getResultList()를 사용해야 합니다.
             TypedQuery<Member> query = em.createQuery(
-                    "SELECT m FROM Member m WHERE m.trainerNo = :trainerNo", Member.class);
+                    "SELECT m FROM Member m WHERE m.trainer.trainerNo = :trainerNo", Member.class);
             query.setParameter("trainerNo", trainerNo);
             return Optional.ofNullable(query.getSingleResult());
         } catch (NoResultException e) {

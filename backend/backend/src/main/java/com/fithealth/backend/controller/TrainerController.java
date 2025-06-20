@@ -1,5 +1,6 @@
 package com.fithealth.backend.controller;
 
+import com.fithealth.backend.dto.Trainer.SelectTrainerDto;
 import com.fithealth.backend.dto.Trainer.addTrainerDto;
 import com.fithealth.backend.service.TrainerService;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +29,11 @@ public class TrainerController {
             @RequestParam(value = "files", required = false) List<MultipartFile> files
     ) throws IOException {
         return ResponseEntity.ok(trainerService.registerTrainer(trainerDto, files));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<SelectTrainerDto.Response>> getTrainerList() {
+        List<SelectTrainerDto.Response> trainers = trainerService.getAllTrainers();
+        return ResponseEntity.ok(trainers);
     }
 }

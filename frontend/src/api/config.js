@@ -32,4 +32,7 @@ export const API_ENDPOINTS = {
     CREATE: '/api/board',
     DETAIL: '/api/board',
   },
+  COACH: {
+    LIST: 'api/trainer',
+  },
 };

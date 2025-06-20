@@ -1,13 +1,12 @@
 package com.fithealth.backend.service;
 
+import com.fithealth.backend.dto.Trainer.SelectTrainerDto;
 import com.fithealth.backend.dto.Trainer.addTrainerDto;
-import com.fithealth.backend.entity.Career;
-import com.fithealth.backend.entity.Member;
-import com.fithealth.backend.entity.Trainer;
-import com.fithealth.backend.entity.TrainerFile;
+import com.fithealth.backend.entity.*;
 import com.fithealth.backend.enums.CommonEnums;
 import com.fithealth.backend.repository.MemberRepository;
 import com.fithealth.backend.repository.TrainerRepository;
+import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +15,8 @@ import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import jakarta.persistence.EntityManager;
 
 @Service
@@ -114,5 +115,51 @@ public class TrainerServiceImpl implements TrainerService {
             Long trainerNo = trainerRepository.save(trainer);
             return trainerNo;
         }
+    }
+
+    @Override
+    public List<SelectTrainerDto.Response> getAllTrainers() {
+        List<Member> coaches = memberRepository.findTrainer();
+        return coaches.stream().map(member -> {
+            // SelectTrainerDto.Response의 필드에 맞게 데이터 추출 및 가공
+            Long trainerNo = (member.getTrainer() != null) ? member.getTrainer().getTrainerNo() : null;
+            String trainerName = member.getUserName();
+
+            String wishArea = (member.getTrainer() != null) ? member.getTrainer().getWishArea() : null;
+            if (wishArea == null || wishArea.isEmpty()) {
+                wishArea = member.getAddress(); // Trainer에 없으면 Member 주소 사용
+            }
+            if (wishArea == null || wishArea.isEmpty()) {
+                wishArea = "지역 정보 없음";
+            }
+
+            String majorName = (member.getTrainer() != null) ? member.getTrainer().getMajorName() : "미정";
+            String profileImg = member.getProfileImage();
+            // 해당 트레이너의 리뷰를 조회하여 평균 별점과 리뷰 수 계산
+            TypedQuery<Review> reviewQuery = em.createQuery(
+                    "SELECT r FROM Review r WHERE r.payment.responseMember.userEmail = :trainerEmail", Review.class);
+            reviewQuery.setParameter("trainerEmail", member.getUserEmail());
+            List<Review> reviewsList = reviewQuery.getResultList();
+
+            Double averageRating = 0.0;
+            Long reviewsCount = (long) reviewsList.size();
+
+            if (!reviewsList.isEmpty() && reviewsCount > 0) {
+                double totalRating = reviewsList.stream()
+                        .mapToDouble(Review::getRating)
+                        .sum();
+                averageRating = Math.round((totalRating / reviewsCount) * 10.0) / 10.0;
+            }
+
+            return new SelectTrainerDto.Response(
+                    trainerNo,
+                    trainerName,
+                    wishArea,
+                    majorName,
+                    profileImg,
+                    averageRating,
+                    reviewsCount
+            );
+        }).collect(Collectors.toList());
     }
 }

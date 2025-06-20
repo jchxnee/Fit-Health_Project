@@ -1,6 +1,6 @@
-import React, { useState } from 'react'; // useEffect는 이제 필요 없습니다.
+import React, { useState, useEffect } from 'react'; // useEffect 추가
 import CategoryMenu from '/src/components/CategoryMenu';
-import RegionFilterComponent from '/src/components/filter/RegionFilter'; // RegionFilterComponent 경로 확인
+import RegionFilterComponent from '/src/components/filter/RegionFilter';
 import RecommendedExerciseSection from '../../components/TitleBar';
 import styled from 'styled-components';
 import BasicFilter from '../../components/filter/BasicFilter';
@@ -8,8 +8,9 @@ import CoachListItem from '../../components/CoachMatching/CoachListItem';
 import theme from '../../styles/theme';
 import { Link } from 'react-router-dom';
 import Pagination from '../../components/Pagination';
+import api from '../../api/axios';
+import { API_ENDPOINTS } from '../../api/config';
 
-// --- (Styled Components remain unchanged) ---
 const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -72,219 +73,39 @@ const CoachListContainer = styled.div`
     }
   }
 `;
-// --- (End of Styled Components) ---
 
 const CoachList = () => {
-  // Category filter state
+  const [coaches, setCoaches] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [selectedCategory, setSelectedCategory] = useState('전체');
 
-  // Region filter state
   const [selectedRegion, setSelectedRegion] = useState('전체');
-  // availableRegions 상태는 RegionFilterComponent에서 직접 관리하므로 여기서는 필요 없습니다.
 
-  // BasicFilter states (search and status)
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('전체');
 
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 7;
 
-  // **수정된 하드코딩된 트레이너 데이터**
-  // RegionFilterComponent의 regions 배열에 있는 지역명과 일치시키거나,
-  // 해당 지역명을 포함하도록 location 값을 변경합니다.
-  const coaches = [
-    {
-      id: 1,
-      name: '김성은',
-      specialization: '헬스 전문',
-      location: '서울 강남구', // '서울'로 필터링 가능
-      status: '활동중',
-      rating: 4.5,
-      reviews: 1795,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach1',
-    },
-    {
-      id: 2,
-      name: '이수진',
-      specialization: '헬스 전문',
-      location: '인천 연수구', // '인천'으로 필터링 가능
-      status: '활동중',
-      rating: 4.2,
-      reviews: 1200,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach2',
-    },
-    {
-      id: 3,
-      name: '박민준',
-      specialization: '요가 전문',
-      location: '강원도 강릉시', // '강원도'로 필터링 가능
-      status: '휴면',
-      rating: 0.0,
-      reviews: 0,
-      imageUrl: '/public/img/minju.png',
-    },
-    {
-      id: 4,
-      name: '최유리',
-      specialization: '요가 전문',
-      location: '충북 청주시', // '충북'으로 필터링 가능
-      status: '활동중',
-      rating: 4.8,
-      reviews: 2500,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach4',
-    },
-    {
-      id: 5,
-      name: '정하늘',
-      specialization: '도수 전문',
-      location: '경기도 화성시', // '경기도'로 필터링 가능
-      status: '활동중',
-      rating: 4.1,
-      reviews: 900,
-      imageUrl: '/public/img/hanuel.png',
-    },
-    {
-      id: 6,
-      name: '김예찬',
-      specialization: '재활 전문',
-      location: '경남 김해시', // '경남'으로 필터링 가능
-      status: '휴면',
-      rating: 2.5,
-      reviews: 10,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach6',
-    },
-    {
-      id: 7,
-      name: '이지은',
-      specialization: '도수 전문',
-      location: '경북 경주시', // '경북'으로 필터링 가능
-      status: '활동중',
-      rating: 3.5,
-      reviews: 300,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach7',
-    },
-    {
-      id: 8,
-      name: '박선영',
-      specialization: '필라테스',
-      location: '서울 마포구',
-      status: '활동중',
-      rating: 4.7,
-      reviews: 800,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach8',
-    },
-    {
-      id: 9,
-      name: '강동원',
-      specialization: '헬스 전문',
-      location: '경기도 수원시',
-      status: '활동중',
-      rating: 4.0,
-      reviews: 1100,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach9',
-    },
-    {
-      id: 10,
-      name: '송지효',
-      specialization: '요가 전문',
-      location: '경남 부산 해운대구',
-      status: '활동중',
-      rating: 4.9,
-      reviews: 3000,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach10',
-    },
-    {
-      id: 11,
-      name: '유재석',
-      specialization: '재활 전문',
-      location: '경북 대구 수성구',
-      status: '휴면',
-      rating: 3.2,
-      reviews: 50,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach11',
-    },
-    {
-      id: 12,
-      name: '김종국',
-      specialization: '도수 전문',
-      location: '광주 서구',
-      status: '활동중',
-      rating: 4.3,
-      reviews: 600,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach12',
-    },
-    {
-      id: 13,
-      name: '전지현',
-      specialization: '헬스 전문',
-      location: '대전 유성구',
-      status: '활동중',
-      rating: 4.6,
-      reviews: 1500,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach13',
-    },
-    {
-      id: 14,
-      name: '하정우',
-      specialization: '필라테스',
-      location: '울산 남구',
-      status: '활동중',
-      rating: 4.4,
-      reviews: 750,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach14',
-    },
-    {
-      id: 15,
-      name: '공유',
-      specialization: '요가 전문',
-      location: '세종시', // RegionFilterComponent에 '세종'이 있다면 이렇게 변경
-      status: '활동중',
-      rating: 4.2,
-      reviews: 900,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach15',
-    },
-    {
-      id: 16,
-      name: '김우빈',
-      specialization: '재활 전문',
-      location: '제주도 제주시', // RegionFilterComponent에 '제주'가 있다면 이렇게 변경
-      status: '휴면',
-      rating: 3.7,
-      reviews: 120,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach16',
-    },
-    {
-      id: 17,
-      name: '이민호',
-      specialization: '헬스 전문',
-      location: '충남 천안시',
-      status: '활동중',
-      rating: 4.0,
-      reviews: 200,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach17',
-    },
-    {
-      id: 18,
-      name: '수지',
-      specialization: '필라테스',
-      location: '전북 전주시',
-      status: '활동중',
-      rating: 4.3,
-      reviews: 180,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach18',
-    },
-    {
-      id: 19,
-      name: '아이유',
-      specialization: '요가 전문',
-      location: '전남 목포시',
-      status: '활동중',
-      rating: 4.6,
-      reviews: 250,
-      imageUrl: 'https://via.placeholder.com/64x64?text=Coach19',
-    },
-  ];
+  useEffect(() => {
+    const fetchTrainers = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get(API_ENDPOINTS.COACH.LIST);
+        setCoaches(response.data);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch trainers:', err);
+        setError('트레이너 정보를 불러오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrainers();
+  }, []); // 빈 배열: 컴포넌트가 처음 마운트될 때 한 번만 실행
 
   const basicFilterOptions = [
     {
@@ -292,8 +113,8 @@ const CoachList = () => {
       key: 'status',
       options: [
         { label: '전체', value: '전체' },
-        { label: '활동중', value: 'active' },
-        { label: '휴면', value: 'inactive' },
+        { label: '활동중', value: 'Y' }, // 백엔드 CommonEnums.Status.Y 값과 일치
+        { label: '휴면', value: 'N' }, // 백엔드 CommonEnums.Status.N 값과 일치
       ],
     },
   ];
@@ -307,18 +128,18 @@ const CoachList = () => {
     setCurrentPage(1);
   };
 
-  // **수정된 필터링 로직: coach.location이 selectedRegion을 포함하는지 확인**
-  const filteredCoaches = coaches.filter((coach) => {
-    const matchesCategory = selectedCategory === '전체' || coach.specialization.startsWith(selectedCategory);
+  const filteredCoaches = coaches.filter((trainerDto) => {
+    const matchesCategory =
+      selectedCategory === '전체' || (trainerDto.majorName && trainerDto.majorName.startsWith(selectedCategory));
 
-    // selectedRegion이 '전체'이거나, coach.location 문자열이 selectedRegion을 포함하는지 확인합니다.
-    // 예를 들어, selectedRegion이 '경기'일 때 '경기도 화성시'를 포함하도록 합니다.
-    const matchesRegion = selectedRegion === '전체' || coach.location.includes(selectedRegion);
+    const matchesRegion =
+      selectedRegion === '전체' || (trainerDto.wishArea && trainerDto.wishArea.includes(selectedRegion));
 
-    const matchesSearch = searchQuery === '' || coach.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch =
+      searchQuery === '' ||
+      (trainerDto.trainerName && trainerDto.trainerName.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    const matchesStatus =
-      selectedStatus === '전체' || coach.status === (selectedStatus === 'active' ? '활동중' : '휴면');
+    const matchesStatus = selectedStatus === '전체' || (trainerDto.status && trainerDto.status === selectedStatus); // trainerDto.status 필드가 있다고 가정
 
     return matchesCategory && matchesRegion && matchesSearch && matchesStatus;
   });
@@ -333,6 +154,23 @@ const CoachList = () => {
     setCurrentPage(pageNumber);
     window.scrollTo(0, 0);
   };
+
+  // 로딩 및 에러 상태 처리
+  if (loading) {
+    return (
+      <PageWrapper>
+        <div>트레이너 목록을 불러오는 중...</div>
+      </PageWrapper>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageWrapper>
+        <div>오류: {error}</div>
+      </PageWrapper>
+    );
+  }
 
   return (
     <>
@@ -350,14 +188,12 @@ const CoachList = () => {
           </SidebarWrapper>
 
           <MainContentWrapper>
-            {/* RegionFilterComponent는 변경할 필요 없음. regions prop 제거. */}
             <RegionFilterComponent
               selectedRegion={selectedRegion}
               onSelectRegion={(region) => {
                 setSelectedRegion(region);
                 setCurrentPage(1);
               }}
-              // regions prop은 RegionFilterComponent에서 직접 관리하므로 여기서는 전달하지 않습니다.
             />
 
             <FilterAndSearchContainer>
@@ -370,11 +206,32 @@ const CoachList = () => {
             </FilterAndSearchContainer>
 
             <CoachListContainer>
-              {currentCoaches.map((coach) => (
-                <Link key={coach.id} to={`/coach/${coach.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <CoachListItem coach={coach} />
-                </Link>
-              ))}
+              {currentCoaches.length > 0 ? (
+                currentCoaches.map((trainerDto) => (
+                  // DTO의 trainerNo를 key로 사용하고, Link 경로에도 사용
+                  <Link
+                    key={trainerDto.trainerNo}
+                    to={`/coach/${trainerDto.trainerNo}`}
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                  >
+                    {/* CoachListItem 컴포넌트에 SelectTrainerDto.Response의 필드를 매핑하여 전달 */}
+                    <CoachListItem
+                      coach={{
+                        id: trainerDto.trainerNo, // trainerNo
+                        name: trainerDto.trainerName, // trainerName
+                        specialization: trainerDto.majorName, // majorName
+                        location: trainerDto.wishArea, // wishArea
+                        rating: trainerDto.rating, // rating
+                        reviews: trainerDto.reviews, // reviews
+                        imageUrl: trainerDto.profileImg, // profileImg
+                        // status: trainerDto.status, // DTO에 status 필드가 있다면 주석 해제
+                      }}
+                    />
+                  </Link>
+                ))
+              ) : (
+                <div>조건에 맞는 트레이너를 찾을 수 없습니다.</div>
+              )}
             </CoachListContainer>
 
             <Pagination currentPage={currentPage} totalPages={calculatedTotalPages} onPageChange={handlePageChange} />
