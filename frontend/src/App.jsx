@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import './App.css';
 import theme from './styles/theme';
 import GlobalStyle from './styles/GlobalStyle';
+import { ToastContainer } from 'react-toastify';
 
 // Header/Footer
 import Header from './components/Header';
@@ -46,6 +47,7 @@ import MyInfoPage from './pages/myPage/MyInfoPage';
 import ChangePwdPage from './pages/myPage/ChangePwdPage';
 import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
 import useUserStore from './store/useUserStore';
+import RefundPage from './pages/PayPage/RefundPage';
 
 function AppContent() {
   const location = useLocation();
@@ -83,6 +85,7 @@ function AppContent() {
         <Route path="/nextReservation" element={<NextReservation />} />
         <Route path="/coachReview" element={<CoachReview />} />
         <Route path="/paymentPage" element={<PaymentPage />} />
+        <Route path="/refundPage" element={<RefundPage />} />
         <Route path="/coachmatchingList" element={<CoachCalendar />} />
 
         {/* 커뮤니티 */}
@@ -111,6 +114,7 @@ function App() {
       <Router>
         <AppContent />
       </Router>
+      <ToastContainer />
     </ThemeProvider>
   );
 }

@@ -4,6 +4,7 @@ import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.enums.CommonEnums;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class LoginDto {
@@ -37,7 +38,7 @@ public class LoginDto {
     public static class Response {
         private String user_email;
         private String user_name;
-        private LocalDateTime birth;
+        private LocalDate birth;
         private String phone;
         private String address;
         private CommonEnums.Gender gender;

@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class Member {
     private String userName;
 
     @Column(name = "BIRTH")
-    private LocalDateTime birth;
+    private LocalDate birth;
 
     @Column(length = 11)
     private String phone;
@@ -88,6 +89,9 @@ public class Member {
     private List<Notice> notices = new ArrayList<>();
 
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Health> healths = new ArrayList<>();
+
 
     @PrePersist
     public void prePersist() {
@@ -107,4 +111,29 @@ public class Member {
     public void preUpdate() {
         this.modifyDate = LocalDateTime.now();
     }
+
+    public void changeName(String userName) {
+        this.userName = userName;
+    }
+
+    public void changeBirth(LocalDate birth) {
+        this.birth = birth;
+    }
+
+    public void changeInfo(String phone, String address, CommonEnums.Gender gender, Double height, String goal) {
+        this.phone = phone;
+        this.address = address;
+        this.gender = gender;
+        this.height = height;
+        this.goal = goal;
+    }
+
+    public void changePwd(String userPwd) {
+        this.userPwd = userPwd;
+    }
+
+    public void changeStatus(CommonEnums.Status status){
+        this.status = status;
+    }
+
 }

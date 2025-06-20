@@ -25,9 +25,25 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 
     @Override
     public List<Long> findbyTrainerEmail(String trainerEmail) {
+        return List.of();
+    }
+
+    @Override
+    public List<Long> findByResponseEmail(String trainerEmail) {
         return em.createQuery(
                         "SELECT p.paymentId FROM Payment p WHERE p.responseMember.userEmail = :trainerEmail", Long.class)
                 .setParameter("trainerEmail", trainerEmail)
                 .getResultList();
+    }
+
+    @Override
+    public Optional<Payment> findOneLast(String userEmail) {
+        String sql = "SELECT p FROM Payment p WHERE p.member.userEmail = :userEmail ORDER BY p.appliedAt DESC";
+        return em.createQuery(sql, Payment.class)
+                .setParameter("userEmail", userEmail)
+                .setMaxResults(1)
+                .getResultList()
+                .stream()
+                .findFirst();
     }
 }

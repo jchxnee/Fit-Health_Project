@@ -9,6 +9,7 @@ import lombok.Getter; // Getter 추가
 import lombok.Setter; // Setter 추가
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "PAYMENT")
@@ -29,7 +30,7 @@ public class Payment {
     private Member member; // 결제자 Member
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "RESPONSE_EMAIL", nullable = false, referencedColumnName = "USER_EMAIL") // RESPONSE_NAME이 Member의 USER_EMAIL을 참조
+    @JoinColumn(name = "RESPONSE_EMAIL", nullable = false, referencedColumnName = "USER_EMAIL")
     private Member responseMember; // 응답자 (트레이너의 Member 정보)
 
     // Review와의 OneToOne 양방향 매핑 (mappedBy로 연관 관계의 주인이 아님을 명시)
@@ -40,15 +41,15 @@ public class Payment {
     @Column(name = "TRANSACTION_ID", length = 100)
     private String transactionId;
 
-    @Column(name = "PAYMENT_METHOD", nullable = false, length = 10)
+    @Column(name = "PAYMENT_METHOD", length = 10)
     private String paymentMethod;
 
-    @Column(name = "STATUS", nullable = false, length = 10)
+    @Column(name = "PAYMENT_STATUS", nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
-    private CommonEnums.Status status;
+    private CommonEnums.Status paymentStatus;
 
-    @Column(name = "PAYMENT_AT", nullable = false)
-    private LocalDate paymentAt;
+    @Column(name = "PAYMENT_AT")
+    private LocalDateTime paymentAt;
 
     @Column(name = "PRODUCT_PRICE", nullable = false)
     private Long productPrice;
@@ -60,20 +61,31 @@ public class Payment {
     private Long totalCount;
 
     @Column(name = "FIRST_RESERVATION", nullable = false)
-    private LocalDate firstReservation;
+    private LocalDateTime firstReservation;
 
     @Column(name = "USE_STATUS" , nullable = false)
     @Enumerated(EnumType.STRING)
     private CommonEnums.Status useStatus;
 
+    @Column(name = "APPLIED_AT", nullable = false, updatable = false)
+    private LocalDateTime appliedAt;
+
 
     @PrePersist
     public void prePersist() {
-        this.firstReservation = LocalDate.now();
-        this.paymentAt = LocalDate.now();
+        this.appliedAt = LocalDateTime.now();
 
-        if(this.status == null) {
-            this.status = CommonEnums.Status.Y;
+        if(this.paymentStatus == null) {
+            this.paymentStatus = CommonEnums.Status.N;
         }
+
+        if(this.useStatus == null) {
+            this.useStatus = CommonEnums.Status.Y;
+        }
+    }
+
+    public void changePayment(CommonEnums.Status status){
+        this.paymentStatus = status;
+        this.paymentAt = LocalDateTime.now();
     }
 }

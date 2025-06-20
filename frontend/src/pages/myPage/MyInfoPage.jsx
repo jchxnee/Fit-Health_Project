@@ -3,6 +3,12 @@ import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
 import { Button, Item, List, Wrapper } from '../../styles/common/SelectGoal';
 import RegionSelect from '../../components/RegionSelect';
+import useUserStore from '../../store/useUserStore';
+import * as yup from 'yup';
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { toast } from 'react-toastify';
+import { memberService } from '../../api/member';
 
 const categories = [
   '체형교정·가벼운통증',
@@ -15,52 +21,111 @@ const categories = [
   '근골격계 케어',
 ];
 
-const MyInfoPage = () => {
-  const [selectedGender, setSelectedGender] = useState('');
-  const [height, setHeight] = useState('');
-  const [phone, setPhone] = useState('');
-  const [selected, setSelected] = useState('근력향상');
+const schema = yup.object().shape({
+  phone: yup.string().matches(/^\d{11}$/, '전화번호는 11자리 숫자로만 입력해주세요.'),
+  height: yup.number().typeError('숫자만 입력하세요.').min(0),
+  gender: yup.string(),
+  goal: yup.string(),
+  address: yup.string(),
+});
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const MyInfoPage = () => {
+  const { user, updateUser } = useUserStore();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const methods = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      phone: user.phone ?? '',
+      height: user.height ?? '',
+      gender: user.gender ?? '',
+      goal: user.goal ?? '',
+      address: user.address ?? '',
+    },
+  });
+
+  const { handleSubmit, setValue } = methods;
+
+  // UI 전용 상태
+  const [selected, setSelected] = useState(user.goal || '');
+  const [selectedGender, setSelectedGender] = useState(user.gender || '');
+
+  // 성별 선택 시 form에도 반영
+  const handleGenderSelect = (value) => {
+    setSelectedGender(value);
+    setValue('gender', value);
+  };
+
+  // 목표 선택 시 form에도 반영
+  const handleGoalSelect = (value) => {
+    setSelected(value);
+    setValue('goal', value);
+  };
+
+  const onInvalid = (errors) => {
+    toast.error('입력 정보를 확인해주세요.');
+  };
+
+  const onSubmit = async (data) => {
+    console.log('✅ onSubmit 실행', data);
+    try {
+      setIsLoading(true);
+
+      await memberService.updateInfo(user.email, data);
+
+      updateUser(data);
+      updateUser({
+        phone: data.phone,
+        address: data.address,
+        gender: data.gender,
+        height: data.height,
+        goal: data.goal,
+      });
+      toast.success('내 정보가 성공적으로 수정되었습니다.');
+    } catch (err) {
+      if (err.response?.data?.message) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error('정보 수정 중 오류가 발생했습니다.');
+        console.error(err);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <>
       <CustomInfoContainer>
-        <CustomInfoForm onSubmit={handleSubmit}>
+        <CustomInfoForm onSubmit={handleSubmit(onSubmit, onInvalid)}>
           <PageTitle>내 정보 관리</PageTitle>
 
           {/* 전화번호 섹션 */}
           <InputGroup>
             <Label htmlFor="phone">전화번호</Label>
             <InputWithUnit>
-              <StyledInput type="text" id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <StyledInput type="text" id="phone" {...methods.register('phone')} />
             </InputWithUnit>
           </InputGroup>
 
           {/* 주소 섹션 */}
           <InputGroup>
             <Label>주소</Label>
-            <RegionSelect className="Select" />
+            <Controller
+              name="address"
+              control={methods.control}
+              render={({ field }) => <RegionSelect value={field.value} onChange={field.onChange} className="Select" />}
+            />
           </InputGroup>
 
           {/* 성별 섹션 */}
           <InputGroup>
             <Label>성별</Label>
             <GenderSelection>
-              <GenderButton
-                type="button"
-                $isSelected={selectedGender === 'male'}
-                onClick={() => setSelectedGender('male')}
-              >
+              <GenderButton type="button" $selected={selectedGender === 'M'} onClick={() => handleGenderSelect('M')}>
                 남성
               </GenderButton>
-              <GenderButton
-                type="button"
-                $isSelected={selectedGender === 'female'}
-                onClick={() => setSelectedGender('female')}
-              >
+              <GenderButton type="button" $selected={selectedGender === 'F'} onClick={() => handleGenderSelect('F')}>
                 여성
               </GenderButton>
             </GenderSelection>
@@ -73,9 +138,9 @@ const MyInfoPage = () => {
               <StyledInput
                 type="number"
                 id="height"
-                value={height}
-                onChange={(e) => setHeight(e.target.value)}
-                placeholder="예) 175"
+                {...methods.register('height')}
+                placeholder="예) 175.8"
+                step="0.1"
               />
               <UnitText>cm</UnitText>
             </InputWithUnit>
@@ -85,10 +150,17 @@ const MyInfoPage = () => {
           <InputGroup>
             <Label>목표</Label>
             <Wrapper>
-              <Button>
+              <Button type="button">
                 <List>
                   {categories.map((cat) => (
-                    <Item key={cat} selected={selected === cat} onClick={() => setSelected(cat)}>
+                    <Item
+                      key={cat}
+                      selected={selected === cat}
+                      onClick={(e) => {
+                        e.preventDefault(); // submit 방지
+                        handleGoalSelect(cat);
+                      }}
+                    >
                       {cat}
                     </Item>
                   ))}
@@ -97,7 +169,9 @@ const MyInfoPage = () => {
             </Wrapper>
           </InputGroup>
 
-          <SubmitButton type="submit">내 정보 변경</SubmitButton>
+          <SubmitButton type="submit" disabled={isLoading}>
+            내 정보 변경
+          </SubmitButton>
         </CustomInfoForm>
       </CustomInfoContainer>
     </>
@@ -115,7 +189,6 @@ const CustomInfoContainer = styled.div`
   min-height: calc(100vh - 60px);
   box-sizing: border-box;
   width: 100%;
-  font-family: 'Noto Sans KR', sans-serif;
 `;
 
 const CustomInfoForm = styled.form`
@@ -190,8 +263,8 @@ export const GenderButton = styled.button`
   border-radius: 24px;
   border: 1.5px solid #cdcdcd;
 
-  background: ${({ selected, theme }) => (selected ? theme.colors.secondary : 'transparent')};
-  color: ${({ $isSelected, theme }) => ($isSelected ? '#fff' : theme.colors.primary)};
+  background: ${({ $selected, theme }) => ($selected ? theme.colors.secondary : 'transparent')};
+  color: ${({ $selected, theme }) => ($selected ? theme.colors.white : theme.colors.primary)};
 
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: 500;

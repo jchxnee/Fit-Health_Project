@@ -5,7 +5,6 @@ export const memberService = {
   //회원가입
   signUp: async (memberData) => {
     try {
-      console.log('post 보내는 중 ', memberData);
       const { data } = await api.post(API_ENDPOINTS.MEMBER.BASE, {
         user_email: memberData.useremail,
         user_pwd: memberData.userpwd,
@@ -24,9 +23,10 @@ export const memberService = {
       throw new Error('서버 통살 불량');
     }
   },
+
+  //로그인
   login: async (memberData) => {
     try {
-      console.log('post 보내는 중 ', memberData);
       const { data } = await api.post(API_ENDPOINTS.MEMBER.LOGIN, {
         user_email: memberData.useremail,
         user_pwd: memberData.userpwd,
@@ -41,10 +41,10 @@ export const memberService = {
       throw new Error('서버 통실 불량');
     }
   },
+
+  //이메일 중복 확인
   checkEmailExists: async (email) => {
     try {
-      console.log('GET 보내는 중 ', email);
-
       const { data } = await api.get(API_ENDPOINTS.MEMBER.FIND, {
         params: {
           userEmail: email,
@@ -56,6 +56,108 @@ export const memberService = {
     } catch (error) {
       if (error.response) {
         const message = error.response?.data?.message || '이메일을 가져오는데 실패하였습니다.';
+        throw new Error(message);
+      }
+
+      throw new Error('서버 통신 불량');
+    }
+  },
+
+  //이름 수정
+  updateName: async (useremail, newUsername) => {
+    try {
+      const { data } = await api.put(API_ENDPOINTS.MEMBER.UPDATENAME, {
+        user_email: useremail,
+        user_name: newUsername,
+      });
+
+      return data;
+    } catch (error) {
+      if (error.response) {
+        const message = error.response?.data?.message || '이름 수정하는데 실패하였습니다.';
+        throw new Error(message);
+      }
+
+      throw new Error('서버 통신 불량');
+    }
+  },
+
+  //생년월일 수정
+  updateBirth: async (useremail, newBirth) => {
+    try {
+      const { data } = await api.put(API_ENDPOINTS.MEMBER.UPDATEBIRTH, {
+        user_email: useremail,
+        birth: newBirth,
+      });
+
+      return data;
+    } catch (error) {
+      if (error.response) {
+        const message = error.response?.data?.message || '생년월일 수정하는데 실패하였습니다.';
+        throw new Error(message);
+      }
+
+      throw new Error('서버 통신 불량');
+    }
+  },
+
+  //내 정보 수정
+  updateInfo: async (useremail, data) => {
+    try {
+      const { result } = await api.put(API_ENDPOINTS.MEMBER.BASE, {
+        user_email: useremail,
+        phone: data.phone,
+        address: data.address,
+        gender: data.gender,
+        height: data.height,
+        goal: data.goal,
+      });
+
+      return result;
+    } catch (error) {
+      if (error.response) {
+        const message = error.response?.data?.message || '내 정보 수정하는데 실패하였습니다.';
+        throw new Error(message);
+      }
+
+      throw new Error('서버 통신 불량');
+    }
+  },
+
+  //비밀번호 변경
+  changePwd: async (useremail, userpwd) => {
+    try {
+      console.log(useremail);
+      console.log(userpwd);
+      const { data } = await api.put(API_ENDPOINTS.MEMBER.UPDATEPWD, {
+        user_email: useremail,
+        user_pwd: userpwd,
+      });
+
+      return data;
+    } catch (error) {
+      if (error.response) {
+        const message = error.response?.data?.message || '비밀번호를 변경하는데 실패하였습니다.';
+        throw new Error(message);
+      }
+
+      throw new Error('서버 통신 불량');
+    }
+  },
+
+  //회원 탈퇴
+  deleteMember: async (useremail) => {
+    try {
+      const { data } = await api.put(API_ENDPOINTS.MEMBER.DELETE, null, {
+        params: {
+          userEmail: useremail,
+        },
+      });
+
+      return data;
+    } catch (error) {
+      if (error.response) {
+        const message = error.response?.data?.message || '회원 탈퇴하는데 실패하였습니다.';
         throw new Error(message);
       }
 

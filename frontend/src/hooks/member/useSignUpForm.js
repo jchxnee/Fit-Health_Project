@@ -1,12 +1,12 @@
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { memberService } from '../../api/member';
+import { useState } from 'react';
 
-// 회원가입 폼의 유효성 검사 스키마
+// 회원가입 유효성 검사 스키마 정의
 const signUpSchema = yup.object().shape({
   useremail: yup.string().email('유효한 이메일 주소를 입력해주세요.').required('이메일을 입력해주세요.'),
 
@@ -32,59 +32,66 @@ const signUpSchema = yup.object().shape({
 
   phone: yup
     .string()
-    .matches(/^\d{11}$/, '전화번호는 11자리 숫자로만 입력해주세요.') // Ensures exactly 11 digits and only numbers
+    .matches(/^\d{11}$/, '전화번호는 11자리 숫자로만 입력해주세요.')
     .required('전화번호를 입력해주세요.'),
 
-  birth: yup.date().max(new Date(), '미래 날짜는 선택할 수 없습니다.'),
+  birth: yup
+    .date()
+    .nullable() // null 허용
+    .notRequired() // 필수 아님
+    .max(new Date(), '미래 날짜는 선택할 수 없습니다.'),
 });
 
+// 회원가입 폼 커스텀 훅 정의
 export const useSignUpForm = () => {
-  const navigate = useNavigate();
-  //react-hook-form으로 폼 상태 초기화 및 유효성 검사
+  const navigate = useNavigate(); // 페이지 이동 함수
+  const [isLoading, setIsLoading] = useState(false);
+
+  // react-hook-form 설정
   const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting }, //유효성 에러 및 제출중 상태
-    setError,
-    watch,
-    trigger,
+    register, // 입력 필드와 연결하는 메서드
+    handleSubmit, // 제출 함수 래퍼
+    formState: {
+      errors, // 유효성 검사 에러 객체
+      isSubmitting, // 제출 중 상태
+    },
+    setError, // 특정 필드에 수동으로 에러 설정
+    watch, // 필드 값 실시간 감시
+    trigger, // 특정 필드 강제 유효성 검사
   } = useForm({
-    resolver: yupResolver(signUpSchema), //yup스키마와 연결
-    mode: 'onChange',
+    resolver: yupResolver(signUpSchema), // yup 스키마로 유효성 검사 연결
+    mode: 'onChange', // 입력값 변경 시마다 검사 실행
   });
 
+  // 실제 회원가입 처리 함수
   const onsubmit = async (data) => {
     try {
-      //중복 이메일 체크
-      //setError('email', {});
+      setIsLoading(true); // 로딩 시작
 
-      //회원가입 API 호출
-      console.log('memberService 보내는 중 ', data);
-      await memberService.signUp({
-        useremail: data.useremail,
-        userpwd: data.userpwd,
-        username: data.username,
-        phone: data.phone,
-        birth: data.birth,
-      });
+      await memberService.signUp(data);
 
+      // 성공 메시지 및 로그인 페이지로 이동
       toast.success('회원가입 완료!');
       navigate('/login');
     } catch (error) {
+      // 에러 발생 시 알림
       toast.error('회원가입 중 문제가 발생하였습니다.');
       console.error('회원가입 에러 : ', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  //컴포넌트에서 사용할 값들 반환
+  // 컴포넌트에서 사용할 값들 반환
   return {
-    register,
-    handleSubmit,
-    onsubmit,
-    errors,
-    isSubmitting,
-    watch,
-    trigger,
-    setError,
+    register, // 인풋 필드 연결
+    handleSubmit, // 폼 제출 핸들러
+    onsubmit, // 커스텀 제출 로직
+    errors, // 유효성 검사 에러
+    isSubmitting, // 제출 상태 (버튼 비활성화 등)
+    watch, // 실시간 값 감시
+    trigger, // 수동 유효성 검사 실행
+    setError, // 수동 에러 설정
+    isLoading,
   };
 };

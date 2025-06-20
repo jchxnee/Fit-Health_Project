@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import axios from 'axios';
+import useUserStore from '../../store/useUserStore';
 
 export default function useCoachRegisterForm() {
+  const { user } = useUserStore();
+  const userEmail = user?.email || '';
   const [photos, setPhotos] = useState([]);
   const [careers, setCareers] = useState([]);
   const [kakaoId, setKakaoId] = useState('');
@@ -22,6 +25,7 @@ export default function useCoachRegisterForm() {
     setError(null);
     try {
       const formData = new FormData();
+      formData.append('userEmail', userEmail);  // 사용자 이메일 추가
       formData.append('majorName', majorName);
       formData.append('wishArea', wishArea);
       formData.append('kakaoId', kakaoId);

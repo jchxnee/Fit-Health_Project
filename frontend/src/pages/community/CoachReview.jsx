@@ -1,74 +1,22 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'; // useMemo 추가
+// src/pages/CoachReview.jsx
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import { FaChevronDown, FaThumbsUp, FaRegThumbsUp, FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
-import TitleBar from '../../components/TitleBar'; // TitleBar 컴포넌트 경로 확인
-import betaImg from '../../assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
+import TitleBar from '../../components/TitleBar';
+import betaImg from '../../assets/beta_user_img.png';
+import { useParams } from 'react-router-dom';
+import api from '../../api/axios';
+import { API_ENDPOINTS } from '../../api/config';
 
 function CoachReview() {
+  const { trainerEmail } = useParams(); // URL에서 trainerEmail 가져오기
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const [sortCriteria, setSortCriteria] = useState('highestRating'); // 초기 정렬 기준: 높은순
   const sortMenuRef = useRef(null);
 
-  // 더미 코치 후기 데이터
-  const [reviews, setReviews] = useState([
-    {
-      id: 1,
-      author: '김하나님',
-      authorProfileImg: betaImg,
-      timeAgo: '1시간 전',
-      rating: 4.5,
-      content: '트레이너분이 친절하시고 잘 알려주셔서 운동하기 좋았어요! -ㅇ-👍',
-      reviewBodyImage: betaImg,
-      recommendCount: 5,
-      isRecommended: false,
-    },
-    {
-      id: 2,
-      author: '김하나님',
-      authorProfileImg: betaImg,
-      timeAgo: '1시간 전',
-      rating: 3.0,
-      content: '트레이너분이 친절하시고 잘 알려주셔서 운동하기 좋았어요! -ㅇ-👍',
-      reviewBodyImage: '',
-      recommendCount: 8,
-      isRecommended: false,
-    },
-    {
-      id: 3,
-      author: '박트레이닝',
-      authorProfileImg: betaImg,
-      timeAgo: '30분 전',
-      rating: 2.5,
-      content: '운동 설명이 자세해서 좋았어요.',
-      reviewBodyImage: '',
-      recommendCount: 10,
-      isRecommended: true,
-    },
-    {
-      id: 4,
-      author: '이운동',
-      authorProfileImg: betaImg,
-      timeAgo: '2시간 전',
-      rating: 5.0,
-      content: '최고의 트레이너입니다!',
-      reviewBodyImage: '',
-      recommendCount: 15,
-      isRecommended: false,
-    },
-    {
-      id: 5,
-      author: '최강체력',
-      authorProfileImg: betaImg,
-      timeAgo: '5분 전',
-      rating: 1.0,
-      content: '좀 아쉬운 부분이 있었어요.',
-      reviewBodyImage: '',
-      recommendCount: 2,
-      isRecommended: false,
-    },
-  ]);
+  const [reviews, setReviews] = useState([]); // 실제 리뷰 데이터를 저장할 상태
+  const [loading, setLoading] = useState(true); // 로딩 상태
+  const [error, setError] = useState(null); // 에러 상태
 
   // '높은 순' 드롭다운 외부 클릭 감지
   useEffect(() => {
@@ -82,6 +30,44 @@ function CoachReview() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // API로부터 리뷰 데이터를 가져오는 useEffect
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!trainerEmail) {
+        // trainerEmail이 없으면 API 호출하지 않음
+        setLoading(false);
+        setError('트레이너 이메일이 제공되지 않았습니다.');
+        return;
+      }
+      setLoading(true);
+      setError(null);
+      try {
+        // API_ENDPOINTS.REVIEW.SELECT와 trainerEmail을 조합하여 요청
+        const response = await api.get(`${API_ENDPOINTS.REVIEW.SELECT}${trainerEmail}`);
+        // 백엔드 DTO 구조에 맞춰 데이터 매핑
+        const fetchedReviews = response.data.map((review) => ({
+          id: review.reviewId, // 백엔드 reviewId를 id로 매핑
+          author: review.userName, // userName을 author로
+          authorProfileImg: review.userProfileImage || betaImg, // userProfileImage를 authorProfileImg로
+          timeAgo: new Date(review.createdAt).toLocaleDateString(), // createdAt을 timeAgo로 간단히 변환
+          rating: review.rating,
+          content: review.reviewContent,
+          reviewBodyImage: review.reviewImage || '', // reviewImage를 reviewBodyImage로
+          recommendCount: review.recommendCount,
+          isRecommended: false, // 이 부분은 서버에서 받아오거나 클라이언트에서 관리
+        }));
+        setReviews(fetchedReviews);
+      } catch (err) {
+        console.error('Failed to fetch reviews:', err);
+        setError('리뷰를 불러오는 데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, [trainerEmail]); // trainerEmail이 변경될 때마다 리뷰를 다시 불러옴
 
   // 별점 렌더링 함수 (FaStar, FaStarHalfAlt, FaRegStar 사용)
   const renderStars = (rating) => {
@@ -134,10 +120,10 @@ function CoachReview() {
       case 'lowestRating':
         return reviewsCopy.sort((a, b) => a.rating - b.rating); // 낮은 순
       case 'latest':
-        // 'timeAgo'가 문자열이므로 실제 날짜/시간 객체로 변환하여 비교하거나,
-        // 실제 데이터베이스에서는 타임스탬프를 사용하여 비교하는 것이 좋습니다.
-        // 여기서는 간단히 id를 역순으로 (가장 최근에 추가된 것이 id가 높다고 가정)
-        return reviewsCopy.sort((a, b) => b.id - a.id); // 최신순 (id 기준)
+        // `createdAt` 같은 실제 타임스탬프가 있다면 그것을 사용하고,
+        // 현재는 `timeAgo`가 문자열이므로 임시로 id를 역순으로 (가장 최근에 추가된 것이 id가 높다고 가정)
+        // 실제 백엔드 데이터 `createdAt` (ISO 8601) 기준으로 정렬하려면 Date 객체로 변환하여 비교:
+        return reviewsCopy.sort((a, b) => new Date(b.timeAgo) - new Date(a.timeAgo));
       default:
         return reviewsCopy;
     }
@@ -157,13 +143,19 @@ function CoachReview() {
     }
   };
 
+  if (loading) return <PageContainer>로딩 중...</PageContainer>;
+  if (error) return <PageContainer>에러: {error}</PageContainer>;
+  if (reviews.length === 0) return <PageContainer>등록된 리뷰가 없습니다.</PageContainer>; // 리뷰가 없을 때
+
   return (
     <>
+      {/* <Header /> */} {/* Header와 Footer는 App.js에서 렌더링되므로 여기서는 제거해도 됨 */}
       <PageContainer>
         <TitleBar title="코치 후기" /> {/* TitleBar 컴포넌트 사용 */}
         <MainContentWrapper>
           <CoachInfoSection>
-            <CoachName>김성은 트레이너</CoachName>
+            {/* 실제 트레이너 이름은 백엔드에서 받아와야 하지만, 현재는 더미 데이터 또는 상위 컴포넌트에서 전달받아야 함 */}
+            <CoachName>{trainerEmail} 트레이너</CoachName> {/* 임시로 이메일 표시 */}
             <ReviewCount>총 {reviews.length}개의 후기</ReviewCount>
             <SortDropdownContainer ref={sortMenuRef}>
               <SortButton onClick={() => setSortMenuOpen(!sortMenuOpen)}>
@@ -223,13 +215,14 @@ function CoachReview() {
           ))}
         </MainContentWrapper>
       </PageContainer>
+      {/* <Footer /> */}
     </>
   );
 }
 
 export default CoachReview;
 
-// --- 스타일 컴포넌트 ---
+// --- 스타일 컴포넌트 (변경 없음) ---
 
 const PageContainer = styled.div`
   width: 100%;

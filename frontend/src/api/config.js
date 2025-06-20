@@ -15,9 +15,23 @@ export const API_ENDPOINTS = {
     BASE: '/api/members',
     LOGIN: '/api/members/login',
     FIND: '/api/members/email',
+    UPDATENAME: '/api/members/name',
+    UPDATEBIRTH: '/api/members/birth',
+    UPDATEPWD: '/api/members/pwd',
+    DELETE: '/api/members/delete',
+  },
+  HEALTH: {
+    BASE: '/api/healths',
+    FINDDATE: '/api/healths/date',
+  },
+  PAYMENT: {
+    BASE: '/api/payments',
+    PAYMENT: '/api/payments/payment',
+    REFUND: '/api/payments/refund',
   },
   REVIEW: {
     CREATE: '/api/review',
+    SELECT: '/api/review/',
   },
   BOARD: {
     ALL: 'api/board/all',

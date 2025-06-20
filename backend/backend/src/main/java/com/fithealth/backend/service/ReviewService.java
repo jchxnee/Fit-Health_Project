@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface ReviewService {
     Review createReview(ReviewCreateDto.Create reviewCreateDto);
-    List<ReviewSelectDto.Select> selectReview(String trainerEmail);
+    List<ReviewSelectDto.Select> selectByTrainerNo(Long trainerNo);
 }

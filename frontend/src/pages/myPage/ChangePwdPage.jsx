@@ -1,25 +1,87 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
-import Header from '../../components/Header';
+import * as yup from 'yup';
+import { toast } from 'react-toastify';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm } from 'react-hook-form';
+import { memberService } from '../../api/member';
+import useUserStore from '../../store/useUserStore';
+import { useNavigate } from 'react-router-dom';
+
+const signUpSchema = yup.object().shape({
+  currentPassword: yup.string().required('현재 비밀번호를 입력해주세요.'),
+
+  newPassword: yup
+    .string()
+    .min(8, '비밀번호는 8자 이상 입력해주세요.')
+    .matches(
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+`~])[a-zA-Z\d!@#$%^&*()\-_=+`~]{8,16}$/,
+      '비밀번호는 영문자, 숫자, 특수문자를 모두 포함해서 입력해주세요.'
+    )
+    .required('새 비밀번호를 입력해주세요.'),
+
+  confirmNewPassword: yup
+    .string()
+    .oneOf([yup.ref('newPassword'), null], '비밀번호가 일치하지 않습니다.')
+    .required('비밀번호 확인을 입력해주세요.'),
+});
 
 const ChangePwdPage = () => {
-  const [phoneNumber, setPhoneNumber] = useState('010-1234-5678'); // 더미 데이터
-  const [email, setEmail] = useState('user@example.com'); // 더미 데이터
-  const [currentPassword, setCurrentPassword] = useState(''); // 더미 데이터
-  const [newPassword, setNewPassword] = useState(''); // 더미 데이터
-  const [confirmNewPassword, setConfirmNewPassword] = useState(''); // 더미 데이터
+  const { user } = useUserStore();
+  const logout = useUserStore((state) => state.logout);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert('개인 정보 변경 처리');
-    // 여기에 개인 정보 변경 로직 (API 호출 등) 추가
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(signUpSchema),
+  });
+
+  const onSubmit = async (data) => {
+    try {
+      setIsLoading(true);
+
+      const checkData = {
+        useremail: user.email,
+        userpwd: data.currentPassword,
+      };
+
+      const checkuser = await memberService.login(checkData);
+
+      if (!checkuser) {
+        toast.error('현재 비밀번호가 일치하지 않습니다.');
+        return;
+      }
+
+      await memberService.changePwd(user.email, data.newPassword);
+
+      logout();
+      toast.success('비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.');
+      navigate('/');
+    } catch (error) {
+      toast.error('비밀번호 변경 중 오류가 발생했습니다.');
+      console.error('비밀번호 변경 에러 : ', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onInvalid = (formErrors) => {
+    console.log('폼 에러:', formErrors); // ✅ 콘솔 확인
+    const firstError = Object.values(formErrors)[0];
+    if (firstError?.message) {
+      toast.error(firstError.message);
+    }
   };
 
   return (
     <>
       <PersonalInfoContainer>
-        <PersonalInfoForm onSubmit={handleSubmit}>
+        <PersonalInfoForm onSubmit={handleSubmit(onSubmit, onInvalid)}>
           <PageTitle>비밀번호 변경</PageTitle>
 
           <InputGroup>
@@ -27,8 +89,7 @@ const ChangePwdPage = () => {
             <Input
               type="password"
               id="currentPassword"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
+              {...register('currentPassword')}
               placeholder="현재 비밀번호 입력"
             />
           </InputGroup>
@@ -38,8 +99,7 @@ const ChangePwdPage = () => {
             <Input
               type="password"
               id="newPassword"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              {...register('newPassword')}
               placeholder="새 비밀번호 (8~16자, 영문/숫자/특수문자)"
             />
           </InputGroup>
@@ -49,13 +109,14 @@ const ChangePwdPage = () => {
             <Input
               type="password"
               id="confirmNewPassword"
-              value={confirmNewPassword}
-              onChange={(e) => setConfirmNewPassword(e.target.value)}
+              {...register('confirmNewPassword')}
               placeholder="새 비밀번호 다시 입력"
             />
           </InputGroup>
 
-          <SubmitButton type="submit">비밀번호 변경</SubmitButton>
+          <SubmitButton type="submit" disabled={isLoading}>
+            비밀번호 변경
+          </SubmitButton>
         </PersonalInfoForm>
       </PersonalInfoContainer>
     </>
@@ -75,7 +136,7 @@ const PersonalInfoContainer = styled.div`
   width: 100%;
 `;
 
-const PersonalInfoForm = styled.div`
+const PersonalInfoForm = styled.form`
   background-color: ${({ theme }) => theme.colors.white};
   padding: ${({ theme }) => theme.spacing[10]};
   border-radius: ${({ theme }) => theme.borderRadius.ten};

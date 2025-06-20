@@ -1,32 +1,60 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
-import Header from '../../components/Header';
+import { toast } from 'react-toastify';
+import { memberService } from '../../api/member';
+import useUserStore from '../../store/useUserStore';
+import { useNavigate } from 'react-router-dom';
 
 const DeleteMemberPage = () => {
   const [currentPassword, setCurrentPassword] = useState('');
+  const { user } = useUserStore();
+  const logout = useUserStore((state) => state.logout);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleWithdraw = (e) => {
+  const handleWithdraw = async (e) => {
     e.preventDefault();
 
-    // 실제 비밀번호 확인 로직 (서버 통신 필요)
+    if (isLoading) return; // 로딩 중이면 아무 작업도 하지 않음
+
     if (currentPassword === '') {
       alert('현재 비밀번호를 입력해주세요.');
       return;
     }
 
-    const confirmWithdrawal = window.confirm('정말 탈퇴하시겠습니까?'); // 확인창 띄우기
-
-    if (confirmWithdrawal) {
-      // 사용자가 '확인'을 눌렀을 때 실행될 로직
-      alert('회원 탈퇴가 완료되었습니다.');
-      // 여기에 회원 탈퇴를 처리하는 API 호출 등을 추가
-      // 예: navigate('/logout'); 또는 회원 정보 삭제 로직
-      console.log('회원 탈퇴 진행');
-    } else {
-      // 사용자가 '취소'를 눌렀을 때 실행될 로직
+    const confirmWithdrawal = window.confirm('정말 탈퇴하시겠습니까?');
+    if (!confirmWithdrawal) {
       alert('회원 탈퇴가 취소되었습니다.');
       console.log('회원 탈퇴 취소');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const checkData = {
+        useremail: user.email,
+        userpwd: currentPassword,
+      };
+
+      const checkuser = await memberService.login(checkData);
+
+      if (!checkuser) {
+        toast.error('현재 비밀번호가 일치하지 않습니다.');
+        return;
+      }
+
+      await memberService.deleteMember(user.email);
+
+      logout();
+      toast.success('회원 탈퇴가 완료되었습니다. 이용해주셔서 감사합니다.');
+      navigate('/');
+    } catch (error) {
+      toast.error('회원 탈퇴 중 오류가 발생했습니다.');
+      console.error('회원 탈퇴 에러 : ', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -43,11 +71,12 @@ const DeleteMemberPage = () => {
               id="currentPassword"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="" // '회원 탈퇴.png' 이미지에 placeholder 없음
             />
           </InputGroup>
 
-          <WithdrawButton type="submit">회원 탈퇴</WithdrawButton>
+          <WithdrawButton type="submit" disabled={isLoading}>
+            회원 탈퇴
+          </WithdrawButton>
         </WithdrawForm>
       </WithdrawContainer>
     </>

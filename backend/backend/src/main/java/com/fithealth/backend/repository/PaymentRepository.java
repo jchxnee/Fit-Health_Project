@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface PaymentRepository {
     Optional<Payment> findOne(Long paymentId);
     List<Long> findbyTrainerEmail(String trainerEmail);
+    Optional<Payment> findOneLast(String userEmail);
+    List<Long> findByResponseEmail(String trainerEmail);
 }
