@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import './App.css';
 import theme from './styles/theme';
 import GlobalStyle from './styles/GlobalStyle';
+import { ToastContainer } from 'react-toastify';
 
 // Header/Footer
 import Header from './components/Header';
@@ -47,6 +48,7 @@ import ChangePwdPage from './pages/myPage/ChangePwdPage';
 import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
 import betaImg from './assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
 import { useState } from 'react';
+import useUserStore from './store/useUserStore';
 
 function AppContent() {
   const location = useLocation();
@@ -112,6 +114,7 @@ function App() {
       <Router>
         <AppContent />
       </Router>
+      <ToastContainer />
     </ThemeProvider>
   );
 }

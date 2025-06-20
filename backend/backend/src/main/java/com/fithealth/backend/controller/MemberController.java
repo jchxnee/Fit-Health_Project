@@ -2,6 +2,7 @@ package com.fithealth.backend.controller;
 
 import com.fithealth.backend.dto.member.LoginDto;
 import com.fithealth.backend.dto.member.SignupDto;
+import com.fithealth.backend.dto.member.UpdateDto;
 import com.fithealth.backend.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,5 +33,29 @@ public class MemberController {
     @GetMapping("/email")
     public ResponseEntity<Boolean> findMember(@RequestParam String userEmail) {
         return ResponseEntity.ok(memberService.findMember(userEmail));
+    }
+
+    //이름 수정 API
+    @PutMapping("/name")
+    public ResponseEntity<Boolean> updateName(@RequestBody UpdateDto.RequestName updateDto) {
+        return ResponseEntity.ok(memberService.updateName(updateDto));
+    }
+
+    //생일 수정 API
+    @PutMapping("/birth")
+    public ResponseEntity<Boolean> updateBirth(@RequestBody UpdateDto.RequestBirth updateDto) {
+        return ResponseEntity.ok(memberService.updateBirth(updateDto));
+    }
+
+    //내 정보 수정 API
+    @PutMapping
+    public ResponseEntity<Boolean> updateInfo(@RequestBody UpdateDto.RequestInfo updateDto) {
+        return ResponseEntity.ok(memberService.updateInfo(updateDto));
+    }
+
+    //내 정보 수정 API
+    @PutMapping("/pwd")
+    public ResponseEntity<Boolean> updatePwd(@RequestBody UpdateDto.RequestPwd updateDto) {
+        return ResponseEntity.ok(memberService.updatePwd(updateDto));
     }
 }

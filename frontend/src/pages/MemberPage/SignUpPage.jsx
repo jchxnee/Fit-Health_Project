@@ -7,7 +7,16 @@ import { useSignUpForm } from '../../hooks/member/useSignUpForm';
 import { memberService } from '../../api/member';
 
 function SignUpPage() {
-  const { register, handleSubmit, onsubmit: handleFormSubmit, errors, trigger, watch, setError } = useSignUpForm(); // watch 추가 (email 값 읽기 위함)
+  const {
+    register,
+    handleSubmit,
+    onsubmit: handleFormSubmit,
+    errors,
+    trigger,
+    watch,
+    setError,
+    isLoading,
+  } = useSignUpForm(); // watch 추가 (email 값 읽기 위함)
 
   const [agreeService, setAgreeService] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
@@ -275,7 +284,9 @@ function SignUpPage() {
           </TermsContent>
         </TermsAndConditionsGroup>
 
-        <SignUpButton type="submit">회원가입</SignUpButton>
+        <SignUpButton type="submit" disabled={isLoading}>
+          회원가입
+        </SignUpButton>
       </SignupForm>
     </SignupContainer>
   );

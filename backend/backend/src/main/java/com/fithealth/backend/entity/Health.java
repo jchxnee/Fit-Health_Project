@@ -27,11 +27,11 @@ public class Health {
     @Column(name = "WEIGHT", nullable = false)
     private double weight;
 
-    @Column(name = "SKELETAL_MUSCLE", nullable = false)
-    private double skeletalMuscle;
-
     @Column(name = "BODY_FAT", nullable = false)
     private double bodyFat;
+
+    @Column(name = "SKELETAL_MUSCLE", nullable = false)
+    private double skeletalMuscle;
 
     @Column(name = "CREATE_DATE", nullable = false)
     private LocalDateTime createDate;
@@ -39,5 +39,14 @@ public class Health {
     @PrePersist
     public void prePersist() {
         this.createDate = LocalDateTime.now();
+    }
+
+    public void changeMember(Member member) {
+        this.member = member;
+        if(!member.getHealths().contains(this)){
+            member.getHealths().add(this);
+        } else{
+            member.getHealths().remove(this);
+        }
     }
 }
