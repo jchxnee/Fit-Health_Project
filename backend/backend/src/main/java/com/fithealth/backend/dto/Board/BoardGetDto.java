@@ -2,6 +2,7 @@ package com.fithealth.backend.dto.Board;
 
 import com.fithealth.backend.entity.Board;
 import com.fithealth.backend.entity.BoardFile;
+import com.fithealth.backend.dto.Comment.CommentGetDto; // ⭐ CommentGetDto import 추가 ⭐
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +30,8 @@ public class BoardGetDto {
         private String board_category_name;
         private Long comments_count;
         private List<BoardFileDto> files;
-        private Boolean is_liked_by_user; // ⭐ 추가된 필드 ⭐
+        private Boolean is_liked_by_user;
+        private List<CommentGetDto> comments; // ⭐ 이 줄을 추가하여 댓글 목록 포함 ⭐
 
         // ⭐ userEmail 파라미터 추가 ⭐
         public static Response toDto(Board board, Boolean isLikedByUser) {
@@ -48,7 +50,11 @@ public class BoardGetDto {
                     .files(board.getBoardPhoto().stream()
                             .map(BoardFileDto::toDto)
                             .collect(Collectors.toList()))
-                    .is_liked_by_user(isLikedByUser) // ⭐ 필드 값 설정 ⭐
+                    .is_liked_by_user(isLikedByUser)
+                    // ⭐ 댓글 목록을 DTO로 변환하여 설정 ⭐
+                    .comments(board.getComments().stream()
+                            .map(CommentGetDto::fromEntity) // CommentGetDto의 fromEntity 사용
+                            .collect(Collectors.toList()))
                     .build();
         }
     }

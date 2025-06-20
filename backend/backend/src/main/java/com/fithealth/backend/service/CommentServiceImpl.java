@@ -44,11 +44,16 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true) // 조회 메소드는 readOnly = true로 설정하여 성능 최적화
     public List<CommentGetDto> getCommentsByBoardNo(Long boardNo) {
+        // Board 엔티티를 찾아서 그 Board에 연관된 댓글들을 가져오거나
+        // CommentRepository에 findByBoardNo 같은 메소드를 추가할 수 있습니다.
         Board board = boardRepository.findById(boardNo)
                 .orElseThrow(() -> new EntityNotFoundException("게시물을 찾을 수 없습니다."));
 
+        // Board 엔티티에 comments 필드가 OneToMany로 잘 매핑되어 있다면 바로 접근 가능
+        // N+1 문제 방지를 위해 Fetch Join을 사용하는 것이 좋습니다 (JPA Repository에서 구현)
+        // 예: List<Comment> comments = commentRepository.findByBoard_BoardNoWithMember(boardNo);
         return board.getComments().stream()
-                .map(CommentGetDto.Response::toDto) // 엔티티를 DTO로 변환
+                .map(CommentGetDto::fromEntity) // 엔티티를 DTO로 변환
                 .collect(Collectors.toList());
     }
 }

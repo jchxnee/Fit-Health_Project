@@ -204,16 +204,16 @@ function CommunityPostDetailPage() {
                 post.comments.map((comment) => (
                   <CommentItem key={comment.comment_no}>
                     <CommentAuthorInfo>
-                      <ProfileImage src={betaImg} alt={comment.member.userName} />
+                      <ProfileImage src={betaImg} alt={comment.user_name} />
                       <AuthorDetails>
                         <AuthorDetailsSmall>
-                          <AuthorName>{comment.member.userEmail}</AuthorName>
+                          <AuthorName>{comment.user_name}</AuthorName>
                         </AuthorDetailsSmall>
                         <CommentAuthorRegion></CommentAuthorRegion>
                       </AuthorDetails>
                     </CommentAuthorInfo>
                     <CommentText>{comment.comment_content}</CommentText>
-                    <CommentTime>{new Date(comment.createdDate).toLocaleString()}</CommentTime>
+                    <CommentTime>{new Date(comment.created_date).toLocaleString()}</CommentTime>
                   </CommentItem>
                 ))}
             </CommentList>

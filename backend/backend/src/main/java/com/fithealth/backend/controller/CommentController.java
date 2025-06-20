@@ -25,9 +25,9 @@ public class CommentController {
         return ResponseEntity.ok(commentService.createComment(commentCreateDto));
     }
 
-    @GetMapping
-    public ResponseEntity<List<CommentGetDto>> getComments(@RequestParam CommentGetDto.Response commentGetDto) {
-        return ResponseEntity.ok(commentService.getComment(commentGetDto));
+    @GetMapping("/board/{boardNo}")
+    public ResponseEntity<List<CommentGetDto>> getCommentsByBoardNo(@PathVariable Long boardNo) {
+        return ResponseEntity.ok(commentService.getCommentsByBoardNo(boardNo));
     }
 
 
