@@ -30,4 +30,15 @@ public class PaymentRepositoryImpl implements PaymentRepository {
                 .setParameter("trainerEmail", trainerEmail)
                 .getResultList();
     }
+
+    @Override
+    public Optional<Payment> findOneLast(String userEmail) {
+        String sql = "SELECT p FROM Payment p WHERE p.member.userEmail = :userEmail ORDER BY p.appliedAt DESC";
+        return em.createQuery(sql, Payment.class)
+                .setParameter("userEmail", userEmail)
+                .setMaxResults(1)
+                .getResultList()
+                .stream()
+                .findFirst();
+    }
 }

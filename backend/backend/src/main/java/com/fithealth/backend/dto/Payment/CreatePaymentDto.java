@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class CreatePaymentDto {
 
@@ -25,7 +26,7 @@ public class CreatePaymentDto {
         private Long productPrice;
         private String productName;
         private Long totalCount;
-        private LocalDate firstReservation;
+        private LocalDateTime firstReservation;
 
         public Payment toEntity() {
             return Payment.builder()

@@ -24,6 +24,11 @@ export const API_ENDPOINTS = {
     BASE: '/api/healths',
     FINDDATE: '/api/healths/date',
   },
+  PAYMENT: {
+    BASE: '/api/payments',
+    PAYMENT: '/api/payments/payment',
+    REFUND: '/api/payments/refund',
+  },
   REVIEW: {
     CREATE: '/api/review',
   },

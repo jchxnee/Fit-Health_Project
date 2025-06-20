@@ -1,5 +1,7 @@
 package com.fithealth.backend.dto.Payment;
 
+import com.fithealth.backend.dto.member.LoginDto;
+import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.entity.Payment;
 import com.fithealth.backend.enums.CommonEnums; // CommonEnums 임포트
 import lombok.AllArgsConstructor;
@@ -9,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -25,11 +28,11 @@ public class ResponsePaymentDto {
     private String transactionId;
     private String paymentMethod;
     private CommonEnums.Status status;
-    private LocalDate paymentAt;
+    private LocalDateTime paymentAt;
     private Long productPrice;
     private String productName;
     private Long totalCount;
-    private LocalDate firstReservation;
+    private LocalDateTime firstReservation;
     private CommonEnums.Status useStatus;
 
 
@@ -56,7 +59,7 @@ public class ResponsePaymentDto {
                 .trainerName(trainerName)
                 .transactionId(payment.getTransactionId())
                 .paymentMethod(payment.getPaymentMethod())
-                .status(payment.getStatus())
+                .status(payment.getPaymentStatus())
                 .paymentAt(payment.getPaymentAt())
                 .productPrice(payment.getProductPrice())
                 .productName(payment.getProductName())
@@ -64,5 +67,37 @@ public class ResponsePaymentDto {
                 .firstReservation(payment.getFirstReservation())
                 .useStatus(payment.getUseStatus())
                 .build();
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class Response {
+        private Long payment_id;
+        private String user_name;
+        private String trainer_name;
+        private String user_phone;
+        private CommonEnums.Status payment_status;
+        private Long product_price;
+        private String product_name;
+        private Long total_count;
+        private LocalDateTime first_reservation;
+
+        public static ResponsePaymentDto.Response toDto(Payment payment) {
+            return ResponsePaymentDto.Response.builder()
+                    .payment_id(payment.getPaymentId())
+                    .user_name(payment.getMember().getUserName())
+                    .trainer_name(payment.getResponseMember().getUserName())
+                    .user_phone(payment.getMember().getPhone())
+                    .payment_status(payment.getPaymentStatus())
+                    .product_price(payment.getProductPrice())
+                    .product_name(payment.getProductName())
+                    .total_count(payment.getTotalCount())
+                    .first_reservation(payment.getFirstReservation())
+                    .build();
+        }
+
     }
 }
