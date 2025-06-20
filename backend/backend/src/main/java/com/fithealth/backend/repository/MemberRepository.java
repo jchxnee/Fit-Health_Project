@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface MemberRepository {
     void save(Member member);
     Optional<Member> findOne(String userEmail);
+    void updateGradeAndTrainer(String userEmail, CommonEnums.Grade grade, Long trainerNo);
     Optional<Member> findOneStatusY(String userEmail, CommonEnums.Status status);
 }
