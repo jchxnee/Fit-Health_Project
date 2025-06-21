@@ -26,19 +26,12 @@ const Label = styled.div`
     width: 90px;
 `;
 
-function RegionSection({ wishArea, setWishArea }) {
-  // wishArea는 '시/도 구/군' 형태의 문자열로 저장
-  const handleRegionChange = (province, city) => {
-    if (province && city) setWishArea(`${province} ${city}`);
-    else if (province) setWishArea(province);
-    else setWishArea('');
-  };
-
+function RegionSection({ value, onChange }) {
   return (
     <Section>
       <Row>
         <Label>희망지역</Label>
-        <RegionSelect value={wishArea} onChange={handleRegionChange} />
+        <RegionSelect className="Select" value={value} onChange={onChange} />
       </Row>
     </Section>
   );
