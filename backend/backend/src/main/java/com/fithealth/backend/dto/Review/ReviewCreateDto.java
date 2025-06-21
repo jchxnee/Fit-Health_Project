@@ -6,11 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import org.springframework.web.multipart.MultipartFile;
 
 
 public class ReviewCreateDto {
 
+    @Setter
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
@@ -19,6 +20,7 @@ public class ReviewCreateDto {
         private String reviewContent;
         private Double rating;
         private Long heart;
+        private MultipartFile reviewImageFile;
 
         public Review toEntity() {
             return Review.builder()

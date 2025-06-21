@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReviewRepository {
-    Review save(Review review); // 저장 또는 업데이트
-    List<Review> findByPaymentId(List<Long> paymentIds); // 전체 조회
+    Review save(Review review);
+    List<Review> findByPaymentId(List<Long> paymentIds);
+    List<Review> findReviewsByUserEmailWithPaymentAndMembers(String userEmail);
+
 }
