@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long>,
         JpaSpecificationExecutor<Board> {
@@ -22,6 +24,8 @@ public interface BoardRepository extends JpaRepository<Board, Long>,
     // ⭐ 위와 동일하게 수정 제안 ⭐
     @EntityGraph(attributePaths = {"member"}) // 또는 {"member", "comments"}
     Page<Board> findByBoardCategoryNameAndStatus(String boardCategoryName, CommonEnums.Status status, Pageable pageable);
+
+    Optional<Board> findById(Long boardNo);
 
     // 상세 조회 시에는 모든 컬렉션을 EAGER 로딩하는 것이 좋을 수 있습니다.
     // 하지만 목록 조회와 동일하게 MultipleBagFetchException이 발생할 수 있습니다.

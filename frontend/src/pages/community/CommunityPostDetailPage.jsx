@@ -82,14 +82,16 @@ function CommunityPostDetailPage() {
     try {
       const newCommentData = {
         board_no: boardNo,
-        commentContent: commentInput,
-        user_email: currentUserEmail, // ⭐ 임시 사용자 이메일 사용 ⭐
+        comment_content: commentInput,
+        user_email: currentUserEmail,
       };
-      const response = await axios.post('http://localhost:7961/api/comment', newCommentData);
+      const response = await api.post(API_ENDPOINTS.COMMENT.CREATE, newCommentData);
+
+      console.log('게시글 등록 성공:', response.data);
 
       // 댓글 작성 후 게시글 데이터를 다시 불러와서 댓글 목록 업데이트
-      const updatedPostResponse = await axios.get(
-        `http://localhost:7961/api/board/${boardNo}?userEmail=${currentUserEmail}`
+      const updatedPostResponse = await api.get(
+        `${API_ENDPOINTS.BOARD.DETAIL}/${boardNo}?userEmail=${currentUserEmail}`
       );
       setPost(updatedPostResponse.data);
       setCommentInput('');
@@ -202,16 +204,16 @@ function CommunityPostDetailPage() {
                 post.comments.map((comment) => (
                   <CommentItem key={comment.comment_no}>
                     <CommentAuthorInfo>
-                      <ProfileImage src={betaImg} alt={comment.member.userName} />
+                      <ProfileImage src={betaImg} alt={comment.user_name} />
                       <AuthorDetails>
                         <AuthorDetailsSmall>
-                          <AuthorName>{comment.member.userName}</AuthorName>
+                          <AuthorName>{comment.user_name}</AuthorName>
                         </AuthorDetailsSmall>
                         <CommentAuthorRegion></CommentAuthorRegion>
                       </AuthorDetails>
                     </CommentAuthorInfo>
-                    <CommentText>{comment.commentContent}</CommentText>
-                    <CommentTime>{new Date(comment.createdDate).toLocaleString()}</CommentTime>
+                    <CommentText>{comment.comment_content}</CommentText>
+                    <CommentTime>{new Date(comment.created_date).toLocaleString()}</CommentTime>
                   </CommentItem>
                 ))}
             </CommentList>

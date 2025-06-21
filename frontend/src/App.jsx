@@ -46,8 +46,6 @@ import FAQPage from './pages/FAQPage/FAQPage';
 import MyInfoPage from './pages/myPage/MyInfoPage';
 import ChangePwdPage from './pages/myPage/ChangePwdPage';
 import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
-import betaImg from './assets/beta_user_img.png'; // 이미지 경로에 맞게 수정
-import { useState } from 'react';
 import useUserStore from './store/useUserStore';
 import RefundPage from './pages/PayPage/RefundPage';
 

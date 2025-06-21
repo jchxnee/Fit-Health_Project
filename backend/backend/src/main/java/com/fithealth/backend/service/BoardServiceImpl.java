@@ -36,11 +36,11 @@ public class BoardServiceImpl implements BoardService {
     private final String UPLOAD_PATH = "C:\\Users\\User\\Pictures\\photo";
 
     @Override
-    public Long createBoard(BoardCreateDto.Create boardDto, List<MultipartFile> files) throws IOException {
-        Member member = memberRepository.findOne(boardDto.getUser_email())
+    public Long createBoard(BoardCreateDto.Create boardCreateDto, List<MultipartFile> files) throws IOException {
+        Member member = memberRepository.findOne(boardCreateDto.getUser_email())
                 .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));
 
-        Board board = boardDto.toEntity();
+        Board board = boardCreateDto.toEntity();
         board.changeMember(member);
 
         if(files != null && !files.isEmpty()){
