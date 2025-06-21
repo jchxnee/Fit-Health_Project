@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // useEffect 추가
+import React, { useState, useEffect } from 'react';
 import CategoryMenu from '/src/components/CategoryMenu';
 import RegionFilterComponent from '/src/components/filter/RegionFilter';
 import RecommendedExerciseSection from '../../components/TitleBar';
@@ -105,7 +105,7 @@ const CoachList = () => {
     };
 
     fetchTrainers();
-  }, []); // 빈 배열: 컴포넌트가 처음 마운트될 때 한 번만 실행
+  }, []);
 
   const basicFilterOptions = [
     {
@@ -113,8 +113,8 @@ const CoachList = () => {
       key: 'status',
       options: [
         { label: '전체', value: '전체' },
-        { label: '활동중', value: 'Y' }, // 백엔드 CommonEnums.Status.Y 값과 일치
-        { label: '휴면', value: 'N' }, // 백엔드 CommonEnums.Status.N 값과 일치
+        { label: '활동중', value: 'Y' },
+        { label: '휴면', value: 'N' },
       ],
     },
   ];
@@ -132,14 +132,49 @@ const CoachList = () => {
     const matchesCategory =
       selectedCategory === '전체' || (trainerDto.majorName && trainerDto.majorName.startsWith(selectedCategory));
 
-    const matchesRegion =
-      selectedRegion === '전체' || (trainerDto.wishArea && trainerDto.wishArea.includes(selectedRegion));
+    const trimmedSelectedRegion = selectedRegion.trim();
+    const trimmedWishArea = trainerDto.wishArea ? trainerDto.wishArea.trim() : '';
+
+    let regionMatch = false;
+    if (trimmedSelectedRegion === '전체') {
+      regionMatch = true;
+    } else {
+      let fullRegionName = trimmedSelectedRegion;
+      switch (trimmedSelectedRegion) {
+        case '전남':
+          fullRegionName = '전라남도';
+          break;
+        case '전북':
+          fullRegionName = '전라북도';
+          break;
+        case '경남':
+          fullRegionName = '경상남도';
+          break;
+        case '경북':
+          fullRegionName = '경상북도';
+          break;
+        case '충남':
+          fullRegionName = '충청남도';
+          break;
+        case '충북':
+          fullRegionName = '충청북도';
+          break;
+        case '강원':
+          fullRegionName = '강원특별자치도';
+          break;
+        case '제주':
+          fullRegionName = '제주특별자치도';
+          break;
+      }
+      regionMatch = trimmedWishArea.startsWith(fullRegionName);
+    }
+    const matchesRegion = regionMatch;
 
     const matchesSearch =
       searchQuery === '' ||
       (trainerDto.trainerName && trainerDto.trainerName.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    const matchesStatus = selectedStatus === '전체' || (trainerDto.status && trainerDto.status === selectedStatus); // trainerDto.status 필드가 있다고 가정
+    const matchesStatus = selectedStatus === '전체' || (trainerDto.status && trainerDto.status === selectedStatus);
 
     return matchesCategory && matchesRegion && matchesSearch && matchesStatus;
   });
@@ -155,7 +190,6 @@ const CoachList = () => {
     window.scrollTo(0, 0);
   };
 
-  // 로딩 및 에러 상태 처리
   if (loading) {
     return (
       <PageWrapper>
@@ -208,23 +242,20 @@ const CoachList = () => {
             <CoachListContainer>
               {currentCoaches.length > 0 ? (
                 currentCoaches.map((trainerDto) => (
-                  // DTO의 trainerNo를 key로 사용하고, Link 경로에도 사용
                   <Link
                     key={trainerDto.trainerNo}
                     to={`/coach/${trainerDto.trainerNo}`}
                     style={{ textDecoration: 'none', color: 'inherit' }}
                   >
-                    {/* CoachListItem 컴포넌트에 SelectTrainerDto.Response의 필드를 매핑하여 전달 */}
                     <CoachListItem
                       coach={{
-                        id: trainerDto.trainerNo, // trainerNo
-                        name: trainerDto.trainerName, // trainerName
-                        specialization: trainerDto.majorName, // majorName
-                        location: trainerDto.wishArea, // wishArea
-                        rating: trainerDto.rating, // rating
-                        reviews: trainerDto.reviews, // reviews
-                        imageUrl: trainerDto.profileImg, // profileImg
-                        // status: trainerDto.status, // DTO에 status 필드가 있다면 주석 해제
+                        id: trainerDto.trainerNo,
+                        name: trainerDto.trainerName,
+                        specialization: trainerDto.majorName,
+                        location: trainerDto.wishArea,
+                        rating: trainerDto.rating,
+                        reviews: trainerDto.reviews,
+                        imageUrl: trainerDto.profileImg,
                       }}
                     />
                   </Link>

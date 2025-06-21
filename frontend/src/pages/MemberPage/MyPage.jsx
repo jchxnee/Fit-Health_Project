@@ -261,7 +261,9 @@ const MyPage = () => {
           </SectionHeader>
           <SectionLink to="/coachRegister">핏코치 정보 수정</SectionLink>
           <SectionLink to="/myPostsPage">내가 작성한 게시물/댓글</SectionLink>
-          <SectionLink to="/myReviewsPage">내가 작성한 리뷰</SectionLink>
+          <SectionLink to="/myReviewsPage" state={{ userEmail: user.email }}>
+            내가 작성한 리뷰
+          </SectionLink>
           <Divider />
         </SectionBlock>
 

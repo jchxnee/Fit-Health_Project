@@ -2,57 +2,88 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import { FaChevronDown, FaStar, FaStarHalfAlt, FaRegStar, FaThumbsUp, FaRegThumbsUp } from 'react-icons/fa';
-import betaImg from '../../assets/beta_user_img.png'; // 사용자 이미지 (Header에서 사용)
 import { IoMdMore } from 'react-icons/io';
-
-// --- 더미 데이터 (실제로는 API에서 받아옴) ---
-const myReviewsData = [
-  {
-    id: 1,
-    coachName: '김성은',
-    round: 2,
-    date: '2025.06.07',
-    rating: 4,
-    content: '트레이너분이 친절하시고 잘 알려주셔서 운동하기 좋았어요! -ㅇㅎㅇㅌ-',
-    imageUrl: betaImg,
-    recommendCount: 5,
-    isRecommended: false,
-  },
-  {
-    id: 2,
-    coachName: '김성은',
-    round: 3,
-    date: '2025.06.01', // 날짜 데이터 수정 (최신순 정렬 확인용)
-    rating: 4.5,
-    content: '트레이너분이 친절하시고 잘 알려주셔서 운동하기 좋았어요! -ㅇㅎㅇㅌ-',
-    imageUrl: null, // 이미지가 없는 리뷰
-    recommendCount: 5,
-    isRecommended: false,
-  },
-  {
-    id: 3,
-    coachName: '이동훈',
-    round: 1,
-    date: '2025.06.05',
-    rating: 5.0,
-    content: '정말 최고입니다! 자세 교정에 큰 도움이 되었어요.',
-    imageUrl: betaImg,
-    recommendCount: 2,
-    isRecommended: false,
-  },
-];
+import { useLocation } from 'react-router-dom';
+import api from '../../api/axios';
+import { API_ENDPOINTS } from '../../api/config';
+import { toast } from 'react-toastify';
 
 function MyReviewsPage() {
+  const location = useLocation();
+  const userEmail = location.state?.userEmail;
+
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
-  const [reviews, setReviews] = useState(myReviewsData); // 리뷰 목록 상태
-  const [sortCriteria, setSortCriteria] = useState('highestRating'); // 초기 정렬 기준: 높은순
+  const [reviews, setReviews] = useState([]);
+  const [sortCriteria, setSortCriteria] = useState('latest');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const sortMenuRef = useRef(null);
 
   // --- 모달 관련 상태 및 Ref 추가 ---
-  const [modalOpenReviewId, setModalOpenReviewId] = useState(null); // 현재 모달이 열린 리뷰의 ID
-  const modalRef = useRef(null); // 모달 외부 클릭 감지를 위한 Ref
+  const [modalOpenReviewId, setModalOpenReviewId] = useState(null);
+  const modalRef = useRef(null);
 
-  // 추천 버튼 토글 핸들러
+  // 백엔드에서 리뷰 데이터를 가져오는 함수
+  const fetchMyReviews = async (email, currentSortCriteria) => {
+    if (!email) {
+      // toast.error('사용자 이메일 정보가 없습니다.');
+      setLoading(false);
+      setError('로그인 정보가 없습니다. 다시 로그인해주세요.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null); // 새로운 요청 전에 에러 초기화
+
+    try {
+      // 백엔드 API 호출: /api/review/my?userEmail=사용자이메일
+      const response = await api.get(API_ENDPOINTS.REVIEW.MYREVIEW, {
+        params: { userEmail: email }, // 쿼리 파라미터로 userEmail 전달
+      });
+      console.log('백엔드에서 받은 리뷰 데이터:', response.data);
+
+      // 데이터를 받아온 후, 현재 정렬 기준에 맞게 정렬하여 상태 업데이트
+      const fetchedReviews = response.data.map((review) => ({
+        id: review.reviewId,
+        coachName: review.trainerName,
+        date: review.createdAt.split('T')[0].replace(/-/g, '.'),
+        rating: review.rating,
+        content: review.reviewContent,
+        imageUrl: review.imageUrl,
+        recommendCount: review.recommendCount || 0,
+        isRecommended: review.isRecommended || false,
+      }));
+
+      const sortedFetchedReviews = [...fetchedReviews].sort((a, b) => {
+        if (currentSortCriteria === 'highestRating') {
+          return b.rating - a.rating;
+        } else if (currentSortCriteria === 'lowestRating') {
+          return a.rating - b.rating;
+        } else if (currentSortCriteria === 'latest') {
+          const dateA = new Date(a.date.replace(/\./g, '-'));
+          const dateB = new Date(b.date.replace(/\./g, '-'));
+          return dateB - dateA;
+        }
+        return 0;
+      });
+
+      setReviews(sortedFetchedReviews);
+    } catch (err) {
+      console.error('리뷰 데이터를 불러오는 데 실패했습니다:', err);
+      setError('리뷰 데이터를 불러오는 데 실패했습니다.');
+      toast.error('리뷰 데이터를 불러오는 데 실패했습니다.');
+      setReviews([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 또는 userEmail, sortCriteria 변경 시 데이터 불러오기
+  useEffect(() => {
+    fetchMyReviews(userEmail, sortCriteria);
+  }, [userEmail, sortCriteria]); // userEmail 또는 sortCriteria가 변경될 때마다 데이터 다시 불러오고 정렬
+
+  // 추천 버튼 토글 핸들러 (더미 데이터가 아닌 실제 업데이트를 위한 API 호출 필요)
   const handleRecommendToggle = (id) => {
     setReviews((prevReviews) =>
       prevReviews.map((review) =>
@@ -65,25 +96,8 @@ function MyReviewsPage() {
           : review
       )
     );
+    toast.info('추천 기능은 현재 프론트엔드에서만 동작합니다.');
   };
-
-  // 컴포넌트 마운트 시 또는 정렬 기준 변경 시 리뷰 정렬
-  useEffect(() => {
-    const sortedReviews = [...myReviewsData].sort((a, b) => {
-      if (sortCriteria === 'highestRating') {
-        return b.rating - a.rating; // 높은 별점순 (내림차순)
-      } else if (sortCriteria === 'lowestRating') {
-        return a.rating - b.rating; // 낮은 별점순 (오름차순)
-      } else if (sortCriteria === 'latest') {
-        // 날짜를 Date 객체로 변환하여 비교 (YYYY.MM.DD 형식 가정)
-        const dateA = new Date(a.date.replace(/\./g, '-')); // "YYYY.MM.DD" -> "YYYY-MM-DD"
-        const dateB = new Date(b.date.replace(/\./g, '-'));
-        return dateB - dateA; // 최신순 (내림차순)
-      }
-      return 0;
-    });
-    setReviews(sortedReviews);
-  }, [sortCriteria]); // sortCriteria가 변경될 때마다 정렬
 
   // 외부 클릭 시 드롭다운 닫기 (정렬 메뉴)
   useEffect(() => {
@@ -96,7 +110,7 @@ function MyReviewsPage() {
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
-  }, [sortMenuRef]);
+  }, []); // 의존성 배열에서 sortMenuRef 제거 (ref는 변경되지 않음)
 
   // 외부 클릭 시 모달 닫기 (수정/삭제 모달)
   useEffect(() => {
@@ -109,7 +123,7 @@ function MyReviewsPage() {
     return () => {
       document.removeEventListener('mousedown', handleModalOutsideClick);
     };
-  }, [modalRef]);
+  }, []); // 의존성 배열에서 modalRef 제거 (ref는 변경되지 않음)
 
   // 드롭다운 메뉴 텍스트를 현재 정렬 기준에 따라 표시
   const getSortButtonText = () => {
@@ -143,26 +157,58 @@ function MyReviewsPage() {
     return stars;
   };
 
-  // 리뷰 수정 핸들러
+  // 리뷰 수정 핸들러 (실제 API 호출 필요)
   const handleEditReview = (reviewId) => {
     alert(`리뷰 ID: ${reviewId} 수정 기능 구현 예정`);
     setModalOpenReviewId(null); // 모달 닫기
   };
 
-  // 리뷰 삭제 핸들러
-  const handleDeleteReview = (reviewId) => {
+  // 리뷰 삭제 핸들러 (실제 API 호출 필요)
+  const handleDeleteReview = async (reviewId) => {
     if (window.confirm('정말 이 리뷰를 삭제하시겠습니까?')) {
-      const updatedReviews = reviews.filter((review) => review.id !== reviewId);
-      setReviews(updatedReviews); // 상태 업데이트
-      alert('리뷰가 삭제되었습니다.');
+      try {
+        // 백엔드 삭제 API 호출 (DELETE /api/review/{reviewId} 가정)
+        await api.delete(`${API_ENDPOINTS.REVIEW.SELECT}${reviewId}`);
+        toast.success('리뷰가 삭제되었습니다.');
+        // 성공 시 리뷰 목록에서 해당 리뷰 제거
+        setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
+      } catch (err) {
+        console.error('리뷰 삭제 실패:', err);
+        toast.error('리뷰 삭제에 실패했습니다.');
+      } finally {
+        setModalOpenReviewId(null); // 모달 닫기
+      }
+    } else {
+      setModalOpenReviewId(null); // 모달 닫기
     }
-    setModalOpenReviewId(null); // 모달 닫기
   };
 
   // MenuButton 클릭 핸들러: 해당 리뷰의 모달 열기/닫기 토글
   const handleMenuButtonClick = (id) => {
     setModalOpenReviewId(modalOpenReviewId === id ? null : id);
   };
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <TitleBar title="내가 쓴 리뷰" />
+        <ContentWrapper>
+          <LoadingMessage>리뷰를 불러오는 중입니다...</LoadingMessage>
+        </ContentWrapper>
+      </PageContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageContainer>
+        <TitleBar title="내가 쓴 리뷰" />
+        <ContentWrapper>
+          <ErrorMessage>{error}</ErrorMessage>
+        </ContentWrapper>
+      </PageContainer>
+    );
+  }
 
   return (
     <>
@@ -212,10 +258,9 @@ function MyReviewsPage() {
                   <CoachInfo>
                     <MenuMini>
                       <CoachName>{review.coachName} 트레이너</CoachName>
-                      {/* MenuButton의 position을 relative로 설정하여 모달의 기준점 제공 */}
                       <MenuButtonWrapper>
                         <MenuButton onClick={() => handleMenuButtonClick(review.id)}>
-                          <IoMdMore size={20} color="#9E9E9E" /> {/* 아이콘 색상 추가 */}
+                          <IoMdMore size={20} color="#9E9E9E" />
                         </MenuButton>
                         {modalOpenReviewId === review.id && (
                           <ReviewActionsModal ref={modalRef}>
@@ -241,7 +286,7 @@ function MyReviewsPage() {
                 </ReviewBodyMini>
               </ReviewCard>
             ))}
-            {reviews.length === 0 && <NoReviewsMessage>작성한 리뷰가 없습니다.</NoReviewsMessage>}
+            {reviews.length === 0 && !loading && !error && <NoReviewsMessage>작성한 리뷰가 없습니다.</NoReviewsMessage>}
           </ReviewListSection>
         </ContentWrapper>
       </PageContainer>
@@ -361,6 +406,18 @@ const MenuMini = styled.div`
   align-items: center;
   gap: ${({ theme }) => theme.spacing['1']};
 `;
+const StarRatingContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: ${({ theme }) => theme.fontSizes.base}; /* 리뷰 페이지에서는 별 크기 조정 */
+  color: ${({ theme }) => theme.colors.star};
+`;
+
+const RatingText = styled.p`
+  color: ${({ theme }) => theme.colors.primary};
+  padding-left: ${({ theme }) => theme.spacing['2']};
+`;
 
 const MenuButtonWrapper = styled.div`
   position: relative; /* 모달의 기준점 */
@@ -474,43 +531,23 @@ const RecommendButton = styled.button`
   }
 `;
 
-const ReviewFooter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: ${({ theme }) => theme.spacing['3']};
-  padding-top: ${({ theme }) => theme.spacing['3']};
-  border-top: 1px solid ${({ theme }) => theme.colors.gray['100']};
-`;
-
-const StarRatingContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  font-size: ${({ theme }) => theme.fontSizes.base}; /* 리뷰 페이지에서는 별 크기 조정 */
-  color: ${({ theme }) => theme.colors.star};
-`;
-
-const RatingText = styled.p`
-  color: ${({ theme }) => theme.colors.primary};
-  padding-left: ${({ theme }) => theme.spacing['2']};
-`;
-
-const Recommendation = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing['1']};
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: ${({ theme }) => theme.colors.gray['600']};
-
-  svg {
-    transform: translateY(-1px); /* 하트 아이콘 미세 조정 */
-  }
-`;
-
 const NoReviewsMessage = styled.p`
   text-align: center;
   font-size: ${({ theme }) => theme.fontSizes.md};
   color: ${({ theme }) => theme.colors.gray['500']};
+  margin-top: ${({ theme }) => theme.spacing['8']};
+`;
+
+const LoadingMessage = styled.p`
+  text-align: center;
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  color: ${({ theme }) => theme.colors.gray['600']};
+  margin-top: ${({ theme }) => theme.spacing['8']};
+`;
+
+const ErrorMessage = styled.p`
+  text-align: center;
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  color: red;
   margin-top: ${({ theme }) => theme.spacing['8']};
 `;
