@@ -18,6 +18,11 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     private EntityManager em;
 
     @Override
+    public void save(Payment payment) {
+        em.persist(payment);
+    }
+
+    @Override
     public Optional<Payment> findOne(Long paymentId) {
         Payment payment = em.find(Payment.class, paymentId);
         return Optional.ofNullable(payment);

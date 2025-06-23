@@ -46,9 +46,13 @@ public class TrainerController {
 
     @GetMapping("/{trainerNo}")
     public ResponseEntity<TrainerDetailDto.Response> getTrainer(@PathVariable Long trainerNo) {
-        System.out.println("컨트롤러가 받은 트레이너 번호 : " + trainerNo);
         TrainerDetailDto.Response trainerDetails = trainerService.getTrainer(trainerNo);
         return ResponseEntity.ok(trainerDetails);
+    }
+
+    @GetMapping("/request/{trainerNo}")
+    public ResponseEntity<TrainerDetailDto.ResponseRequest> getTrainerRequest(@PathVariable Long trainerNo) {
+        return ResponseEntity.ok(trainerService.getTrainerRequest(trainerNo));
     }
 
     @PutMapping("/{trainerNo}")

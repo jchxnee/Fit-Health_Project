@@ -15,4 +15,5 @@ public interface TrainerService {
     TrainerDetailDto.Response getTrainer(Long trainerNo);
     void updateTrainer(UpdateTrainerDto.Request requestDto);
     void patchTrainer(Long trainerNo, java.util.Map<String, Object> updates);
+    TrainerDetailDto.ResponseRequest getTrainerRequest(Long trainerNo);
 }
