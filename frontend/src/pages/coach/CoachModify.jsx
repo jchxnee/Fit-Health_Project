@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import TitleBar from '../../components/TitleBar.jsx';
 import styled from 'styled-components';
 import useCoachRegisterForm from '../../hooks/coach/Form';
@@ -11,6 +11,8 @@ import PhotoSection from '../../components/CoachModify/PhotoSection.jsx';
 import CareerSection from '../../components/CoachModify/CareerSection.jsx';
 import AgreementSection from '../../components/CoachModify/AgreementSection.jsx';
 import SubmitSection from '../../components/CoachModify/SubmitSection.jsx';
+import { useParams, useNavigate } from 'react-router-dom';
+import api from '../../api/axios';
 
 const MainContainer = styled.section`
   max-width: 1008px;
@@ -24,7 +26,9 @@ const MainContainer = styled.section`
   }
 `;
 
-function CoachRegister() {
+function CoachModify() {
+  const { trainerNo } = useParams();
+  const navigate = useNavigate();
   const {
     photos, setPhotos,
     careers, setCareers,
@@ -38,16 +42,75 @@ function CoachRegister() {
     majorName, setMajorName,
     wishArea, setWishArea,
     loading, error,
-    submitForm,
   } = useCoachRegisterForm();
 
+  // 원본 데이터 저장용
+  const originalData = useRef(null);
+
+  useEffect(() => {
+    if (!trainerNo || trainerNo === 'undefined') return;
+    api.get(`/api/trainer/${trainerNo}`).then(res => {
+      const data = res.data;
+      setMajorName(data.majorName || '');
+      setWishArea(data.wishArea || '');
+      setKakaoId(data.kakaoId || '');
+      setInstaId(data.instaId || '');
+      setPrice(data.oncePrice || '');
+      setDiscount3(data.discount3 || '');
+      setDiscount5(data.discount5 || '');
+      setDiscount10(data.discount10 || '');
+      setIntro(data.introduce || '');
+      setCareers(data.careers || []);
+      setPhotos((data.trainerPhoto || []).map(photo => ({
+        file: null,
+        preview: `/api/images/${photo.changeName}`,
+        uploadedFileName: photo.changeName,
+        originName: photo.originName,
+      })));
+      originalData.current = data;
+    });
+  }, [trainerNo]);
+
+  // 변경된 값만 PATCH로 전송
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const ok = await submitForm();
-    if (ok) {
-      alert('코치 수정이 완료됐습니다!');
-    } else {
-      alert('수정 실패: ' + (error?.message || '오류'));
+    if (!trainerNo || trainerNo === 'undefined') {
+      alert('트레이너 번호가 올바르지 않습니다.');
+      return;
+    }
+    const changed = {};
+    if (majorName !== originalData.current?.majorName) changed.majorName = majorName;
+    if (wishArea !== originalData.current?.wishArea) changed.wishArea = wishArea;
+    if (kakaoId !== originalData.current?.kakaoId) changed.kakaoId = kakaoId;
+    if (instaId !== originalData.current?.instaId) changed.instaId = instaId;
+    if (intro !== originalData.current?.introduce) changed.introduce = intro;
+    if (String(price) !== String(originalData.current?.oncePrice)) changed.oncePrice = price;
+    if (String(discount3) !== String(originalData.current?.discount3)) changed.discount3 = discount3;
+    if (String(discount5) !== String(originalData.current?.discount5)) changed.discount5 = discount5;
+    if (String(discount10) !== String(originalData.current?.discount10)) changed.discount10 = discount10;
+    if (JSON.stringify(careers) !== JSON.stringify(originalData.current?.careers)) changed.careers = careers;
+    if (
+      JSON.stringify(photos.map(p => ({originName: p.originName, changeName: p.uploadedFileName || p.changeName}))) !==
+      JSON.stringify((originalData.current?.trainerPhoto || []).map(p => ({originName: p.originName, changeName: p.changeName})))
+    ) {
+      changed.trainerPhoto = photos
+        .map(p => ({
+          originName: p.originName,
+          changeName: p.uploadedFileName || p.changeName
+        }))
+        .filter(p => p.originName && p.changeName);
+    }
+    if (Object.keys(changed).length === 0) {
+      alert('변경된 내용이 없습니다.');
+      return;
+    }
+    try {
+      await api.patch(`/api/trainer/${trainerNo}`, changed);
+      originalData.current = { ...originalData.current, ...changed };
+      alert('코치 정보가 성공적으로 수정되었습니다!');
+      navigate(`/coach/${trainerNo}`);
+    } catch (err) {
+      alert('수정 실패: ' + (err?.response?.data?.message || '오류'));
     }
   };
 
@@ -56,7 +119,7 @@ function CoachRegister() {
       <MainContainer>
         <TitleBar title="핏코치 수정" />
         <FieldSection majorName={majorName} setMajorName={setMajorName} />
-        <RegionSection wishArea={wishArea} setWishArea={setWishArea} />
+        <RegionSection value={wishArea} onChange={setWishArea} />
         <IdSection
           kakaoId={kakaoId}
           setKakaoId={setKakaoId}
@@ -83,4 +146,4 @@ function CoachRegister() {
   );
 }
 
-export default CoachRegister;
+export default CoachModify;

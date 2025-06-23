@@ -11,9 +11,9 @@ const PhotoContainer = styled.div`
 
 const PhotoGrid = styled.div`
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: ${theme.spacing.md};
-    padding: ${theme.spacing.lg} 0;
+    grid-template-columns: repeat(4, 1fr);
+    gap: ${theme.spacing[4]};
+    padding: ${theme.spacing[5]} 0;
 `;
 
 const PhotoItem = styled.div`

@@ -151,7 +151,7 @@ const CoachDetail = () => {
       <PageWrapper>
         <TitleBarContainer>
           <ButtonTitleBar title={'핏코치 매칭'} />
-          <NavItem to="/coachModify">
+          <NavItem to={`/coachModify/${id}`}>
             수정 <FiEdit />
           </NavItem>
         </TitleBarContainer>
