@@ -26,7 +26,8 @@ public class BoardGetDto {
         private Long heart;
         private String user_email;
         private String user_name;
-        private String user_img;
+        private String profile_image;
+        private String address;
         private String board_category_name;
         private Long comments_count;
         private List<BoardFileDto> files;
@@ -44,7 +45,8 @@ public class BoardGetDto {
                     .created_date(board.getCreatedDate())
                     .user_email(board.getMember().getUserEmail())
                     .user_name(board.getMember().getUserName())
-                    .user_img(board.getMember().getProfileImage())
+                    .profile_image(board.getMember().getProfileImage())
+                    .address(board.getMember().getAddress())
                     .board_category_name(board.getBoardCategoryName())
                     .comments_count((long) board.getComments().size())
                     .files(board.getBoardPhoto().stream()

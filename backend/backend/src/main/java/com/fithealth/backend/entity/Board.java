@@ -78,7 +78,16 @@ public class Board {
     }
 
     public void addBoardFile(BoardFile boardFile) {
-        this.boardPhoto.add(boardFile);
-        boardFile.setBoard(this);
+        if (this.boardPhoto == null) {
+            this.boardPhoto = new ArrayList<>();
+        }
+        this.boardPhoto.add(boardFile); // BoardFile을 리스트에 추가
+        boardFile.setBoard(this);      // BoardFile에게 자신이 어떤 Board에 속하는지 알려줌
+    }
+
+    public void updateBoardDetails(String boardTitle, String boardContent, String boardCategoryName) {
+        this.boardTitle = boardTitle;
+        this.boardContent = boardContent;
+        this.boardCategoryName = boardCategoryName;
     }
 }

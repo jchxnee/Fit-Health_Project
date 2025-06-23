@@ -37,6 +37,8 @@ export const API_ENDPOINTS = {
     ALL: 'api/board/all',
     CREATE: '/api/board',
     DETAIL: '/api/board',
+    UPDATE: '/api/board',
+    DELETE: '/api/board/delete',
   },
   COMMENT: {
     ALL: 'api/comment',

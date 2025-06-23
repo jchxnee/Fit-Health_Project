@@ -125,8 +125,10 @@ function CommunityPage() {
             <NoticeSection>
               {notices.map((notice) => (
                 <NoticeItem key={notice.id}>
-                  <NoticeLabel>공지</NoticeLabel>
-                  <NoticeText>{notice.title}</NoticeText>
+                  <div>
+                    <NoticeLabel>공지</NoticeLabel>
+                    <NoticeText>{notice.title}</NoticeText>
+                  </div>
                   <NoticeLink href={notice.link}>{notice.icon}</NoticeLink>
                 </NoticeItem>
               ))}
@@ -286,6 +288,7 @@ const NoticeSection = styled.div`
 
 const NoticeItem = styled.div`
   display: flex;
+  justify-content: space-between;
   align-items: center;
   flex-grow: 1;
 `;

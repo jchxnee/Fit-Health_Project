@@ -18,6 +18,8 @@ public class CommentGetDto { // 이전의 Response 내부 클래스 대신 직�
     private String comment_content; // commentContent (카멜 케이스)
     private LocalDateTime created_date; // createdDate (카멜 케이스)
     private String user_email; // 댓글 작성자 이메일 (Member 엔티티에서 가져옴)
+    private String profile_image;
+    private String address;
     private String user_name; // 댓글 작성자 이름 (Member 엔티티에서 가져옴)
 
     // DTO 변환을 위한 fromEntity 메소드 추가 (Service 레이어에서 사용)
@@ -27,6 +29,8 @@ public class CommentGetDto { // 이전의 Response 내부 클래스 대신 직�
                 .comment_content(comment.getCommentContent())
                 .created_date(comment.getCreatedDate())
                 .user_email(comment.getMember().getUserEmail())
+                .profile_image(comment.getMember().getProfileImage())
+                .address(comment.getMember().getAddress())
                 .user_name(comment.getMember().getUserName())
                 .build();
     }

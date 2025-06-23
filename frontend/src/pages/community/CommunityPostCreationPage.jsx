@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import { FaCamera } from 'react-icons/fa';
 import { GoTriangleDown } from 'react-icons/go';
-import { Link, useNavigate } from 'react-router-dom';
-import useUserStore from '../../store/useUserStore'; // useUserStore 임포트
+import { useNavigate, useParams } from 'react-router-dom';
+import useUserStore from '../../store/useUserStore';
 import { API_ENDPOINTS } from '../../api/config';
 import api from '../../api/axios';
 
@@ -15,27 +15,68 @@ const ErrorMessage = styled.p`
   margin-left: 12px;
 `;
 
-function CommunityPostCreationPage() {
+// isEditMode를 prop으로 받도록 변경합니다.
+function CommunityPostCreationPage({ isEditMode = false }) {
   const { user } = useUserStore();
+  const navigate = useNavigate();
+  const { id: boardNoFromParams } = useParams(); // URL에서 게시글 번호를 가져옵니다.
+
+  // 수정 모드일 때만 boardNo를 사용하고, 아니면 null로 설정합니다.
+  const boardNo = isEditMode ? boardNoFromParams : null;
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('운동해요!');
-  const [files, setFiles] = useState([]); // 업로드할 파일들을 저장하는 상태
+  const [files, setFiles] = useState([]); // 새로 업로드할 파일들
+  const [existingImageUrls, setExistingImageUrls] = useState([]); // 기존 이미지 URL
   const [isSubmitting, setIsSubmitting] = useState(false); // 제출 상태
-  const [errors, setErrors] = useState({}); // 에러 상태 (간단한 수동 유효성 검사)
-
-  const navigate = useNavigate();
+  const [errors, setErrors] = useState({}); // 에러 상태
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const fileInputRef = useRef(null); // 파일 인풋 참조
 
-  const imageCount = files.length; // 이미지 수
+  const imageCount = files.length + existingImageUrls.length; // 전체 이미지 수 (신규 + 기존)
 
   const categories = ['운동해요!', '궁금해요!', '소통해요!'];
 
-  // 폼 유효성 검사 (간단한 예시)
+  // 게시글 데이터 불러오기 (수정 모드일 경우)
+  useEffect(() => {
+    if (isEditMode && boardNo) {
+      const fetchPostData = async () => {
+        try {
+          const response = await api.get(`${API_ENDPOINTS.BOARD.DETAIL}/${boardNo}?userEmail=${user.email}`);
+          const postData = response.data;
+          setTitle(postData.board_title);
+          setContent(postData.board_content);
+          setSelectedCategory(postData.board_category_name);
+          setExistingImageUrls(
+            postData.files
+              ? postData.files.map((file) => ({
+                  file_no: file.file_no,
+                  url: `http://localhost:7961/uploads/${file.change_name}`,
+                }))
+              : []
+          );
+        } catch (error) {
+          console.error('게시글 데이터를 불러오는 데 실패했습니다:', error);
+          alert('게시글 데이터를 불러오는 데 실패했습니다.');
+          navigate('/community'); // 에러 발생 시 커뮤니티 목록으로 돌아갑니다.
+        }
+      };
+      fetchPostData();
+    } else if (!isEditMode) {
+      // 생성 모드일 때는 모든 상태를 초기화합니다.
+      setTitle('');
+      setContent('');
+      setSelectedCategory('운동해요!');
+      setFiles([]);
+      setExistingImageUrls([]);
+      setErrors({});
+    }
+  }, [isEditMode, boardNo, user.email, navigate]); // boardNo, user.email, navigate가 변경될 때 재실행
+
+  // 폼 유효성 검사
   const isFormValid = title.trim() !== '' && content.trim() !== '';
 
   const handleTitleChange = (e) => {
@@ -63,9 +104,25 @@ function CommunityPostCreationPage() {
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    const newFiles = [...files, ...selectedFiles].slice(0, 15);
-    setFiles(newFiles);
-    e.target.value = null;
+    const totalCurrentImages = files.length + existingImageUrls.length;
+    const filesToAdd = selectedFiles.slice(0, 15 - totalCurrentImages); // 15개 제한에 맞춰 파일 추가
+
+    if (filesToAdd.length < selectedFiles.length) {
+      alert(
+        `최대 15개의 이미지만 업로드할 수 있습니다. 이미 ${totalCurrentImages}개의 이미지가 있으며, ${filesToAdd.length}개의 새로운 이미지만 추가됩니다.`
+      );
+    }
+
+    setFiles((prevFiles) => [...prevFiles, ...filesToAdd]);
+    e.target.value = null; // 동일 파일 재선택 가능하게 인풋 초기화
+  };
+
+  const handleRemoveExistingImage = (fileNoToRemove) => {
+    setExistingImageUrls((prevUrls) => prevUrls.filter((file) => file.file_no !== fileNoToRemove));
+  };
+
+  const handleRemoveNewImage = (indexToRemove) => {
+    setFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToRemove));
   };
 
   const handleSubmitClick = async (e) => {
@@ -85,7 +142,7 @@ function CommunityPostCreationPage() {
     }
 
     if (!user || !user.email) {
-      alert('로그인 후에 게시글을 작성할 수 있습니다.');
+      alert('로그인 후에 게시글을 작성/수정할 수 있습니다.');
       navigate('/login');
       return;
     }
@@ -94,33 +151,58 @@ function CommunityPostCreationPage() {
 
     const formData = new FormData();
 
+    if (isEditMode && boardNo) {
+      formData.append('board_no', boardNo);
+    }
+
     formData.append('user_email', user.email);
     formData.append('board_category_name', selectedCategory);
     formData.append('board_title', title);
     formData.append('board_content', content);
 
+    // 수정 모드일 경우, 남아있는 기존 이미지의 file_no를 보냅니다.
+    if (isEditMode && existingImageUrls.length > 0) {
+      existingImageUrls.forEach((file) => {
+        formData.append('existing_file_numbers', file.file_no);
+      });
+    }
+
+    // 새로 추가된 파일들을 보냅니다.
     files.forEach((file) => {
       formData.append('files', file);
     });
 
     try {
-      const response = await api.post(API_ENDPOINTS.BOARD.CREATE, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      let response;
+      if (isEditMode) {
+        // 수정 API 호출
+        response = await api.put(`${API_ENDPOINTS.BOARD.UPDATE}/${boardNo}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        alert('게시글이 성공적으로 수정되었습니다!');
+      } else {
+        // 생성 API 호출
+        response = await api.post(API_ENDPOINTS.BOARD.CREATE, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        alert('게시글이 성공적으로 등록되었습니다!');
+      }
 
-      console.log('게시글 등록 성공:', response.data);
-      alert('게시글이 성공적으로 등록되었습니다!');
+      console.log('게시글 처리 성공:', response.data);
       navigate('/community');
     } catch (error) {
-      console.error('게시글 등록 실패:', error.response ? error.response.data : error.message);
-      alert(`게시글 등록에 실패했습니다: ${error.response ? error.response.data || error.message : error.message}`);
+      console.error('게시글 처리 실패:', error.response ? error.response.data : error.message);
+      alert(`게시글 처리 실패: ${error.response ? error.response.data || error.message : error.message}`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // 드롭다운 메뉴 외부 클릭 감지
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -136,7 +218,7 @@ function CommunityPostCreationPage() {
   return (
     <>
       <PageContainer>
-        <TitleBar title="커뮤니티 글등록" />
+        <TitleBar title={isEditMode ? '커뮤니티 글수정' : '커뮤니티 글등록'} />
         <ContentWrapper onSubmit={handleSubmitClick}>
           <TopSection>
             <CategorySelect ref={dropdownRef}>
@@ -156,7 +238,7 @@ function CommunityPostCreationPage() {
             </CategorySelect>
             <SubmitButtonWrapper>
               <SubmitButton type="submit" disabled={!isFormValid || isSubmitting} $isValid={isFormValid}>
-                {isSubmitting ? '등록 중...' : '등록'}
+                {isSubmitting ? (isEditMode ? '수정 중...' : '등록 중...') : isEditMode ? '수정' : '등록'}
               </SubmitButton>
               {!isFormValid && <Tooltip>제목과 내용을 입력해주세요</Tooltip>}
             </SubmitButtonWrapper>
@@ -174,13 +256,31 @@ function CommunityPostCreationPage() {
               style={{ display: 'none' }}
             />
             <ImageCount>{imageCount}/15</ImageCount>
+            {/* 기존 이미지 미리보기 */}
+            {existingImageUrls.map((file) => (
+              <ImagePreviewContainer key={file.file_no}>
+                <img
+                  src={file.url}
+                  alt={`기존 이미지`}
+                  style={{ width: '60px', height: '60px', objectFit: 'cover', margin: '2px', borderRadius: '6px' }}
+                />
+                <RemoveImageButton type="button" onClick={() => handleRemoveExistingImage(file.file_no)}>
+                  X
+                </RemoveImageButton>
+              </ImagePreviewContainer>
+            ))}
+            {/* 새로 추가된 이미지 미리보기 */}
             {files.map((file, index) => (
-              <img
-                key={index}
-                src={URL.createObjectURL(file)}
-                alt={`preview-${index}`}
-                style={{ width: '60px', height: '60px', objectFit: 'cover', margin: '2px', borderRadius: '6px' }}
-              />
+              <ImagePreviewContainer key={`new-${index}`}>
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt={`preview-${index}`}
+                  style={{ width: '60px', height: '60px', objectFit: 'cover', margin: '2px', borderRadius: '6px' }}
+                />
+                <RemoveImageButton type="button" onClick={() => handleRemoveNewImage(index)}>
+                  X
+                </RemoveImageButton>
+              </ImagePreviewContainer>
             ))}
           </UploadSection>
           <TitleInput
@@ -215,7 +315,31 @@ function CommunityPostCreationPage() {
 
 export default CommunityPostCreationPage;
 
-// --- 스타일 컴포넌트 (변경 없음) ---
+// --- 추가된 스타일 컴포넌트 ---
+const ImagePreviewContainer = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+const RemoveImageButton = styled.button`
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 10;
+`;
+
+// --- 기존 스타일 컴포넌트 (변경 없음) ---
 const SubmitButton = styled.button`
   background: none;
   border: none;
