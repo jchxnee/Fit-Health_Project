@@ -70,11 +70,11 @@ public class Payment {
 
     @Column(name = "USE_STATUS" , nullable = false)
     @Enumerated(EnumType.STRING)
-    private CommonEnums.Status useStatus;
+    private CommonEnums.UseStatus useStatus;
 
     @Column(name = "APPLIED_AT", nullable = false, updatable = false)
     private LocalDateTime appliedAt;
-
+    
 
     @PrePersist
     public void prePersist() {
@@ -85,7 +85,7 @@ public class Payment {
         }
 
         if(this.useStatus == null) {
-            this.useStatus = CommonEnums.Status.Y;
+            this.useStatus = CommonEnums.UseStatus.Y;
         }
     }
 

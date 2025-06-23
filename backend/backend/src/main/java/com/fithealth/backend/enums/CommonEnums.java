@@ -5,6 +5,10 @@ public class CommonEnums {
         Y, N, C
     }
 
+    public enum UseStatus {
+        Y, N, C
+    }
+
     public enum Grade {
         A, U, C
     }

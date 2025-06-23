@@ -2,6 +2,7 @@ package com.fithealth.backend.service;
 
 import com.fithealth.backend.dto.Payment.CreatePaymentDto;
 import com.fithealth.backend.dto.Payment.ResponsePaymentDto;
+import com.fithealth.backend.dto.Payment.SelectPaymentDto;
 import com.fithealth.backend.dto.Reservation.ReservationCreateDto;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.entity.Payment;
@@ -14,6 +15,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,5 +65,13 @@ public class PaymentServiceImpl implements  PaymentService {
 
         reservationRepository.save(reservation);
         return reservation.getReservationNo();
+    }
+
+    @Override
+    public List<SelectPaymentDto.Response> findPaymentList(String userEmail) {
+        List<Payment> payments = paymentRepository.findPaymentList(userEmail);
+        return payments.stream()
+                .map(SelectPaymentDto.Response::fromEntity)
+                .collect(Collectors.toList());
     }
 }

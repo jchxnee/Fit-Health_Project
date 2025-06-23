@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // useCallback 임포트
+import { useNavigate } from 'react-router-dom';
+import api from '../../api/axios';
+import { API_ENDPOINTS } from '../../api/config';
 
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
@@ -7,181 +10,16 @@ import UserTable from '../../components/UserTable';
 import theme from '../../styles/theme';
 import { FaSearch } from 'react-icons/fa';
 import Pagination from '../../components/Pagination';
-import MatchingRefuse from '../../components/modal/MatchingRefuse.jsx';
-
-const allMatchingData = [
-  {
-    id: 1,
-    coachName: '김현아',
-    category: '도수',
-    status: '완료됨',
-    sessions: '10회/10회',
-    amount: '50,000원',
-    startDate: '2025/06/04 19:00',
-    history: [
-      { date: '2025/06/04', session: '1회차' },
-      { date: '2025/06/06', session: '2회차' },
-      { date: '2025/06/08', session: '3회차' },
-      { date: '2025/06/10', session: '4회차' },
-      { date: '2025/06/12', session: '5회차' },
-      { date: '2025/06/14', session: '6회차' },
-      { date: '2025/06/16', session: '7회차' },
-      { date: '2025/06/18', session: '8회차' },
-      { date: '2025/06/20', session: '9회차' },
-      { date: '2025/06/22', session: '10회차' },
-    ],
-  },
-  {
-    id: 2,
-    coachName: '이주찬',
-    category: '재활',
-    status: '진행중',
-    sessions: '2회/10회',
-    amount: '138,000원',
-    startDate: '2025/06/04 19:00',
-    history: [
-      { date: '2025/06/04', session: '1회차' },
-      { date: '2025/06/06', session: '2회차' },
-    ],
-  },
-  {
-    id: 3,
-    coachName: '전진영',
-    category: '헬스',
-    status: '완료됨',
-    sessions: '4회/4회',
-    amount: '182,000원',
-    startDate: '2025/06/04 19:00',
-    history: [
-      { date: '2025/06/01', session: '1회차' },
-      { date: '2025/06/02', session: '2회차' },
-      { date: '2025/06/03', session: '3회차' },
-      { date: '2025/06/04', session: '4회차' },
-    ],
-  },
-  {
-    id: 4,
-    coachName: '전진영',
-    category: '헬스',
-    status: '취소됨',
-    sessions: '0회/9회',
-    amount: '440,000원',
-    startDate: '2025/06/04 19:00',
-    history: [], // 취소된 기록은 비어있을 수 있음
-  },
-  {
-    id: 5,
-    coachName: '황인태',
-    category: '도수',
-    status: '진행중',
-    sessions: '8회/10회',
-    amount: '423,000원',
-    startDate: '2025/06/04 19:00',
-    history: [
-      { date: '2025/06/01', session: '1회차' },
-      { date: '2025/06/03', session: '2회차' },
-      { date: '2025/06/05', session: '3회차' },
-      { date: '2025/06/07', session: '4회차' },
-      { date: '2025/06/09', session: '5회차' },
-      { date: '2025/06/11', session: '6회차' },
-      { date: '2025/06/13', session: '7회차' },
-      { date: '2025/06/15', session: '8회차' },
-    ],
-  },
-  {
-    id: 6,
-    coachName: '전진영',
-    category: '재활',
-    status: '완료됨',
-    sessions: '10회/10회',
-    amount: '517,000원',
-    startDate: '2025/06/04 19:00',
-    history: [
-      { date: '2025/05/20', session: '1회차' },
-      { date: '2025/05/22', session: '2회차' },
-      { date: '2025/05/24', session: '3회차' },
-      { date: '2025/05/26', session: '4회차' },
-      { date: '2025/05/28', session: '5회차' },
-      { date: '2025/05/30', session: '6회차' },
-      { date: '2025/06/01', session: '7회차' },
-      { date: '2025/06/03', session: '8회차' },
-      { date: '2025/06/05', session: '9회차' },
-      { date: '2025/06/07', session: '10회차' },
-    ],
-  },
-  {
-    id: 7,
-    coachName: '전진영',
-    category: '재활',
-    status: '취소됨',
-    sessions: '0회/10회',
-    amount: '517,000원',
-    startDate: '2025/06/04 19:00',
-    history: [],
-  },
-  {
-    id: 8,
-    coachName: '전진영',
-    category: '재활',
-    status: '진행중',
-    sessions: '5회/10회',
-    amount: '517,000원',
-    startDate: '2025/06/04 19:00',
-    history: [
-      { date: '2025/06/04', session: '1회차' },
-      { date: '2025/06/07', session: '2회차' },
-      { date: '2025/06/10', session: '3회차' },
-      { date: '2025/06/13', session: '4회차' },
-      { date: '2025/06/16', session: '5회차' },
-    ],
-  },
-  {
-    id: 9,
-    coachName: '전진영',
-    category: '재활',
-    status: '완료됨',
-    sessions: '10회/10회',
-    amount: '517,000원',
-    startDate: '2025/06/04 19:00',
-    history: [
-      { date: '2025/04/10', session: '1회차' },
-      { date: '2025/04/12', session: '2회차' },
-      { date: '2025/04/14', session: '3회차' },
-      { date: '2025/04/16', session: '4회차' },
-      { date: '2025/04/18', session: '5회차' },
-      { date: '2025/04/20', session: '6회차' },
-      { date: '2025/04/22', session: '7회차' },
-      { date: '2025/04/24', session: '8회차' },
-      { date: '2025/04/26', session: '9회차' },
-      { date: '2025/04/28', session: '10회차' },
-    ],
-  },
-  {
-    id: 10,
-    coachName: '전진영',
-    category: '재활',
-    status: '진행중',
-    sessions: '7회/10회',
-    amount: '517,000원',
-    startDate: '2025/06/04 19:00',
-    history: [
-      { date: '2025/06/01', session: '1회차' },
-      { date: '2025/06/03', session: '2회차' },
-      { date: '2025/06/05', session: '3회차' },
-      { date: '2025/06/07', session: '4회차' },
-      { date: '2025/06/09', session: '5회차' },
-      { date: '2025/06/11', session: '6회차' },
-      { date: '2025/06/13', session: '7회차' },
-    ],
-  },
-];
+import HistoryModal from '../../components/modal/HistoryModal';
+import useUserStore from '../../store/useUserStore';
+import { toast } from 'react-toastify';
 
 const tableColumns = [
-  { key: 'coachName', label: '코치 이름', sortable: true },
+  { key: 'trainerName', label: '코치 이름', sortable: true },
   { key: 'category', label: '카테고리', sortable: true },
   { key: 'status', label: '상태', sortable: true },
   { key: 'sessions', label: '횟수', sortable: true },
-  { key: 'amount', label: '결제금액', sortable: true },
+  { key: 'productPrice', label: '결제금액', sortable: true },
   { key: 'startDate', label: '시작일자', sortable: true },
 ];
 
@@ -239,7 +77,36 @@ const SearchIcon = styled(FaSearch)`
   font-size: ${({ theme }) => theme.fontSizes.md};
 `;
 
+const LoadingMessage = styled.div`
+  text-align: center;
+  padding: 50px;
+  font-size: 1.2em;
+  color: #666;
+`;
+
+const ErrorMessage = styled.div`
+  text-align: center;
+  padding: 50px;
+  font-size: 1.2em;
+  color: #d9534f;
+  border: 1px solid #d9534f;
+  background-color: #f2dede;
+  margin: 20px;
+  border-radius: 5px;
+`;
+
+const NoDataMessage = styled.div`
+  text-align: center;
+  padding: 50px;
+  font-size: 1.2em;
+  color: #999;
+`;
+
 const MatchingList = () => {
+  const navigate = useNavigate();
+  const user = useUserStore((state) => state.user);
+  const isAuthenticated = useUserStore((state) => state.isAuthenticated);
+
   const selectBarOptions = [
     { label: '전체', value: 'all' },
     { label: '완료됨', value: '완료됨' },
@@ -249,18 +116,42 @@ const MatchingList = () => {
 
   const [currentSelection, setCurrentSelection] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+
+  const [matchingList, setMatchingList] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
-  // 페이지네이션 상태 추가
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // 한 페이지에 표시할 항목 수
+  const itemsPerPage = 10;
 
-  // 모달 상태 관리
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
 
+  const fetchMatchingList = useCallback(async () => {
+    const userEmail = user?.email;
+
+    if (!isAuthenticated || !userEmail) {
+      toast.error('로그인이 필요하거나 사용자 이메일 정보를 찾을 수 없어 신청 내역을 불러올 수 없습니다.');
+      navigate('/login');
+      return;
+    }
+    try {
+      const response = await api.get(API_ENDPOINTS.PAYMENT.LIST, {
+        params: {
+          userEmail: userEmail,
+        },
+      });
+      setMatchingList(response.data);
+    } catch (err) {
+      console.error('신청 내역을 불러오는 중 오류 발생:', err);
+    }
+  }, [isAuthenticated, user?.email, navigate]);
+
   useEffect(() => {
-    let currentFilteredData = allMatchingData;
+    fetchMatchingList();
+  }, [fetchMatchingList]);
+
+  useEffect(() => {
+    let currentFilteredData = matchingList;
 
     if (currentSelection !== 'all') {
       currentFilteredData = currentFilteredData.filter((item) => {
@@ -275,15 +166,13 @@ const MatchingList = () => {
     }
 
     setFilteredData(currentFilteredData);
-    setCurrentPage(1); // 필터링 또는 검색 시 현재 페이지를 1로 초기화
-  }, [currentSelection, searchTerm]);
+    setCurrentPage(1);
+  }, [currentSelection, searchTerm, matchingList]);
 
-  // 현재 페이지에 해당하는 데이터만 잘라냄
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
-  // 총 페이지 수 계산
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const handleSelectBarChange = (selectedValue) => {
@@ -305,7 +194,6 @@ const MatchingList = () => {
     setSelectedRowData(null);
   };
 
-  // 페이지 변경 핸들러
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -321,15 +209,22 @@ const MatchingList = () => {
               <SearchIcon />
               <SearchInput type="text" placeholder="이름 검색" value={searchTerm} onChange={handleSearchChange} />
             </SearchInputWrapper>
+            {/* 새로고침 버튼 (선택 사항, 필요 시 추가) */}
+            {/* <RefreshButton onClick={fetchMatchingList} disabled={loading}>
+              <FaSyncAlt />
+            </RefreshButton> */}
           </TableWrapper>
-          <UserTable data={currentItems} columns={tableColumns} onRowClick={handleRowClick} />
-          {/* Pagination 컴포넌트에 prop 전달 */}
+          {filteredData.length === 0 ? (
+            <NoDataMessage>고객님의 신청 내역이 존재하지 않습니다.</NoDataMessage>
+          ) : (
+            <UserTable data={currentItems} columns={tableColumns} onRowClick={handleRowClick} />
+          )}
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </ContentWrapper>
       </PageWrapper>
 
       {selectedRowData && (
-        <MatchingRefuse
+        <HistoryModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           coachName={selectedRowData.coachName}

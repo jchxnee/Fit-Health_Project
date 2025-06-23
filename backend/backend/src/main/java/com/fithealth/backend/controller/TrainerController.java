@@ -3,6 +3,7 @@ package com.fithealth.backend.controller;
 import com.fithealth.backend.dto.Trainer.SelectTrainerDto;
 import com.fithealth.backend.dto.Trainer.TrainerDetailDto;
 import com.fithealth.backend.dto.Trainer.addTrainerDto;
+import com.fithealth.backend.dto.Trainer.UpdateTrainerDto;
 import com.fithealth.backend.service.TrainerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.io.IOException;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.UUID;
+import java.io.File;
 
 @RestController
 @RequestMapping("/api/trainer")
@@ -48,6 +53,38 @@ public class TrainerController {
     @GetMapping("/request/{trainerNo}")
     public ResponseEntity<TrainerDetailDto.ResponseRequest> getTrainerRequest(@PathVariable Long trainerNo) {
         return ResponseEntity.ok(trainerService.getTrainerRequest(trainerNo));
+    }
+
+    @PutMapping("/{trainerNo}")
+    public ResponseEntity<Void> updateTrainer(@PathVariable Long trainerNo, @RequestBody UpdateTrainerDto.Request requestDto) {
+        // trainerNo가 일치하는지 검증
+        if (!trainerNo.equals(requestDto.getTrainerNo())) {
+            return ResponseEntity.badRequest().build();
+        }
+        trainerService.updateTrainer(requestDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{trainerNo}")
+    public ResponseEntity<Void> patchTrainer(@PathVariable Long trainerNo, @RequestBody Map<String, Object> updates) {
+        trainerService.patchTrainer(trainerNo, updates);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/uploadPhoto")
+    public ResponseEntity<Map<String, String>> uploadPhoto(@RequestParam("file") MultipartFile file) throws IOException {
+        String UPLOAD_PATH = "E:\\test";
+        String originName = file.getOriginalFilename();
+        String changeName = UUID.randomUUID().toString() + "_" + originName;
+        File uploadDir = new File(UPLOAD_PATH);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+        file.transferTo(new File(UPLOAD_PATH + File.separator + changeName));
+        Map<String, String> result = new HashMap<>();
+        result.put("originName", originName);
+        result.put("changeName", changeName);
+        return ResponseEntity.ok(result);
     }
 }
 

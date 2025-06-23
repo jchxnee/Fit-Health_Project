@@ -3,6 +3,7 @@ package com.fithealth.backend.service;
 import com.fithealth.backend.dto.Trainer.SelectTrainerDto;
 import com.fithealth.backend.dto.Trainer.TrainerDetailDto;
 import com.fithealth.backend.dto.Trainer.addTrainerDto;
+import com.fithealth.backend.dto.Trainer.UpdateTrainerDto;
 import com.fithealth.backend.entity.*;
 import com.fithealth.backend.enums.CommonEnums;
 import com.fithealth.backend.repository.MemberRepository;
@@ -176,6 +177,94 @@ public class TrainerServiceImpl implements TrainerService {
         }
 
         return TrainerDetailDto.Response.fromEntity(trainer, member);
+    }
+
+    @Override
+    @Transactional
+    public void updateTrainer(UpdateTrainerDto.Request requestDto) {
+        Trainer trainer = em.find(Trainer.class, requestDto.getTrainerNo());
+        if (trainer == null) {
+            throw new IllegalArgumentException("해당 트레이너가 존재하지 않습니다. trainerNo: " + requestDto.getTrainerNo());
+        }
+        trainer.setMajorName(requestDto.getMajorName());
+        trainer.setWishArea(requestDto.getWishArea());
+        trainer.setKakaoId(requestDto.getKakaoId());
+        trainer.setInstaId(requestDto.getInstaId());
+        trainer.setIntroduce(requestDto.getIntroduce());
+        trainer.setOncePrice(requestDto.getOncePrice());
+        trainer.setDiscount3(requestDto.getDiscount3());
+        trainer.setDiscount5(requestDto.getDiscount5());
+        trainer.setDiscount10(requestDto.getDiscount10());
+        trainer.getCareers().clear();
+        if (requestDto.getCareers() != null) {
+            for (String content : requestDto.getCareers()) {
+                Career career = Career.builder()
+                        .content(content)
+                        .trainer(trainer)
+                        .build();
+                trainer.getCareers().add(career);
+            }
+        }
+        trainer.getTrainerPhoto().clear();
+        if (requestDto.getTrainerPhoto() != null) {
+            for (addTrainerDto.FileRequest file : requestDto.getTrainerPhoto()) {
+                TrainerFile trainerFile = TrainerFile.builder()
+                        .trainer(trainer)
+                        .originName(file.getOriginName())
+                        .changeName(file.getChangeName())
+                        .build();
+                trainer.getTrainerPhoto().add(trainerFile);
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    public void patchTrainer(Long trainerNo, java.util.Map<String, Object> updates) {
+        Trainer trainer = em.find(Trainer.class, trainerNo);
+        if (trainer == null) throw new IllegalArgumentException("해당 트레이너가 존재하지 않습니다.");
+
+        updates.forEach((key, value) -> {
+            switch (key) {
+                case "majorName": trainer.setMajorName((String) value); break;
+                case "wishArea": trainer.setWishArea((String) value); break;
+                case "kakaoId": trainer.setKakaoId((String) value); break;
+                case "instaId": trainer.setInstaId((String) value); break;
+                case "introduce": trainer.setIntroduce((String) value); break;
+                case "oncePrice": trainer.setOncePrice(Long.valueOf(value.toString())); break;
+                case "discount3": trainer.setDiscount3(Long.valueOf(value.toString())); break;
+                case "discount5": trainer.setDiscount5(Long.valueOf(value.toString())); break;
+                case "discount10": trainer.setDiscount10(Long.valueOf(value.toString())); break;
+                case "careers":
+                    trainer.getCareers().clear();
+                    if (value instanceof java.util.List) {
+                        for (Object c : (java.util.List<?>) value) {
+                            Career career = Career.builder().content((String) c).trainer(trainer).build();
+                            trainer.getCareers().add(career);
+                        }
+                    }
+                    break;
+                case "trainerPhoto":
+                    trainer.getTrainerPhoto().clear();
+                    if (value instanceof java.util.List) {
+                        for (Object f : (java.util.List<?>) value) {
+                            java.util.Map fileMap = (java.util.Map) f;
+                            String originName = (String) fileMap.get("originName");
+                            String changeName = (String) fileMap.get("changeName");
+                            if (originName != null && changeName != null) { // null 방어
+                                TrainerFile tf = TrainerFile.builder()
+                                    .trainer(trainer)
+                                    .originName(originName)
+                                    .changeName(changeName)
+                                    .build();
+                                trainer.getTrainerPhoto().add(tf);
+                            }
+                        }
+                    }
+                    break;
+                // 필요시 추가 필드
+            }
+        });
     }
 
     @Override
