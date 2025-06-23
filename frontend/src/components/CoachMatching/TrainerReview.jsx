@@ -1,4 +1,3 @@
-// src/components/CoachMatching/TrainerReview.jsx
 import React from 'react';
 import styled from 'styled-components';
 import { FiMessageCircle } from 'react-icons/fi';

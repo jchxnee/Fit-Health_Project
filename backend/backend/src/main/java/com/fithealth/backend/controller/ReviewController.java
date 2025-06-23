@@ -2,6 +2,7 @@ package com.fithealth.backend.controller;
 
 import com.fithealth.backend.dto.Review.ReviewCreateDto;
 import com.fithealth.backend.dto.Review.ReviewSelectDto;
+import com.fithealth.backend.dto.Review.SelectMyReviewDto;
 import com.fithealth.backend.dto.member.LoginDto; // LoginDto 임포트
 import com.fithealth.backend.entity.Review;
 import com.fithealth.backend.service.ReviewService;
@@ -30,6 +31,14 @@ public class ReviewController {
         System.out.println("컨트롤러가 받은 트레이너 번호 : " + trainerNo);
         List<ReviewSelectDto.Select> reviews = reviewService.selectByTrainerNo(trainerNo); // 3. 서비스 메서드 호출명 변경
         return ResponseEntity.ok(reviews);
+    }
+
+    @GetMapping("/my") // "내가 작성한 리뷰" 목록을 위한 엔드포인트
+    public ResponseEntity<List<SelectMyReviewDto.Select>> getMyReviews(@RequestParam String userEmail) {
+        System.out.println("컨트롤러가 받은 사용자 이메일: " + userEmail);
+        // userEmail을 사용하여 해당 사용자의 리뷰를 조회하는 서비스 메서드 호출
+        List<SelectMyReviewDto.Select> myReviews = reviewService.selectByUserEmail(userEmail);
+        return ResponseEntity.ok(myReviews);
     }
 
 
