@@ -10,6 +10,8 @@ import lombok.Setter; // Setter 추가
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "PAYMENT")
@@ -65,11 +67,13 @@ public class Payment {
 
     @Column(name = "USE_STATUS" , nullable = false)
     @Enumerated(EnumType.STRING)
-    private CommonEnums.Status useStatus;
+    private CommonEnums.UseStatus useStatus;
 
     @Column(name = "APPLIED_AT", nullable = false, updatable = false)
     private LocalDateTime appliedAt;
 
+    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reservation> reservations = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {
@@ -80,7 +84,7 @@ public class Payment {
         }
 
         if(this.useStatus == null) {
-            this.useStatus = CommonEnums.Status.Y;
+            this.useStatus = CommonEnums.UseStatus.Y;
         }
     }
 

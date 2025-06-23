@@ -5,7 +5,7 @@ import SelectBar from '../../components/selectbar/BasicSelectBar.jsx'; // 컴포
 import theme from '../../styles/theme.js'; // 테마 경로 확인
 import { FaSearch } from 'react-icons/fa';
 import Pagination from '../../components/Pagination.jsx'; // Pagination 컴포넌트 임포트 확인
-import HistoryModal from '../../components/modal/HistoryModal.jsx';
+import MatchingRefuse from '../../components/modal/MatchingRefuse';
 import TrainerTable from '../TrainerTable.jsx';
 import CoachSubBar from './CoachSubBar.jsx'; // CoachSubBar 임포트 추가
 
@@ -158,7 +158,7 @@ const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, curre
       </ContentWrapper>
 
       {selectedRowData && (
-        <HistoryModal
+        <MatchingRefuse
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           coachName={selectedRowData.coachName}

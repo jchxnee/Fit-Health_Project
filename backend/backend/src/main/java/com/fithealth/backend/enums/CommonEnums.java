@@ -2,7 +2,11 @@ package com.fithealth.backend.enums;
 
 public class CommonEnums {
     public enum Status {
-        Y, N
+        Y, N, C
+    }
+
+    public enum UseStatus {
+        Y,N,C
     }
 
     public enum Grade {

@@ -1,10 +1,13 @@
 package com.fithealth.backend.controller;
 
 import com.fithealth.backend.dto.Payment.ResponsePaymentDto;
+import com.fithealth.backend.dto.Payment.SelectPaymentDto;
 import com.fithealth.backend.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -25,4 +28,12 @@ public class PaymentController {
     public ResponseEntity<Boolean> goPayment(@RequestParam Long paymentId) {
         return ResponseEntity.ok(paymentService.goPayment(paymentId));
     }
+
+    //신청내역 조회
+    @GetMapping("/list")
+    public ResponseEntity<List<SelectPaymentDto.Response>> selectPaymentList(@RequestParam("userEmail") String userEmail) {
+        List<SelectPaymentDto.Response> paymentList = paymentService.findPaymentList(userEmail);
+        return ResponseEntity.ok(paymentList);
+    }
+
 }

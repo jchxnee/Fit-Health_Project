@@ -40,6 +40,8 @@ function UserMenu({ onMenuItemClick }) {
     navigate('/'); // 메인 페이지로 이동
   };
 
+  // 신청 내역으로 이동하면서 이메일을 쿼리 파라미터로 넘기는 함수
+
   const menuItems = [
     { name: '마이페이지', to: '/mypage' },
     { name: '신청 내역', to: '/matchingList' },

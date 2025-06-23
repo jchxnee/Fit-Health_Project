@@ -183,13 +183,7 @@ export default function BasicFilter({ filterOptions, onFilterChange, currentSear
     <SearchFilterContainer>
       <SearchInputWrapper>
         <SearchIcon />
-        {/* value prop을 추가하여 외부에서 관리되는 검색어 상태와 동기화 */}
-        <SearchInput
-          type="text"
-          placeholder="이름 검색"
-          onChange={handleSearchChange}
-          value={currentSearch} // 이 부분이 중요!
-        />
+        <SearchInput type="text" placeholder="이름 검색" onChange={handleSearchChange} value={currentSearch} />
       </SearchInputWrapper>
       <FilterWrapper>
         {filterOptions.map((filter, index) => (

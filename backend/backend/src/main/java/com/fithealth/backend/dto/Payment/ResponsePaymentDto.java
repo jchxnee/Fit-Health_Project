@@ -27,47 +27,14 @@ public class ResponsePaymentDto {
     private String trainerName;
     private String transactionId;
     private String paymentMethod;
-    private CommonEnums.Status status;
+    private CommonEnums.Status paymentstatus;
     private LocalDateTime paymentAt;
     private Long productPrice;
     private String productName;
     private Long totalCount;
     private LocalDateTime firstReservation;
-    private CommonEnums.Status useStatus;
+    private CommonEnums.UseStatus useStatus;
 
-
-    public static ResponsePaymentDto fromEntity(Payment payment) {
-        String userEmail = null;
-        String userName = null;
-        if (payment.getMember() != null) {
-            userEmail = payment.getMember().getUserEmail();
-            userName = payment.getMember().getUserName();
-        }
-
-        String trainerEmail = null;
-        String trainerName = null;
-        if (payment.getResponseMember() != null) {
-            trainerEmail = payment.getResponseMember().getUserEmail();
-            trainerName = payment.getResponseMember().getUserName();
-        }
-
-        return ResponsePaymentDto.builder()
-                .paymentId(payment.getPaymentId())
-                .userEmail(userEmail)
-                .userName(userName)
-                .trainerEmail(trainerEmail)
-                .trainerName(trainerName)
-                .transactionId(payment.getTransactionId())
-                .paymentMethod(payment.getPaymentMethod())
-                .status(payment.getPaymentStatus())
-                .paymentAt(payment.getPaymentAt())
-                .productPrice(payment.getProductPrice())
-                .productName(payment.getProductName())
-                .totalCount(payment.getTotalCount())
-                .firstReservation(payment.getFirstReservation())
-                .useStatus(payment.getUseStatus())
-                .build();
-    }
 
     @Getter
     @Setter

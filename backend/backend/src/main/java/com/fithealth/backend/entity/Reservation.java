@@ -41,7 +41,8 @@ public class Reservation {
     private String rejectComment;
 
     @Column(name = "STATUS", nullable = false, length = 10)
-    private CommonEnums.Status status;;
+    @Enumerated(EnumType.STRING)
+    private CommonEnums.Status status;
 
     @PrePersist
     public void prePersist() {
