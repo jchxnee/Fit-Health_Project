@@ -10,6 +10,8 @@ import lombok.Setter; // Setter 추가
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "PAYMENT")
@@ -38,6 +40,9 @@ public class Payment {
     @OneToOne(mappedBy = "payment", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Review review; // 이 결제에 대한 리뷰
 
+    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL)
+    private List<Reservation> reservations = new ArrayList<>();
+
     @Column(name = "TRANSACTION_ID", length = 100)
     private String transactionId;
 
@@ -65,11 +70,11 @@ public class Payment {
 
     @Column(name = "USE_STATUS" , nullable = false)
     @Enumerated(EnumType.STRING)
-    private CommonEnums.Status useStatus;
+    private CommonEnums.UseStatus useStatus;
 
     @Column(name = "APPLIED_AT", nullable = false, updatable = false)
     private LocalDateTime appliedAt;
-
+    
 
     @PrePersist
     public void prePersist() {
@@ -80,7 +85,25 @@ public class Payment {
         }
 
         if(this.useStatus == null) {
-            this.useStatus = CommonEnums.Status.Y;
+            this.useStatus = CommonEnums.UseStatus.Y;
+        }
+    }
+
+    public void changeMember(Member member) {
+        this.member = member;
+        if(!member.getPaymentsByMember().contains(this)){
+            member.getPaymentsByMember().add(this);
+        } else{
+            member.getPaymentsByMember().remove(this);
+        }
+    }
+
+    public void changeResponseMember(Member member) {
+        this.responseMember = member;
+        if(!responseMember.getPaymentsByResponseMember().contains(this)){
+            responseMember.getPaymentsByResponseMember().add(this);
+        } else{
+            responseMember.getPaymentsByResponseMember().remove(this);
         }
     }
 

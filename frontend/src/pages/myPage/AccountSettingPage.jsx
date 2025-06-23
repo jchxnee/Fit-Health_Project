@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { CiCamera } from 'react-icons/ci';
 import { Link } from 'react-router-dom';
@@ -37,7 +37,42 @@ const birthSchema = yup.object({
 
 function AccountSettingsPage() {
   const { user, updateUser } = useUserStore();
+  const [imageUrl, setImageUrl] = useState(user.img || basicProfile);
+  const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // 클라이언트에서 즉시 이미지 미리보기
+    const previewUrl = URL.createObjectURL(file);
+    setImageUrl(previewUrl);
+
+    try {
+      setIsLoading(true);
+
+      const response = await await memberService.updateProfileImage(file, user.email);
+      console.log('응답 확인:', response); // { imageUrl: '/images/profile/...' }
+
+      if (response?.imageUrl) {
+        setImageUrl(response.data.imageUrl);
+        updateUser({ img: response.data.imageUrl });
+        toast.success('프로필 사진 변경 완료!');
+      }
+    } catch (error) {
+      toast.error('이미지 변경 중 문제가 발생했습니다.');
+      console.error('이미지 업로드 실패', error);
+      // 실패 시 원래 이미지로 롤백 가능
+      setImageUrl(user.img || basicProfile);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const {
     register,
@@ -107,14 +142,21 @@ function AccountSettingsPage() {
         <SettingsForm>
           <PageTitle>계정 설정</PageTitle>
 
-          <ProfileImageWrapper>
+          <ProfileImageWrapper onClick={handleImageClick}>
+            <HiddenInput
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              disabled={isLoading}
+            />
             <ProfileImage src={user.img ? user.img : basicProfile} alt="프로필 이미지" />
             <CameraIcon>
               <StyledCameraIcon />
             </CameraIcon>
           </ProfileImageWrapper>
 
-          {/* 이름 InputGroup */}
+          {/* 이메일 InputGroup */}
           <InputGroup>
             <LabelWrapper>
               <Label>이메일</Label>
@@ -209,6 +251,10 @@ const ProfileImage = styled.img`
   height: 100%;
   object-fit: cover;
   border-radius: ${({ theme }) => theme.borderRadius.full};
+`;
+
+const HiddenInput = styled.input`
+  display: none;
 `;
 
 const CameraIcon = styled.div`

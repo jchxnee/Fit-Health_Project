@@ -78,7 +78,7 @@ function PhotoSection({ photos, setPhotos }) {
       formData.append("file", file);
 
       try {
-        const res = await axios.post(`${API_BASE}/api/trainer/register`, formData, {
+        const res = await axios.post(`${API_BASE}/api/trainer/uploadPhoto`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
 
@@ -89,6 +89,7 @@ function PhotoSection({ photos, setPhotos }) {
           preview: URL.createObjectURL(file),
           uploadedFileName: uploaded.changeName,
           originName: uploaded.originName,
+          changeName: uploaded.changeName,
         };
 
         setPhotos((prev) => [...prev, newPhoto]);

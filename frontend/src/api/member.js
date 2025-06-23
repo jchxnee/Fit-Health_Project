@@ -63,6 +63,30 @@ export const memberService = {
     }
   },
 
+  //프로필 이미지 수정
+  updateProfileImage: async (profileImage, userEmail) => {
+    try {
+      const formData = new FormData();
+      formData.append('userEmail', userEmail);
+      formData.append('profileImage', profileImage);
+
+      const { data } = await api.put(API_ENDPOINTS.MEMBER.UPDATEPROFILEIMAGE, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // ✅ 문제의 핵심: 여기를 data만 return해야 함
+      return data;
+    } catch (error) {
+      if (error.response) {
+        const message = error.response?.data?.message || '프로필 사진 수정하는데 실패하였습니다.';
+        throw new Error(message);
+      }
+      throw new Error('서버 통신 불량');
+    }
+  },
+
   //이름 수정
   updateName: async (useremail, newUsername) => {
     try {

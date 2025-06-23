@@ -124,17 +124,17 @@ const Tooltip = styled.div`
   z-index: ${({ theme }) => theme.zIndices.tooltip};
 `;
 
-const SelectCourse = ({ courseQuantity, onQuantityChange, oneTimePrice }) => {
+const SelectCourse = ({ courseQuantity, onQuantityChange, oneTimePrice, trainer, onPriceChange }) => {
   const [showLimitMessage, setShowLimitMessage] = React.useState(false);
 
   const calculateDiscountedPrice = (quantity, pricePerSession) => {
     let discountRate = 0;
     if (quantity >= 10) {
-      discountRate = 0.1;
+      discountRate = trainer.discount10 / 100;
     } else if (quantity >= 5) {
-      discountRate = 0.05;
+      discountRate = trainer.discount5 / 100;
     } else if (quantity >= 3) {
-      discountRate = 0.03;
+      discountRate = trainer.discount3 / 100;
     }
 
     const totalOriginalPrice = quantity * pricePerSession;
@@ -145,6 +145,13 @@ const SelectCourse = ({ courseQuantity, onQuantityChange, oneTimePrice }) => {
   const totalOriginalPrice = courseQuantity * oneTimePrice;
   const finalDiscountedPrice = calculateDiscountedPrice(courseQuantity, oneTimePrice);
   const isDiscountApplied = finalDiscountedPrice !== totalOriginalPrice;
+
+  // 부모 컴포넌트에 최종 금액 전달
+  React.useEffect(() => {
+    if (onPriceChange) {
+      onPriceChange(finalDiscountedPrice);
+    }
+  }, [finalDiscountedPrice, onPriceChange]);
 
   const handleInternalQuantityChange = (delta) => {
     const newQuantity = courseQuantity + delta;

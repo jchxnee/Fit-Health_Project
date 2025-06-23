@@ -17,6 +17,7 @@ export const API_ENDPOINTS = {
     BASE: '/api/members',
     LOGIN: '/api/members/login',
     FIND: '/api/members/email',
+    UPDATEPROFILEIMAGE: '/api/members/profileImage',
     UPDATENAME: '/api/members/name',
     UPDATEBIRTH: '/api/members/birth',
     UPDATEPWD: '/api/members/pwd',
@@ -30,6 +31,7 @@ export const API_ENDPOINTS = {
     BASE: '/api/payments',
     PAYMENT: '/api/payments/payment',
     REFUND: '/api/payments/refund',
+    LIST: '/api/payments/list',
   },
   REVIEW: {
     CREATE: '/api/review',
@@ -54,6 +56,10 @@ export const API_ENDPOINTS = {
     CREATE: '/api/comment',
   },
   COACH: {
+<<<<<<< HEAD
+    LIST: 'api/trainer',
+=======
     LIST: '/api/trainer',
+>>>>>>> d3c4aa5228d5173df1d8af118b40801fd76d0139
   },
 };

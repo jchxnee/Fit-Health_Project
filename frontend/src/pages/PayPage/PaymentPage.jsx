@@ -18,19 +18,21 @@ import TitleBar from '../../components/TitleBar';
 import useUserStore from '../../store/useUserStore';
 import { paymentService } from '../../api/payment';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const PaymentPage = () => {
   const { user } = useUserStore();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [paymentData, setPaymentData] = useState(null); // <- 결제 정보 상태 저장
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!user?.email) return;
+    if (!user?.email || !id) return;
+    console.log('paymentId:', id);
 
     const fetchPaymentData = async () => {
-      const data = await paymentService.getPaymentData(user.email);
+      const data = await paymentService.getPaymentData(id);
       console.log('API 응답:', data);
       setPaymentData(data);
     };
@@ -105,7 +107,7 @@ const PaymentPage = () => {
 
     try {
       setIsLoading(true);
-      const response = await paymentService.goPayment(paymentData.payment_id);
+      const response = await paymentService.goPayment(id, paymentData.first_reservation);
       console.log('결제 처리 결과:', response);
 
       toast.success('결제가 완료되었습니다!');
@@ -119,7 +121,7 @@ const PaymentPage = () => {
   };
 
   if (!paymentData) {
-    return <div>결제 정보 불러오는 중...</div>;
+    return <div>결제 정보를 불러올 수 없습니다.</div>;
   }
 
   return (
@@ -152,11 +154,29 @@ const PaymentPage = () => {
             <SectionTitle>결제 정보</SectionTitle>
             <InfoRow>
               <InfoKey>{paymentData.total_count}회 핏헬스 회원가</InfoKey>
-              <InfoValue>250,000원</InfoValue>
+              <InfoValue> {(paymentData.total_count * paymentData.once_price).toLocaleString()}원</InfoValue>
             </InfoRow>
             <InfoRow>
               <InfoKey>할인 금액</InfoKey>
-              <InfoValue>1,250원</InfoValue>
+              <InfoValue>
+                {(() => {
+                  const count = paymentData.total_count;
+                  const basePrice = paymentData.total_count * paymentData.once_price;
+                  let discount = 0;
+
+                  if (count >= 3 && count < 5) {
+                    discount = paymentData.discount_3 / 100;
+                  } else if (count >= 5 && count < 10) {
+                    discount = paymentData.discount_5 / 100;
+                  } else if (count >= 10) {
+                    discount = paymentData.discount_10 / 100;
+                  }
+
+                  const finalPrice = basePrice * discount;
+
+                  return `${finalPrice.toLocaleString()}원`;
+                })()}
+              </InfoValue>
             </InfoRow>
             <TotalAmountRow>
               <TotalAmountKey>총 결제 금액</TotalAmountKey>

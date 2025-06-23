@@ -19,24 +19,19 @@ public class CreatePaymentDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Create {
-        private String userEmail; // 결제자 이메일 (Member의 USER_EMAIL)
-        private String trainerEmail; // 응답자(트레이너) 이메일 (Member의 USER_EMAIL)
-        private String transactionId;
-        private String paymentMethod;
-        private Long productPrice;
-        private String productName;
-        private Long totalCount;
-        private LocalDateTime firstReservation;
+        private String user_email; // 결제자 이메일 (Member의 USER_EMAIL)
+        private String trainer_email; // 응답자(트레이너) 이메일 (Member의 USER_EMAIL)
+        private Long product_price;
+        private String product_name;
+        private Long total_count;
+        private LocalDateTime first_reservation;
 
         public Payment toEntity() {
             return Payment.builder()
-                    // Member 엔티티(member, responseMember)는 서비스 계층에서 조회 후 설정
-                    .transactionId(this.transactionId)
-                    .paymentMethod(this.paymentMethod)
-                    .productPrice(this.productPrice)
-                    .productName(this.productName)
-                    .totalCount(this.totalCount)
-                    .firstReservation(this.firstReservation)
+                    .productPrice(this.product_price)
+                    .productName(this.product_name)
+                    .totalCount(this.total_count)
+                    .firstReservation(this.first_reservation)
                     .build();
         }
     }

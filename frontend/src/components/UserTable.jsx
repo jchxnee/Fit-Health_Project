@@ -258,7 +258,6 @@ const StyledTable = styled.table`
   th,
   td {
     padding: ${theme.spacing['3']} ${theme.spacing['4']};
-    text-align: left;
     border-bottom: 1px solid ${theme.colors.gray['200']};
     white-space: nowrap;
   }
@@ -275,6 +274,8 @@ const StyledTable = styled.table`
   td {
     color: ${theme.colors.gray['700']};
     font-size: ${theme.fontSizes.sm};
+    text-align: center;
+    padding-right: calc(${theme.spacing['4']} + 10px);
   }
 
   th:last-child,
@@ -295,6 +296,7 @@ const ThContent = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing['1']};
+  justify-content: center;
 `;
 
 const SortIconWrapper = styled.div`
@@ -309,7 +311,7 @@ const ThreeDotsMenu = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  padding: ${theme.spacing['1']};
+  padding-left: ${theme.spacing['2']};
   color: ${theme.colors.gray['500']};
   font-size: ${theme.fontSizes.lg};
   display: flex;
