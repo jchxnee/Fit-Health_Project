@@ -185,6 +185,8 @@ const MatchingList = () => {
   };
 
   const handleRowClick = (rowData) => {
+    console.log('Selected Row Data:', rowData);
+
     setSelectedRowData(rowData);
     setIsModalOpen(true);
   };

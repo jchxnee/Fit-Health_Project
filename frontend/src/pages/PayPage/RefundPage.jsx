@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   InfoKey,
   InfoRow,
@@ -18,9 +19,39 @@ import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 
 const RefundPage = () => {
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false); // 취소 규정 모달 상태
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
-  // 취소 규정 모달 열기/닫기 핸들러
+  const location = useLocation();
+  const paymentId = location.state?.paymentId;
+
+  const [currentPaymentId, setCurrentPaymentId] = useState(null);
+  const [lessonInfo, setLessonInfo] = useState(null);
+  const [reservationInfo, setReservationInfo] = useState(null);
+  const [refundDetails, setRefundDetails] = useState(null);
+
+  useEffect(() => {
+    if (paymentId) {
+      setCurrentPaymentId(paymentId);
+
+      setLessonInfo({
+        trainerName: '김요가 트레이너',
+        lessonDate: '2025.06.12 PM 6시 30분',
+        sessionNumber: '3회차',
+      });
+      setReservationInfo({
+        userName: '김현아',
+        phoneNumber: '010-5028-0682',
+      });
+      setRefundDetails({
+        originalAmount: '237,500원',
+        cancellationFee: '3,750원',
+        refundAmount: '233,750원',
+      });
+    } else {
+      console.warn('RefundPage: paymentId가 전달되지 않았습니다.');
+    }
+  }, [paymentId]);
+
   const handleOpenCancelModal = () => {
     setIsCancelModalOpen(true);
   };
@@ -33,58 +64,53 @@ const RefundPage = () => {
     <PaymentContainer>
       <TitleBar title={'환불'} />
       <PaymentContentBox>
-        {/* 레슨 정보 */}
+        {currentPaymentId && <p>현재 결제 번호: {currentPaymentId}</p>}
+
         <section>
           <SectionTitle>요가 레슨</SectionTitle>
           <InfoStackedRow>
-            <InfoKey>김요가 트레이너</InfoKey>
-            <InfoValue>2025.06.12 PM 6시 30분</InfoValue>
-            <InfoValue>진행 회차 : 3회차</InfoValue>
+            <InfoKey>{lessonInfo?.trainerName || '정보 없음'}</InfoKey>
+            <InfoValue>{lessonInfo?.lessonDate || '정보 없음'}</InfoValue>
+            <InfoValue>진행 회차 : {lessonInfo?.sessionNumber || '정보 없음'}</InfoValue>
           </InfoStackedRow>
           <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
         </section>
 
-        {/* 예약자 정보 */}
         <section>
           <SectionTitle>예약자 정보</SectionTitle>
           <InfoRow className="horizontal-start">
-            <InfoKey>김현아</InfoKey>
-            <InfoValue>010-5028-0682</InfoValue>
+            <InfoKey>{reservationInfo?.userName || '정보 없음'}</InfoKey>
+            <InfoValue>{reservationInfo?.phoneNumber || '정보 없음'}</InfoValue>
           </InfoRow>
           <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
         </section>
 
-        {/* 환불 정보 */}
         <PaymentAmountSection>
           <SectionTitle>환불 정보</SectionTitle>
           <InfoRow>
             <InfoKey>결제 금액</InfoKey>
-            <InfoValue>237,500원</InfoValue>
+            <InfoValue>{refundDetails?.originalAmount || '정보 없음'}</InfoValue>
           </InfoRow>
           <InfoRow>
             <CancleInfoKey>
               취소 수수료
               <CiCircleInfo style={{ cursor: 'pointer' }} onClick={handleOpenCancelModal} />
             </CancleInfoKey>
-            <InfoValue>3,750원</InfoValue>
+            <InfoValue>{refundDetails?.cancellationFee || '정보 없음'}</InfoValue>
           </InfoRow>
           <TotalAmountRow>
             <TotalAmountKey>환불 금액</TotalAmountKey>
-            <TotalAmountValue $isRed>233,750원</TotalAmountValue>
+            <TotalAmountValue $isRed>{refundDetails?.refundAmount || '정보 없음'}</TotalAmountValue>
           </TotalAmountRow>
           <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
         </PaymentAmountSection>
 
-        {/* 결제하기 버튼 */}
         <PaymentButton>환불 신청</PaymentButton>
       </PaymentContentBox>
 
-      {/* 취소 규정 모달 */}
       {isCancelModalOpen && (
         <ModalOverlay onClick={handleCloseCancelModal}>
           <ModalContent onClick={(e) => e.stopPropagation()}>
-            {' '}
-            {/* 모달 바깥 클릭 시 닫히도록 */}
             <ModalHeader>
               <ModalTitle>취소 규정</ModalTitle>
               <CloseButton onClick={handleCloseCancelModal}>&times;</CloseButton>
