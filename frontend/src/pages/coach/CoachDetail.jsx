@@ -105,7 +105,6 @@ const CoachDetail = () => {
     return <PageWrapper>트레이너 정보를 찾을 수 없습니다.</PageWrapper>;
   }
 
-  // API로부터 받은 데이터로 컴포넌트에 전달할 props 구성
   const currentTrainer = {
     name: trainerDetails.trainerName,
     email: `trainer${id}@example.com`,
@@ -152,7 +151,7 @@ const CoachDetail = () => {
       <PageWrapper>
         <TitleBarContainer>
           <ButtonTitleBar title={'핏코치 매칭'} />
-          <NavItem to="/coachRegister">
+          <NavItem to="/coachModify">
             수정 <FiEdit />
           </NavItem>
         </TitleBarContainer>

@@ -48,6 +48,7 @@ import ChangePwdPage from './pages/myPage/ChangePwdPage';
 import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
 import useUserStore from './store/useUserStore';
 import RefundPage from './pages/PayPage/RefundPage';
+import CoachModify from './pages/coach/CoachModify.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -81,6 +82,7 @@ function AppContent() {
         <Route path="/coachList" element={<CoachList />} />
         <Route path="/coachRegister" element={<CoachRegister />} />
         <Route path="/coach/:id" element={<CoachDetail />} />
+        <Route path="/coachModify" element={<CoachModify />}/>
         <Route path="/coachMatching" element={<CoachMatching />} />
         <Route path="/nextReservation" element={<NextReservation />} />
         <Route path="/coachReview" element={<CoachReview />} />
