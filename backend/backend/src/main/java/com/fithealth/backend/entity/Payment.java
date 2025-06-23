@@ -89,6 +89,24 @@ public class Payment {
         }
     }
 
+    public void changeMember(Member member) {
+        this.member = member;
+        if(!member.getPaymentsByMember().contains(this)){
+            member.getPaymentsByMember().add(this);
+        } else{
+            member.getPaymentsByMember().remove(this);
+        }
+    }
+
+    public void changeResponseMember(Member member) {
+        this.responseMember = member;
+        if(!responseMember.getPaymentsByResponseMember().contains(this)){
+            responseMember.getPaymentsByResponseMember().add(this);
+        } else{
+            responseMember.getPaymentsByResponseMember().remove(this);
+        }
+    }
+
     public void changePayment(CommonEnums.Status status){
         this.paymentStatus = status;
         this.paymentAt = LocalDateTime.now();

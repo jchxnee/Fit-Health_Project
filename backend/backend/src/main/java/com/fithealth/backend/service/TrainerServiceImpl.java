@@ -177,4 +177,12 @@ public class TrainerServiceImpl implements TrainerService {
 
         return TrainerDetailDto.Response.fromEntity(trainer, member);
     }
+
+    @Override
+    public TrainerDetailDto.ResponseRequest getTrainerRequest(Long trainerNo) {
+        Member member = memberRepository.findByTrainerNo(trainerNo)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 트레이너를 찾을 수 없습니다. trainerNo: " + trainerNo));
+
+        return TrainerDetailDto.ResponseRequest.fromEntity(member);
+    }
 }

@@ -12,5 +12,5 @@ public interface TrainerService {
     Long registerTrainer(addTrainerDto.Create trainerDto, List<MultipartFile> files) throws IOException;
     List<SelectTrainerDto.Response> getAllTrainers();
     TrainerDetailDto.Response getTrainer(Long trainerNo);
-
+    TrainerDetailDto.ResponseRequest getTrainerRequest(Long trainerNo);
 }

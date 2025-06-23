@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import theme from '../../styles/theme';
 import TitleBar from '../../components/TitleBar';
-
+import api from '../../api/axios';
 import SelectCourse from '../../components/CoachMatching/SelectCourse';
 import ReservationCalendar from '../../components/CoachMatching/ReservationCalendar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import useUserStore from '../../store/useUserStore';
+import { toast } from 'react-toastify';
+import { paymentService } from '../../api/payment';
 
 const PageWrapper = styled.div`
   display: flex;
@@ -50,7 +53,7 @@ const TrainerNameText = styled.p`
   font-weight: bold;
 `;
 
-const SubmitButton = styled(Link)`
+const SubmitButton = styled.button`
   background-color: ${theme.colors.button};
   color: ${theme.colors.white};
   border: none;
@@ -72,20 +75,14 @@ const SubmitButton = styled(Link)`
   }
 `;
 
-const SelectedDateTimeDisplay = styled.div`
-  text-align: center;
-  font-size: 1.1em;
-  color: ${theme.colors.black};
-  font-weight: bold;
-  margin-top: 10px;
-  span {
-    color: ${theme.colors.primary};
-  }
-`;
-
 const CoachMatching = () => {
-  const [courseQuantity, setCourseQuantity] = useState(4);
-
+  const { user } = useUserStore();
+  const { id } = useParams();
+  const [trainer, setTrainer] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [courseQuantity, setCourseQuantity] = useState(3);
+  const [finalPrice, setFinalPrice] = useState(0); // 할인 적용된 최종 금액
+  const navigate = useNavigate();
   // **** 여기를 수정합니다. ****
   // 로컬 시간대를 고려하여 현재 날짜를 YYYY-MM-DD 형식으로 가져오는 헬퍼 함수
   const getTodayDateString = () => {
@@ -97,34 +94,32 @@ const CoachMatching = () => {
   };
 
   const [selectedDate, setSelectedDate] = useState(getTodayDateString());
-  // **************************
-
   const [selectedTime, setSelectedTime] = useState(null);
 
-  const [trainerId, setTrainerId] = useState(1);
-  const [trainerInfo, setTrainerInfo] = useState(null);
-
-  const [oneTimePrice, setOneTimePrice] = useState(0);
-
   useEffect(() => {
-    const fetchTrainerInfo = async () => {
-      const dbTrainersData = {
-        1: { id: 1, name: '김성은', specialization: '헬스', pricePerSession: 50000 },
-        2: { id: 2, name: '박트레이너', specialization: '필라테스', pricePerSession: 60000 },
-      };
-      setTimeout(() => {
-        const fetchedInfo = dbTrainersData?.[trainerId];
-        setTrainerInfo(fetchedInfo);
-        if (fetchedInfo) {
-          setOneTimePrice(fetchedInfo.pricePerSession);
-        }
-      }, 500);
+    if (!user?.email || !id) return;
+
+    const fetchCoachData = async () => {
+      try {
+        const { data } = await api.get(`/api/trainer/request/${id}`);
+        console.log('API 응답:', data);
+        setTrainer(data);
+      } catch (error) {
+        console.error('트레이너 정보 가져오기 실패:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    if (trainerId) {
-      fetchTrainerInfo();
-    }
-  }, [trainerId]);
+    fetchCoachData();
+  }, [user?.email, id]);
+
+  if (loading) {
+    return <PageWrapper>로딩 중...</PageWrapper>;
+  }
+  if (!trainer) {
+    return <PageWrapper>트레이너 정보를 찾을 수 없습니다.</PageWrapper>;
+  }
 
   const handleQuantityChange = (delta) => {
     setCourseQuantity((prev) => Math.max(1, prev + delta));
@@ -138,16 +133,55 @@ const CoachMatching = () => {
     setSelectedTime(e.target.value);
   };
 
+  const handleRequest = async () => {
+    console.log('handleRequest 시작됨');
+
+    if (!selectedDate || !selectedTime) {
+      toast.warning('신청하실 날짜와 시간을 선택해주세요.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `정말로 아래 내용으로 신청하시겠습니까?\n\n날짜: ${selectedDate}\n시간: ${selectedTime}`
+    );
+    if (!confirmed) return;
+
+    try {
+      setLoading(true);
+
+      const data = {
+        userEmail: user.email,
+        trainerEmail: trainer.trainerEmail,
+        totalPrice: finalPrice,
+        productName: trainer.majorName,
+        totalCount: courseQuantity,
+        firstReservation: selectedDate + 'T' + selectedTime,
+      };
+
+      console.log(data);
+      const response = await paymentService.insertPayment(data);
+      console.log('신청 처리 결과:', response);
+
+      toast.success('결제를 진행해주세요!');
+      navigate(`/paymentPage/${response}`);
+    } catch (error) {
+      console.error('결제 에러:', error);
+      toast.error('결제 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <PageWrapper>
         <TitleBar title={'신청'} />
         <ContentContainer>
-          {trainerInfo ? (
+          {trainer ? (
             <>
               <TrainerInfoWrapper>
-                <SectionTitle>{trainerInfo.specialization} 레슨</SectionTitle>
-                <TrainerNameText>트레이너 명 : {trainerInfo.name} 트레이너</TrainerNameText>
+                <SectionTitle>{trainer.majorName} 레슨</SectionTitle>
+                <TrainerNameText>트레이너 명 : {trainer.trainerName} 트레이너</TrainerNameText>
               </TrainerInfoWrapper>
             </>
           ) : (
@@ -158,7 +192,9 @@ const CoachMatching = () => {
           <SelectCourse
             courseQuantity={courseQuantity}
             onQuantityChange={handleQuantityChange}
-            oneTimePrice={oneTimePrice}
+            oneTimePrice={trainer.oncePrice}
+            trainer={trainer}
+            onPriceChange={setFinalPrice}
           />
 
           <SectionTitle>날짜 및 시간 선택</SectionTitle>
@@ -170,9 +206,7 @@ const CoachMatching = () => {
             onTimeChange={handleTimeChange}
           />
         </ContentContainer>
-        <SubmitButton to="/paymentPage" disabled={!selectedDate || !selectedTime || courseQuantity === 0}>
-          신청하기
-        </SubmitButton>
+        <SubmitButton onClick={handleRequest}>신청하기</SubmitButton>
       </PageWrapper>
     </>
   );

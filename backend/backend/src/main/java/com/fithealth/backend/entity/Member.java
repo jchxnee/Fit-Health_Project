@@ -73,10 +73,10 @@ public class Member {
     private LocalDateTime modifyDate;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Payment> payments = new ArrayList<>();
+    private List<Payment> paymentsByMember = new ArrayList<>();
 
     @OneToMany(mappedBy = "responseMember", cascade = CascadeType.ALL)
-    private List<Payment> payments2 = new ArrayList<>();
+    private List<Payment> paymentsByResponseMember = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
