@@ -40,6 +40,7 @@ public class PaymentController {
     //신청내역 조회
     @GetMapping("/list")
     public ResponseEntity<List<SelectPaymentDto.Response>> selectPaymentList(@RequestParam("userEmail") String userEmail) {
+        System.out.println(userEmail);
         List<SelectPaymentDto.Response> paymentList = paymentService.findPaymentList(userEmail);
         return ResponseEntity.ok(paymentList);
     }
