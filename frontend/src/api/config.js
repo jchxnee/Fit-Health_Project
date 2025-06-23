@@ -1,5 +1,7 @@
 const { VITE_API_URL, VITE_API_TIMEOUT = 5000, VITE_API_VERSION = 'v1' } = import.meta.env;
 
+export const API_BASE_URL = 'http://localhost:7961';
+
 export const API_CONFIG = {
   // BASE_URL: `${VITE_API_URL}/${VITE_API_VERSION}`, localhost:8001/api/v1
   BASE_URL: `${VITE_API_URL}`,
@@ -42,5 +44,8 @@ export const API_ENDPOINTS = {
   COMMENT: {
     ALL: 'api/comment',
     CREATE: '/api/comment',
+  },
+  COACH: {
+    LIST: '/api/trainer',
   },
 };

@@ -1,6 +1,8 @@
 package com.fithealth.backend.controller;
 
+import com.fithealth.backend.dto.Review.ReviewSelectDto;
 import com.fithealth.backend.dto.Trainer.SelectTrainerDto;
+import com.fithealth.backend.dto.Trainer.TrainerDetailDto;
 import com.fithealth.backend.dto.Trainer.addTrainerDto;
 import com.fithealth.backend.service.TrainerService;
 import lombok.RequiredArgsConstructor;
@@ -35,5 +37,12 @@ public class TrainerController {
     public ResponseEntity<List<SelectTrainerDto.Response>> getTrainerList() {
         List<SelectTrainerDto.Response> trainers = trainerService.getAllTrainers();
         return ResponseEntity.ok(trainers);
+    }
+
+    @GetMapping("/{trainerNo}")
+    public ResponseEntity<TrainerDetailDto.Response> getTrainer(@PathVariable Long trainerNo) {
+        System.out.println("컨트롤러가 받은 트레이너 번호 : " + trainerNo);
+        TrainerDetailDto.Response trainerDetails = trainerService.getTrainer(trainerNo);
+        return ResponseEntity.ok(trainerDetails);
     }
 }
