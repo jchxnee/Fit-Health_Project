@@ -88,7 +88,7 @@ function AppContent() {
         <Route path="/coachReview" element={<CoachReview />} />
         <Route path="/paymentPage" element={<PaymentPage />} />
         <Route path="/refundPage" element={<RefundPage />} />
-        <Route path="/coachmatchingList" element={<CoachCalendar />} />
+          <Route path="/coachmatchingList" element={<CoachCalendar />} />
 
         {/* 커뮤니티 */}
         <Route path="/community" element={<CommunityPage />} />
