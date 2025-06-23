@@ -259,7 +259,7 @@ const MyPage = () => {
             관리
             <AiOutlineTool />
           </SectionHeader>
-          <SectionLink to="/coachRegister">핏코치 정보 수정</SectionLink>
+          <SectionLink to={`/coachModify/${user.trainerNo}`}>핏코치 정보 수정</SectionLink>
           <SectionLink to="/myPostsPage">내가 작성한 게시물/댓글</SectionLink>
           <SectionLink to="/myReviewsPage" state={{ userEmail: user.email }}>
             내가 작성한 리뷰
