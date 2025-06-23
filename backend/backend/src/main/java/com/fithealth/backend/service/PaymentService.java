@@ -1,8 +1,9 @@
 package com.fithealth.backend.service;
 
 import com.fithealth.backend.dto.Payment.ResponsePaymentDto;
+import com.fithealth.backend.dto.Reservation.ReservationCreateDto;
 
 public interface PaymentService {
     ResponsePaymentDto.Response findPayment(String userEmail);
-    Boolean goPayment(Long paymentId);
+    Long goPayment(ReservationCreateDto.Create createDto);
 }

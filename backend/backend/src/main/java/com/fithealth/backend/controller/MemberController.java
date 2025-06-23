@@ -7,6 +7,12 @@ import com.fithealth.backend.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:5175")
 @RestController
@@ -31,6 +37,16 @@ public class MemberController {
     @GetMapping("/email")
     public ResponseEntity<Boolean> findMember(@RequestParam String userEmail) {
         return ResponseEntity.ok(memberService.findMember(userEmail));
+    }
+
+    //사진 수정 API
+    @PutMapping("/profileImage")
+    public ResponseEntity<?> updateProfileImage(
+            @RequestParam("userEmail") String userEmail,
+            @RequestParam("profileImage") MultipartFile profileImage) throws IOException {
+        Map<String, String> response = new HashMap<>();
+        response.put("imageUrl", "/testImage" + memberService.updateProfileImage(userEmail, profileImage));
+        return ResponseEntity.ok(response);
     }
 
     //이름 수정 API

@@ -39,6 +39,7 @@ const RefundPage = () => {
           <InfoStackedRow>
             <InfoKey>김요가 트레이너</InfoKey>
             <InfoValue>2025.06.12 PM 6시 30분</InfoValue>
+            <InfoValue>진행 회차 : 3회차</InfoValue>
           </InfoStackedRow>
           <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
         </section>

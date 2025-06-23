@@ -10,6 +10,8 @@ import lombok.Setter; // Setter 추가
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "PAYMENT")
@@ -37,6 +39,9 @@ public class Payment {
     // "review"는 Review 엔티티에 정의된 Payment 필드의 이름
     @OneToOne(mappedBy = "payment", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Review review; // 이 결제에 대한 리뷰
+
+    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL)
+    private List<Reservation> reservations = new ArrayList<>();
 
     @Column(name = "TRANSACTION_ID", length = 100)
     private String transactionId;

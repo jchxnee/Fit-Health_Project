@@ -112,6 +112,10 @@ public class Member {
         this.modifyDate = LocalDateTime.now();
     }
 
+    public void changeProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
     public void changeName(String userName) {
         this.userName = userName;
     }

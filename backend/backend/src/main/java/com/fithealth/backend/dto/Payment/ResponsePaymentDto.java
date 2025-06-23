@@ -84,9 +84,13 @@ public class ResponsePaymentDto {
         private String product_name;
         private Long total_count;
         private LocalDateTime first_reservation;
+        private Long once_price;
+        private Long discount_3;
+        private Long discount_5;
+        private Long discount_10;
 
         public static ResponsePaymentDto.Response toDto(Payment payment) {
-            return ResponsePaymentDto.Response.builder()
+            return Response.builder()
                     .payment_id(payment.getPaymentId())
                     .user_name(payment.getMember().getUserName())
                     .trainer_name(payment.getResponseMember().getUserName())
@@ -96,6 +100,10 @@ public class ResponsePaymentDto {
                     .product_name(payment.getProductName())
                     .total_count(payment.getTotalCount())
                     .first_reservation(payment.getFirstReservation())
+                    .once_price(payment.getResponseMember().getTrainer().getOncePrice())
+                    .discount_3(payment.getResponseMember().getTrainer().getDiscount3())
+                    .discount_5(payment.getResponseMember().getTrainer().getDiscount5())
+                    .discount_10(payment.getResponseMember().getTrainer().getDiscount10())
                     .build();
         }
 

@@ -1,6 +1,7 @@
 package com.fithealth.backend.controller;
 
 import com.fithealth.backend.dto.Payment.ResponsePaymentDto;
+import com.fithealth.backend.dto.Reservation.ReservationCreateDto;
 import com.fithealth.backend.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class PaymentController {
 
     //결제 진행 API
     @PutMapping("/payment")
-    public ResponseEntity<Boolean> goPayment(@RequestParam Long paymentId) {
-        return ResponseEntity.ok(paymentService.goPayment(paymentId));
+    public ResponseEntity<Long> goPayment(@RequestBody ReservationCreateDto.Create createDto) {
+        return ResponseEntity.ok(paymentService.goPayment(createDto));
     }
 }

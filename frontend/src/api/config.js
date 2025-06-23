@@ -15,6 +15,7 @@ export const API_ENDPOINTS = {
     BASE: '/api/members',
     LOGIN: '/api/members/login',
     FIND: '/api/members/email',
+    UPDATEPROFILEIMAGE: '/api/members/profileImage',
     UPDATENAME: '/api/members/name',
     UPDATEBIRTH: '/api/members/birth',
     UPDATEPWD: '/api/members/pwd',
@@ -42,5 +43,8 @@ export const API_ENDPOINTS = {
   COMMENT: {
     ALL: 'api/comment',
     CREATE: '/api/comment',
+  },
+  COACH: {
+    LIST: 'api/trainer',
   },
 };
