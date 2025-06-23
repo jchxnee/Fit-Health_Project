@@ -3,6 +3,7 @@ package com.fithealth.backend.service;
 import com.fithealth.backend.dto.member.LoginDto;
 import com.fithealth.backend.dto.member.SignupDto;
 import com.fithealth.backend.dto.member.UpdateDto;
+import com.fithealth.backend.entity.BoardFile;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.enums.CommonEnums;
 import com.fithealth.backend.repository.MemberRepository;
@@ -10,6 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +24,7 @@ public class MemberServiceImpl implements MemberService{
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final String UPLOAD_PATH = "C:\\testImage";
 
     @Override
     public String createMember(SignupDto.Create createDto) {
@@ -47,6 +54,29 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public Boolean findMember(String userEmail) {
         return memberRepository.findOneStatusY(userEmail, CommonEnums.Status.Y).isPresent();
+    }
+
+    @Override
+    public String updateProfileImage(String userEmail, MultipartFile file) throws IOException {
+        Member member = memberRepository.findOne(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("이메일이 존재하지 않습니다."));
+
+        if(file != null && !file.isEmpty()){
+            String originName = file.getOriginalFilename();
+            String changeName = UUID.randomUUID().toString() + "_" + originName;
+
+            File uploadDir = new File(UPLOAD_PATH);
+            if(!uploadDir.exists()){
+                uploadDir.mkdirs();
+            }
+
+            file.transferTo(new File(UPLOAD_PATH + File.separator + changeName));
+
+            member.changeProfileImage(changeName);
+            return changeName;
+        }
+
+        return null;
     }
 
     @Override

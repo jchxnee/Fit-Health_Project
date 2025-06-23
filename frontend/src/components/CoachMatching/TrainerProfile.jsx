@@ -98,7 +98,7 @@ const SocialTextSpan = styled.span`
 `;
 
 const Specialty = styled.span`
-  font-size: ${theme.fontSizes.xl};
+  font-size: ${theme.fontSizes['2xl']};
   font-weight: ${theme.fontWeights.medium};
   color: ${theme.colors.primary};
   flex-shrink: 0;
@@ -108,7 +108,7 @@ const Specialty = styled.span`
 const Location = styled.div`
   display: flex;
   align-items: center;
-  font-size: ${theme.fontSizes.sm};
+  font-size: ${theme.fontSizes.base};
   color: ${theme.colors.gray[600]};
   margin-bottom: ${theme.spacing[3]};
   gap: ${theme.spacing.xs};
@@ -131,7 +131,7 @@ const ApplyButton = styled.button`
   color: ${theme.colors.white};
   border: none;
   border-radius: ${theme.borderRadius.md};
-  padding: ${theme.spacing[3]} ${theme.spacing[6]};
+  padding: ${theme.spacing[3]} ${theme.spacing[5]};
   font-size: ${theme.fontSizes.lg};
   font-weight: ${theme.fontWeights.bold};
   cursor: pointer;
@@ -139,7 +139,7 @@ const ApplyButton = styled.button`
   transition: background-color 0.2s ease-in-out;
 
   &:hover {
-    background-color: ${theme.colors.primaryDark};
+    background-color: ${theme.colors.primary};
     opacity: 90%;
   }
 `;
@@ -228,7 +228,7 @@ const TrainerProfile = ({ trainer }) => {
           <Specialty>{trainer.specialty}</Specialty>
         </NameRow>
         <Location>
-          <FaMapMarkerAlt size={14} />
+          <FaMapMarkerAlt size={16} />
           {trainer.location}
         </Location>
         <Introduction>{trainer.introduction}</Introduction>

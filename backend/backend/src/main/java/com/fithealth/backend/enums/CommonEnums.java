@@ -6,7 +6,7 @@ public class CommonEnums {
     }
 
     public enum UseStatus {
-        Y,N,C
+        Y, N, C
     }
 
     public enum Grade {

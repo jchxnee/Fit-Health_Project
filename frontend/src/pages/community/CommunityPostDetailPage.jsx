@@ -1,10 +1,10 @@
+// CommunityPostDetailPage.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { FaHeart, FaRegHeart, FaEllipsisV, FaShareAlt } from 'react-icons/fa';
+import { FaThumbsUp, FaRegHeart, FaEllipsisV, FaShareAlt } from 'react-icons/fa';
 import { RiMessage2Fill } from 'react-icons/ri';
 import { FaPaperPlane } from 'react-icons/fa';
-import betaImg from '../../assets/beta_user_img.png';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // useNavigate 임포트 추가
 import axios from 'axios';
 import api from '../../api/axios';
 import { API_ENDPOINTS } from '../../api/config';
@@ -14,6 +14,7 @@ function CommunityPostDetailPage() {
   const { user } = useUserStore();
   const { id } = useParams();
   const boardNo = id;
+  const navigate = useNavigate(); // useNavigate 훅 사용
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +26,6 @@ function CommunityPostDetailPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  // ⭐ 임시 사용자 이메일 (실제 로그인 시스템과 연동 필요) ⭐
   const currentUserEmail = user.email;
 
   // 게시글 데이터 및 댓글 목록 불러오기
@@ -34,15 +34,13 @@ function CommunityPostDetailPage() {
       try {
         setLoading(true);
         setError(null);
-        // ⭐ userEmail 파라미터 추가 ⭐
         const response = await api.get(`${API_ENDPOINTS.BOARD.DETAIL}/${boardNo}?userEmail=${currentUserEmail}`);
         const fetchedPost = response.data;
 
         setPost(fetchedPost);
         setLikesCount(fetchedPost.heart || 0);
-        setIsLiked(fetchedPost.is_liked_by_user); // ⭐ 좋아요 상태 초기화 ⭐
+        setIsLiked(fetchedPost.is_liked_by_user);
 
-        // ⭐ 조회수 증가 API 호출 ⭐
         await api.put(`/api/board/${boardNo}/view`);
       } catch (err) {
         console.error('게시글 상세 정보를 불러오는 중 오류 발생:', err);
@@ -55,17 +53,16 @@ function CommunityPostDetailPage() {
     if (boardNo) {
       fetchPostDetail();
     }
-  }, [boardNo, currentUserEmail]); // currentUserEmail이 변경될 때도 다시 불러오도록 설정
+  }, [boardNo, currentUserEmail]);
 
   const handleLikeToggle = async () => {
     try {
-      // ⭐ 좋아요 토글 API 호출 ⭐
       const response = await axios.post(`http://localhost:7961/api/board/${boardNo}/like`, currentUserEmail, {
         headers: {
-          'Content-Type': 'application/json', // String을 JSON으로 보낼 때 필요
+          'Content-Type': 'application/json',
         },
       });
-      const newLikedStatus = response.data; // 백엔드에서 반환된 좋아요 상태 (true/false)
+      const newLikedStatus = response.data;
 
       setIsLiked(newLikedStatus);
       setLikesCount((prevCount) => (newLikedStatus ? prevCount + 1 : prevCount - 1));
@@ -87,9 +84,8 @@ function CommunityPostDetailPage() {
       };
       const response = await api.post(API_ENDPOINTS.COMMENT.CREATE, newCommentData);
 
-      console.log('게시글 등록 성공:', response.data);
+      console.log('댓글 등록 성공:', response.data);
 
-      // 댓글 작성 후 게시글 데이터를 다시 불러와서 댓글 목록 업데이트
       const updatedPostResponse = await api.get(
         `${API_ENDPOINTS.BOARD.DETAIL}/${boardNo}?userEmail=${currentUserEmail}`
       );
@@ -98,6 +94,20 @@ function CommunityPostDetailPage() {
     } catch (err) {
       console.error('댓글 작성 중 오류 발생:', err);
       alert('댓글 작성에 실패했습니다.');
+    }
+  };
+
+  const handleDeletePost = async () => {
+    if (!window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+      return;
+    }
+    try {
+      await api.put(`${API_ENDPOINTS.BOARD.DELETE}/${boardNo}`);
+      alert('게시글이 삭제되었습니다.');
+      navigate('/community'); // 삭제 후 목록 페이지로 이동
+    } catch (err) {
+      console.error('게시글 삭제 중 오류 발생:', err);
+      alert('게시글 삭제에 실패했습니다.');
     }
   };
 
@@ -133,10 +143,10 @@ function CommunityPostDetailPage() {
           <PostHeader>
             <PostCategory>커뮤니티 &gt; {post.board_category_name}</PostCategory>
             <PostTitle>{post.board_title}</PostTitle>
-            <PostAuthorRegion>{post.user_address}</PostAuthorRegion>
+            <PostAuthorRegion>{post.address}</PostAuthorRegion>
             <PostInfo>
               <AuthorInfo>
-                <ProfileImage src={post.user_img} alt={post.user_name} />
+                <ProfileImage src={post.profile_image} alt={post.user_name} />
                 <AuthorDetailsStyled>
                   <AuthorName>{post.user_name}</AuthorName>
                   <PostMeta>
@@ -150,15 +160,21 @@ function CommunityPostDetailPage() {
                 <ShareButton>
                   <FaShareAlt color="#757575" />
                 </ShareButton>
-                <EllipsisButton onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                  <FaEllipsisV color="#757575" />
-                </EllipsisButton>
-                {isMenuOpen && (
-                  <DropdownMenu>
-                    <DropdownMenuItem>수정</DropdownMenuItem>
-                    <DropdownMenuItem>삭제</DropdownMenuItem>
-                  </DropdownMenu>
+                {/* ⭐ 이 부분이 변경됩니다 ⭐ */}
+                {currentUserEmail === post.user_email && (
+                  <>
+                    <EllipsisButton onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                      <FaEllipsisV color="#757575" />
+                    </EllipsisButton>
+                    {isMenuOpen && (
+                      <DropdownMenu>
+                        <DropdownMenuItem onClick={() => navigate(`/community/${boardNo}/edit`)}>수정</DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDeletePost}>삭제</DropdownMenuItem>
+                      </DropdownMenu>
+                    )}
+                  </>
                 )}
+                {/* ⭐ 변경 끝 ⭐ */}
               </PostActions>
             </PostInfo>
           </PostHeader>
@@ -177,7 +193,7 @@ function CommunityPostDetailPage() {
             </ImageGallery>
             <InteractionStats>
               <LikeButton onClick={handleLikeToggle}>
-                {isLiked ? <FaHeart color="#E53935" /> : <FaRegHeart color="#757575" />}
+                {isLiked ? <FaThumbsUp color="#E53935" /> : <FaThumbsUp color="#757575" />}
                 <span>좋아요 {likesCount}</span>
               </LikeButton>
               <CommentCount>
@@ -204,7 +220,7 @@ function CommunityPostDetailPage() {
                 post.comments.map((comment) => (
                   <CommentItem key={comment.comment_no}>
                     <CommentAuthorInfo>
-                      <ProfileImage src={betaImg} alt={comment.user_name} />
+                      <ProfileImage src={comment.profile_image} alt={comment.user_name} />
                       <AuthorDetails>
                         <AuthorDetailsSmall>
                           <AuthorName>{comment.user_name}</AuthorName>
@@ -226,7 +242,7 @@ function CommunityPostDetailPage() {
 
 export default CommunityPostDetailPage;
 
-// --- 스타일 컴포넌트 ---
+// --- 스타일 컴포넌트 (변경 없음) ---
 const PageContainer = styled.div`
   width: 100%;
   display: flex;
@@ -245,7 +261,7 @@ const MainContentWrapper = styled.div`
   padding: ${({ theme }) => theme.spacing['8']};
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing['6']};
+  gap: ${({ theme }) => theme.spacing['8']};
 `;
 
 const PostHeader = styled.div`
@@ -257,8 +273,8 @@ const PostHeader = styled.div`
 
 const PostCategory = styled.span`
   font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: ${({ theme }) => theme.colors.gray['600']};
-  margin-bottom: ${({ theme }) => theme.spacing['1']};
+  color: ${({ theme }) => theme.colors.gray['400']};
+  margin-bottom: ${({ theme }) => theme.spacing['5']};
   display: block;
 `;
 
@@ -266,15 +282,15 @@ const PostTitle = styled.h1`
   font-size: ${({ theme }) => theme.fontSizes['2xl']};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.gray['900']};
-  margin: 0;
+  margin-bottom: ${({ theme }) => theme.spacing['4']};
 `;
 
 const PostAuthorRegion = styled.span`
   display: block;
   font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: ${({ theme }) => theme.colors.gray['500']};
+  color: ${({ theme }) => theme.colors.gray['400']};
   margin-top: ${({ theme }) => theme.spacing['2']};
-  margin-bottom: ${({ theme }) => theme.spacing['4']};
+  margin-bottom: ${({ theme }) => theme.spacing['10']};
 `;
 
 const PostInfo = styled.div`

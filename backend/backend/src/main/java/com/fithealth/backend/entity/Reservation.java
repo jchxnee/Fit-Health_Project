@@ -32,10 +32,10 @@ public class Reservation {
     private Payment payment;
 
     @Column(name = "SELECT_DATE", nullable = false)
-    private LocalDate selectDate;
+    private LocalDateTime selectDate;
 
     @Column(name = "CREATED_DATE", nullable = false)
-    private LocalDate createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "REJECT_COMMENT", length = 50)
     private String rejectComment;
@@ -46,10 +46,19 @@ public class Reservation {
 
     @PrePersist
     public void prePersist() {
-        this.createdDate = LocalDate.now();
+        this.createdDate = LocalDateTime.now();
 
         if(this.status == null) {
-            this.status = CommonEnums.Status.Y;
+            this.status = CommonEnums.Status.N;
+        }
+    }
+
+    public void changePayment(Payment payment) {
+        this.payment = payment;
+        if(!payment.getReservations().contains(this)){
+            payment.getReservations().add(this);
+        } else{
+            payment.getReservations().remove(this);
         }
     }
 }

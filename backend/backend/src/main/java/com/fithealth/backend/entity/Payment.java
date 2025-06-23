@@ -40,6 +40,9 @@ public class Payment {
     @OneToOne(mappedBy = "payment", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Review review; // 이 결제에 대한 리뷰
 
+    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL)
+    private List<Reservation> reservations = new ArrayList<>();
+
     @Column(name = "TRANSACTION_ID", length = 100)
     private String transactionId;
 
@@ -71,9 +74,7 @@ public class Payment {
 
     @Column(name = "APPLIED_AT", nullable = false, updatable = false)
     private LocalDateTime appliedAt;
-
-    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reservation> reservations = new ArrayList<>();
+    
 
     @PrePersist
     public void prePersist() {

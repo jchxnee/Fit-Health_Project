@@ -19,11 +19,12 @@ export const paymentService = {
   },
 
   //결제 진행
-  goPayment: async (paymentId) => {
+  goPayment: async (paymentId, firstReservation) => {
     try {
-      const { data } = await api.put(API_ENDPOINTS.PAYMENT.PAYMENT, null, {
+      const { data } = await api.put(API_ENDPOINTS.PAYMENT.PAYMENT, {
         params: {
-          paymentId: paymentId,
+          payment_id: paymentId,
+          select_date: firstReservation,
         },
       });
 

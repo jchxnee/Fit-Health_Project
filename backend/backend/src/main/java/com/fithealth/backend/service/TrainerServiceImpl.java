@@ -1,6 +1,7 @@
 package com.fithealth.backend.service;
 
 import com.fithealth.backend.dto.Trainer.SelectTrainerDto;
+import com.fithealth.backend.dto.Trainer.TrainerDetailDto;
 import com.fithealth.backend.dto.Trainer.addTrainerDto;
 import com.fithealth.backend.entity.*;
 import com.fithealth.backend.enums.CommonEnums;
@@ -161,5 +162,19 @@ public class TrainerServiceImpl implements TrainerService {
                     reviewsCount
             );
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TrainerDetailDto.Response getTrainer(Long trainerNo) {
+        Member member = memberRepository.findByTrainerNo(trainerNo)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 트레이너를 찾을 수 없습니다. trainerNo: " + trainerNo));
+
+        Trainer trainer = member.getTrainer();
+        if (trainer == null) {
+            throw new IllegalStateException("해당 멤버는 트레이너 정보를 가지고 있지 않습니다. memberEmail: " + member.getUserEmail());
+        }
+
+        return TrainerDetailDto.Response.fromEntity(trainer, member);
     }
 }
