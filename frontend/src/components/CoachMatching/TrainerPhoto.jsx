@@ -1,80 +1,73 @@
 import React from 'react';
 import styled from 'styled-components';
+import theme from '../../styles/theme';
+import { API_BASE_URL } from '../../api/config';
 
-const Wrapper = styled.section`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  background: ${({ theme }) => theme.colors.white};
-  margin: ${({ theme }) => `${theme.spacing[10]} 0`};
+const PhotoContainer = styled.div`
+    width: ${theme.width.lg};
+    margin-top: ${theme.spacing[5]};
+    border-top: 1px solid ${theme.colors.gray[200]};
 `;
-const Container = styled.div`
-  width: ${({ theme }) => theme.width.lg};
+
+const PhotoGrid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: ${theme.spacing.md};
+    padding: ${theme.spacing.lg} 0;
 `;
-const TitleRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${({ theme }) => theme.spacing[6]};
+
+const PhotoItem = styled.div`
+    width: 100%;
+    padding-top: 100%; /* 1:1 Aspect Ratio */
+    position: relative;
+    background-color: #f0f0f0; /* Placeholder color */
+    border-radius: ${theme.borderRadius.md};
+    overflow: hidden;
 `;
+
+const Image = styled.img`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 이미지가 컨테이너를 꽉 채우도록 */
+`;
+
 const Title = styled.h2`
-  font-family: 'SUITE', sans-serif;
-  font-weight: ${({ theme }) => theme.fontWeights.bold};
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
-  color: ${({ theme }) => theme.colors.primary};
-`;
-const ViewAll = styled.span`
-  font-family: 'SUITE', sans-serif;
-  font-size: ${({ theme }) => theme.fontSizes.lg};
-  color: ${({ theme }) => theme.colors.primary};
-  cursor: pointer;
-`;
-const List = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing[10]};
-  justify-content: center;
-`;
-const TrainerCard = styled.div`
-  width: 250px;
-  height: 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: ${({ theme }) => theme.colors.white};
-  border-radius: ${({ theme }) => theme.borderRadius['2xl']};
-  overflow: hidden;
-  box-shadow: ${({ theme }) => theme.shadows.md};
+    font-size: ${theme.fontSizes['2xl']};
+    font-weight: bold;
+    color: ${theme.colors.text};
+    text-align: left;
+    margin-bottom: ${theme.spacing[4]};
+    margin-top: ${theme.spacing[5]};
 `;
 
-const PhotoImg = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: ${({ theme }) => theme.borderRadius['2xl']};
-`;
-
-const trainers = [
-  { name: '김순자 트레이너', imageUrl: '/public/img/chest.png' },
-  { name: '정나미 트레이너', imageUrl: '/public/img/trainer2.jpg' },
-  { name: '고훈 트레이너', imageUrl: '/public/img/trainer3.jpg' },
-  { name: '김현아 트레이너', imageUrl: '/public/img/trainer4.jpg' },
-];
-
-const TrainerPhoto = () => (
-  <Wrapper>
-    <Container>
-      <TitleRow>
+const TrainerPhoto = ({ photos }) => {
+  if (!photos || photos.length === 0) {
+    return (
+      <PhotoContainer>
         <Title>트레이너 사진</Title>
-      </TitleRow>
-      <List>
-        {trainers.map((t) => (
-          <TrainerCard key={t.name}>
-            <PhotoImg src={t.imageUrl} alt={t.name} />
-          </TrainerCard>
+        <p>등록된 사진이 없습니다.</p>
+      </PhotoContainer>
+    );
+  }
+
+  return (
+    <PhotoContainer>
+      <Title>트레이너 사진</Title>
+      <PhotoGrid>
+        {photos.map((photo, index) => (
+          <PhotoItem key={index}>
+            <Image
+              src={`${API_BASE_URL}/api/images/${photo.changeName}`}
+              alt={photo.originName}
+            />
+          </PhotoItem>
         ))}
-      </List>
-    </Container>
-  </Wrapper>
-);
+      </PhotoGrid>
+    </PhotoContainer>
+  );
+};
 
 export default TrainerPhoto;

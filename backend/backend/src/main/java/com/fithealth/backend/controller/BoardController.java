@@ -2,6 +2,7 @@ package com.fithealth.backend.controller;
 
 import com.fithealth.backend.dto.Board.BoardCreateDto;
 import com.fithealth.backend.dto.Board.BoardGetDto;
+import com.fithealth.backend.dto.Board.BoardUpdateDto;
 import com.fithealth.backend.dto.PageResponse;
 import com.fithealth.backend.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,20 @@ public class BoardController {
             @RequestParam(value = "userEmail", required = false) String userEmail // ⭐ userEmail 파라미터 추가 ⭐
     ) {
         return ResponseEntity.ok(boardService.getBoardDetail(boardNo, userEmail)); // ⭐ userEmail 전달 ⭐
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Long> updateBoard(
+            @ModelAttribute BoardUpdateDto.Update boardUpdateDto,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files
+    )  throws IOException {
+        return ResponseEntity.ok(boardService.updateBoard(boardUpdateDto, files));
+    }
+
+    @PutMapping("delete/{id}")
+    public ResponseEntity<Long> deleteBoard(@PathVariable("id") Long boardNo){
+         boardService.delete(boardNo);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/view") // ⭐ 조회수 증가 엔드포인트 추가 ⭐

@@ -48,6 +48,7 @@ import ChangePwdPage from './pages/myPage/ChangePwdPage';
 import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
 import useUserStore from './store/useUserStore';
 import RefundPage from './pages/PayPage/RefundPage';
+import CoachModify from './pages/coach/CoachModify.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -81,6 +82,7 @@ function AppContent() {
         <Route path="/coachList" element={<CoachList />} />
         <Route path="/coachRegister" element={<CoachRegister />} />
         <Route path="/coach/:id" element={<CoachDetail />} />
+        <Route path="/coachModify" element={<CoachModify />}/>
         <Route path="/coachMatching" element={<CoachMatching />} />
         <Route path="/nextReservation" element={<NextReservation />} />
         <Route path="/coachReview" element={<CoachReview />} />
@@ -91,6 +93,7 @@ function AppContent() {
         {/* 커뮤니티 */}
         <Route path="/community" element={<CommunityPage />} />
         <Route path="/communityPostCreationPage" element={<CommunityPostCreationPage user={user} />} />
+        <Route path="/community/:id/edit" element={<CommunityPostCreationPage isEditMode={true} />} />
         <Route path="/reviewCreationPage" element={<ReviewCreationPage />} />
         <Route path="/communityDetailPage/:id" element={<CommunityPostDetailPage />} />
         <Route path="/notice" element={<NoticePage />} />
