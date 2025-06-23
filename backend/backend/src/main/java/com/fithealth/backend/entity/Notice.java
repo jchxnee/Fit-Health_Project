@@ -25,6 +25,9 @@ public class Notice {
     @Column(name = "NOTICE_CONTENT", nullable = false)
     private String noticeContent;
 
+    @Column(name = "NOTICE_CATEGORY_NAME")
+    private String noticeCategoryName;
+
     @Column(name = "CREATED_DATE")
     private LocalDateTime createdDate;
 
@@ -45,4 +48,10 @@ public class Notice {
     }
 
 
+    public void changeMember(Member member) {
+        this.member = member;
+        if(!member.getNotices().contains(this)) {
+            member.getNotices().add(this);
+        }
+    }
 }

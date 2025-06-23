@@ -49,6 +49,8 @@ import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
 import useUserStore from './store/useUserStore';
 import RefundPage from './pages/PayPage/RefundPage';
 import CoachModify from './pages/coach/CoachModify.jsx';
+import NoticePostCreationPage from './pages/noticePage/NoticePostCreationPage';
+import NoticeDetailPage from './pages/noticePage/NoticeDetailPage';
 
 function AppContent() {
   const location = useLocation();
@@ -82,7 +84,7 @@ function AppContent() {
         <Route path="/coachList" element={<CoachList />} />
         <Route path="/coachRegister" element={<CoachRegister />} />
         <Route path="/coach/:id" element={<CoachDetail />} />
-        <Route path="/coachModify" element={<CoachModify />}/>
+        <Route path="/coachModify" element={<CoachModify />} />
         <Route path="/coachMatching" element={<CoachMatching />} />
         <Route path="/nextReservation" element={<NextReservation />} />
         <Route path="/coachReview" element={<CoachReview />} />
@@ -97,6 +99,9 @@ function AppContent() {
         <Route path="/reviewCreationPage" element={<ReviewCreationPage />} />
         <Route path="/communityDetailPage/:id" element={<CommunityPostDetailPage />} />
         <Route path="/notice" element={<NoticePage />} />
+        <Route path="/NoticePostCreationPage" element={<NoticePostCreationPage />} />
+        <Route path="/NoticeDetailPage/:noticeNo" element={<NoticeDetailPage />} />
+
         <Route path="/faqPage" element={<FAQPage />} />
         <Route path="/myPostsPage" element={<MyPostsPage />} />
         <Route path="/myCommentsPage" element={<MyCommentsPage />} />

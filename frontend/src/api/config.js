@@ -43,6 +43,12 @@ export const API_ENDPOINTS = {
     UPDATE: '/api/board',
     DELETE: '/api/board/delete',
   },
+  NOTICE: {
+    LIST: '/api/notice/all',
+    DETAIL: '/api/notice',
+    CREATE: '/api/notice',
+    UPDATE: '/api/notice',
+  },
   COMMENT: {
     ALL: 'api/comment',
     CREATE: '/api/comment',
