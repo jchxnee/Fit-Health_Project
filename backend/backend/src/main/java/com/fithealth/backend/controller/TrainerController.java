@@ -1,6 +1,5 @@
 package com.fithealth.backend.controller;
 
-import com.fithealth.backend.dto.Review.ReviewSelectDto;
 import com.fithealth.backend.dto.Trainer.SelectTrainerDto;
 import com.fithealth.backend.dto.Trainer.TrainerDetailDto;
 import com.fithealth.backend.dto.Trainer.addTrainerDto;
@@ -39,6 +38,7 @@ public class TrainerController {
         return ResponseEntity.ok(trainers);
     }
 
+
     @GetMapping("/{trainerNo}")
     public ResponseEntity<TrainerDetailDto.Response> getTrainer(@PathVariable Long trainerNo) {
         System.out.println("컨트롤러가 받은 트레이너 번호 : " + trainerNo);
@@ -46,3 +46,5 @@ public class TrainerController {
         return ResponseEntity.ok(trainerDetails);
     }
 }
+
+

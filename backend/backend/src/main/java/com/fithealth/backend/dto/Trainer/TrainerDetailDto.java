@@ -73,4 +73,4 @@ public class TrainerDetailDto {
                     .build();
         }
     }
-} 
+}

@@ -10,6 +10,7 @@ import TrainerProfile from '../../components/CoachMatching/TrainerProfile';
 import TrainerCourse from '../../components/CoachMatching/TrainerCourse';
 import { useParams } from 'react-router-dom'; // useParams 임포트 확인
 import api from '../../api/axios';
+import { Link } from "react-router-dom";
 import { API_ENDPOINTS } from '../../api/config';
 
 const PageWrapper = styled.div`
@@ -24,36 +25,36 @@ const PageWrapper = styled.div`
 `;
 
 const TitleBarContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: ${theme.width.lg};
-  padding: 0;
-  margin-bottom: ${theme.spacing.lg};
-  padding-bottom: ${theme.spacing.md};
-  border-top: 1px solid ${({ theme }) => theme.colors.gray['400']};
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: ${theme.width.lg};
+    padding: 0;
+    margin-bottom: ${theme.spacing.lg};
+    padding-bottom: ${theme.spacing.md};
+    border-top: 1px solid ${({ theme }) => theme.colors.gray['400']};
 `;
 
-const EditButton = styled.button`
-  width: ${theme.spacing['20']};
-  height: ${theme.spacing['8']};
-  background-color: ${theme.colors.button};
-  color: ${theme.colors.white};
-  border: none;
-  border-radius: ${theme.borderRadius.md};
-  padding: ${theme.spacing.sm} ${theme.spacing.md};
-  font-size: ${theme.fontSizes.base};
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: ${theme.spacing.xs};
-  transition: background-color 0.2s ease-in-out;
+const NavItem = styled(Link)`
+    width: ${theme.spacing['20']};
+    height: ${theme.spacing['8']};
+    background-color: ${theme.colors.button};
+    color: ${theme.colors.white};
+    border: none;
+    border-radius: ${theme.borderRadius.md};
+    padding: ${theme.spacing.sm} ${theme.spacing.md};
+    font-size: ${theme.fontSizes.base};
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: ${theme.spacing.xs};
+    transition: background-color 0.2s ease-in-out;
 
-  &:hover {
-    background-color: ${theme.colors.primaryDark};
-    opacity: 90%;
-  }
+    &:hover {
+        background-color: ${theme.colors.primaryDark};
+        opacity: 90%;
+    }
 `;
 
 const CoachDetail = () => {
@@ -94,7 +95,6 @@ const CoachDetail = () => {
     fetchCoachData();
   }, [id]);
 
-  // 로딩 및 에러 상태에 따른 UI 렌더링
   if (loading) {
     return <PageWrapper>로딩 중...</PageWrapper>;
   }
@@ -108,7 +108,7 @@ const CoachDetail = () => {
   // API로부터 받은 데이터로 컴포넌트에 전달할 props 구성
   const currentTrainer = {
     name: trainerDetails.trainerName,
-    email: `trainer${id}@example.com`, // 이메일은 API 응답에 없으므로 임시 처리
+    email: `trainer${id}@example.com`,
     id: trainerDetails.trainerNo,
     specialty: trainerDetails.majorName,
     kakaoId: trainerDetails.kakaoId,
@@ -152,20 +152,19 @@ const CoachDetail = () => {
       <PageWrapper>
         <TitleBarContainer>
           <ButtonTitleBar title={'핏코치 매칭'} />
-          <EditButton>
+          <NavItem to="/coachRegister">
             수정 <FiEdit />
-          </EditButton>
+          </NavItem>
         </TitleBarContainer>
         <TrainerProfile trainer={currentTrainer} />
         <TrainerQualifications qualifications={trainerQuals} />
         <TrainerCourse courses={trainerCourses} />
         <TrainerPhoto photos={trainerDetails.trainerPhoto} />
-        {/* TrainerReview 컴포넌트에 트레이너 ID와 불러온 리뷰 데이터 전달 */}
-        {/* TrainerReview 내부에서 '리뷰 더보기' 링크를 위해 trainerId를 전달합니다. */}
-        <TrainerReview trainerId={id} reviews={reviews} /> {/* prop 이름을 trainerId로 명확히 변경 */}
+        <TrainerReview trainerId={id} reviews={reviews} />
       </PageWrapper>
     </>
   );
 };
 
 export default CoachDetail;
+

@@ -4,47 +4,43 @@ import theme from '../../styles/theme';
 import { API_BASE_URL } from '../../api/config';
 
 const PhotoContainer = styled.div`
-  width: ${theme.width.lg};
-  margin-top: ${theme.spacing.lg};
-  border-top: 1px solid ${theme.colors.gray[200]};
+    width: ${theme.width.lg};
+    margin-top: ${theme.spacing[5]};
+    border-top: 1px solid ${theme.colors.gray[200]};
 `;
 
 const PhotoGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: ${theme.spacing.md};
-  padding: ${theme.spacing.lg} 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: ${theme.spacing.md};
+    padding: ${theme.spacing.lg} 0;
 `;
 
 const PhotoItem = styled.div`
-  width: 100%;
-  padding-top: 100%; /* 1:1 Aspect Ratio */
-  position: relative;
-  background-color: #f0f0f0; /* Placeholder color */
-  border-radius: ${theme.borderRadius.md};
-  overflow: hidden;
+    width: 100%;
+    padding-top: 100%; /* 1:1 Aspect Ratio */
+    position: relative;
+    background-color: #f0f0f0; /* Placeholder color */
+    border-radius: ${theme.borderRadius.md};
+    overflow: hidden;
 `;
 
 const Image = styled.img`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* 이미지가 컨테이너를 꽉 채우도록 */
-  transition: transform 0.3s ease-in-out;
-
-  &:hover {
-    transform: scale(1.05);
-  }
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 이미지가 컨테이너를 꽉 채우도록 */
 `;
 
 const Title = styled.h2`
-  font-size: ${theme.fontSizes.lg};
-  font-weight: bold;
-  color: ${theme.colors.text};
-  margin-bottom: ${theme.spacing.sm};
-  margin-top: ${theme.spacing.lg};
+    font-size: ${theme.fontSizes['2xl']};
+    font-weight: bold;
+    color: ${theme.colors.text};
+    text-align: left;
+    margin-bottom: ${theme.spacing[4]};
+    margin-top: ${theme.spacing[5]};
 `;
 
 const TrainerPhoto = ({ photos }) => {
