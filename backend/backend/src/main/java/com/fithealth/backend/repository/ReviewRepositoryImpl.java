@@ -57,5 +57,27 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 
     }
 
+    @Override
+    public Boolean findOne(Long paymentId) {
+        if(paymentId == null) {
+            return false;
+        }
+        else{
+            try {
+                List<Review> result = em.createQuery("SELECT r FROM Review r "
+                                + "WHERE r.payment.paymentId = :paymentId", Review.class) // 쿼리 결과의 타입을 Review.class로 명시
+                        .setParameter("paymentId", paymentId)
+                        .setMaxResults(1)
+                        .getResultList();
+
+                return !result.isEmpty();
+
+            } catch (Exception e) {
+                System.err.println("결제번호로 리뷰를 찾을 수 없습니다. " + e.getMessage());
+                return false;
+            }
+        }
+    }
+
 
 }

@@ -181,4 +181,9 @@ public class ReviewServiceImpl implements ReviewService {
                 .collect(Collectors.toList());
 
     }
+
+    @Override
+    public Boolean findOne(Long paymentId) {
+        return reviewRepository.findOne(paymentId);
+    }
 }

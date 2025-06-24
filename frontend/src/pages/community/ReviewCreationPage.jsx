@@ -1,19 +1,38 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react'; // useEffect 추가
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import { FaCamera, FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
-import api from '../../api/axios.js'; // axios 인스턴스 임포트
-import { API_ENDPOINTS } from '../../api/config.js'; // API 엔드포인트 임포트
+import api from '../../api/axios.js';
+import { API_ENDPOINTS } from '../../api/config.js';
+import { useLocation } from 'react-router-dom'; // useLocation 훅 추가
 
 function ReviewCreationPage() {
+  const location = useLocation(); // useLocation 훅 사용
+  const { paymentId, trainerName } = location.state || {}; // state에서 paymentId와 trainerName 추출
+
   const [content, setContent] = useState('');
   const [imageCount, setImageCount] = useState(0);
-  // 변경: paymentId를 information 상태에 추가합니다.
-  // 실제 사용 시에는 이 paymentId를 동적으로 받아와야 합니다.
-  // 예를 들어, 목록에서 리뷰 작성 버튼을 클릭할 때 해당 paymentId를 넘겨주거나,
-  // URL 쿼리 파라미터에서 읽어오는 방식 등을 고려해야 합니다.
-  // 여기서는 임시로 하드코딩된 값(예: 1)을 사용하여 테스트하겠습니다.
-  const [information] = useState({ coachName: '김성은', paymentId: 1 }); // paymentId 추가
+
+  // information 상태를 초기화할 때, navigate로 받아온 trainerName과 paymentId를 사용
+  // 초기값이 존재하지 않을 수 있으므로 기본값 설정 또는 로딩 처리 필요
+  const [information, setInformation] = useState({
+    coachName: trainerName || '알 수 없음', // 받아온 trainerName 사용, 없으면 '알 수 없음'
+    paymentId: paymentId, // 받아온 paymentId 사용
+  });
+
+  // 이 useEffect는 paymentId와 trainerName이 성공적으로 받아와졌는지 확인하고
+  // information 상태를 업데이트하는 데 사용될 수 있습니다.
+  useEffect(() => {
+    if (paymentId && trainerName) {
+      setInformation({ coachName: trainerName, paymentId: paymentId });
+    } else {
+      // paymentId 또는 trainerName이 없는 경우의 처리 (예: 이전 페이지로 리다이렉트, 에러 메시지 표시)
+      console.warn('ReviewCreationPage: paymentId or trainerName not found in location state.');
+      // alert("유효하지 않은 접근입니다. 다시 시도해주세요.");
+      // navigate('/'); // 예시: 홈으로 리다이렉트
+    }
+  }, [paymentId, trainerName]); // paymentId나 trainerName이 변경될 때만 실행
+
   const contentTextareaRef = useRef(null);
   const [isContentFocused, setIsContentFocused] = useState(false);
 
@@ -21,8 +40,7 @@ function ReviewCreationPage() {
   const [hoverRating, setHoverRating] = useState(0);
   const starRatingRef = useRef(null);
 
-  // 내용과 별점, 그리고 paymentId가 모두 유효한지 확인하는 함수
-  // information.paymentId가 유효한지도 확인합니다.
+  // 내용, 별점, paymentId가 모두 유효한지 확인
   const isFormValid = content.trim() !== '' && selectedRating > 0 && information.paymentId != null;
 
   const handleContentChange = (e) => {
@@ -31,52 +49,42 @@ function ReviewCreationPage() {
 
   const handleImageUpload = () => {
     setImageCount((prevCount) => Math.min(prevCount + 1, 15));
-    // 실제 이미지 업로드 로직 추가 필요 (백엔드와 연동)
     alert('이미지 업로드 기능은 현재 구현되지 않았습니다.');
   };
 
   const handleSubmit = async () => {
-    // 비동기 함수로 변경
     if (!isFormValid) {
       console.log('폼이 유효하지 않습니다. 내용, 별점, Payment ID를 모두 확인해주세요.');
-      alert('리뷰 내용을 입력하고 별점을 선택해주세요.'); // 사용자에게 더 명확한 메시지
+      alert('리뷰 내용을 입력하고 별점을 선택해주세요.');
       return;
     }
 
     const reviewPayload = {
-      paymentId: information.paymentId, // information 상태에서 paymentId 사용
+      paymentId: information.paymentId,
       reviewContent: content,
       rating: selectedRating,
-      heart: 0, // 프론트에서 heart를 따로 입력받지 않는다면 0 또는 기본값 설정
+      heart: 0,
     };
 
     console.log('전송할 리뷰 데이터:', reviewPayload);
 
     try {
-      // 백엔드 API 호출
       const response = await api.post(API_ENDPOINTS.REVIEW.CREATE, reviewPayload);
       console.log('리뷰 등록 성공:', response.data);
       alert('리뷰가 성공적으로 등록되었습니다!');
 
-      // 성공 후 상태 초기화 (페이지 이동 없음, 현재 페이지 유지)
       setContent('');
       setImageCount(0);
       setSelectedRating(0);
       setHoverRating(0);
       setIsContentFocused(false);
-      // textarea 초기화를 위해 ref를 사용할 수도 있습니다.
-      // if (contentTextareaRef.current) {
-      //   contentTextareaRef.current.value = '';
-      // }
     } catch (error) {
       console.error('리뷰 등록 실패:', error);
-      // 서버에서 전달된 에러 메시지가 있다면 표시
       const errorMessage = error.response?.data?.message || '리뷰 등록에 실패했습니다.';
       alert(errorMessage);
     }
   };
 
-  // 별점 렌더링 함수 (0.5점 단위 표시 지원)
   const renderStars = (ratingToDisplay) => {
     const stars = [];
     const fullStars = Math.floor(ratingToDisplay);
@@ -94,7 +102,6 @@ function ReviewCreationPage() {
     return stars;
   };
 
-  // 마우스 움직임 감지하여 0.5점 단위로 별점 계산
   const handleStarMouseMove = (e) => {
     if (!starRatingRef.current) return;
 
@@ -120,7 +127,6 @@ function ReviewCreationPage() {
     setHoverRating(calculatedRating);
   };
 
-  // 별점 클릭 시 0.5점 단위로 별점 설정
   const handleStarClick = (e) => {
     if (!starRatingRef.current) return;
 
@@ -162,7 +168,7 @@ function ReviewCreationPage() {
         <TitleBar title="리뷰 등록" />
         <ContentWrapper>
           <TopSection>
-            {/* information.coachName 사용 */}
+            {/* trainerName 대신 information.coachName을 사용하는 것이 일관적 */}
             <CategorySelect>{information.coachName} 트레이너</CategorySelect>
             <StarRatingContainer
               ref={starRatingRef}
@@ -215,7 +221,6 @@ function ReviewCreationPage() {
 export default ReviewCreationPage;
 
 // --- 스타일 컴포넌트 ---
-// (이전과 동일하므로 생략하지만, 실제 코드에는 포함되어야 합니다.)
 const PageContainer = styled.div`
   width: 100%;
   display: flex;

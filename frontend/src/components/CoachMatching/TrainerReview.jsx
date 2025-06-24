@@ -129,7 +129,7 @@ const StarRating = ({ rating = 0 }) => {
 // TrainerReview는 CoachDetail의 일부로, 리뷰 목록의 요약본을 보여주는 역할입니다.
 
 const TrainerReview = (
-  { trainerEmail, reviews = [] } // reviews prop 추가
+  { trainerNo, reviews = [] } // reviews prop 추가
 ) => (
   <Wrapper>
     <Container>
@@ -158,8 +158,8 @@ const TrainerReview = (
         </PostsColumn>
         {/* '리뷰 더보기' 클릭 시, props로 받은 trainerEmail을 URL 파라미터로 전달 */}
         {/* trainerEmail이 있을 때만 Link를 렌더링하도록 조건부 렌더링 */}
-        {trainerEmail && (
-          <Link to={`/coachReview/${trainerEmail}`}>
+        {trainerNo && (
+          <Link to={`/coachReview/${trainerNo}`}>
             <MoreInfoBox>
               <MoreText>리뷰 더보기</MoreText>
             </MoreInfoBox>

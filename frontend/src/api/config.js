@@ -37,6 +37,7 @@ export const API_ENDPOINTS = {
     CREATE: '/api/review',
     SELECT: '/api/review/',
     MYREVIEW: '/api/review/my',
+    FIND: '/api/review/exsists/',
   },
   BOARD: {
     ALL: 'api/board/all',
@@ -56,6 +57,6 @@ export const API_ENDPOINTS = {
     CREATE: '/api/comment',
   },
   COACH: {
-    LIST: 'api/trainer',
+    LIST: 'api/trainer/',
   },
 };

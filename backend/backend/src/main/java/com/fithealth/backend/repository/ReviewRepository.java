@@ -8,5 +8,5 @@ public interface ReviewRepository {
     Review save(Review review);
     List<Review> findByPaymentId(List<Long> paymentIds);
     List<Review> findReviewsByUserEmailWithPaymentAndMembers(String userEmail);
-
+    Boolean findOne(Long paymentId);
 }

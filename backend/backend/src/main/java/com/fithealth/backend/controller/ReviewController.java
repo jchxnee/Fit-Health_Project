@@ -41,5 +41,10 @@ public class ReviewController {
         return ResponseEntity.ok(myReviews);
     }
 
-
+    @GetMapping("/exsists/{paymentId}")
+    public ResponseEntity<Boolean> findReview(@PathVariable Long paymentId) {
+        System.out.println("프론트에서 받은 결제번호 : " + paymentId);
+        boolean exists = reviewService.findOne(paymentId);
+        return ResponseEntity.ok(exists);
+    }
 }
