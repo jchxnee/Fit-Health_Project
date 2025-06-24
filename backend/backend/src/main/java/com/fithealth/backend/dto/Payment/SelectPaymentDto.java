@@ -1,5 +1,6 @@
 package com.fithealth.backend.dto.Payment;
 
+import com.fithealth.backend.dto.Reservation.SelectReservation;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.entity.Payment;
 import com.fithealth.backend.entity.Reservation;
@@ -9,6 +10,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
 
 public class SelectPaymentDto {
 
@@ -33,6 +35,8 @@ public class SelectPaymentDto {
         private String sessions;
         private String startDate;
         private String category;
+
+        private List<SelectReservation.Response> history;
 
         public static SelectPaymentDto.Response fromEntity(Payment payment) {
             String userEmail = null;
@@ -87,8 +91,15 @@ public class SelectPaymentDto {
                 displayStartDate = payment.getFirstReservation().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             }
 
+            List<SelectReservation.Response> reservationHistory = null;
+            if (payment.getReservations() != null && !payment.getReservations().isEmpty()) {
+                reservationHistory = payment.getReservations().stream()
+                        .map(SelectReservation.Response::fromEntity)
+                        .toList();
+            }
 
-            return SelectPaymentDto.Response.builder()
+
+            return Response.builder()
                     .paymentId(payment.getPaymentId())
                     .userEmail(userEmail)
                     .userName(userName)
@@ -103,6 +114,7 @@ public class SelectPaymentDto {
                     .sessions(displaySessions)
                     .startDate(displayStartDate)
                     .category(category)
+                    .history(reservationHistory)
                     .build();
         }
     }
