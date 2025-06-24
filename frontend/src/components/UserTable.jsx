@@ -5,17 +5,18 @@ import { CiMenuKebab } from 'react-icons/ci';
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 import { IoReload } from 'react-icons/io5';
 import theme from '../styles/theme';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const UserTable = ({ data, columns, onRowClick }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
-  const [openMenuId, setOpenMenuId] = useState(null); // 열려있는 메뉴의 row id를 저장
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 }); // 메뉴 위치 상태 추가
-  const menuRef = useRef(null); // 팝업 메뉴 DOM 엘리먼트 참조
-  const currentMenuButtonRef = useRef(null); // 현재 열린 메뉴를 트리거한 버튼 DOM 엘리먼트 참조
-  const tableContainerRef = useRef(null); // StyledTableContainer DOM 엘리먼트 참조
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const menuRef = useRef(null);
+  const currentMenuButtonRef = useRef(null);
+  const tableContainerRef = useRef(null);
 
-  // 정렬된 데이터 반환 함수 (useMemo 최적화)
+  const navigate = useNavigate(); //
+
   const sortedData = useMemo(() => {
     let sortableItems = [...data];
     if (sortConfig.key !== null && sortConfig.direction !== 'none') {
@@ -111,30 +112,43 @@ const UserTable = ({ data, columns, onRowClick }) => {
         }
 
         setMenuPosition({
-          // 팝업의 top은 '...' 버튼의 뷰포트 top에서 테이블 컨테이너의 뷰포트 top을 뺀 값으로 계산 (상대적인 top)
           top: buttonRect.top - tableContainerRect.top,
-          // 팝업의 left는 테이블 컨테이너의 전체 너비 (오른쪽 끝) + 여백
-          left: tableContainerRect.width + 10, // 10px 여백
+          left: tableContainerRect.width + 10,
         });
         setOpenMenuId(rowId);
-        currentMenuButtonRef.current = e.currentTarget; // 현재 열린 메뉴를 트리거한 버튼 참조 저장
+        currentMenuButtonRef.current = e.currentTarget;
       }
     },
     [openMenuId]
   ); // openMenuId를 의존성 배열에 추가하여 상태 변경 시 함수 재생성
 
-  // 메뉴 아이템 클릭 핸들러
   const handleMenuItemClick = (e, action, rowData) => {
-    e.stopPropagation(); // 메뉴 아이템 클릭 시 메뉴가 바로 닫히지 않도록
-    setOpenMenuId(null); // 메뉴 아이템 클릭 후 메뉴 닫기
-    setMenuPosition({ top: 0, left: 0 }); // 위치 초기화
-    currentMenuButtonRef.current = null; // 버튼 참조 초기화
-    alert(`${rowData.coachName} 코치의 ${action} 선택됨!`); // 실제 로직으로 대체
-    // 예: if (action === '1:1 채팅') { /* 1:1 채팅 로직 */ }
+    e.stopPropagation();
+    setOpenMenuId(null);
+    setMenuPosition({ top: 0, left: 0 });
+    currentMenuButtonRef.current = null;
+    if (action === '결제취소') {
+      if (rowData && rowData.paymentId) {
+        console.log('결제번호는 : ', rowData.paymentId);
+        console.log('navigate 함수 호출 직전! 이동할 경로:', `/refundPage/${rowData.paymentId}`);
+        navigate(`/refundPage/${rowData.paymentId}`);
+      } else {
+        alert('결제 번호를 찾을 수 없습니다.');
+      }
+    } else if (action === '1:1 채팅') {
+      navigate('/chat', { state: { userId: rowData.userId, coachId: rowData.coachId } });
+    } else if (action === '후기 남기기') {
+      navigate('/reviewCreationPage', { state: { lessonId: rowData.lessonId, coachId: rowData.coachId } });
+    } else if (action === '다음 회차예약') {
+      navigate('/nextReservation', { state: { currentLesson: rowData } });
+    } else if (action === '예약취소') {
+      alert(`${rowData.coachName || rowData.name} 코치의 예약을 취소합니다.`);
+    } else {
+      alert(`${rowData.coachName || rowData.name} 코치의 ${action} 선택됨!`);
+    }
   };
 
   return (
-    // StyledTableContainer에 ref 속성 추가
     <StyledTableContainer ref={tableContainerRef}>
       <StyledTable>
         <thead>
@@ -167,13 +181,9 @@ const UserTable = ({ data, columns, onRowClick }) => {
           ))}
         </tbody>
       </StyledTable>
-      {/* openMenuId가 null이 아닐 때만 팝업 메뉴 렌더링 */}
       {openMenuId !== null && (
-        // PopupMenu는 StyledTableContainer의 자식으로, StyledTable 밖에서 렌더링
         <PopupMenu ref={menuRef} $top={menuPosition.top} $left={menuPosition.left}>
-          {/* sortedData에서 해당 row 데이터를 찾아 전달 */}
           <PopupMenuItem
-            to="/chat"
             onClick={(e) =>
               handleMenuItemClick(
                 e,
@@ -185,7 +195,6 @@ const UserTable = ({ data, columns, onRowClick }) => {
             1:1 채팅
           </PopupMenuItem>
           <PopupMenuItem
-            to="/reviewCreationPage"
             onClick={(e) =>
               handleMenuItemClick(
                 e,
@@ -197,7 +206,6 @@ const UserTable = ({ data, columns, onRowClick }) => {
             후기 남기기
           </PopupMenuItem>
           <PopupMenuItem
-            to="/nextReservation"
             onClick={(e) =>
               handleMenuItemClick(
                 e,
@@ -223,13 +231,13 @@ const UserTable = ({ data, columns, onRowClick }) => {
             onClick={(e) =>
               handleMenuItemClick(
                 e,
-                '삭제',
-                sortedData.find((d) => d.id === openMenuId)
+                '결제취소',
+                sortedData.find((d) => d.id === openMenuId) // 현재 행의 모든 데이터를 handleMenuItemClick으로 전달
               )
             }
             $isDelete
           >
-            삭제
+            결제취소
           </PopupMenuItem>
         </PopupMenu>
       )}
@@ -239,7 +247,7 @@ const UserTable = ({ data, columns, onRowClick }) => {
 
 export default UserTable;
 
-// Styled-components (수정된 StyledTableContainer와 PopupMenu)
+// Styled-components (동일)
 const StyledTableContainer = styled.div`
   width: 100%;
   margin-top: 20px;
@@ -347,7 +355,7 @@ const PopupMenu = styled.div`
   outline: none;
 `;
 
-const PopupMenuItem = styled(Link)`
+const PopupMenuItem = styled.button`
   background: none;
   border: none;
   padding: ${theme.spacing['3']} ${theme.spacing['4']};

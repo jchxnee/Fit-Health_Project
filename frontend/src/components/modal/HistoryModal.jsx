@@ -1,3 +1,5 @@
+// src/main/components/modal/HistoryModal.jsx
+
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Calendar from 'react-calendar';
@@ -206,18 +208,33 @@ const HistoryListItem = styled.div`
   font-size: ${theme.fontSizes.md};
   color: ${theme.colors.gray['800']};
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column; /* 세로로 정렬하도록 변경 */
+  align-items: flex-start; /* 왼쪽 정렬 */
   box-shadow: ${theme.shadows.sm};
   transition: background-color 0.2s ease-in-out;
 `;
 
-const HistoryDate = styled.span`
-  font-weight: ${theme.fontWeights.medium};
+const HistoryItemTopRow = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
 `;
 
-const HistorySession = styled.span`
+const HistoryDate = styled.span`
+  font-weight: ${theme.fontWeights.medium};
+  font-size: ${theme.fontSizes.base};
+`;
+
+const HistorySessionStatus = styled.span`
   color: ${theme.colors.gray['600']};
+  font-size: ${theme.fontSizes.sm}; /* 좀 더 작게 */
+`;
+
+const RejectComment = styled.p`
+  color: ${theme.colors.danger};
+  font-size: ${theme.fontSizes.sm};
+  margin-top: ${theme.spacing[1]};
+  margin-bottom: 0;
 `;
 
 const HistoryModal = ({ isOpen, onClose, coachName, history }) => {
@@ -225,10 +242,17 @@ const HistoryModal = ({ isOpen, onClose, coachName, history }) => {
 
   const [activeDate, setActiveDate] = useState(new Date());
 
-  const sessionDates = history.map((item) => {
-    const [year, month, day] = item.date.split('/').map(Number);
-    return new Date(year, month - 1, day);
-  });
+  // history 배열의 각 item.selectDate (yyyy-MM-dd)를 Date 객체로 변환
+  const sessionDates = history
+    .map((item) => {
+      // ⭐ 변경된 부분: 시간 부분을 제거합니다.
+      const datePart = item.selectDate.split(' ')[0]; // '2025-06-23 00:00' -> '2025-06-23'
+      const [year, month, day] = datePart.split('-').map(Number);
+      const dateObj = new Date(year, month - 1, day);
+      // console.log(`Parsing "${item.selectDate}" to Date:`, dateObj); // 디버깅 로그는 필요 없으면 제거
+      return dateObj;
+    })
+    .filter((date) => date instanceof Date && !isNaN(date.getTime()));
 
   const isSameDay = (date1, date2) => {
     return (
@@ -268,14 +292,21 @@ const HistoryModal = ({ isOpen, onClose, coachName, history }) => {
           <HistoryListWrapper>
             {history.length > 0 ? (
               history.map((item, index) => {
-                const [year, month, day] = item.date.split('/').map(Number);
+                // 이 부분도 캘린더 하이라이트 로직과 일관되게 날짜 부분만 파싱하도록 수정
+                const datePartForHighlight = item.selectDate.split(' ')[0];
+                const [year, month, day] = datePartForHighlight.split('-').map(Number);
                 const safeItemDate = new Date(year, month - 1, day);
 
                 const isItemSessionDate = sessionDates.some((sessionDate) => isSameDay(sessionDate, safeItemDate));
+
                 return (
                   <HistoryListItem key={index} $isSessionDate={isItemSessionDate}>
-                    <HistoryDate>{item.date}</HistoryDate>
-                    <HistorySession>{item.session}</HistorySession>
+                    <HistoryItemTopRow>
+                      <HistoryDate>
+                        {index + 1}회차: {item.selectDate.split(' ')[0]} {/* 리스트에서도 날짜만 표시 */}
+                      </HistoryDate>
+                    </HistoryItemTopRow>
+                    {item.rejectComment && <RejectComment>거절 사유: {item.rejectComment}</RejectComment>}
                   </HistoryListItem>
                 );
               })
