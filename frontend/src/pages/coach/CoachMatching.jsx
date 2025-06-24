@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import theme from '../../styles/theme';
 import TitleBar from '../../components/TitleBar';
-
+import api from '../../api/axios'; // 두 번째 코드에서 추가된 부분
 import SelectCourse from '../../components/CoachMatching/SelectCourse';
 import ReservationCalendar from '../../components/CoachMatching/ReservationCalendar';
-import { Link } from 'react-router-dom'; // Link는 SubmitButton을 button으로 변경하여 더 이상 필요하지 않을 수 있습니다.
+import { useNavigate, useParams } from 'react-router-dom'; // 두 번째 코드에서 추가된 부분
+import useUserStore from '../../store/useUserStore'; // 두 번째 코드에서 추가된 부분
+import { toast } from 'react-toastify'; // 두 번째 코드에서 추가된 부분
+import { paymentService } from '../../api/payment'; // 두 번째 코드에서 추가된 부분
 
 const PageWrapper = styled.div`
   display: flex;
@@ -51,7 +54,6 @@ const TrainerNameText = styled.p`
 `;
 
 const SubmitButton = styled.button`
-  /* Link 대신 button으로 변경 */
   background-color: ${theme.colors.button};
   color: ${theme.colors.white};
   border: none;
@@ -74,7 +76,13 @@ const SubmitButton = styled.button`
 `;
 
 const CoachMatching = () => {
-  const [courseQuantity, setCourseQuantity] = useState(4);
+  const { user } = useUserStore(); // 두 번째 코드에서 추가된 부분
+  const { id } = useParams(); // 두 번째 코드에서 추가된 부분
+  const [trainer, setTrainer] = useState(null); // 두 번째 코드에서 추가된 부분
+  const [loading, setLoading] = useState(true);
+  const [courseQuantity, setCourseQuantity] = useState(3); // 두 번째 코드의 초기값 3 사용
+  const [finalPrice, setFinalPrice] = useState(0); // 두 번째 코드에서 추가된 부분
+  const navigate = useNavigate(); // 두 번째 코드에서 추가된 부분
 
   // 로컬 시간대를 고려하여 현재 날짜를 YYYY-MM-DD 형식으로 가져오는 헬퍼 함수
   const getTodayDateString = () => {
@@ -88,30 +96,31 @@ const CoachMatching = () => {
   const [selectedDate, setSelectedDate] = useState(getTodayDateString());
   const [selectedTime, setSelectedTime] = useState(null);
 
-  const [trainerId, setTrainerId] = useState(1);
-  const [trainerInfo, setTrainerInfo] = useState(null);
-
-  const [oneTimePrice, setOneTimePrice] = useState(0);
-
   useEffect(() => {
-    const fetchTrainerInfo = async () => {
-      const dbTrainersData = {
-        1: { id: 1, name: '김성은', specialization: '헬스', pricePerSession: 50000 },
-        2: { id: 2, name: '박트레이너', specialization: '필라테스', pricePerSession: 60000 },
-      };
-      setTimeout(() => {
-        const fetchedInfo = dbTrainersData?.[trainerId];
-        setTrainerInfo(fetchedInfo);
-        if (fetchedInfo) {
-          setOneTimePrice(fetchedInfo.pricePerSession);
-        }
-      }, 500);
+    if (!user?.email || !id) return;
+
+    const fetchCoachData = async () => {
+      try {
+        const { data } = await api.get(`/api/trainer/request/${id}`);
+        console.log('API 응답:', data);
+        setTrainer(data);
+      } catch (error) {
+        console.error('트레이너 정보 가져오기 실패:', error);
+        toast.error('트레이너 정보를 가져오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    if (trainerId) {
-      fetchTrainerInfo();
-    }
-  }, [trainerId]);
+    fetchCoachData();
+  }, [user?.email, id]);
+
+  if (loading) {
+    return <PageWrapper>로딩 중...</PageWrapper>;
+  }
+  if (!trainer) {
+    return <PageWrapper>트레이너 정보를 찾을 수 없습니다.</PageWrapper>;
+  }
 
   const handleQuantityChange = (delta) => {
     setCourseQuantity((prev) => Math.max(1, prev + delta));
@@ -125,10 +134,12 @@ const CoachMatching = () => {
     setSelectedTime(e.target.value);
   };
 
-  // 신청하기 버튼 클릭 시 호출될 함수
-  const handleRequest = () => {
+  // 신청하기 버튼 클릭 시 호출될 함수 (두 번째 코드의 로직에 기반하여 통합)
+  const handleRequest = async () => {
+    console.log('handleRequest 시작됨');
+
     if (!selectedDate || !selectedTime) {
-      alert('신청하실 날짜와 시간을 선택해주세요.');
+      toast.warning('신청하실 날짜와 시간을 선택해주세요.'); // toast 사용
       return;
     }
 
@@ -136,14 +147,31 @@ const CoachMatching = () => {
       `정말로 아래 내용으로 신청하시겠습니까?\n\n날짜: ${selectedDate}\n시간: ${selectedTime}`
     );
 
-    if (confirmed) {
-      // 확인 버튼을 눌렀을 경우, 여기에서 다음 로직 (예: 결제 페이지로 이동, API 호출 등)을 추가할 수 있습니다.
-      // 현재 코드에서는 Link 컴포넌트를 사용하고 있었으므로, 여기서는 단순히 콘솔 로그를 남깁니다.
-      // 실제 애플리케이션에서는 navigate('/paymentPage')와 같은 방식으로 페이지를 이동할 수 있습니다.
-      console.log('신청이 확인되었습니다. 다음 단계로 진행합니다.');
-      // 예시: navigate('/paymentPage');
-    } else {
-      console.log('신청이 취소되었습니다.');
+    if (!confirmed) return; // '취소'를 누르면 여기서 종료
+
+    try {
+      setLoading(true);
+
+      const data = {
+        userEmail: user.email,
+        trainerEmail: trainer.trainerEmail,
+        totalPrice: finalPrice,
+        productName: trainer.majorName,
+        totalCount: courseQuantity,
+        firstReservation: selectedDate + 'T' + selectedTime,
+      };
+
+      console.log('전송할 데이터:', data);
+      const response = await paymentService.insertPayment(data);
+      console.log('신청 처리 결과:', response);
+
+      toast.success('결제를 진행해주세요!');
+      navigate(`/paymentPage/${response}`);
+    } catch (error) {
+      console.error('결제 에러:', error);
+      toast.error('결제 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -152,11 +180,11 @@ const CoachMatching = () => {
       <PageWrapper>
         <TitleBar title={'신청'} />
         <ContentContainer>
-          {trainerInfo ? (
+          {trainer ? (
             <>
               <TrainerInfoWrapper>
-                <SectionTitle>{trainerInfo.specialization} 레슨</SectionTitle>
-                <TrainerNameText>트레이너 명 : {trainerInfo.name} 트레이너</TrainerNameText>
+                <SectionTitle>{trainer.majorName} 레슨</SectionTitle>
+                <TrainerNameText>트레이너 명 : {trainer.trainerName} 트레이너</TrainerNameText>
               </TrainerInfoWrapper>
             </>
           ) : (
@@ -167,7 +195,9 @@ const CoachMatching = () => {
           <SelectCourse
             courseQuantity={courseQuantity}
             onQuantityChange={handleQuantityChange}
-            oneTimePrice={oneTimePrice}
+            oneTimePrice={trainer.oncePrice} // trainer 객체에서 price 정보 사용
+            trainer={trainer} // trainer 정보 전달 (SelectCourse에서 할인 계산에 사용될 수 있음)
+            onPriceChange={setFinalPrice} // 최종 금액 업데이트 콜백
           />
 
           <SectionTitle>날짜 및 시간 선택</SectionTitle>
@@ -179,8 +209,11 @@ const CoachMatching = () => {
             onTimeChange={handleTimeChange}
           />
         </ContentContainer>
-        {/* SubmitButton을 styled.button으로 변경하고 onClick 핸들러 추가 */}
-        <SubmitButton onClick={handleRequest} disabled={!selectedDate || !selectedTime || courseQuantity === 0}>
+        {/* 신청하기 버튼: handleRequest 함수 호출 및 disabled 조건 유지 */}
+        <SubmitButton
+          onClick={handleRequest}
+          disabled={!selectedDate || !selectedTime || courseQuantity === 0 || loading}
+        >
           신청하기
         </SubmitButton>
       </PageWrapper>

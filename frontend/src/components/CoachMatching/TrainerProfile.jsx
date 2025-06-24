@@ -233,7 +233,7 @@ const TrainerProfile = ({ trainer }) => {
         </Location>
         <Introduction>{trainer.introduction}</Introduction>
         <BackDiv>
-          <NavItem to="/coachMatching">
+          <NavItem to={`/coachMatching/${trainer.id}`}>
             <ApplyButton>신청하기</ApplyButton>
           </NavItem>
         </BackDiv>

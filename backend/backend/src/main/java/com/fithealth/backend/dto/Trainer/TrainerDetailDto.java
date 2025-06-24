@@ -62,6 +62,34 @@ public class TrainerDetailDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    public static class ResponseRequest {
+        private Long trainerNo;
+        private String trainerEmail;
+        private String trainerName;
+        private String majorName;
+        private Long oncePrice;
+        private Long discount3;
+        private Long discount5;
+        private Long discount10;
+
+        public static ResponseRequest fromEntity(Member member) {
+            return ResponseRequest.builder()
+                    .trainerNo(member.getTrainer().getTrainerNo())
+                    .trainerEmail(member.getUserEmail())
+                    .trainerName(member.getUserName())
+                    .majorName(member.getTrainer().getMajorName())
+                    .oncePrice(member.getTrainer().getOncePrice())
+                    .discount3(member.getTrainer().getDiscount3())
+                    .discount5(member.getTrainer().getDiscount5())
+                    .discount10(member.getTrainer().getDiscount10())
+                    .build();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class FileResponse {
         private String originName;
         private String changeName;

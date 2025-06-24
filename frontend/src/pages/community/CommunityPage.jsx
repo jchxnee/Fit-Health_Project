@@ -42,7 +42,6 @@ function CommunityPage() {
           },
         });
 
-        // ⭐ 여기서 수정합니다: response.data.content에 접근 ⭐
         const fetchedPageResponse = response.data; // PageResponse 객체 전체
         const allPostsContent = fetchedPageResponse.content; // 실제 게시글 배열
 
@@ -50,11 +49,9 @@ function CommunityPage() {
         setTotalPostsCount(fetchedPageResponse.totalCount);
         setTotalPages(fetchedPageResponse.totalPage);
 
-        // 1. TOP 5 게시글: 조회수(count) 기준으로 내림차순 정렬 후 상위 5개
-        // 백엔드에서 이미 활성 게시글만 가져오므로 별도 필터링 불필요
-        // 만약 TOP 5를 따로 가져오는 API가 있다면 더 효율적입니다.
+        // 1. TOP 3 게시글: 조회수(count) 기준으로 내림차순 정렬 후 상위 3개
         const sortedByViews = [...allPostsContent].sort((a, b) => b.count - a.count);
-        setTopPosts(sortedByViews.slice(0, 5));
+        setTopPosts(sortedByViews.slice(0, 3));
 
         // 2. 사진 게시글: 파일이 첨부된 게시글 중 최신 4개
         const photoPostsData = [...allPostsContent]
@@ -136,7 +133,7 @@ function CommunityPage() {
 
             {activeCategory === '전체' && topPosts.length > 0 && (
               <>
-                <SectionTitleSmall>TOP 5 커뮤니티 글🔥</SectionTitleSmall>
+                <SectionTitleSmall>TOP 3 커뮤니티 글🔥</SectionTitleSmall>
                 <TopPostsGrid>
                   {topPosts.map((post) => (
                     <StyledPostLink key={post.board_no} to={`/communityDetailPage/${post.board_no}`}>

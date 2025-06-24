@@ -415,6 +415,7 @@ const RegionSelect = ({ value, onChange }) => {
               </ProvinceList>
               <CityList>
                 {selectedProvince &&
+                  Array.isArray(regions[selectedProvince]) &&
                   regions[selectedProvince].map((city) => (
                     <ListItem key={city} $isSelected={selectedCity === city} onClick={() => handleCitySelect(city)}>
                       {city}
