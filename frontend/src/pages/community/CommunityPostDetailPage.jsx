@@ -1,10 +1,9 @@
-// CommunityPostDetailPage.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { FaThumbsUp, FaRegHeart, FaEllipsisV, FaShareAlt } from 'react-icons/fa';
+import { FaThumbsUp, FaEllipsisV, FaShareAlt } from 'react-icons/fa';
 import { RiMessage2Fill } from 'react-icons/ri';
 import { FaPaperPlane } from 'react-icons/fa';
-import { useParams, useNavigate } from 'react-router-dom'; // useNavigate 임포트 추가
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import api from '../../api/axios';
 import { API_ENDPOINTS } from '../../api/config';
@@ -14,7 +13,7 @@ function CommunityPostDetailPage() {
   const { user } = useUserStore();
   const { id } = useParams();
   const boardNo = id;
-  const navigate = useNavigate(); // useNavigate 훅 사용
+  const navigate = useNavigate();
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -160,7 +159,6 @@ function CommunityPostDetailPage() {
                 <ShareButton>
                   <FaShareAlt color="#757575" />
                 </ShareButton>
-                {/* ⭐ 이 부분이 변경됩니다 ⭐ */}
                 {currentUserEmail === post.user_email && (
                   <>
                     <EllipsisButton onClick={() => setIsMenuOpen(!isMenuOpen)}>

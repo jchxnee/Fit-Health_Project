@@ -50,16 +50,13 @@ export const API_ENDPOINTS = {
     DETAIL: '/api/notice',
     CREATE: '/api/notice',
     UPDATE: '/api/notice',
+    DELETE: '/api/notice/delete',
   },
   COMMENT: {
     ALL: 'api/comment',
     CREATE: '/api/comment',
   },
   COACH: {
-<<<<<<< HEAD
-    LIST: 'api/trainer',
-=======
     LIST: '/api/trainer',
->>>>>>> d3c4aa5228d5173df1d8af118b40801fd76d0139
   },
 };
