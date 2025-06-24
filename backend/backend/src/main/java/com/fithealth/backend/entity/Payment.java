@@ -107,7 +107,7 @@ public class Payment {
         }
     }
 
-    public void changePayment(CommonEnums.Status status){
+    public void changeStatus(CommonEnums.Status status){
         this.paymentStatus = status;
         this.paymentAt = LocalDateTime.now();
     }

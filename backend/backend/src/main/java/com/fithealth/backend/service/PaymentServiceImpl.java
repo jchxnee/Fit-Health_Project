@@ -58,7 +58,7 @@ public class PaymentServiceImpl implements  PaymentService {
         Payment payment = paymentRepository.findOne(createDto.getPayment_id())
                 .orElseThrow(() -> new IllegalArgumentException("결제 정보가 없습니다."));
 
-        payment.changePayment(CommonEnums.Status.Y);
+        payment.changeStatus(CommonEnums.Status.Y);
 
         Reservation reservation = createDto.toEntity();
         reservation.changePayment(payment);

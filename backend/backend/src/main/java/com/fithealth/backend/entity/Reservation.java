@@ -40,7 +40,7 @@ public class Reservation {
     @Column(name = "REJECT_COMMENT", length = 50)
     private String rejectComment;
 
-    @Column(name = "STATUS", nullable = false, length = 10)
+    @Column(name = "STATUS", nullable = false)
     @Enumerated(EnumType.STRING)
     private CommonEnums.Status status;
 
