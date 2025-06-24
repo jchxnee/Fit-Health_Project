@@ -5,7 +5,7 @@ import TitleBar from '../../components/TitleBar';
 
 import SelectCourse from '../../components/CoachMatching/SelectCourse';
 import ReservationCalendar from '../../components/CoachMatching/ReservationCalendar';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Link는 SubmitButton을 button으로 변경하여 더 이상 필요하지 않을 수 있습니다.
 
 const PageWrapper = styled.div`
   display: flex;
@@ -50,7 +50,8 @@ const TrainerNameText = styled.p`
   font-weight: bold;
 `;
 
-const SubmitButton = styled(Link)`
+const SubmitButton = styled.button`
+  /* Link 대신 button으로 변경 */
   background-color: ${theme.colors.button};
   color: ${theme.colors.white};
   border: none;
@@ -72,21 +73,9 @@ const SubmitButton = styled(Link)`
   }
 `;
 
-const SelectedDateTimeDisplay = styled.div`
-  text-align: center;
-  font-size: 1.1em;
-  color: ${theme.colors.black};
-  font-weight: bold;
-  margin-top: 10px;
-  span {
-    color: ${theme.colors.primary};
-  }
-`;
-
 const CoachMatching = () => {
   const [courseQuantity, setCourseQuantity] = useState(4);
 
-  // **** 여기를 수정합니다. ****
   // 로컬 시간대를 고려하여 현재 날짜를 YYYY-MM-DD 형식으로 가져오는 헬퍼 함수
   const getTodayDateString = () => {
     const today = new Date();
@@ -97,8 +86,6 @@ const CoachMatching = () => {
   };
 
   const [selectedDate, setSelectedDate] = useState(getTodayDateString());
-  // **************************
-
   const [selectedTime, setSelectedTime] = useState(null);
 
   const [trainerId, setTrainerId] = useState(1);
@@ -138,6 +125,28 @@ const CoachMatching = () => {
     setSelectedTime(e.target.value);
   };
 
+  // 신청하기 버튼 클릭 시 호출될 함수
+  const handleRequest = () => {
+    if (!selectedDate || !selectedTime) {
+      alert('신청하실 날짜와 시간을 선택해주세요.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `정말로 아래 내용으로 신청하시겠습니까?\n\n날짜: ${selectedDate}\n시간: ${selectedTime}`
+    );
+
+    if (confirmed) {
+      // 확인 버튼을 눌렀을 경우, 여기에서 다음 로직 (예: 결제 페이지로 이동, API 호출 등)을 추가할 수 있습니다.
+      // 현재 코드에서는 Link 컴포넌트를 사용하고 있었으므로, 여기서는 단순히 콘솔 로그를 남깁니다.
+      // 실제 애플리케이션에서는 navigate('/paymentPage')와 같은 방식으로 페이지를 이동할 수 있습니다.
+      console.log('신청이 확인되었습니다. 다음 단계로 진행합니다.');
+      // 예시: navigate('/paymentPage');
+    } else {
+      console.log('신청이 취소되었습니다.');
+    }
+  };
+
   return (
     <>
       <PageWrapper>
@@ -170,7 +179,8 @@ const CoachMatching = () => {
             onTimeChange={handleTimeChange}
           />
         </ContentContainer>
-        <SubmitButton to="/paymentPage" disabled={!selectedDate || !selectedTime || courseQuantity === 0}>
+        {/* SubmitButton을 styled.button으로 변경하고 onClick 핸들러 추가 */}
+        <SubmitButton onClick={handleRequest} disabled={!selectedDate || !selectedTime || courseQuantity === 0}>
           신청하기
         </SubmitButton>
       </PageWrapper>
