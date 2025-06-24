@@ -30,5 +30,13 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getCommentsByBoardNo(boardNo));
     }
 
+    @DeleteMapping("/{commentNo}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long commentNo) {
+        commentService.deleteComment(commentNo);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
 
 }

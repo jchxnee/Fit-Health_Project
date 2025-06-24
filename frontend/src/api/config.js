@@ -55,6 +55,7 @@ export const API_ENDPOINTS = {
   COMMENT: {
     ALL: 'api/comment',
     CREATE: '/api/comment',
+    DELETE: '/api/comment',
   },
   COACH: {
     LIST: '/api/trainer',

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { FaThumbsUp, FaEllipsisV, FaShareAlt } from 'react-icons/fa';
+import { FaThumbsUp, FaEllipsisV, FaShareAlt, FaTimes } from 'react-icons/fa'; // FaTimes 아이콘 추가
 import { RiMessage2Fill } from 'react-icons/ri';
 import { FaPaperPlane } from 'react-icons/fa';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -96,6 +96,25 @@ function CommunityPostDetailPage() {
     }
   };
 
+  // 댓글 삭제 핸들러 추가
+  const handleDeleteComment = async (commentNo) => {
+    if (!window.confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
+      return;
+    }
+    try {
+      await api.delete(`${API_ENDPOINTS.COMMENT.DELETE}/${commentNo}`);
+      alert('댓글이 삭제되었습니다.');
+      // 댓글 삭제 후 게시글 정보를 다시 불러와 댓글 목록 업데이트
+      const updatedPostResponse = await api.get(
+        `${API_ENDPOINTS.BOARD.DETAIL}/${boardNo}?userEmail=${currentUserEmail}`
+      );
+      setPost(updatedPostResponse.data);
+    } catch (err) {
+      console.error('댓글 삭제 중 오류 발생:', err);
+      alert('댓글 삭제에 실패했습니다.');
+    }
+  };
+
   const handleDeletePost = async () => {
     if (!window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
       return;
@@ -172,7 +191,6 @@ function CommunityPostDetailPage() {
                     )}
                   </>
                 )}
-                {/* ⭐ 변경 끝 ⭐ */}
               </PostActions>
             </PostInfo>
           </PostHeader>
@@ -217,15 +235,24 @@ function CommunityPostDetailPage() {
               {post.comments &&
                 post.comments.map((comment) => (
                   <CommentItem key={comment.comment_no}>
-                    <CommentAuthorInfo>
-                      <ProfileImage src={comment.profile_image} alt={comment.user_name} />
-                      <AuthorDetails>
-                        <AuthorDetailsSmall>
-                          <AuthorName>{comment.user_name}</AuthorName>
-                        </AuthorDetailsSmall>
-                        <CommentAuthorRegion></CommentAuthorRegion>
-                      </AuthorDetails>
-                    </CommentAuthorInfo>
+                    <CommentHeader>
+                      {' '}
+                      {/* CommentHeader 추가 */}
+                      <CommentAuthorInfo>
+                        <ProfileImage src={comment.profile_image} alt={comment.user_name} />
+                        <AuthorDetails>
+                          <AuthorDetailsSmall>
+                            <AuthorName>{comment.user_name}</AuthorName>
+                          </AuthorDetailsSmall>
+                          <CommentAuthorRegion></CommentAuthorRegion>
+                        </AuthorDetails>
+                      </CommentAuthorInfo>
+                      {currentUserEmail === comment.user_email && (
+                        <DeleteCommentButton onClick={() => handleDeleteComment(comment.comment_no)}>
+                          <FaTimes size="14" color="#a0a0a0" />
+                        </DeleteCommentButton>
+                      )}
+                    </CommentHeader>
                     <CommentText>{comment.comment_content}</CommentText>
                     <CommentTime>{new Date(comment.created_date).toLocaleString()}</CommentTime>
                   </CommentItem>
@@ -240,7 +267,7 @@ function CommunityPostDetailPage() {
 
 export default CommunityPostDetailPage;
 
-// --- 스타일 컴포넌트 (변경 없음) ---
+// --- 스타일 컴포넌트 (변경 있음) ---
 const PageContainer = styled.div`
   width: 100%;
   display: flex;
@@ -519,11 +546,19 @@ const CommentItem = styled.div`
   }
 `;
 
+// 댓글 헤더 (작성자 정보와 삭제 버튼을 함께 묶기 위해 추가)
+const CommentHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: ${({ theme }) => theme.spacing['1']};
+`;
+
 const CommentAuthorInfo = styled.div`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing['3']};
-  margin-bottom: ${({ theme }) => theme.spacing['1']};
 `;
 
 const ProfileImage = styled.img`
@@ -566,4 +601,19 @@ const CommentTime = styled.span`
 const CommentAuthorRegion = styled.span`
   font-size: ${({ theme }) => theme.fontSizes.xs};
   color: ${({ theme }) => theme.colors.gray['500']};
+`;
+
+const DeleteCommentButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-left: auto; /* 오른쪽으로 이동 */
+  display: flex;
+  align-items: center;
+  color: ${({ theme }) => theme.colors.gray['500']};
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.gray['700']};
+  }
 `;
