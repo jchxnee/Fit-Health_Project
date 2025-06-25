@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaSearch } from 'react-icons/fa';
-import theme from '/src/styles/theme.js'; // theme import 추가
+// import theme from '/src/styles/theme.js'; // theme는 Styled-components ThemeProvider를 통해 주입되므로 여기서 직접 임포트할 필요 없음
 
 export const FilterButton = styled.button`
   display: flex;
@@ -87,6 +87,7 @@ export function DropdownFilterButton({ label, options, onSelect, currentSelected
   };
 
   // 현재 선택된 값에 해당하는 label을 찾아서 버튼에 표시
+  // currentSelectedValue가 null/undefined일 수 있으므로 기본값 설정
   const displayLabel = options.find((option) => option.value === currentSelectedValue)?.label || label;
 
   return (
@@ -172,10 +173,9 @@ const FilterWrapper = styled.div`
   }
 `;
 
-// BasicFilter 컴포넌트에 currentSearch, currentStatus prop 추가
-export default function BasicFilter({ filterOptions, onFilterChange, currentSearch, currentStatus }) {
+// BasicFilter 컴포넌트에 currentSearch, currentCategory, currentSort prop 추가
+export default function BasicFilter({ filterOptions, onFilterChange, currentSearch, currentCategory, currentSort }) {
   const handleSearchChange = (event) => {
-    // BasicFilter 내부에서 직접 검색어 상태를 관리하지 않고, 부모로부터 받은 onFilterChange 호출
     onFilterChange('search', event.target.value);
   };
 
@@ -183,7 +183,12 @@ export default function BasicFilter({ filterOptions, onFilterChange, currentSear
     <SearchFilterContainer>
       <SearchInputWrapper>
         <SearchIcon />
-        <SearchInput type="text" placeholder="이름 검색" onChange={handleSearchChange} value={currentSearch} />
+        <SearchInput
+          type="text"
+          placeholder="제목, 내용, 작성자 검색"
+          onChange={handleSearchChange}
+          value={currentSearch}
+        />
       </SearchInputWrapper>
       <FilterWrapper>
         {filterOptions.map((filter, index) => (
@@ -193,7 +198,9 @@ export default function BasicFilter({ filterOptions, onFilterChange, currentSear
             options={filter.options}
             onSelect={(value) => onFilterChange(filter.key, value)}
             // 필터의 key에 따라 적절한 현재 선택된 값을 전달
-            currentSelectedValue={filter.key === 'status' ? currentStatus : undefined}
+            currentSelectedValue={
+              filter.key === 'category' ? currentCategory : filter.key === 'sort' ? currentSort : undefined
+            }
           />
         ))}
       </FilterWrapper>

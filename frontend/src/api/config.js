@@ -32,6 +32,7 @@ export const API_ENDPOINTS = {
     PAYMENT: '/api/payments/payment',
     REFUND: '/api/payments/refund',
     LIST: '/api/payments/list',
+    RESERVATION: '/api/payments/reservation',
   },
   REVIEW: {
     CREATE: '/api/review',
@@ -45,16 +46,20 @@ export const API_ENDPOINTS = {
     DETAIL: '/api/board',
     UPDATE: '/api/board',
     DELETE: '/api/board/delete',
+    MYPOSTS: '/api/board/myposts',
   },
   NOTICE: {
     LIST: '/api/notice/all',
     DETAIL: '/api/notice',
     CREATE: '/api/notice',
     UPDATE: '/api/notice',
+    DELETE: '/api/notice/delete',
   },
   COMMENT: {
     ALL: 'api/comment',
     CREATE: '/api/comment',
+    DELETE: '/api/comment',
+    MYCOMMENTS: '/api/comment/mycomments',
   },
   COACH: {
     LIST: '/api/trainer',

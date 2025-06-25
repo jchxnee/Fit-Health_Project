@@ -4,6 +4,7 @@ import com.fithealth.backend.dto.Board.BoardCreateDto;
 import com.fithealth.backend.dto.Board.BoardGetDto;
 import com.fithealth.backend.dto.Board.BoardUpdateDto;
 import com.fithealth.backend.dto.PageResponse;
+import com.fithealth.backend.dto.Review.SelectMyReviewDto;
 import com.fithealth.backend.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,6 +53,23 @@ public class BoardController {
         return ResponseEntity.ok(boardService.getBoardDetail(boardNo, userEmail)); // ⭐ userEmail 전달 ⭐
     }
 
+    @GetMapping("/myposts")
+    public ResponseEntity<PageResponse<BoardGetDto.Response>> getMyPosts(
+            @RequestParam(defaultValue = "all") String category,
+            @RequestParam(required = false) String search, // 검색 파라미터 추가
+            @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam("userEmail") String userEmail
+    ) {
+
+        if (userEmail == null || userEmail.isEmpty() || "anonymousUser".equals(userEmail)) {
+            return ResponseEntity.status(401).build();
+        }
+
+        // 검색 기능이 포함된 메서드 호출
+        PageResponse<BoardGetDto.Response> response = boardService.getMyBoardListWithSearch(userEmail, category, search, pageable);
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Long> updateBoard(
             @ModelAttribute BoardUpdateDto.Update boardUpdateDto,
@@ -73,7 +93,7 @@ public class BoardController {
     @PostMapping("/{id}/like") // ⭐ 좋아요 토글 엔드포인트 추가 ⭐
     public ResponseEntity<Boolean> toggleLike(
             @PathVariable("id") Long boardNo,
-            @RequestBody String userEmail // ⭐ userEmail을 요청 본문으로 받음 ⭐
+            @RequestBody String userEmail
     ) {
         String parsedUserEmail = userEmail.replace("\"", ""); // JSON 문자열로 넘어올 경우 따옴표 제거
         boolean liked = boardService.toggleLike(boardNo, parsedUserEmail);

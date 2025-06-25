@@ -1,10 +1,13 @@
 package com.fithealth.backend.repository;
 
 import com.fithealth.backend.entity.Reservation;
+import com.fithealth.backend.enums.CommonEnums;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Transactional
 @Repository
@@ -16,5 +19,14 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     @Override
     public void save(Reservation reservation) {
         em.persist(reservation);
+    }
+
+    @Override
+    public List<Reservation> findByPaymentId(Long paymentId, CommonEnums.Status status) {
+        String sql = "SELECT r FROM Reservation r WHERE r.payment.id = :paymentId AND r.status = : status ORDER BY r.reservationNo ASC";
+        return em.createQuery(sql, Reservation.class)
+                .setParameter("paymentId", paymentId)
+                .setParameter("status", status)
+                .getResultList();
     }
 }

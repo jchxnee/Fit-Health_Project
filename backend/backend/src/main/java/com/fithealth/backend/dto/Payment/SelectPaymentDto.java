@@ -73,7 +73,7 @@ public class SelectPaymentDto {
             String displayStatus;
             if (payment.getUseStatus() == CommonEnums.UseStatus.N) {
                 displayStatus = "완료됨";
-            } else if (payment.getPaymentStatus() == CommonEnums.Status.C) {
+            } else if (payment.getUseStatus() == CommonEnums.UseStatus.C) {
                 displayStatus = "취소됨";
             } else {
                 // 예약 상태를 기반으로 '진행중' 판단 로직 추가

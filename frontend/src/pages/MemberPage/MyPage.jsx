@@ -109,148 +109,154 @@ const MyPage = () => {
         </AlertBar>
 
         {/* 건강 정보 섹션 추가 */}
-        <HealthInfoContainer>
-          <HealthInfoSectionHeader>
-            <SectionHeader>
-              건강 정보
-              <MdOutlineHealthAndSafety />
-            </SectionHeader>
-            <HealthInfoInputButton onClick={openHealthInputModal}>건강정보 입력</HealthInfoInputButton>
-          </HealthInfoSectionHeader>
-          <ChartContainer>
-            <div style={{ height: '400px' }}>
-              {chartData.length === 0 || chartData.every((item) => item.data.length === 0) ? (
-                <p style={{ textAlign: 'center', padding: '2rem' }}>건강 데이터가 없습니다.</p>
-              ) : (
-                <ResponsiveLine
-                  data={chartData}
-                  margin={{ top: 50, right: 140, bottom: 70, left: 50 }}
-                  xScale={{ type: 'point' }}
-                  yScale={{
-                    type: 'linear',
-                    min: 'auto',
-                    max: 'auto',
-                    stacked: false,
-                    reverse: false,
-                  }}
-                  yFormat=" >-.2f"
-                  axisTop={null}
-                  axisRight={null}
-                  axisBottom={{
-                    tickSize: 5,
-                    tickPadding: 5,
-                    tickRotation: -45,
-                    legend: '날짜',
-                    legendOffset: 50,
-                    legendPosition: 'middle',
-                    truncateTickAt: 0,
-                    format: (value) => {
-                      const parts = value.split('.');
-                      return parts.length === 3 ? `${parts[1]}.${parts[2]}` : value;
-                    },
-                  }}
-                  axisLeft={{
-                    tickSize: 5,
-                    tickPadding: 5,
-                    tickRotation: 0,
-                    legend: '값 (kg)',
-                    legendOffset: -40,
-                    legendPosition: 'middle',
-                  }}
-                  pointSize={10}
-                  pointColor={{ theme: 'background' }}
-                  pointBorderWidth={2}
-                  pointBorderColor={{ from: 'serieColor' }}
-                  pointLabelYOffset={-12}
-                  useMesh={true}
-                  colors={['#FF5733', '#3366FF', '#33CC33']}
-                  theme={{
-                    axis: {
-                      domain: {
+        {user.grade === 'U' && (
+          <HealthInfoContainer>
+            <HealthInfoSectionHeader>
+              <SectionHeader>
+                건강 정보
+                <MdOutlineHealthAndSafety />
+              </SectionHeader>
+              <HealthInfoInputButton onClick={openHealthInputModal}>건강정보 입력</HealthInfoInputButton>
+            </HealthInfoSectionHeader>
+            <ChartContainer>
+              <div style={{ height: '400px' }}>
+                {chartData.length === 0 || chartData.every((item) => item.data.length === 0) ? (
+                  <p style={{ textAlign: 'center', padding: '2rem' }}>건강 데이터가 없습니다.</p>
+                ) : (
+                  <ResponsiveLine
+                    data={chartData}
+                    margin={{ top: 50, right: 140, bottom: 70, left: 50 }}
+                    xScale={{ type: 'point' }}
+                    yScale={{
+                      type: 'linear',
+                      min: 'auto',
+                      max: 'auto',
+                      stacked: false,
+                      reverse: false,
+                    }}
+                    yFormat=" >-.2f"
+                    axisTop={null}
+                    axisRight={null}
+                    axisBottom={{
+                      tickSize: 5,
+                      tickPadding: 5,
+                      tickRotation: -45,
+                      legend: '날짜',
+                      legendOffset: 50,
+                      legendPosition: 'middle',
+                      truncateTickAt: 0,
+                      format: (value) => {
+                        const parts = value.split('.');
+                        return parts.length === 3 ? `${parts[1]}.${parts[2]}` : value;
+                      },
+                    }}
+                    axisLeft={{
+                      tickSize: 5,
+                      tickPadding: 5,
+                      tickRotation: 0,
+                      legend: '값 (kg)',
+                      legendOffset: -40,
+                      legendPosition: 'middle',
+                    }}
+                    pointSize={10}
+                    pointColor={{ theme: 'background' }}
+                    pointBorderWidth={2}
+                    pointBorderColor={{ from: 'serieColor' }}
+                    pointLabelYOffset={-12}
+                    useMesh={true}
+                    colors={['#FF5733', '#3366FF', '#33CC33']}
+                    theme={{
+                      axis: {
+                        domain: {
+                          line: {
+                            stroke: '#d4d4d4',
+                            strokeWidth: 1,
+                          },
+                        },
+                        ticks: {
+                          line: {
+                            stroke: '#d4d4d4',
+                            strokeWidth: 1,
+                          },
+                          text: {
+                            fontSize: 11,
+                            fill: '#333333',
+                          },
+                        },
+                        legend: {
+                          text: {
+                            fontSize: 12,
+                            fill: '#333333',
+                            fontWeight: 'bold',
+                          },
+                        },
+                      },
+                      grid: {
                         line: {
-                          stroke: '#d4d4d4',
+                          stroke: '#e0e0e0',
                           strokeWidth: 1,
                         },
                       },
-                      ticks: {
-                        line: {
-                          stroke: '#d4d4d4',
-                          strokeWidth: 1,
-                        },
-                        text: {
-                          fontSize: 11,
-                          fill: '#333333',
-                        },
-                      },
-                      legend: {
+                      legends: {
                         text: {
                           fontSize: 12,
                           fill: '#333333',
-                          fontWeight: 'bold',
                         },
                       },
-                    },
-                    grid: {
-                      line: {
-                        stroke: '#e0e0e0',
-                        strokeWidth: 1,
+                      tooltip: {
+                        container: {
+                          background: 'white',
+                          color: '#333333',
+                          fontSize: 12,
+                          borderRadius: '4px',
+                          boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.1)',
+                        },
                       },
-                    },
-                    legends: {
-                      text: {
-                        fontSize: 12,
-                        fill: '#333333',
-                      },
-                    },
-                    tooltip: {
-                      container: {
-                        background: 'white',
-                        color: '#333333',
-                        fontSize: 12,
-                        borderRadius: '4px',
-                        boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.1)',
-                      },
-                    },
-                  }}
-                  legends={[
-                    {
-                      anchor: 'bottom-right',
-                      direction: 'column',
-                      justify: false,
-                      translateX: 120,
-                      translateY: 0,
-                      itemsSpacing: 0,
-                      itemDirection: 'left-to-right',
-                      itemWidth: 80,
-                      itemHeight: 20,
-                      itemOpacity: 0.75,
-                      symbolSize: 12,
-                      symbolShape: 'circle',
-                      symbolBorderColor: 'rgba(0, 0, 0, .5)',
-                      effects: [
-                        {
-                          on: 'hover',
-                          style: {
-                            itemBackground: 'rgba(0, 0, 0, .03)',
-                            itemOpacity: 1,
+                    }}
+                    legends={[
+                      {
+                        anchor: 'bottom-right',
+                        direction: 'column',
+                        justify: false,
+                        translateX: 120,
+                        translateY: 0,
+                        itemsSpacing: 0,
+                        itemDirection: 'left-to-right',
+                        itemWidth: 80,
+                        itemHeight: 20,
+                        itemOpacity: 0.75,
+                        symbolSize: 12,
+                        symbolShape: 'circle',
+                        symbolBorderColor: 'rgba(0, 0, 0, .5)',
+                        effects: [
+                          {
+                            on: 'hover',
+                            style: {
+                              itemBackground: 'rgba(0, 0, 0, .03)',
+                              itemOpacity: 1,
+                            },
                           },
-                        },
-                      ],
-                    },
-                  ]}
-                />
-              )}
-            </div>
-          </ChartContainer>
-          <Divider />
-        </HealthInfoContainer>
+                        ],
+                      },
+                    ]}
+                  />
+                )}
+              </div>
+            </ChartContainer>
+            <Divider />
+          </HealthInfoContainer>
+        )}
 
         <SectionBlock>
           <SectionHeader>
             내역
             <LuClipboardList />
           </SectionHeader>
-          <SectionLink to="/matchingList">신청 내역</SectionLink>
+          {user.grade === 'U' ? (
+            <SectionLink to="/matchingList">신청 내역</SectionLink>
+          ) : (
+            <SectionLink to="/coachmatchingList">매칭 내역</SectionLink>
+          )}
           <Divider />
         </SectionBlock>
 
@@ -259,11 +265,13 @@ const MyPage = () => {
             관리
             <AiOutlineTool />
           </SectionHeader>
-          <SectionLink to={`/coachModify/${user.trainerNo}`}>핏코치 정보 수정</SectionLink>
+          {user.grade === 'C' && <SectionLink to={`/coachModify/${user.trainerNo}`}>핏코치 정보 수정</SectionLink>}
           <SectionLink to="/myPostsPage">내가 작성한 게시물/댓글</SectionLink>
-          <SectionLink to="/myReviewsPage" state={{ userEmail: user.email }}>
-            내가 작성한 리뷰
-          </SectionLink>
+          {user.grade === 'U' && (
+            <SectionLink to="/myReviewsPage" state={{ userEmail: user.email }}>
+              내가 작성한 리뷰
+            </SectionLink>
+          )}
           <Divider />
         </SectionBlock>
 
