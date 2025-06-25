@@ -6,20 +6,14 @@ import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 import { IoReload } from 'react-icons/io5';
 import theme from '../styles/theme';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../api/axios';
-import { API_ENDPOINTS } from '../api/config';
 
 const UserTable = ({ data, columns, onRowClick }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
-  const [openMenuId, setOpenMenuId] = useState(null); // 이제 paymentId를 저장합니다.
+  const [openMenuId, setOpenMenuId] = useState(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const menuRef = useRef(null);
   const currentMenuButtonRef = useRef(null);
   const tableContainerRef = useRef(null);
-
-  const [hasReviewForCurrentPayment, setHasReviewForCurrentPayment] = useState(false);
-  const [isReviewStatusLoading, setIsReviewStatusLoading] = useState(false); // 로딩 상태
-
   const navigate = useNavigate();
 
   const sortedData = useMemo(() => {
@@ -46,7 +40,6 @@ const UserTable = ({ data, columns, onRowClick }) => {
     return sortableItems;
   }, [data, sortConfig]);
 
-  // 메뉴 외부 클릭 감지 useEffect
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -66,30 +59,6 @@ const UserTable = ({ data, columns, onRowClick }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [currentMenuButtonRef, menuRef]);
-
-  // openMenuId가 변경될 때 (메뉴가 열릴 때) 리뷰 존재 여부 확인 API 호출
-  useEffect(() => {
-    const fetchReviewStatus = async () => {
-      if (openMenuId === null) {
-        setHasReviewForCurrentPayment(false); // 메뉴가 닫혔을 때
-        return;
-      }
-
-      setIsReviewStatusLoading(true);
-      try {
-        const response = await api.get(`${API_ENDPOINTS.REVIEW.FIND}${openMenuId}`);
-        setHasReviewForCurrentPayment(response.data);
-        console.log(`Payment ID ${openMenuId}에 대한 리뷰 존재 여부: ${response.data}`);
-      } catch (error) {
-        console.error('리뷰 존재 여부를 가져오는 중 오류 발생:', error);
-        setHasReviewForCurrentPayment(false);
-      } finally {
-        setIsReviewStatusLoading(false);
-      }
-    };
-
-    fetchReviewStatus();
-  }, [openMenuId]); // openMenuId가 변경될 때마다 이 이펙트 실행
 
   const handleSortClick = (key) => {
     let direction = 'ascending';
@@ -114,8 +83,6 @@ const UserTable = ({ data, columns, onRowClick }) => {
   };
 
   const handleRowClick = (row) => {
-    // HistoryModal을 열기 위해 사용됩니다.
-    // rowData의 스냅샷을 찍어 전달
     console.log('--- handleRowClick 호출 시점 rowData (스냅샷) ---');
     console.log('rowData (deep clone):', JSON.parse(JSON.stringify(row)));
     console.log('rowData.sessions (직접):', row.sessions);
@@ -129,7 +96,6 @@ const UserTable = ({ data, columns, onRowClick }) => {
   // 더보기 메뉴 토글 핸들러
   const handleThreeDotsMenuClick = useCallback(
     (e, rowPaymentId) => {
-      // rowId 대신 rowPaymentId로 인자 이름 변경
       e.stopPropagation();
 
       if (openMenuId === rowPaymentId) {
@@ -162,29 +128,29 @@ const UserTable = ({ data, columns, onRowClick }) => {
     setOpenMenuId(null);
     setMenuPosition({ top: 0, left: 0 });
     currentMenuButtonRef.current = null;
-
     console.log('--- handleMenuItemClick 호출 시점 rowData ---');
     console.log('rowData (deep clone):', JSON.parse(JSON.stringify(rowData)));
     console.log('rowData.sessions (직접):', rowData.sessions);
+    console.log('rowData.hasReview (직접):', rowData.hasReview); // Access hasReview directly from rowData
     console.log('--- handleMenuItemClick 호출 시점 rowData 종료 ---');
-
     if (action === '결제취소') {
-      // ... 기존 로직 ...
+      navigate(`/refundPage/${rowData.paymentId}`);
     } else if (action === '1:1 채팅') {
-      // ... 기존 로직 ...
+      console.log('채팅하시오.');
     } else if (action === '후기 남기기') {
-      if (rowData.status === '완료됨') {
+      if (rowData.status === '완료됨' && !rowData.hasReview) {
         navigate('/reviewCreationPage', {
           state: {
             paymentId: rowData.paymentId,
             trainerName: rowData.trainerName,
           },
         });
+      } else if (rowData.hasReview) {
+        alert('이미 후기를 작성했습니다.');
       } else {
         alert('완료된 수업에 대해서만 후기를 남길 수 있습니다.');
       }
     } else if (action === '다음 회차예약') {
-      // sessions 문자열 파싱 (예: "0 / 3" -> { current: 0, total: 3 })
       const sessionsParts = rowData.sessions.split(/\s*\/\s*/);
       console.log('sessionsParts 배열:', sessionsParts);
       console.log('sessionsParts[0]:', sessionsParts[0]);
@@ -200,12 +166,12 @@ const UserTable = ({ data, columns, onRowClick }) => {
       }
     } else if (action === '예약취소') {
       if (rowData.status === '진행중') {
-        alert(`${rowData.coachName || rowData.name} 코치의 예약을 취소합니다. (실제 취소 로직 필요)`);
+        alert(`${rowData.trainerName || rowData.name} 코치의 예약을 취소합니다. (실제 취소 로직 필요)`); // Use trainerName
       } else {
         alert('진행중인 예약만 취소할 수 있습니다.');
       }
     } else {
-      alert(`${rowData.coachName || rowData.name} 코치의 ${action} 선택됨!`);
+      alert(`${rowData.trainerName || rowData.name} 코치의 ${action} 선택됨!`); // Use trainerName
     }
   };
 
@@ -228,26 +194,18 @@ const UserTable = ({ data, columns, onRowClick }) => {
           </tr>
         </thead>
         <tbody>
-          {sortedData.map(
-            (
-              row // rowIndex 제거, row.paymentId가 유일 키
-            ) => (
-              <tr key={row.paymentId} onClick={() => handleRowClick(row)}>
-                {' '}
-                {/* key={row.paymentId}로 변경 */}
-                {columns.map((col) => (
-                  <td key={col.key}>{col.key === 'status' ? <StatusBadge status={row[col.key]} /> : row[col.key]}</td>
-                ))}
-                <TdMenuCell>
-                  <ThreeDotsMenu onClick={(e) => handleThreeDotsMenuClick(e, row.paymentId)}>
-                    {' '}
-                    {/* row.id 대신 row.paymentId로 변경 */}
-                    <CiMenuKebab />
-                  </ThreeDotsMenu>
-                </TdMenuCell>
-              </tr>
-            )
-          )}
+          {sortedData.map((row) => (
+            <tr key={row.paymentId} onClick={() => handleRowClick(row)}>
+              {columns.map((col) => (
+                <td key={col.key}>{col.key === 'status' ? <StatusBadge status={row[col.key]} /> : row[col.key]}</td>
+              ))}
+              <TdMenuCell>
+                <ThreeDotsMenu onClick={(e) => handleThreeDotsMenuClick(e, row.paymentId)}>
+                  <CiMenuKebab />
+                </ThreeDotsMenu>
+              </TdMenuCell>
+            </tr>
+          ))}
         </tbody>
       </StyledTable>
       {openMenuId !== null && (
@@ -257,65 +215,52 @@ const UserTable = ({ data, columns, onRowClick }) => {
               handleMenuItemClick(
                 e,
                 '1:1 채팅',
-                sortedData.find((d) => d.paymentId === openMenuId) // d.id 대신 d.paymentId로 변경
+                sortedData.find((d) => d.paymentId === openMenuId)
               )
             }
           >
             1:1 채팅
           </PopupMenuItem>
-          {isReviewStatusLoading ? (
-            <PopupMenuItem disabled style={{ color: theme.colors.gray['500'] }}>
-              리뷰 상태 확인 중...
+          {sortedData.find((d) => d.paymentId === openMenuId)?.hasReview === false && (
+            <PopupMenuItem
+              onClick={(e) =>
+                handleMenuItemClick(
+                  e,
+                  '후기 남기기',
+                  sortedData.find((d) => d.paymentId === openMenuId)
+                )
+              }
+            >
+              후기 남기기
             </PopupMenuItem>
-          ) : (
-            !hasReviewForCurrentPayment && (
-              <PopupMenuItem
-                onClick={(e) =>
-                  handleMenuItemClick(
-                    e,
-                    '후기 남기기',
-                    sortedData.find((d) => d.paymentId === openMenuId)
-                  )
-                }
-              >
-                후기 남기기
-              </PopupMenuItem>
-            )
           )}
-          <PopupMenuItem
-            onClick={(e) =>
-              handleMenuItemClick(
-                e,
-                '다음 회차예약',
-                sortedData.find((d) => d.paymentId === openMenuId) // d.id 대신 d.paymentId로 변경
-              )
-            }
-          >
-            다음 회차예약
-          </PopupMenuItem>
-          <PopupMenuItem
-            onClick={(e) =>
-              handleMenuItemClick(
-                e,
-                '예약취소',
-                sortedData.find((d) => d.paymentId === openMenuId) // d.id 대신 d.paymentId로 변경
-              )
-            }
-          >
-            예약취소
-          </PopupMenuItem>
-          <PopupMenuItem
-            onClick={(e) =>
-              handleMenuItemClick(
-                e,
-                '결제취소',
-                sortedData.find((d) => d.paymentId === openMenuId) // d.id 대신 d.paymentId로 변경
-              )
-            }
-            $isDelete
-          >
-            결제취소
-          </PopupMenuItem>
+          {sortedData.find((d) => d.paymentId === openMenuId)?.status === '진행중' && (
+            <PopupMenuItem
+              onClick={(e) =>
+                handleMenuItemClick(
+                  e,
+                  '다음 회차예약',
+                  sortedData.find((d) => d.paymentId === openMenuId)
+                )
+              }
+            >
+              다음 회차예약
+            </PopupMenuItem>
+          )}
+          {sortedData.find((d) => d.paymentId === openMenuId)?.refund && (
+            <PopupMenuItem
+              onClick={(e) =>
+                handleMenuItemClick(
+                  e,
+                  '결제취소',
+                  sortedData.find((d) => d.paymentId === openMenuId)
+                )
+              }
+              $isDelete
+            >
+              결제취소
+            </PopupMenuItem>
+          )}
         </PopupMenu>
       )}
     </StyledTableContainer>
@@ -324,7 +269,6 @@ const UserTable = ({ data, columns, onRowClick }) => {
 
 export default UserTable;
 
-// Styled-components (동일, 변경 없음)
 const StyledTableContainer = styled.div`
   width: 100%;
   margin-top: 20px;

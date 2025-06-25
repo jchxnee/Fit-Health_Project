@@ -140,10 +140,7 @@ const MatchingList = () => {
           userEmail: userEmail,
         },
       });
-      console.log(
-        '*** MatchingList - 백에서 가져온 원본 데이터 (JSON.stringify):',
-        JSON.stringify(response.data, null, 2)
-      );
+      console.log(JSON.stringify(response.data, null, 2));
 
       setMatchingList(response.data);
     } catch (err) {
