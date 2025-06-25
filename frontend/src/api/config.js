@@ -32,6 +32,7 @@ export const API_ENDPOINTS = {
     PAYMENT: '/api/payments/payment',
     REFUND: '/api/payments/refund',
     LIST: '/api/payments/list',
+    RESERVATION: '/api/payments/reservation',
   },
   REVIEW: {
     CREATE: '/api/review',

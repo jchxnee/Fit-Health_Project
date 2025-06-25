@@ -3,13 +3,17 @@ package com.fithealth.backend.service;
 import com.fithealth.backend.dto.Payment.CreatePaymentDto;
 import com.fithealth.backend.dto.Payment.ResponsePaymentDto;
 import com.fithealth.backend.dto.Payment.SelectPaymentDto;
+import com.fithealth.backend.dto.Refund.RefundCreateDto;
 import com.fithealth.backend.dto.Reservation.ReservationCreateDto;
+import com.fithealth.backend.dto.Reservation.SelectReservation;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.entity.Payment;
+import com.fithealth.backend.entity.Refund;
 import com.fithealth.backend.entity.Reservation;
 import com.fithealth.backend.enums.CommonEnums;
 import com.fithealth.backend.repository.MemberRepository;
 import com.fithealth.backend.repository.PaymentRepository;
+import com.fithealth.backend.repository.RefundRepository;
 import com.fithealth.backend.repository.ReservationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +31,7 @@ public class PaymentServiceImpl implements  PaymentService {
     private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
+    private final RefundRepository refundRepository;
 
     @Override
     public Long insertPayment(CreatePaymentDto.Create createDto) {
@@ -54,7 +59,6 @@ public class PaymentServiceImpl implements  PaymentService {
 
     @Override
     public Long goPayment(ReservationCreateDto.Create createDto) {
-        System.out.println("조회할 결제 ID: " + createDto.getPayment_id());
         Payment payment = paymentRepository.findOne(createDto.getPayment_id())
                 .orElseThrow(() -> new IllegalArgumentException("결제 정보가 없습니다."));
 
@@ -73,5 +77,26 @@ public class PaymentServiceImpl implements  PaymentService {
         return payments.stream()
                 .map(SelectPaymentDto.Response::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SelectReservation.RefundResponse> findReservation(Long paymentId) {
+        return reservationRepository.findByPaymentId(paymentId, CommonEnums.Status.Y).stream()
+                .map(SelectReservation.RefundResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Long goRefund(RefundCreateDto.Create createDto) {
+        Payment payment = paymentRepository.findOne(createDto.getPayment_id())
+                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 없습니다."));
+
+        payment.changeUseStatus(CommonEnums.UseStatus.C);
+
+        Refund refund = createDto.toEntity();
+        refund.changePayment(payment);
+
+        refundRepository.save(refund);
+        return refund.getRefundId();
     }
 }

@@ -95,7 +95,7 @@ function AppContent() {
         <Route path="/nextReservation" element={<NextReservation />} />
         <Route path="/coachReview" element={<CoachReview />} />
         <Route path="/paymentPage/:id" element={<PaymentPage />} />
-        <Route path="/refundPage" element={<RefundPage />} />
+        <Route path="/refundPage/:id" element={<RefundPage />} />
         <Route path="/coachmatchingList" element={<CoachCalendar />} />
 
         {/* 커뮤니티 */}
