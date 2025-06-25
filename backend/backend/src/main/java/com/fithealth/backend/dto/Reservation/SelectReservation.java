@@ -50,4 +50,22 @@ public class SelectReservation {
                     .build();
         }
     }
+
+    @Setter
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class RefundResponse {
+
+        private LocalDateTime selectDate;
+        private CommonEnums.Status status;
+
+        public static RefundResponse fromEntity(Reservation reservation) {
+            return RefundResponse.builder()
+                    .selectDate(reservation.getSelectDate())
+                    .status(reservation.getStatus())
+                    .build();
+        }
+    }
 }

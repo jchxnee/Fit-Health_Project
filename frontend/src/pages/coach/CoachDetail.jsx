@@ -10,8 +10,9 @@ import TrainerProfile from '../../components/CoachMatching/TrainerProfile';
 import TrainerCourse from '../../components/CoachMatching/TrainerCourse';
 import { useParams } from 'react-router-dom'; // useParams 임포트 확인
 import api from '../../api/axios';
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import { API_ENDPOINTS } from '../../api/config';
+import useUserStore from '../../store/useUserStore';
 
 const PageWrapper = styled.div`
   display: flex;
@@ -25,39 +26,40 @@ const PageWrapper = styled.div`
 `;
 
 const TitleBarContainer = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: ${theme.width.lg};
-    padding: 0;
-    margin-bottom: ${theme.spacing.lg};
-    padding-bottom: ${theme.spacing.md};
-    border-top: 1px solid ${({ theme }) => theme.colors.gray['400']};
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: ${theme.width.lg};
+  padding: 0;
+  margin-bottom: ${theme.spacing.lg};
+  padding-bottom: ${theme.spacing.md};
+  border-top: 1px solid ${({ theme }) => theme.colors.gray['400']};
 `;
 
 const NavItem = styled(Link)`
-    width: ${theme.spacing['20']};
-    height: ${theme.spacing['8']};
-    background-color: ${theme.colors.button};
-    color: ${theme.colors.white};
-    border: none;
-    border-radius: ${theme.borderRadius.md};
-    padding: ${theme.spacing.sm} ${theme.spacing.md};
-    font-size: ${theme.fontSizes.base};
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: ${theme.spacing.xs};
-    transition: background-color 0.2s ease-in-out;
+  width: ${theme.spacing['20']};
+  height: ${theme.spacing['8']};
+  background-color: ${theme.colors.button};
+  color: ${theme.colors.white};
+  border: none;
+  border-radius: ${theme.borderRadius.md};
+  padding: ${theme.spacing.sm} ${theme.spacing.md};
+  font-size: ${theme.fontSizes.base};
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: ${theme.spacing.xs};
+  transition: background-color 0.2s ease-in-out;
 
-    &:hover {
-        background-color: ${theme.colors.primaryDark};
-        opacity: 90%;
-    }
+  &:hover {
+    background-color: ${theme.colors.primaryDark};
+    opacity: 90%;
+  }
 `;
 
 const CoachDetail = () => {
+  const { user } = useUserStore();
   const { id } = useParams();
   const [trainerDetails, setTrainerDetails] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -117,7 +119,7 @@ const CoachDetail = () => {
     imageUrl: trainerDetails.profileImage || '../../../public/img/minju.png',
   };
 
-  const trainerQuals = trainerDetails.careers.map(career => ({ text: career }));
+  const trainerQuals = trainerDetails.careers.map((career) => ({ text: career }));
 
   const trainerCourses = [
     {
@@ -151,11 +153,13 @@ const CoachDetail = () => {
       <PageWrapper>
         <TitleBarContainer>
           <ButtonTitleBar title={'핏코치 매칭'} />
-          <NavItem to={`/coachModify/${id}`}>
-            수정 <FiEdit />
-          </NavItem>
+          {user.trainerNo === currentTrainer.id && (
+            <NavItem to={`/coachModify/${id}`}>
+              수정 <FiEdit />
+            </NavItem>
+          )}
         </TitleBarContainer>
-        <TrainerProfile trainer={currentTrainer} />
+        <TrainerProfile trainer={currentTrainer} user={user} />
         <TrainerQualifications qualifications={trainerQuals} />
         <TrainerCourse courses={trainerCourses} />
         <TrainerPhoto photos={trainerDetails.trainerPhoto} />
@@ -166,4 +170,3 @@ const CoachDetail = () => {
 };
 
 export default CoachDetail;
-

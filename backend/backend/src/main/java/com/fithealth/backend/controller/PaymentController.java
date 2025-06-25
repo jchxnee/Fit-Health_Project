@@ -3,7 +3,9 @@ package com.fithealth.backend.controller;
 import com.fithealth.backend.dto.Payment.CreatePaymentDto;
 import com.fithealth.backend.dto.Payment.ResponsePaymentDto;
 import com.fithealth.backend.dto.Payment.SelectPaymentDto;
+import com.fithealth.backend.dto.Refund.RefundCreateDto;
 import com.fithealth.backend.dto.Reservation.ReservationCreateDto;
+import com.fithealth.backend.dto.Reservation.SelectReservation;
 import com.fithealth.backend.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,8 +42,21 @@ public class PaymentController {
     //신청내역 조회
     @GetMapping("/list")
     public ResponseEntity<List<SelectPaymentDto.Response>> selectPaymentList(@RequestParam("userEmail") String userEmail) {
+        System.out.println(userEmail);
         List<SelectPaymentDto.Response> paymentList = paymentService.findPaymentList(userEmail);
         return ResponseEntity.ok(paymentList);
+    }
+
+    //진행된 레슨 회차 정보 조회 API
+    @GetMapping("/reservation")
+    public ResponseEntity<List<SelectReservation.RefundResponse>> findReservation(@RequestParam Long paymentId) {
+        return ResponseEntity.ok(paymentService.findReservation(paymentId));
+    }
+
+    //환불 진행 API
+    @PutMapping("/refund")
+    public ResponseEntity<Long> goRefund(@RequestBody RefundCreateDto.Create createDto) {
+        return ResponseEntity.ok(paymentService.goRefund(createDto));
     }
 
 }

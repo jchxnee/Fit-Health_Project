@@ -3,7 +3,6 @@ package com.fithealth.backend.repository;
 import com.fithealth.backend.entity.Payment;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.PrePersist;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

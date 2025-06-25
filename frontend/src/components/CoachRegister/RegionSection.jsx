@@ -3,35 +3,35 @@ import styled from 'styled-components';
 import RegionSelect from '../RegionSelect.jsx';
 
 const Section = styled.section`
-    width: 100%;
-    padding: 0 12px;
+  width: 100%;
+  padding: 0 12px;
 `;
 
 const Row = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 120px;
-    justify-content: center;
-    @media (max-width: 200px) {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
+  display: flex;
+  align-items: center;
+  gap: 120px;
+  justify-content: center;
+  @media (max-width: 200px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 `;
 
 const Label = styled.div`
-    font-weight: 600;
-    font-size: 18px;
-    color: #222;
-    width: 90px;
+  font-weight: 600;
+  font-size: 18px;
+  color: #222;
+  width: 90px;
 `;
 
-function RegionSection({ value, onChange }) {
+function RegionSection({ wishArea, setWishArea }) {
   return (
     <Section>
       <Row>
         <Label>희망지역</Label>
-        <RegionSelect className="Select" value={value} onChange={onChange} />
+        <RegionSelect className="Select" value={wishArea} onChange={setWishArea} />
       </Row>
     </Section>
   );
