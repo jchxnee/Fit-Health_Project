@@ -5,6 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom'; // useParams와 useNa
 import TitleBar from '../../components/TitleBar';
 import { API_ENDPOINTS } from '../../api/config'; // API 엔드포인트 가져오기
 import api from '../../api/axios'; // axios 인스턴스 가져오기
+import useUserStore from '../../store/useUserStore';
 
 function NoticeDetailPage() {
   const { noticeNo } = useParams(); // URL 파라미터에서 noticeNo 추출
@@ -13,6 +14,7 @@ function NoticeDetailPage() {
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [error, setError] = useState(null); // 에러 상태
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useUserStore();
 
   const handleDeletePost = async () => {
     if (!window.confirm('정말로 이 공지를 삭제하시겠습니까?')) {
@@ -115,17 +117,19 @@ function NoticeDetailPage() {
           <NoticeDetailContainer>
             <PostInfo>
               <NoticeTitle>{noticeDetail.notice_title}</NoticeTitle> {/* 백엔드 응답 필드명에 맞춤 */}
-              <>
-                <EllipsisButton onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                  <FaEllipsisV color="#757575" />
-                </EllipsisButton>
-                {isMenuOpen && (
-                  <DropdownMenu>
-                    <DropdownMenuItem onClick={() => navigate(`/notice/${noticeNo}/edit`)}>수정</DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleDeletePost}>삭제</DropdownMenuItem>
-                  </DropdownMenu>
-                )}
-              </>
+              {user.grade === 'A' && (
+                <>
+                  <EllipsisButton onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                    <FaEllipsisV color="#757575" />
+                  </EllipsisButton>
+                  {isMenuOpen && (
+                    <DropdownMenu>
+                      <DropdownMenuItem onClick={() => navigate(`/notice/${noticeNo}/edit`)}>수정</DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleDeletePost}>삭제</DropdownMenuItem>
+                    </DropdownMenu>
+                  )}
+                </>
+              )}
             </PostInfo>
             <NoticeDate>{formatDate(noticeDetail.created_date)}</NoticeDate> {/* 백엔드 응답 필드명에 맞춤 */}
             <NoticeContentLine />
