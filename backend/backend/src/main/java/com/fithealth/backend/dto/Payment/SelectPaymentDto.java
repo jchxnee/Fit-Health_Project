@@ -104,7 +104,7 @@ public class SelectPaymentDto {
 
             boolean isRefundable = false;
 
-            if (!"진행중".equals(displayStatus)) {
+            if ("취소됨".equals(displayStatus)) {
                 isRefundable = false;
             } else if(completedSessionsCount ==0){
                 isRefundable = true;
