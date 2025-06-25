@@ -57,6 +57,6 @@ export const API_ENDPOINTS = {
     CREATE: '/api/comment',
   },
   COACH: {
-    LIST: 'api/trainer/',
+    LIST: '/api/trainer',
   },
 };

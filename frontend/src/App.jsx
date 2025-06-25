@@ -83,10 +83,10 @@ function AppContent() {
         <Route path="/coachRegister" element={<CoachRegister />} />
         <Route path="/coach/:id" element={<CoachDetail />} />
         <Route path="/coachModify" element={<CoachModify />} />
-        <Route path="/coachMatching" element={<CoachMatching />} />
+        <Route path="/coachMatching/:trainerNo" element={<CoachMatching />} />
         <Route path="/nextReservation" element={<NextReservation />} />
         <Route path="/coachReview/:trainerNo" element={<CoachReview />} />
-        <Route path="/paymentPage" element={<PaymentPage />} />
+        <Route path="/paymentPage/:id" element={<PaymentPage />} />
         <Route path="/refundPage/:id" element={<RefundPage />} />
         <Route path="/coachmatchingList" element={<CoachCalendar />} />
 
