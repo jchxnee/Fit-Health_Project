@@ -9,4 +9,6 @@ public interface CommentService {
     Long createComment(CommentCreateDto.Create commentCreateDto);
 
     List<CommentGetDto> getCommentsByBoardNo(Long boardNo);
+
+    void deleteComment(Long commentNo);
 }

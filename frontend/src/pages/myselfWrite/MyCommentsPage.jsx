@@ -209,7 +209,7 @@ function MyCommentsPage() {
           <TitleBar title="내가 작성한 게시물/댓글" />
           <Container>
             <TabContainer>
-              <TabButton to="/myPostPage">나의 게시물</TabButton>
+              <TabButton to="/myPostsPage">나의 게시물</TabButton>
               <TabButton style={{ borderBottom: '1px solid #6b7280' }} to="/myCommentsPage">
                 나의 댓글
               </TabButton>{' '}

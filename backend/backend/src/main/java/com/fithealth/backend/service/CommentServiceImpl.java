@@ -56,4 +56,12 @@ public class CommentServiceImpl implements CommentService {
                 .map(CommentGetDto::fromEntity) // 엔티티를 DTO로 변환
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteComment(Long commentNo) {
+        Comment comment = commentRepository.findById(commentNo)
+                .orElseThrow(() -> new EntityNotFoundException("댓글을 찾을 수 없습니다. commentNo: " + commentNo));
+
+        commentRepository.delete(comment);
+    }
 }

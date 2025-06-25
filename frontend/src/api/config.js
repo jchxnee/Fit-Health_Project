@@ -51,10 +51,12 @@ export const API_ENDPOINTS = {
     DETAIL: '/api/notice',
     CREATE: '/api/notice',
     UPDATE: '/api/notice',
+    DELETE: '/api/notice/delete',
   },
   COMMENT: {
     ALL: 'api/comment',
     CREATE: '/api/comment',
+    DELETE: '/api/comment',
   },
   COACH: {
     LIST: '/api/trainer',

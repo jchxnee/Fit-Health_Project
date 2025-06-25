@@ -105,6 +105,7 @@ function AppContent() {
         <Route path="/reviewCreationPage" element={<ReviewCreationPage />} />
         <Route path="/communityDetailPage/:id" element={<CommunityPostDetailPage />} />
         <Route path="/notice" element={<NoticePage />} />
+        <Route path="/notice/:id/edit" element={<NoticePostCreationPage isEditMode={true} />} />
         <Route path="/NoticePostCreationPage" element={<NoticePostCreationPage />} />
         <Route path="/NoticeDetailPage/:noticeNo" element={<NoticeDetailPage />} />
 
