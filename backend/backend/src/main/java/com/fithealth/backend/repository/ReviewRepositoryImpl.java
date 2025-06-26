@@ -50,7 +50,7 @@ public class ReviewRepositoryImpl implements ReviewRepository {
                                 "JOIN FETCH r.payment p " +          // Review와 Payment 조인
                                 "JOIN FETCH p.member m " +           // Payment와 결제자(리뷰 작성자) Member 조인
                                 "JOIN FETCH p.responseMember rm " +  // Payment와 응답자(트레이너) Member 조인
-                                "WHERE m.userEmail = :userEmail " +  // 리뷰 작성자(Member)의 이메일로 필터링
+                                "WHERE m.userEmail = :userEmail AND r.status = 'Y'" +  // 리뷰 작성자(Member)의 이메일로 필터링
                                 "ORDER BY r.createdDate DESC", Review.class) // 최신순 정렬 (선택 사항)
                 .setParameter("userEmail", userEmail)
                 .getResultList();
