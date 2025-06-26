@@ -38,11 +38,11 @@ export default function useCoachRegisterForm() {
       careers.forEach((career, idx) => formData.append(`careers[${idx}]`, career));
       photos.forEach((photo) => formData.append('files', photo.file));
 
-      await axios.post('http://localhost:7961/api/trainer/register', formData, {
+      const data = await axios.post('http://localhost:7961/api/trainer/register', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setLoading(false);
-      return true;
+      return data;
     } catch (err) {
       setError(err);
       setLoading(false);

@@ -140,6 +140,8 @@ const MatchingList = () => {
           userEmail: userEmail,
         },
       });
+      console.log(JSON.stringify(response.data, null, 2));
+
       setMatchingList(response.data);
     } catch (err) {
       console.error('신청 내역을 불러오는 중 오류 발생:', err);
