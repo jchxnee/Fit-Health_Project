@@ -16,6 +16,7 @@ const TrainerTable = ({ data, columns, onRowClick }) => {
 
   // 정렬된 데이터 반환 함수 (useMemo 최적화)
   const sortedData = useMemo(() => {
+    console.log(data);
     let sortableItems = [...data];
     if (sortConfig.key !== null && sortConfig.direction !== 'none') {
       sortableItems.sort((a, b) => {
@@ -214,18 +215,6 @@ const TrainerTable = ({ data, columns, onRowClick }) => {
             }
           >
             거절
-          </PopupMenuItem>
-          <PopupMenuItem
-            onClick={(e) =>
-              handleMenuItemClick(
-                e,
-                '삭제',
-                sortedData.find((d) => d.id === openMenuId)
-              )
-            }
-            $isDelete
-          >
-            삭제
           </PopupMenuItem>
         </PopupMenu>
       )}

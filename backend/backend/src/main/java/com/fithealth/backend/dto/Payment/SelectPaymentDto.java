@@ -1,5 +1,6 @@
 package com.fithealth.backend.dto.Payment;
 
+import com.fithealth.backend.dto.Payment.ResponsePaymentDto.Response;
 import com.fithealth.backend.dto.Reservation.SelectReservation;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.entity.Payment;

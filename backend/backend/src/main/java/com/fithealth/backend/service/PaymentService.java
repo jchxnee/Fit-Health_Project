@@ -14,6 +14,7 @@ public interface PaymentService {
     ResponsePaymentDto.Response findPayment(Long paymentId);
     Long goPayment(ReservationCreateDto.Create createDto);
     List<SelectPaymentDto.Response> findPaymentList(String userEmail);
+    List<SelectPaymentDto.Response> findPaymentListByTrainer(String userEmail);
     List<SelectReservation.RefundResponse> findReservation(Long paymentId);
     Long goRefund(RefundCreateDto.Create createDto);
 }

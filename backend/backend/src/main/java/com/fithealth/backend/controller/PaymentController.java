@@ -47,6 +47,12 @@ public class PaymentController {
         return ResponseEntity.ok(paymentList);
     }
 
+    //코칭내역 조회
+    @GetMapping("/trainerlist")
+    public ResponseEntity<List<SelectPaymentDto.Response>> selectPaymentListTrainer(@RequestParam("userEmail") String userEmail) {
+        return ResponseEntity.ok(paymentService.findPaymentListByTrainer(userEmail));
+    }
+
     //진행된 레슨 회차 정보 조회 API
     @GetMapping("/reservation")
     public ResponseEntity<List<SelectReservation.RefundResponse>> findReservation(@RequestParam Long paymentId) {

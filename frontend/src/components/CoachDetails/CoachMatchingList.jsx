@@ -10,11 +10,11 @@ import TrainerTable from '../TrainerTable.jsx';
 import CoachSubBar from './CoachSubBar.jsx'; // CoachSubBar 임포트 추가
 
 const tableColumns = [
-  { key: 'coachName', label: '코치 이름', sortable: true },
+  { key: 'userName', label: '고객 이름', sortable: true },
   { key: 'category', label: '카테고리', sortable: true },
   { key: 'status', label: '상태', sortable: true },
   { key: 'sessions', label: '횟수', sortable: true },
-  { key: 'amount', label: '결제금액', sortable: true },
+  { key: 'productPrice', label: '결제금액', sortable: true },
   { key: 'startDate', label: '시작일자', sortable: true },
 ];
 

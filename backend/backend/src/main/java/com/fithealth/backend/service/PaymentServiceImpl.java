@@ -80,6 +80,13 @@ public class PaymentServiceImpl implements  PaymentService {
     }
 
     @Override
+    public List<SelectPaymentDto.Response> findPaymentListByTrainer(String userEmail) {
+        return paymentRepository.findPaymentListTrainer(userEmail).stream()
+                .map(SelectPaymentDto.Response::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<SelectReservation.RefundResponse> findReservation(Long paymentId) {
         return reservationRepository.findByPaymentId(paymentId, CommonEnums.Status.Y).stream()
                 .map(SelectReservation.RefundResponse::fromEntity)

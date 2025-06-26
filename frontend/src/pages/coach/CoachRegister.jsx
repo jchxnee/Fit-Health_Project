@@ -13,6 +13,7 @@ import styled from 'styled-components';
 import useCoachRegisterForm from '../../hooks/coach/Form';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import useUserStore from '../../store/useUserStore.js';
 
 const MainContainer = styled.section`
   max-width: 1008px;
@@ -56,12 +57,14 @@ function CoachRegister() {
   } = useCoachRegisterForm();
 
   const navigate = useNavigate();
+  const updateUser = useUserStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const ok = await submitForm();
-    if (ok) {
+    if (ok !== 0) {
       toast.success('코치 등록이 완료됐습니다!');
+      updateUser({ trainerNo: ok });
       navigate('/coachList');
     } else {
       alert('등록 실패: ' + (error?.message || '오류'));
