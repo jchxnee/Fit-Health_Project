@@ -7,7 +7,8 @@ import { IoReload } from 'react-icons/io5';
 import theme from '../styles/theme';
 import SalaryModal from './modal/SalaryModal';
 
-const TrainerTable = ({ data, columns, onRowClick, fetchData }) => {
+// **추가될 props:** onApprove, onReject (CoachMatchingList에서 전달받을 함수)
+const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onReject }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
   const [openMenuId, setOpenMenuId] = useState(null); // 열려있는 메뉴의 row id를 저장
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 }); // 메뉴 위치 상태 추가
@@ -18,7 +19,6 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData }) => {
 
   // 정렬된 데이터 반환 함수 (useMemo 최적화)
   const sortedData = useMemo(() => {
-    console.log('data', data);
     let sortableItems = [...data];
     if (sortConfig.key !== null && sortConfig.direction !== 'none') {
       sortableItems.sort((a, b) => {
@@ -86,7 +86,8 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData }) => {
     return <FaSortDown size={10} />;
   };
 
-  const handleRowClick = (row) => {
+  const handleRowClickInternal = (row) => {
+    // prop 이름과 충돌 방지를 위해 이름 변경
     if (onRowClick) {
       onRowClick(row);
     }
@@ -115,8 +116,8 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData }) => {
         setMenuPosition({
           // 팝업의 top은 '...' 버튼의 뷰포트 top에서 테이블 컨테이너의 뷰포트 top을 뺀 값으로 계산 (상대적인 top)
           top: buttonRect.top - tableContainerRect.top,
-          // 팝업의 left는 테이블 컨테이너의 전체 너비 (오른쪽 끝) + 여백
-          left: tableContainerRect.width + 10, // 10px 여백
+          // 팝업의 left는 '...' 버튼의 뷰포트 left에서 테이블 컨테이너의 뷰포트 left를 뺀 값 + 버튼 너비 + 여백
+          left: buttonRect.left - tableContainerRect.left + buttonRect.width + 10, // 10px 여백 추가
         });
         setOpenMenuId(rowId);
         currentMenuButtonRef.current = e.currentTarget; // 현재 열린 메뉴를 트리거한 버튼 참조 저장
@@ -131,8 +132,22 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData }) => {
     setOpenMenuId(null); // 메뉴 아이템 클릭 후 메뉴 닫기
     setMenuPosition({ top: 0, left: 0 }); // 위치 초기화
     currentMenuButtonRef.current = null; // 버튼 참조 초기화
-    alert(`${rowData.coachName} 코치의 ${action} 선택됨!`); // 실제 로직으로 대체
-    // 예: if (action === '1:1 채팅') { /* 1:1 채팅 로직 */ }
+
+    // **여기서 '승인' 또는 '거절' 액션에 따라 부모 컴포넌트의 함수 호출**
+    if (action === '승인') {
+      if (onApprove) {
+        onApprove(rowData);
+      }
+    } else if (action === '거절') {
+      if (onReject) {
+        onReject(rowData);
+      }
+    } else if (action === '정산신청') {
+      setSalaryModalData(rowData); // 정산 모달 열기
+    } else {
+      // 기타 메뉴 아이템 (예: 1:1 채팅) 처리
+      // console.log(`${rowData.userName} 고객의 ${action} 선택됨!`);
+    }
   };
 
   return (
@@ -156,11 +171,14 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData }) => {
         </thead>
         <tbody>
           {sortedData.map((row, rowIndex) => (
-            <tr key={row.id || rowIndex} onClick={() => handleRowClick(row)}>
+            <tr key={row.id || rowIndex} onClick={() => handleRowClickInternal(row)}>
+              {' '}
+              {/* 이름 변경된 핸들러 사용 */}
               {columns.map((col) => (
                 <td key={col.key}>{col.key === 'status' ? <StatusBadge status={row[col.key]} /> : row[col.key]}</td>
               ))}
               <TdMenuCell>
+                {/* ThreeDotsMenu는 모든 행에 항상 렌더링 */}
                 <ThreeDotsMenu onClick={(e) => handleThreeDotsMenuClick(e, row.id ?? rowIndex)}>
                   <CiMenuKebab />
                 </ThreeDotsMenu>
@@ -175,23 +193,25 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData }) => {
           const rowData = sortedData.find((d, i) => (d.id ?? i) === openMenuId);
           if (!rowData) return null;
 
+          // **조건부 렌더링을 위한 상태 확인:** '승인 대기중' 여부
+          const isPending = rowData.status?.trim() === '승인 대기중';
+
           return (
             <PopupMenu ref={menuRef} $top={menuPosition.top} $left={menuPosition.left}>
               <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '1:1 채팅', rowData)}>1:1 채팅</PopupMenuItem>
 
-              {rowData.status?.trim() === '완료됨' && (
-                <PopupMenuItem
-                  onClick={(e) => {
-                    handleMenuItemClick(e, '정산신청', rowData); // 기존 닫기 처리 포함
-                    setSalaryModalData(rowData); // 모달 열기
-                  }}
-                >
+              {rowData.status?.trim() === '완료됨' && ( // '완료됨' 상태일 때만 '정산신청' 메뉴 보이기
+                <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '정산신청', rowData)}>
                   {rowData.hasSalary ? '정산내역' : '정산신청'}
                 </PopupMenuItem>
               )}
 
-              <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '승인', rowData)}>승인</PopupMenuItem>
-              <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '거절', rowData)}>거절</PopupMenuItem>
+              {isPending && ( // '승인 대기중'일 때만 '승인' 메뉴 보이기
+                <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '승인', rowData)}>승인</PopupMenuItem>
+              )}
+              {isPending && ( // '승인 대기중'일 때만 '거절' 메뉴 보이기
+                <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '거절', rowData)}>거절</PopupMenuItem>
+              )}
             </PopupMenu>
           );
         })()}
@@ -211,7 +231,7 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData }) => {
 
 export default TrainerTable;
 
-// Styled-components (수정된 StyledTableContainer와 PopupMenu)
+// Styled-components (스타일 변경 없음, 이전 코드 그대로 유지)
 const StyledTableContainer = styled.div`
   width: 100%;
   margin-top: 20px;

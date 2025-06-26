@@ -6,6 +6,7 @@ import com.fithealth.backend.dto.Payment.SelectPaymentDto;
 import com.fithealth.backend.dto.Refund.RefundCreateDto;
 import com.fithealth.backend.dto.Reservation.ReservationCreateDto;
 import com.fithealth.backend.dto.Reservation.SelectReservation;
+import com.fithealth.backend.dto.Reservation.UpdateReservationDto;
 import com.fithealth.backend.dto.Salary.SalaryCreateDto;
 import com.fithealth.backend.dto.Salary.SalaryCreateDto.Create;
 import com.fithealth.backend.entity.Member;
@@ -20,6 +21,7 @@ import com.fithealth.backend.repository.RefundRepository;
 import com.fithealth.backend.repository.ReservationRepository;
 import com.fithealth.backend.repository.SalaryRepository;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -122,5 +124,28 @@ public class PaymentServiceImpl implements  PaymentService {
 
         salaryRepository.save(salary);
         return salary.getSalaryNo();
+    }
+
+    @Override
+    public void updateReservationStatus(UpdateReservationDto dto) {
+        Reservation reservation = reservationRepository.findByReservationNo(dto.getReservationNo());
+
+        if(reservation == null) {
+            System.out.println("예약번호에 해당하는 예약이 없다 ㅋ , " + dto.getReservationNo());
+            throw new NoSuchElementException("예약번호에 해당하는 예약이 없어서 오류남ㅋ , " + dto.getReservationNo());
+        }
+
+
+        CommonEnums.Status newStatus = CommonEnums.Status.valueOf(dto.getStatus());
+        reservation.setStatus(newStatus);
+
+       if (CommonEnums.Status.N.equals(newStatus)){
+            reservation.setRejectComment(dto.getRejectReason());
+        } else{
+           reservation.setRejectComment(null);
+       }
+
+       reservationRepository.save(reservation);
+
     }
 }

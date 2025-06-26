@@ -161,6 +161,21 @@ const CalendarWrapper = styled.div`
     align-items: center;
   }
 
+  // ⭐ 추가된 스타일: 거절된 날짜를 위한 빨간색 원 ⭐
+  .react-calendar__tile.rejected-day {
+    background-color: ${theme.colors.dangerLight} !important; /* 연한 빨강 */
+    border-radius: 50%;
+    color: ${theme.colors.danger} !important; /* 진한 빨강 텍스트 */
+    font-weight: ${theme.fontWeights.bold};
+    width: 38px;
+    height: 38px;
+    line-height: 38px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid ${theme.colors.danger}; /* 빨간색 테두리 */
+  }
+
   /* 이전 달/다음 달 날짜 색상 투명하게 (보이지 않게) */
   .react-calendar__month-view__days__day--neighboringMonth {
     color: transparent !important;
@@ -208,8 +223,8 @@ const HistoryListItem = styled.div`
   font-size: ${theme.fontSizes.md};
   color: ${theme.colors.gray['800']};
   display: flex;
-  flex-direction: column; /* 세로로 정렬하도록 변경 */
-  align-items: flex-start; /* 왼쪽 정렬 */
+  flex-direction: column;
+  align-items: center;
   box-shadow: ${theme.shadows.sm};
   transition: background-color 0.2s ease-in-out;
 `;
@@ -242,18 +257,6 @@ const HistoryModal = ({ isOpen, onClose, coachName, history }) => {
 
   const [activeDate, setActiveDate] = useState(new Date());
 
-  // history 배열의 각 item.selectDate (yyyy-MM-dd)를 Date 객체로 변환
-  const sessionDates = history
-    .map((item) => {
-      // ⭐ 변경된 부분: 시간 부분을 제거합니다.
-      const datePart = item.selectDate.split(' ')[0]; // '2025-06-23 00:00' -> '2025-06-23'
-      const [year, month, day] = datePart.split('-').map(Number);
-      const dateObj = new Date(year, month - 1, day);
-      // console.log(`Parsing "${item.selectDate}" to Date:`, dateObj); // 디버깅 로그는 필요 없으면 제거
-      return dateObj;
-    })
-    .filter((date) => date instanceof Date && !isNaN(date.getTime()));
-
   const isSameDay = (date1, date2) => {
     return (
       date1.getFullYear() === date2.getFullYear() &&
@@ -262,10 +265,31 @@ const HistoryModal = ({ isOpen, onClose, coachName, history }) => {
     );
   };
 
+  const sessionDates = [];
+  const rejectedDates = [];
+
+  history.forEach((item) => {
+    const datePart = item.selectDate.split(' ')[0];
+    const [year, month, day] = datePart.split('-').map(Number);
+    const dateObj = new Date(year, month - 1, day);
+
+    if (item.status === 'N' && item.rejectComment) {
+      rejectedDates.push(dateObj);
+    } else if (item.status === 'Y') {
+      sessionDates.push(dateObj);
+    }
+  });
+
   const tileClassName = ({ date, view }) => {
     if (view === 'month') {
+      const isRejectedDay = rejectedDates.some((rejectedDate) => isSameDay(rejectedDate, date));
+      if (isRejectedDay) {
+        return 'rejected-day';
+      }
       const isSessionDay = sessionDates.some((sessionDate) => isSameDay(sessionDate, date));
-      return isSessionDay ? 'session-day' : null;
+      if (isSessionDay) {
+        return 'session-day';
+      }
     }
     return null;
   };
@@ -292,11 +316,12 @@ const HistoryModal = ({ isOpen, onClose, coachName, history }) => {
           <HistoryListWrapper>
             {history.length > 0 ? (
               history.map((item, index) => {
-                // 이 부분도 캘린더 하이라이트 로직과 일관되게 날짜 부분만 파싱하도록 수정
+                // 이 부분은 캘린더 하이라이트와는 별개로, 리스트 아이템의 배경색을 결정
                 const datePartForHighlight = item.selectDate.split(' ')[0];
                 const [year, month, day] = datePartForHighlight.split('-').map(Number);
                 const safeItemDate = new Date(year, month - 1, day);
 
+                // 리스트 아이템의 배경색은 승인된 세션 날짜인 경우만 구분
                 const isItemSessionDate = sessionDates.some((sessionDate) => isSameDay(sessionDate, safeItemDate));
 
                 return (
@@ -304,6 +329,13 @@ const HistoryModal = ({ isOpen, onClose, coachName, history }) => {
                     <HistoryItemTopRow>
                       <HistoryDate>
                         {index + 1}회차: {item.selectDate.split(' ')[0]} {/* 리스트에서도 날짜만 표시 */}
+                        {item.status === 'Y' && <HistorySessionStatus>(승인됨)</HistorySessionStatus>}
+                        {item.status === 'N' && !item.rejectComment && (
+                          <HistorySessionStatus>(승인 대기중)</HistorySessionStatus>
+                        )}
+                        {item.status === 'N' && item.rejectComment && (
+                          <HistorySessionStatus>(거절됨)</HistorySessionStatus>
+                        )}
                       </HistoryDate>
                     </HistoryItemTopRow>
                     {item.rejectComment && <RejectComment>거절 사유: {item.rejectComment}</RejectComment>}

@@ -5,6 +5,7 @@ import com.fithealth.backend.dto.Payment.ResponsePaymentDto;
 import com.fithealth.backend.dto.Payment.SelectPaymentDto;
 
 import com.fithealth.backend.dto.Refund.RefundCreateDto;
+import com.fithealth.backend.dto.Reservation.UpdateReservationDto;
 import com.fithealth.backend.dto.Salary.SalaryCreateDto;
 import java.util.List;
 import com.fithealth.backend.dto.Reservation.ReservationCreateDto;
@@ -19,4 +20,5 @@ public interface PaymentService {
     List<SelectReservation.RefundResponse> findReservation(Long paymentId);
     Long goRefund(RefundCreateDto.Create createDto);
     Long goSalary(SalaryCreateDto.Create createDto);
+    void updateReservationStatus(UpdateReservationDto dto);
 }

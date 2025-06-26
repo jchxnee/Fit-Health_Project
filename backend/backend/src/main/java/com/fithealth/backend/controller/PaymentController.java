@@ -6,6 +6,7 @@ import com.fithealth.backend.dto.Payment.SelectPaymentDto;
 import com.fithealth.backend.dto.Refund.RefundCreateDto;
 import com.fithealth.backend.dto.Reservation.ReservationCreateDto;
 import com.fithealth.backend.dto.Reservation.SelectReservation;
+import com.fithealth.backend.dto.Reservation.UpdateReservationDto;
 import com.fithealth.backend.dto.Salary.SalaryCreateDto;
 import com.fithealth.backend.service.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,6 @@ import java.util.List;
 public class PaymentController {
 
     private final PaymentService paymentService;
-
     //결제 생성 API (신청)
     @PostMapping
     public ResponseEntity<Long> insertPayment(@RequestBody CreatePaymentDto.Create createDto) {
@@ -70,6 +70,17 @@ public class PaymentController {
     @PutMapping("/salary")
     public ResponseEntity<Long> goSalary(@RequestBody SalaryCreateDto.Create createDto) {
         return ResponseEntity.ok(paymentService.goSalary(createDto));
+    }
+
+    @PutMapping("/approve")
+    public ResponseEntity<Void> approveReservation(@RequestBody UpdateReservationDto dto) {
+        paymentService.updateReservationStatus(dto);
+        return ResponseEntity.ok().build();
+    }
+    @PutMapping("/reject")
+    public ResponseEntity<Void> rejectReservation(@RequestBody UpdateReservationDto dto) {
+        paymentService.updateReservationStatus(dto);
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -6,7 +6,7 @@ import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 import { IoReload } from 'react-icons/io5';
 import theme from '../styles/theme'; // theme 파일 경로가 올바른지 확인해주세요.
 import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify'; // react-toastify 임포트
+import { toast } from 'react-toastify';
 
 const StyledTableContainer = styled.div`
   width: 100%;
@@ -221,10 +221,11 @@ const UserTable = ({ data, columns, onRowClick }) => {
     }
   };
 
-  // 'status: Y'인 항목 중 가장 최근 예약 날짜와, 전체 history 중 가장 최근 예약의 상태를 동시에 반환
+  // 'status: Y'인 항목 중 가장 최근 예약 날짜와, 전체 history 중 가장 최근 예약의 상태 및 거절 사유 존재 여부를 동시에 반환
   const getLatestReservationInfo = useCallback((history) => {
     if (!history || history.length === 0) {
-      return { latestApprovedDate: null, latestOverallStatus: null };
+      // ⭐ 추가: rejectCommentExists 필드도 반환 ⭐
+      return { latestApprovedDate: null, latestOverallStatus: null, latestRejectCommentExists: false };
     }
 
     const sortedHistory = [...history].sort((a, b) => {
@@ -234,11 +235,14 @@ const UserTable = ({ data, columns, onRowClick }) => {
     });
 
     const latestStatus = sortedHistory[0].status; // 제일 최근 예약내역의 승인상태
+    // ⭐ 추가: 제일 최근 예약내역의 거절 사유 존재 여부 ⭐
+    const latestRejectCommentExists = !!sortedHistory[0].rejectComment;
 
     const approvedHistory = sortedHistory.filter((item) => item.status === 'Y');
     const latestApprovedDate = approvedHistory.length > 0 ? new Date(approvedHistory[0].selectDate) : null; // 제일 최근 예약내역의 날짜
 
-    return { latestApprovedDate, latestStatus };
+    // ⭐ 반환 값에 latestRejectCommentExists 추가 ⭐
+    return { latestApprovedDate, latestStatus, latestRejectCommentExists };
   }, []);
 
   const handleThreeDotsMenuClick = useCallback(
@@ -299,11 +303,13 @@ const UserTable = ({ data, columns, onRowClick }) => {
         toast.warn('완료된 수업에 대해서만 후기를 남길 수 있습니다.');
       }
     } else if (action === '다음 회차예약') {
-      const { latestOverallStatus } = getLatestReservationInfo(rowData.history);
+      // ⭐ 변경: latestRejectCommentExists를 사용하도록 조건 수정 ⭐
+      const { latestOverallStatus, latestRejectCommentExists } = getLatestReservationInfo(rowData.history);
 
-      if (latestOverallStatus === 'N') {
+      // 코치 승인 대기 중이고 거절 사유가 없을 때만 경고 메시지 표시
+      if (latestOverallStatus === 'N' && !latestRejectCommentExists) {
         toast.warn('코치 승인 대기 중인 예약이 있어 다음 회차 예약을 할 수 없습니다.');
-        return;
+        return; // 예약 진행을 막음
       }
 
       const sessionsParts = rowData.sessions.split(/\s*\/\s*/);
@@ -325,7 +331,8 @@ const UserTable = ({ data, columns, onRowClick }) => {
   }, [openMenuId, sortedData]);
 
   // 가장 최근 예약 정보를 가져옴
-  const { latestApprovedDate, latestStatus } = useMemo(() => {
+  // ⭐ 변경: latestRejectCommentExists도 함께 가져옴 ⭐
+  const { latestApprovedDate, latestStatus, latestRejectCommentExists } = useMemo(() => {
     return selectedRowData ? getLatestReservationInfo(selectedRowData.history) : {};
   }, [selectedRowData, getLatestReservationInfo]);
 
@@ -337,9 +344,11 @@ const UserTable = ({ data, columns, onRowClick }) => {
     ? now.getTime() - latestApprovedDate.getTime() < TWENTY_FOUR_HOURS_IN_MS
     : false;
 
-  // 1. 24시간 이내 조건이 아닐 때 (즉, 24시간이 경과했거나, 승인된 예약이 없는 경우)
-  // 2. 그리고 가장 최근 예약의 상태가 'N'이 아닐 때 (null 또는 'Y'일 때)
-  const shouldShowActionMenus = !isWithin24HoursOfLatestApprovedBooking && latestStatus !== 'N';
+  // 메뉴가 보여야 하는 조건:
+  // 1. 코치 승인된 가장 최근 예약일로부터 24시간이 경과했거나,
+  // 2. (코치 승인 대기 중이 아니거나) OR (코치 승인 대기 중이지만 거절 사유가 있을 때)
+  const shouldShowActionMenus =
+    !isWithin24HoursOfLatestApprovedBooking && (latestStatus !== 'N' || latestRejectCommentExists);
 
   return (
     <StyledTableContainer ref={tableContainerRef}>
@@ -384,8 +393,8 @@ const UserTable = ({ data, columns, onRowClick }) => {
             </PopupMenuItem>
           )}
           {/* 다음 회차 예약 버튼:
-              1. '진행중' 상태
-              2. 'shouldShowActionMenus' (통합 조건)가 true일 때
+                1. '진행중' 상태
+                2. 'shouldShowActionMenus' (통합 조건)가 true일 때
           */}
           {selectedRowData.status === '진행중' && shouldShowActionMenus && (
             <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '다음 회차예약', selectedRowData)}>
@@ -393,8 +402,8 @@ const UserTable = ({ data, columns, onRowClick }) => {
             </PopupMenuItem>
           )}
           {/* 결제 취소 버튼:
-              1. 'refund'가 true
-              2. 'shouldShowActionMenus' (통합 조건)가 true일 때
+                1. 'refund'가 true
+                2. 'shouldShowActionMenus' (통합 조건)가 true일 때
           */}
           {selectedRowData.refund && shouldShowActionMenus && (
             <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '결제취소', selectedRowData)} $isDelete>

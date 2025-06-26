@@ -29,4 +29,9 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                 .setParameter("status", status)
                 .getResultList();
     }
+
+    @Override
+    public Reservation findByReservationNo(Long reservationNo) {
+        return em.find(Reservation.class, reservationNo);
+    }
 }
