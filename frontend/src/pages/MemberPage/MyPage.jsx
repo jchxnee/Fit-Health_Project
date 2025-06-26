@@ -255,7 +255,7 @@ const MyPage = () => {
           {user.grade === 'U' ? (
             <SectionLink to="/matchingList">신청 내역</SectionLink>
           ) : (
-            <SectionLink to="/coachmatchingList">매칭 내역</SectionLink>
+            <SectionLink to="/coachmatchingList">코칭 내역</SectionLink>
           )}
           <Divider />
         </SectionBlock>
