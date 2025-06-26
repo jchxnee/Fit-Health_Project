@@ -7,6 +7,7 @@ import { IoReload } from 'react-icons/io5';
 import theme from '../styles/theme'; // theme 파일 경로가 올바른지 확인해주세요.
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'; // react-toastify 임포트
+import RefundModal from './modal/RefundModal';
 
 const StyledTableContainer = styled.div`
   width: 100%;
@@ -139,6 +140,8 @@ const UserTable = ({ data, columns, onRowClick }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
   const [openMenuId, setOpenMenuId] = useState(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
+  const [refundRowData, setRefundRowData] = useState(null);
   const menuRef = useRef(null);
   const currentMenuButtonRef = useRef(null);
   const tableContainerRef = useRef(null);
@@ -315,6 +318,9 @@ const UserTable = ({ data, columns, onRowClick }) => {
       } else {
         toast.warn('이미 모든 수업을 예약했거나 수업이 진행중인 상태여야만 다음 회차 예약을 할 수 있습니다.');
       }
+    } else if (action === '환불내역') {
+      setRefundRowData(rowData);
+      setIsRefundModalOpen(true);
     }
   };
 
@@ -401,8 +407,19 @@ const UserTable = ({ data, columns, onRowClick }) => {
               결제취소
             </PopupMenuItem>
           )}
+          {selectedRowData.hasRefund && (
+            <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '환불내역', selectedRowData)}>환불내역</PopupMenuItem>
+          )}
         </PopupMenu>
       )}
+      <RefundModal
+        isOpen={isRefundModalOpen}
+        onClose={() => {
+          setIsRefundModalOpen(false);
+          setRefundRowData(null);
+        }}
+        data={refundRowData}
+      />
     </StyledTableContainer>
   );
 };
