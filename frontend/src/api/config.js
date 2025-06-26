@@ -34,6 +34,7 @@ export const API_ENDPOINTS = {
     LIST: '/api/payments/list',
     TRAINERLIST: '/api/payments/trainerlist',
     RESERVATION: '/api/payments/reservation',
+    SALARY: '/api/payments/salary',
   },
   REVIEW: {
     CREATE: '/api/review',

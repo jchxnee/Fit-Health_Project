@@ -88,4 +88,19 @@ export const paymentService = {
       throw new Error(message);
     }
   },
+
+  //정산 신청 진행
+  goSalary: async (paymentId, salaryPrice, salaryFee) => {
+    try {
+      const { data } = await api.put(API_ENDPOINTS.PAYMENT.SALARY, {
+        payment_id: paymentId,
+        salary_price: salaryPrice,
+        salary_fee: salaryFee,
+      });
+      return data;
+    } catch (error) {
+      const message = error.response?.data?.message || '환불 하는데 실패했습니다.';
+      throw new Error(message);
+    }
+  },
 };
