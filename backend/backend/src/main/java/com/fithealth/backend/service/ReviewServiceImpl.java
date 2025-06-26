@@ -6,6 +6,7 @@ import com.fithealth.backend.dto.Review.SelectMyReviewDto;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.entity.Payment;
 import com.fithealth.backend.entity.Review;
+import com.fithealth.backend.enums.CommonEnums.Status;
 import com.fithealth.backend.repository.MemberRepository;
 import com.fithealth.backend.repository.PaymentRepository;
 import com.fithealth.backend.repository.ReviewRepository;
@@ -42,7 +43,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다."));
 
 
-        if (payment.getReview() != null) {
+        if (payment.getReview() != null && payment.getReview().getStatus() == Status.Y) {
             throw new IllegalStateException("이미 이 결제에 대한 리뷰가 존재합니다.");
         }
 

@@ -486,6 +486,7 @@ function ReviewCreationPage() {
                 <div className="guidelines">
                   <p>※ 주제에 맞지 않는 글이나 커뮤니티 이용규정에 위배되는 글은 삭제의 대상이 됩니다.</p>
                   <p>※ 일정 수 이상의 신고를 받으면 작성한 글이 숨김 및 삭제될 수 있습니다.</p>
+                  <p>※ 리뷰 삭제 시 재작성 불가하니 신중히 작성 부탁드립니다.</p>
                 </div>
               </OverlayPlaceholder>
             )}

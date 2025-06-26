@@ -106,7 +106,7 @@ public class SelectPaymentDto {
             }
 
             boolean hasReview = false;
-            if (payment.getReview() != null && payment.getReview().getStatus() == CommonEnums.Status.Y) {
+            if (payment.getReview() != null) {
                 hasReview = true;
             } else {
                 hasReview = false;
