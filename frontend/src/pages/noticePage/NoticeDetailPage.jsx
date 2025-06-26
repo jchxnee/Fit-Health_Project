@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { FaEllipsisV } from 'react-icons/fa';
 import { useParams, useNavigate } from 'react-router-dom'; // useParams와 useNavigate 추가
 import TitleBar from '../../components/TitleBar';
 import { API_ENDPOINTS } from '../../api/config'; // API 엔드포인트 가져오기
 import api from '../../api/axios'; // axios 인스턴스 가져오기
+import useUserStore from '../../store/useUserStore';
 
 function NoticeDetailPage() {
   const { noticeNo } = useParams(); // URL 파라미터에서 noticeNo 추출
@@ -11,6 +13,22 @@ function NoticeDetailPage() {
   const [noticeDetail, setNoticeDetail] = useState(null); // 공지사항 상세 데이터를 위한 상태
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [error, setError] = useState(null); // 에러 상태
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useUserStore();
+
+  const handleDeletePost = async () => {
+    if (!window.confirm('정말로 이 공지를 삭제하시겠습니까?')) {
+      return;
+    }
+    try {
+      await api.put(`${API_ENDPOINTS.NOTICE.DELETE}/${noticeNo}`);
+      alert('공지글이 삭제되었습니다.');
+      navigate('/notice');
+    } catch (err) {
+      console.error('공지글 삭제 중 오류 발생:', err);
+      alert('공지글 삭제에 실패했습니다.');
+    }
+  };
 
   useEffect(() => {
     console.log('NoticeDetailPage useEffect 시작. noticeNo:', noticeNo); // 이 부분을 추가
@@ -97,7 +115,22 @@ function NoticeDetailPage() {
         <TitleBar title="공지사항" />
         <ContentWrapper>
           <NoticeDetailContainer>
-            <NoticeTitle>{noticeDetail.notice_title}</NoticeTitle> {/* 백엔드 응답 필드명에 맞춤 */}
+            <PostInfo>
+              <NoticeTitle>{noticeDetail.notice_title}</NoticeTitle> {/* 백엔드 응답 필드명에 맞춤 */}
+              {user.grade === 'A' && (
+                <>
+                  <EllipsisButton onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                    <FaEllipsisV color="#757575" />
+                  </EllipsisButton>
+                  {isMenuOpen && (
+                    <DropdownMenu>
+                      <DropdownMenuItem onClick={() => navigate(`/notice/${noticeNo}/edit`)}>수정</DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleDeletePost}>삭제</DropdownMenuItem>
+                    </DropdownMenu>
+                  )}
+                </>
+              )}
+            </PostInfo>
             <NoticeDate>{formatDate(noticeDetail.created_date)}</NoticeDate> {/* 백엔드 응답 필드명에 맞춤 */}
             <NoticeContentLine />
             <NoticeContentText>{noticeDetail.notice_content}</NoticeContentText> {/* 백엔드 응답 필드명에 맞춤 */}
@@ -194,4 +227,42 @@ const ToListButton = styled.button`
     color: ${({ theme }) => theme.colors.primary};
     border-color: ${({ theme }) => theme.colors.primary};
   }
+`;
+const EllipsisButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  color: ${({ theme }) => theme.colors.gray['700']};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+`;
+
+const DropdownMenu = styled.div`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.gray['200']};
+  border-radius: ${({ theme }) => theme.borderRadius.sm};
+  box-shadow: ${({ theme }) => theme.shadows.md};
+  z-index: 10;
+  min-width: 100px;
+  overflow: hidden;
+`;
+const DropdownMenuItem = styled.div`
+  padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['3']};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.gray['800']};
+  cursor: pointer;
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.gray['100']};
+  }
+`;
+const PostInfo = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
 `;

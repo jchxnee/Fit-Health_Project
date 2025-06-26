@@ -4,6 +4,7 @@ import com.fithealth.backend.dto.Board.BoardCreateDto;
 import com.fithealth.backend.dto.Board.BoardGetDto;
 import com.fithealth.backend.dto.Notice.NoticeCreateDto;
 import com.fithealth.backend.dto.Notice.NoticeGetDto;
+import com.fithealth.backend.dto.Notice.NoticeUpdateDto;
 import com.fithealth.backend.dto.PageResponse;
 import com.fithealth.backend.entity.Notice;
 import com.fithealth.backend.service.NoticeService;
@@ -39,6 +40,18 @@ public class NoticeController {
     @GetMapping("/{id}")
     public ResponseEntity<NoticeGetDto.Response> getBoard(@PathVariable("id") Long noticeNo) {
         return ResponseEntity.ok(noticeService.getNoticeDetail(noticeNo)); // 세미콜론 누락 수정
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Long> updateBoard(@ModelAttribute NoticeUpdateDto.Update noticeUpdateDto) {
+        String loggedInUserEmail = noticeUpdateDto.getUser_email();
+        return ResponseEntity.ok(noticeService.updateNotice(noticeUpdateDto, loggedInUserEmail));
+    }
+
+    @PutMapping("/delete/{id}")
+    public ResponseEntity<Long> deleteBoard(@PathVariable("id") Long noticeNo) {
+        noticeService.delete(noticeNo);
+        return ResponseEntity.ok().build();
     }
 
 }

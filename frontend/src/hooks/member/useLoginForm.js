@@ -46,6 +46,7 @@ export const useLoginForm = () => {
       // 로그인 성공 시 사용자 정보 상태 저장
       login({
         useremail: user.user_email,
+        trainerNo: user.trainer_no,
         username: user.user_name,
         birth: user.birth,
         phone: user.phone,

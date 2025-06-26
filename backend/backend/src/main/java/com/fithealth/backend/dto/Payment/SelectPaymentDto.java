@@ -73,7 +73,7 @@ public class SelectPaymentDto {
             String displayStatus;
             if (payment.getUseStatus() == CommonEnums.UseStatus.N) {
                 displayStatus = "완료됨";
-            } else if (payment.getPaymentStatus() == CommonEnums.Status.C) {
+            } else if (payment.getUseStatus() == CommonEnums.UseStatus.C) {
                 displayStatus = "취소됨";
             } else {
                 // 예약 상태를 기반으로 '진행중' 판단 로직 추가
@@ -100,7 +100,12 @@ public class SelectPaymentDto {
                         .toList();
             }
 
-            boolean hasReview = payment.getReview() != null;
+            boolean hasReview = false;
+            if (payment.getReview() != null && payment.getReview().getStatus() == CommonEnums.Status.Y) {
+                hasReview = true;
+            } else {
+                hasReview = false;
+            }
 
             boolean isRefundable = false;
 

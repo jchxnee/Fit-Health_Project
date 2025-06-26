@@ -17,7 +17,7 @@ public class Notice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long NoticeNo;
+    private Long noticeNo;
 
     @Column(name = "NOTICE_TITLE", nullable = false)
     private String noticeTitle;
@@ -53,5 +53,11 @@ public class Notice {
         if(!member.getNotices().contains(this)) {
             member.getNotices().add(this);
         }
+    }
+
+    public void updateNoticeDetails(String noticeTitle, String noticeContent, String noticeCategoryName) {
+        this.noticeTitle = noticeTitle;
+        this.noticeContent = noticeContent;
+        this.noticeCategoryName = noticeCategoryName;
     }
 }

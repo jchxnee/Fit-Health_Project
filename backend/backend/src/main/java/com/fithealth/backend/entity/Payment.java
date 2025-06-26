@@ -43,6 +43,12 @@ public class Payment {
     @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();
 
+    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL)
+    private Refund refund;
+
+    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL)
+    private Salary salary;
+
     @Column(name = "TRANSACTION_ID", length = 100)
     private String transactionId;
 
@@ -107,8 +113,12 @@ public class Payment {
         }
     }
 
-    public void changePayment(CommonEnums.Status status){
+    public void changeStatus(CommonEnums.Status status){
         this.paymentStatus = status;
         this.paymentAt = LocalDateTime.now();
+    }
+
+    public void changeUseStatus(CommonEnums.UseStatus status){
+        this.useStatus = status;
     }
 }

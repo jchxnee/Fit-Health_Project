@@ -84,16 +84,19 @@ const CoachMatching = () => {
   const [finalPrice, setFinalPrice] = useState(0); // 두 번째 코드에서 추가된 부분
   const navigate = useNavigate(); // 두 번째 코드에서 추가된 부분
 
-  // 로컬 시간대를 고려하여 현재 날짜를 YYYY-MM-DD 형식으로 가져오는 헬퍼 함수
-  const getTodayDateString = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = (today.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작
-    const day = today.getDate().toString().padStart(2, '0');
+  // 오늘로부터 2일 후 날짜 구하기
+  const getTwoDaysLaterDateString = () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 2); // 이틀 후
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
 
-  const [selectedDate, setSelectedDate] = useState(getTodayDateString());
+  const minDate = getTwoDaysLaterDateString();
+
+  const [selectedDate, setSelectedDate] = useState(minDate); // 초기값도 이틀 후로
   const [selectedTime, setSelectedTime] = useState(null);
 
   useEffect(() => {
@@ -207,6 +210,7 @@ const CoachMatching = () => {
             onDateChange={handleDateChange}
             selectedTime={selectedTime}
             onTimeChange={handleTimeChange}
+            minDate={minDate}
           />
         </ContentContainer>
         {/* 신청하기 버튼: handleRequest 함수 호출 및 disabled 조건 유지 */}

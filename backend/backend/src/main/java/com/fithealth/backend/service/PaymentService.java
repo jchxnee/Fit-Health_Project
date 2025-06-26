@@ -4,12 +4,16 @@ import com.fithealth.backend.dto.Payment.CreatePaymentDto;
 import com.fithealth.backend.dto.Payment.ResponsePaymentDto;
 import com.fithealth.backend.dto.Payment.SelectPaymentDto;
 
+import com.fithealth.backend.dto.Refund.RefundCreateDto;
 import java.util.List;
 import com.fithealth.backend.dto.Reservation.ReservationCreateDto;
+import com.fithealth.backend.dto.Reservation.SelectReservation;
 
 public interface PaymentService {
     Long insertPayment(CreatePaymentDto.Create createDto);
     ResponsePaymentDto.Response findPayment(Long paymentId);
     Long goPayment(ReservationCreateDto.Create createDto);
     List<SelectPaymentDto.Response> findPaymentList(String userEmail);
+    List<SelectReservation.RefundResponse> findReservation(Long paymentId);
+    Long goRefund(RefundCreateDto.Create createDto);
 }

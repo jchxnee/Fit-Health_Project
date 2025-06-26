@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom';
 import api from '../../api/axios';
 import { Link } from 'react-router-dom';
 import { API_ENDPOINTS } from '../../api/config';
+import useUserStore from '../../store/useUserStore';
 
 const PageWrapper = styled.div`
   display: flex;
@@ -61,6 +62,7 @@ const CoachDetail = () => {
   const { id } = useParams(); // URL에서 트레이너 번호 (id)를 가져옵니다.
   // const trainerNo = id; // 명확히 trainerNo로 사용할 수 있습니다.
 
+  const { user } = useUserStore();
   const [trainerDetails, setTrainerDetails] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -166,11 +168,13 @@ const CoachDetail = () => {
       <PageWrapper>
         <TitleBarContainer>
           <ButtonTitleBar title={'핏코치 매칭'} />
-          <NavItem to={`/coachModify/${id}`}>
-            수정 <FiEdit />
-          </NavItem>
+          {user.trainerNo === currentTrainer.id && (
+            <NavItem to={`/coachModify/${id}`}>
+              수정 <FiEdit />
+            </NavItem>
+          )}
         </TitleBarContainer>
-        <TrainerProfile trainer={currentTrainer} />
+        <TrainerProfile trainer={currentTrainer} user={user} />
         <TrainerQualifications qualifications={trainerQuals} />
         <TrainerCourse courses={trainerCourses} />
         <TrainerPhoto photos={trainerDetails.trainerPhoto} />

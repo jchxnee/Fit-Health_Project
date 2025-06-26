@@ -25,7 +25,7 @@ export default function useCoachRegisterForm() {
     setError(null);
     try {
       const formData = new FormData();
-      formData.append('userEmail', userEmail);  // 사용자 이메일 추가
+      formData.append('userEmail', userEmail); // 사용자 이메일 추가
       formData.append('majorName', majorName);
       formData.append('wishArea', wishArea);
       formData.append('kakaoId', kakaoId);
@@ -51,18 +51,30 @@ export default function useCoachRegisterForm() {
   };
 
   return {
-    photos, setPhotos,
-    careers, setCareers,
-    kakaoId, setKakaoId,
-    instaId, setInstaId,
-    price, setPrice,
-    discount3, setDiscount3,
-    discount5, setDiscount5,
-    discount10, setDiscount10,
-    intro, setIntro,
-    majorName, setMajorName,
-    wishArea, setWishArea,
-    loading, error,
+    photos,
+    setPhotos,
+    careers,
+    setCareers,
+    kakaoId,
+    setKakaoId,
+    instaId,
+    setInstaId,
+    price,
+    setPrice,
+    discount3,
+    setDiscount3,
+    discount5,
+    setDiscount5,
+    discount10,
+    setDiscount10,
+    intro,
+    setIntro,
+    majorName,
+    setMajorName,
+    wishArea,
+    setWishArea,
+    loading,
+    error,
     submitForm,
   };
-} 
+}

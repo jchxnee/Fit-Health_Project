@@ -37,6 +37,7 @@ public class LoginDto {
     @Builder
     public static class Response {
         private String user_email;
+        private Long trainer_no;
         private String user_name;
         private LocalDate birth;
         private String phone;
@@ -50,6 +51,9 @@ public class LoginDto {
         public static Response toDto(Member member){
             return Response.builder()
                     .user_email(member.getUserEmail())
+                    .trainer_no(
+                            member.getTrainer() != null ? member.getTrainer().getTrainerNo() : null
+                    )
                     .user_name(member.getUserName())
                     .birth(member.getBirth())
                     .phone(member.getPhone())
