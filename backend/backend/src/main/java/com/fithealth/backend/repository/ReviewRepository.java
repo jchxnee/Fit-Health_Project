@@ -7,6 +7,7 @@ import java.util.Optional;
 public interface ReviewRepository {
     Review save(Review review);
     List<Review> findByPaymentId(List<Long> paymentIds);
-    List<Review> findReviewsByUserEmailWithPaymentAndMembers(String userEmail);
+    List<Review> findReviewsByUser(String userEmail);
     Boolean findOne(Long paymentId);
+    void delete(Long reviewId);
 }

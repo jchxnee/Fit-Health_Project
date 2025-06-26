@@ -48,4 +48,11 @@ public class ReviewController {
         boolean exists = reviewService.findOne(paymentId);
         return ResponseEntity.ok(exists);
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        System.out.println("프론트에서 받은 리뷰 아이디 : " + id);
+        reviewService.delete(id);
+        return ResponseEntity.ok().build();
+    }
 }
