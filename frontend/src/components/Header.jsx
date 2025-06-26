@@ -35,7 +35,7 @@ function UserMenu({ onMenuItemClick }) {
   const updateUser = useUserStore((state) => state.updateUser);
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
-
+  console.log(user.trainerNo);
   const handleLogout = () => {
     logout(); // 상태 초기화
     toast.success('로그아웃되었습니다.');
@@ -50,6 +50,7 @@ function UserMenu({ onMenuItemClick }) {
 
     try {
       await updateUser({ grade: newGrade });
+
       toast.success(newGrade === 'C' ? '핏코치로 전환되었습니다.' : '일반 유저로 전환되었습니다.');
       onMenuItemClick(); // 메뉴 닫기
     } catch (error) {
@@ -177,7 +178,7 @@ function Header({ user }) {
           </HeaderNavLeft>
         </HeaderLeft>
         {user !== null ? (
-          <HeaderRight>
+          <HeaderRight as="div">
             <HeaderNavRight>
               <NotificationWrapper onClick={handleNotificationClick} ref={bellIconRef}>
                 {' '}

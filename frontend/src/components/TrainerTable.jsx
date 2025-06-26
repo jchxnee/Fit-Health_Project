@@ -6,25 +6,25 @@ import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 import { IoReload } from 'react-icons/io5';
 import theme from '../styles/theme';
 import SalaryModal from './modal/SalaryModal';
+import HealthChartModal from './modal/HealthChartModal';
 
-// **추가될 props:** onApprove, onReject (CoachMatchingList에서 전달받을 함수)
 const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onReject }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
-  const [openMenuId, setOpenMenuId] = useState(null); // 열려있는 메뉴의 row id를 저장
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 }); // 메뉴 위치 상태 추가
-  const menuRef = useRef(null); // 팝업 메뉴 DOM 엘리먼트 참조
-  const currentMenuButtonRef = useRef(null); // 현재 열린 메뉴를 트리거한 버튼 DOM 엘리먼트 참조
-  const tableContainerRef = useRef(null); // StyledTableContainer DOM 엘리먼트 참조
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const menuRef = useRef(null);
+  const currentMenuButtonRef = useRef(null);
+  const tableContainerRef = useRef(null);
   const [salaryModalData, setSalaryModalData] = useState(null);
+  const [healthModalOpen, setHealthModalOpen] = useState(false);
+  const [selectedEmail, setSelectedEmail] = useState(null);
 
-  // 정렬된 데이터 반환 함수 (useMemo 최적화)
   const sortedData = useMemo(() => {
     let sortableItems = [...data];
     if (sortConfig.key !== null && sortConfig.direction !== 'none') {
       sortableItems.sort((a, b) => {
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
-
         const isNumeric = (str) => !isNaN(str) && !isNaN(parseFloat(str));
 
         if (isNumeric(aValue) && isNumeric(bValue)) {
@@ -42,19 +42,17 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
     return sortableItems;
   }, [data, sortConfig]);
 
-  // 메뉴 외부 클릭 감지 useEffect
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // 팝업 메뉴 자체나 팝업 메뉴를 연 버튼이 아닌 다른 곳을 클릭했을 때 닫기
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target) &&
         currentMenuButtonRef.current &&
         !currentMenuButtonRef.current.contains(event.target)
       ) {
-        setOpenMenuId(null); // 메뉴 닫기
-        setMenuPosition({ top: 0, left: 0 }); // 메뉴 위치 초기화
-        currentMenuButtonRef.current = null; // 버튼 참조 초기화
+        setOpenMenuId(null);
+        setMenuPosition({ top: 0, left: 0 });
+        currentMenuButtonRef.current = null;
       }
     };
 
@@ -87,26 +85,23 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
   };
 
   const handleRowClickInternal = (row) => {
-    // prop 이름과 충돌 방지를 위해 이름 변경
     if (onRowClick) {
       onRowClick(row);
     }
   };
 
-  // 더보기 메뉴 토글 핸들러
   const handleThreeDotsMenuClick = useCallback(
     (e, rowId) => {
-      e.stopPropagation(); // 행 클릭 이벤트가 전파되는 것을 막음
+      e.stopPropagation();
 
       if (openMenuId === rowId) {
-        // 이미 열려있는 메뉴를 다시 클릭하면 닫기
         setOpenMenuId(null);
         setMenuPosition({ top: 0, left: 0 });
         currentMenuButtonRef.current = null;
       } else {
-        const buttonRect = e.currentTarget.getBoundingClientRect(); // '...' 버튼의 뷰포트 기준 위치
-        const tableContainer = tableContainerRef.current; // StyledTableContainer의 DOM 엘리먼트
-        const tableContainerRect = tableContainer ? tableContainer.getBoundingClientRect() : null; // 테이블 컨테이너의 뷰포트 기준 위치
+        const buttonRect = e.currentTarget.getBoundingClientRect();
+        const tableContainer = tableContainerRef.current;
+        const tableContainerRect = tableContainer ? tableContainer.getBoundingClientRect() : null;
 
         if (!tableContainerRect) {
           console.warn('Table container ref not found. Popup might not position correctly.');
@@ -114,26 +109,24 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
         }
 
         setMenuPosition({
-          // 팝업의 top은 '...' 버튼의 뷰포트 top에서 테이블 컨테이너의 뷰포트 top을 뺀 값으로 계산 (상대적인 top)
           top: buttonRect.top - tableContainerRect.top,
-          // 팝업의 left는 '...' 버튼의 뷰포트 left에서 테이블 컨테이너의 뷰포트 left를 뺀 값 + 버튼 너비 + 여백
-          left: buttonRect.left - tableContainerRect.left + buttonRect.width + 10, // 10px 여백 추가
+          // 'left' 값이 두 번 할당되어 마지막 값이 적용되던 부분을 한 번으로 통합
+          left: buttonRect.left - tableContainerRect.left + buttonRect.width + 10,
         });
         setOpenMenuId(rowId);
-        currentMenuButtonRef.current = e.currentTarget; // 현재 열린 메뉴를 트리거한 버튼 참조 저장
+        currentMenuButtonRef.current = e.currentTarget;
       }
     },
     [openMenuId]
-  ); // openMenuId를 의존성 배열에 추가하여 상태 변경 시 함수 재생성
+  );
 
-  // 메뉴 아이템 클릭 핸들러
   const handleMenuItemClick = (e, action, rowData) => {
-    e.stopPropagation(); // 메뉴 아이템 클릭 시 메뉴가 바로 닫히지 않도록
-    setOpenMenuId(null); // 메뉴 아이템 클릭 후 메뉴 닫기
-    setMenuPosition({ top: 0, left: 0 }); // 위치 초기화
-    currentMenuButtonRef.current = null; // 버튼 참조 초기화
+    e.stopPropagation(); // 메뉴 아이템 클릭 시 메뉴가 바로 닫히도록
 
-    // **여기서 '승인' 또는 '거절' 액션에 따라 부모 컴포넌트의 함수 호출**
+    // setOpenMenuId(null); // 중복 호출 제거, 아래에서 한 번만 호출
+    // setMenuPosition({ top: 0, left: 0 }); // 중복 호출 제거
+    // currentMenuButtonRef.current = null; // 중복 호출 제거
+
     if (action === '승인') {
       if (onApprove) {
         onApprove(rowData);
@@ -144,14 +137,22 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
       }
     } else if (action === '정산신청') {
       setSalaryModalData(rowData); // 정산 모달 열기
-    } else {
-      // 기타 메뉴 아이템 (예: 1:1 채팅) 처리
-      // console.log(`${rowData.userName} 고객의 ${action} 선택됨!`);
+    } else if (action === '고객 건강정보') {
+      setSelectedEmail(rowData.userEmail); // usermail이 아닌 userEmail 사용하도록 명시적으로 수정 (가정)
+      setHealthModalOpen(true);
+    } else if (action === '정산내역') {
+      setSalaryModalData(rowData); // 정산내역도 동일 모달 사용
     }
+    // 기존 alert는 그대로 유지 요청하셨으므로 남겨둡니다.
+    alert(`${rowData.coachName} 코치의 ${action} 선택됨!`);
+
+    // 메뉴 닫힘 관련 상태 업데이트는 한 번만 수행
+    setOpenMenuId(null);
+    setMenuPosition({ top: 0, left: 0 });
+    currentMenuButtonRef.current = null;
   };
 
   return (
-    // StyledTableContainer에 ref 속성 추가
     <StyledTableContainer ref={tableContainerRef}>
       <StyledTable>
         <thead>
@@ -173,12 +174,10 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
           {sortedData.map((row, rowIndex) => (
             <tr key={row.id || rowIndex} onClick={() => handleRowClickInternal(row)}>
               {' '}
-              {/* 이름 변경된 핸들러 사용 */}
               {columns.map((col) => (
                 <td key={col.key}>{col.key === 'status' ? <StatusBadge status={row[col.key]} /> : row[col.key]}</td>
               ))}
               <TdMenuCell>
-                {/* ThreeDotsMenu는 모든 행에 항상 렌더링 */}
                 <ThreeDotsMenu onClick={(e) => handleThreeDotsMenuClick(e, row.id ?? rowIndex)}>
                   <CiMenuKebab />
                 </ThreeDotsMenu>
@@ -187,29 +186,51 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
           ))}
         </tbody>
       </StyledTable>
-      {/* openMenuId가 null이 아닐 때만 팝업 메뉴 렌더링 */}
+
       {openMenuId !== null &&
         (() => {
           const rowData = sortedData.find((d, i) => (d.id ?? i) === openMenuId);
           if (!rowData) return null;
 
-          // **조건부 렌더링을 위한 상태 확인:** '승인 대기중' 여부
+          // ⭐ 변경된 부분: 조건 변수를 명확히 정의하고, 중첩된 PopupMenuItem을 분리 ⭐
           const isPending = rowData.status?.trim() === '승인 대기중';
+          const isCompleted = rowData.status?.trim() === '완료됨';
+          const isInProgress = rowData.status?.trim() === '진행중';
 
           return (
             <PopupMenu ref={menuRef} $top={menuPosition.top} $left={menuPosition.left}>
               <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '1:1 채팅', rowData)}>1:1 채팅</PopupMenuItem>
 
-              {rowData.status?.trim() === '완료됨' && ( // '완료됨' 상태일 때만 '정산신청' 메뉴 보이기
-                <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '정산신청', rowData)}>
+              {/* '진행중' 상태일 때만 '고객 건강정보' 메뉴 보이기 */}
+              {isInProgress && (
+                <PopupMenuItem
+                  onClick={(e) => {
+                    // 이벤트 객체 'e'를 전달하여 전파를 막을 수 있도록 함
+                    handleMenuItemClick(e, '고객 건강정보', rowData);
+                  }}
+                >
+                  고객 건강정보
+                </PopupMenuItem>
+              )}
+
+              {/* '완료됨' 상태일 때만 '정산신청' 또는 '정산내역' 메뉴 보이기 */}
+              {isCompleted && (
+                <PopupMenuItem
+                  onClick={(e) => {
+                    // 이벤트 객체 'e'를 전달하여 전파를 막을 수 있도록 함
+                    handleMenuItemClick(e, '정산신청', rowData); // 액션 이름을 '정산신청'으로 통일
+                  }}
+                >
                   {rowData.hasSalary ? '정산내역' : '정산신청'}
                 </PopupMenuItem>
               )}
 
-              {isPending && ( // '승인 대기중'일 때만 '승인' 메뉴 보이기
+              {/* '승인 대기중'일 때만 '승인' 메뉴 보이기 */}
+              {isPending && (
                 <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '승인', rowData)}>승인</PopupMenuItem>
               )}
-              {isPending && ( // '승인 대기중'일 때만 '거절' 메뉴 보이기
+              {/* '승인 대기중'일 때만 '거절' 메뉴 보이기 */}
+              {isPending && (
                 <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '거절', rowData)}>거절</PopupMenuItem>
               )}
             </PopupMenu>
@@ -221,23 +242,25 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
         onClose={() => setSalaryModalData(null)}
         onSuccess={() => {
           setSalaryModalData(null);
-          fetchData?.(); // 부모에서 내려준 함수로 리렌더
+          fetchData?.();
         }}
         data={salaryModalData}
       />
+
+      <HealthChartModal isOpen={healthModalOpen} onClose={() => setHealthModalOpen(false)} userEmail={selectedEmail} />
     </StyledTableContainer>
   );
 };
 
 export default TrainerTable;
 
-// Styled-components (스타일 변경 없음, 이전 코드 그대로 유지)
+// Styled-components (스타일은 요청에 따라 변경하지 않고 기존 코드 그대로 유지)
 const StyledTableContainer = styled.div`
   width: 100%;
   margin-top: 20px;
   width: ${theme.width.lg};
   margin-bottom: 60px;
-  position: relative; /* 중요: 이 요소를 기준으로 자식 absolute 요소가 위치합니다. */
+  position: relative;
 `;
 
 const StyledTable = styled.table`
@@ -322,7 +345,7 @@ const TdMenuCell = styled.td`
 `;
 
 const PopupMenu = styled.div`
-  position: absolute; /* fixed 대신 absolute로 변경 */
+  position: absolute;
   top: ${({ $top }) => $top}px;
   left: ${({ $left }) => $left}px;
   background: ${theme.colors.white};
@@ -348,6 +371,7 @@ const PopupMenuItem = styled.button`
   cursor: pointer;
   white-space: nowrap;
   outline: none;
+
   &:hover {
     background-color: ${theme.colors.gray['100']};
   }

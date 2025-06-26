@@ -37,7 +37,11 @@ public class SelectPaymentDto {
         private String startDate;
         private String category;
         private boolean hasReview;
+        private boolean hasRefund;
         private boolean isRefund;
+        private Long totalCount;
+        private Long refundPrice;
+        private Long refundFee;
 
         private List<SelectReservation.Response> history;
 
@@ -147,9 +151,7 @@ public class SelectPaymentDto {
                 }
             }
 
-
-
-
+            boolean hasRefund = payment.getRefund() != null;
 
             return Response.builder()
                     .paymentId(payment.getPaymentId())
@@ -168,7 +170,11 @@ public class SelectPaymentDto {
                     .category(category)
                     .history(reservationHistory)
                     .hasReview(hasReview)
+                    .hasRefund(hasRefund)
                     .isRefund(isRefundable)
+                    .totalCount(payment.getTotalCount())
+                    .refundPrice(payment.getRefund() != null ? payment.getRefund().getRefundPrice() : null)
+                    .refundFee(payment.getRefund() != null ? payment.getRefund().getRefundFee() : null)
                     .build();
         }
     }

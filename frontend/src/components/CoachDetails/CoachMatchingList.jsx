@@ -8,15 +8,6 @@ import TrainerTable from '../TrainerTable.jsx';
 import CoachSubBar from './CoachSubBar.jsx';
 import CoachHistoryModal from '../modal/CoachHistoryModal.jsx';
 
-const tableColumns = [
-  { key: 'userName', label: '고객 이름', sortable: true },
-  { key: 'category', label: '카테고리', sortable: true },
-  { key: 'status', label: '상태', sortable: true },
-  { key: 'sessions', label: '횟수', sortable: true },
-  { key: 'productPrice', label: '결제금액', sortable: true },
-  { key: 'startDate', label: '시작일자', sortable: true },
-];
-
 const ContentWrapper = styled.div`
   width: ${theme.width.lg};
   display: flex;
@@ -69,13 +60,35 @@ const SubWrapper = styled.div`
   align-items: center;
 `;
 
-const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, currentView, onDataUpdate }) => {
-  // '승인 대기중' 옵션 제거
+const NoDataMessage = styled.div`
+  text-align: center;
+  padding: 50px;
+  font-size: 1.2em;
+  color: #999;
+`;
+
+const tableColumns = [
+  { key: 'userName', label: '고객 이름', sortable: true },
+  { key: 'category', label: '카테고리', sortable: true },
+  { key: 'status', label: '상태', sortable: true },
+  { key: 'sessions', label: '횟수', sortable: true },
+  { key: 'productPrice', label: '결제금액', sortable: true },
+  { key: 'startDate', label: '시작일자', sortable: true },
+];
+
+const CoachMatchingList = ({
+  allMatchingData: initialMatchingData,
+  onView,
+  currentView,
+  onDataUpdate,
+  onSalarySuccess,
+}) => {
   const selectBarOptions = [
     { label: '전체', value: 'all' },
     { label: '완료됨', value: '완료됨' },
     { label: '진행중', value: '진행중' },
     { label: '취소됨', value: '취소됨' },
+    // '승인 대기중' 옵션은 제거되었습니다.
   ];
 
   const [currentSelection, setCurrentSelection] = useState('all');
@@ -154,7 +167,18 @@ const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, curre
             <CoachSubBar onView={onView} currentView={currentView} />
           </SubWrapper>
         </TableWrapper>
-        <TrainerTable data={currentItems} columns={tableColumns} onRowClick={handleRowClick} />
+
+        {currentItems.length === 0 ? (
+          <NoDataMessage>고객님의 코칭 내역이 존재하지 않습니다.</NoDataMessage>
+        ) : (
+          <TrainerTable
+            data={currentItems}
+            columns={tableColumns}
+            onRowClick={handleRowClick}
+            fetchData={onSalarySuccess}
+          />
+        )}
+
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
       </ContentWrapper>
 
