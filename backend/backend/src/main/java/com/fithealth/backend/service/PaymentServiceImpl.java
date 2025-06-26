@@ -6,15 +6,19 @@ import com.fithealth.backend.dto.Payment.SelectPaymentDto;
 import com.fithealth.backend.dto.Refund.RefundCreateDto;
 import com.fithealth.backend.dto.Reservation.ReservationCreateDto;
 import com.fithealth.backend.dto.Reservation.SelectReservation;
+import com.fithealth.backend.dto.Salary.SalaryCreateDto;
+import com.fithealth.backend.dto.Salary.SalaryCreateDto.Create;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.entity.Payment;
 import com.fithealth.backend.entity.Refund;
 import com.fithealth.backend.entity.Reservation;
+import com.fithealth.backend.entity.Salary;
 import com.fithealth.backend.enums.CommonEnums;
 import com.fithealth.backend.repository.MemberRepository;
 import com.fithealth.backend.repository.PaymentRepository;
 import com.fithealth.backend.repository.RefundRepository;
 import com.fithealth.backend.repository.ReservationRepository;
+import com.fithealth.backend.repository.SalaryRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +36,7 @@ public class PaymentServiceImpl implements  PaymentService {
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
     private final RefundRepository refundRepository;
+    private final SalaryRepository salaryRepository;
 
     @Override
     public Long insertPayment(CreatePaymentDto.Create createDto) {
@@ -80,6 +85,13 @@ public class PaymentServiceImpl implements  PaymentService {
     }
 
     @Override
+    public List<SelectPaymentDto.ResponseTrainer> findPaymentListByTrainer(String userEmail) {
+        return paymentRepository.findPaymentListTrainer(userEmail).stream()
+                .map(SelectPaymentDto.ResponseTrainer::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<SelectReservation.RefundResponse> findReservation(Long paymentId) {
         return reservationRepository.findByPaymentId(paymentId, CommonEnums.Status.Y).stream()
                 .map(SelectReservation.RefundResponse::fromEntity)
@@ -98,5 +110,17 @@ public class PaymentServiceImpl implements  PaymentService {
 
         refundRepository.save(refund);
         return refund.getRefundId();
+    }
+
+    @Override
+    public Long goSalary(SalaryCreateDto.Create createDto) {
+        Payment payment = paymentRepository.findOne(createDto.getPayment_id())
+                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 없습니다."));
+
+        Salary salary = createDto.toEntity();
+        salary.changePayment(payment);
+
+        salaryRepository.save(salary);
+        return salary.getSalaryNo();
     }
 }

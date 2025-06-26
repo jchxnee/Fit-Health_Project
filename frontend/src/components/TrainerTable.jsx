@@ -5,17 +5,20 @@ import { CiMenuKebab } from 'react-icons/ci';
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 import { IoReload } from 'react-icons/io5';
 import theme from '../styles/theme';
+import SalaryModal from './modal/SalaryModal';
 
-const TrainerTable = ({ data, columns, onRowClick }) => {
+const TrainerTable = ({ data, columns, onRowClick, fetchData }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
   const [openMenuId, setOpenMenuId] = useState(null); // 열려있는 메뉴의 row id를 저장
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 }); // 메뉴 위치 상태 추가
   const menuRef = useRef(null); // 팝업 메뉴 DOM 엘리먼트 참조
   const currentMenuButtonRef = useRef(null); // 현재 열린 메뉴를 트리거한 버튼 DOM 엘리먼트 참조
   const tableContainerRef = useRef(null); // StyledTableContainer DOM 엘리먼트 참조
+  const [salaryModalData, setSalaryModalData] = useState(null);
 
   // 정렬된 데이터 반환 함수 (useMemo 최적화)
   const sortedData = useMemo(() => {
+    console.log('data', data);
     let sortableItems = [...data];
     if (sortConfig.key !== null && sortConfig.direction !== 'none') {
       sortableItems.sort((a, b) => {
@@ -158,7 +161,7 @@ const TrainerTable = ({ data, columns, onRowClick }) => {
                 <td key={col.key}>{col.key === 'status' ? <StatusBadge status={row[col.key]} /> : row[col.key]}</td>
               ))}
               <TdMenuCell>
-                <ThreeDotsMenu onClick={(e) => handleThreeDotsMenuClick(e, row.id)}>
+                <ThreeDotsMenu onClick={(e) => handleThreeDotsMenuClick(e, row.id ?? rowIndex)}>
                   <CiMenuKebab />
                 </ThreeDotsMenu>
               </TdMenuCell>
@@ -167,68 +170,41 @@ const TrainerTable = ({ data, columns, onRowClick }) => {
         </tbody>
       </StyledTable>
       {/* openMenuId가 null이 아닐 때만 팝업 메뉴 렌더링 */}
-      {openMenuId !== null && (
-        // PopupMenu는 StyledTableContainer의 자식으로, StyledTable 밖에서 렌더링
-        <PopupMenu ref={menuRef} $top={menuPosition.top} $left={menuPosition.left}>
-          {/* sortedData에서 해당 row 데이터를 찾아 전달 */}
-          <PopupMenuItem
-            onClick={(e) =>
-              handleMenuItemClick(
-                e,
-                '1:1 채팅',
-                sortedData.find((d) => d.id === openMenuId)
-              )
-            }
-          >
-            1:1 채팅
-          </PopupMenuItem>
-          <PopupMenuItem
-            onClick={(e) =>
-              handleMenuItemClick(
-                e,
-                '정산신청',
-                sortedData.find((d) => d.id === openMenuId)
-              )
-            }
-          >
-            정산신청
-          </PopupMenuItem>
-          <PopupMenuItem
-            onClick={(e) =>
-              handleMenuItemClick(
-                e,
-                '승인',
-                sortedData.find((d) => d.id === openMenuId)
-              )
-            }
-          >
-            승인
-          </PopupMenuItem>
-          <PopupMenuItem
-            onClick={(e) =>
-              handleMenuItemClick(
-                e,
-                '거절',
-                sortedData.find((d) => d.id === openMenuId)
-              )
-            }
-          >
-            거절
-          </PopupMenuItem>
-          <PopupMenuItem
-            onClick={(e) =>
-              handleMenuItemClick(
-                e,
-                '삭제',
-                sortedData.find((d) => d.id === openMenuId)
-              )
-            }
-            $isDelete
-          >
-            삭제
-          </PopupMenuItem>
-        </PopupMenu>
-      )}
+      {openMenuId !== null &&
+        (() => {
+          const rowData = sortedData.find((d, i) => (d.id ?? i) === openMenuId);
+          if (!rowData) return null;
+
+          return (
+            <PopupMenu ref={menuRef} $top={menuPosition.top} $left={menuPosition.left}>
+              <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '1:1 채팅', rowData)}>1:1 채팅</PopupMenuItem>
+
+              {rowData.status?.trim() === '완료됨' && (
+                <PopupMenuItem
+                  onClick={(e) => {
+                    handleMenuItemClick(e, '정산신청', rowData); // 기존 닫기 처리 포함
+                    setSalaryModalData(rowData); // 모달 열기
+                  }}
+                >
+                  {rowData.hasSalary ? '정산내역' : '정산신청'}
+                </PopupMenuItem>
+              )}
+
+              <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '승인', rowData)}>승인</PopupMenuItem>
+              <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '거절', rowData)}>거절</PopupMenuItem>
+            </PopupMenu>
+          );
+        })()}
+
+      <SalaryModal
+        isOpen={!!salaryModalData}
+        onClose={() => setSalaryModalData(null)}
+        onSuccess={() => {
+          setSalaryModalData(null);
+          fetchData?.(); // 부모에서 내려준 함수로 리렌더
+        }}
+        data={salaryModalData}
+      />
     </StyledTableContainer>
   );
 };

@@ -56,6 +56,14 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
+    public List<Payment> findPaymentListTrainer(String userEmail) {
+        return em.createQuery(
+                        "SELECT p FROM Payment p WHERE p.responseMember.userEmail = :trainerEmail", Payment.class)
+                .setParameter("trainerEmail", userEmail)
+                .getResultList();
+    }
+
+    @Override
     public Optional<Payment> findOneLast(String userEmail) {
         String sql = "SELECT p FROM Payment p WHERE p.member.userEmail = :userEmail ORDER BY p.appliedAt DESC";
         return em.createQuery(sql, Payment.class)

@@ -38,20 +38,20 @@ export const useHealthForm = ({ useremail, onSuccess }) => {
         today.getDate()
       ).padStart(2, '0')}`;
 
-      // 기존 건강 데이터 조회
-      const existingData = await healthService.getHealthData(useremail);
+      // 건강 데이터 전체 조회
+      const existingDataList = await healthService.getHealthData(useremail);
+      console.log('건강 데이터 전체 조회', existingDataList);
 
-      // 오늘 등록된 데이터가 있는지 확인
-      let alreadyExists = false;
-
-      if (existingData) {
-        const itemDate = new Date(existingData.create_date);
-        const itemDateString = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}-${String(
-          itemDate.getDate()
-        ).padStart(2, '0')}`;
-
-        alreadyExists = itemDateString === todayString;
-      }
+      // 오늘 이미 등록된 데이터가 있는지 확인
+      const alreadyExists = Array.isArray(existingDataList)
+        ? existingDataList.some((item) => {
+            const itemDate = new Date(item.create_date);
+            const itemDateString = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}-${String(
+              itemDate.getDate()
+            ).padStart(2, '0')}`;
+            return itemDateString === todayString;
+          })
+        : false;
 
       if (alreadyExists) {
         toast.error('오늘은 이미 건강 정보를 입력하셨습니다.');

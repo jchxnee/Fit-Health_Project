@@ -10,11 +10,11 @@ import TrainerTable from '../TrainerTable.jsx';
 import CoachSubBar from './CoachSubBar.jsx'; // CoachSubBar 임포트 추가
 
 const tableColumns = [
-  { key: 'coachName', label: '코치 이름', sortable: true },
+  { key: 'userName', label: '고객 이름', sortable: true },
   { key: 'category', label: '카테고리', sortable: true },
   { key: 'status', label: '상태', sortable: true },
   { key: 'sessions', label: '횟수', sortable: true },
-  { key: 'amount', label: '결제금액', sortable: true },
+  { key: 'productPrice', label: '결제금액', sortable: true },
   { key: 'startDate', label: '시작일자', sortable: true },
 ];
 
@@ -71,7 +71,7 @@ const SubWrapper = styled.div`
 `;
 
 // allMatchingData와 함께 onView, currentView prop을 받도록 수정
-const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, currentView }) => {
+const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, currentView, onSalarySuccess }) => {
   // <-- prop 추가
   const selectBarOptions = [
     { label: '전체', value: 'all' },
@@ -153,7 +153,12 @@ const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, curre
             <CoachSubBar onView={onView} currentView={currentView} /> {/* <-- 추가 */}
           </SubWrapper>
         </TableWrapper>
-        <TrainerTable data={currentItems} columns={tableColumns} onRowClick={handleRowClick} />
+        <TrainerTable
+          data={currentItems}
+          columns={tableColumns}
+          onRowClick={handleRowClick}
+          fetchData={onSalarySuccess}
+        />
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
       </ContentWrapper>
 
