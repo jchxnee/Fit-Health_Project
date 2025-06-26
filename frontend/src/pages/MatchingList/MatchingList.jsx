@@ -163,7 +163,7 @@ const MatchingList = () => {
 
     if (searchTerm) {
       currentFilteredData = currentFilteredData.filter((item) =>
-        item.coachName.toLowerCase().includes(searchTerm.toLowerCase())
+        item.trainerName.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 

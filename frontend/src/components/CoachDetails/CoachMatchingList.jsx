@@ -109,7 +109,7 @@ const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, curre
 
     if (searchTerm) {
       currentFilteredData = currentFilteredData.filter((item) =>
-        item.coachName.toLowerCase().includes(searchTerm.toLowerCase())
+        item.userName.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 

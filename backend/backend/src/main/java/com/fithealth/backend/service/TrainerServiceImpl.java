@@ -1,6 +1,7 @@
 package com.fithealth.backend.service;
 
 import com.fithealth.backend.dto.Trainer.SelectTrainerDto;
+import com.fithealth.backend.dto.Trainer.Top3TrainerDto;
 import com.fithealth.backend.dto.Trainer.TrainerDetailDto;
 import com.fithealth.backend.dto.Trainer.addTrainerDto;
 import com.fithealth.backend.dto.Trainer.UpdateTrainerDto;
@@ -273,5 +274,12 @@ public class TrainerServiceImpl implements TrainerService {
                 .orElseThrow(() -> new IllegalArgumentException("해당하는 트레이너를 찾을 수 없습니다. trainerNo: " + trainerNo));
 
         return TrainerDetailDto.ResponseRequest.fromEntity(member);
+    }
+
+    @Override
+    public List<Top3TrainerDto.Response> getTrainerTop3() {
+        return trainerRepository.getTop3().stream()
+                .map(Top3TrainerDto.Response::fromEntity)
+                .collect(Collectors.toList());
     }
 }
