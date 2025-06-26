@@ -227,6 +227,7 @@ function CoachCalendar() {
                   allMatchingData={matchingList}
                   onView={handleViewChange} // <--- 추가
                   currentView={view} // <--- 추가
+                  onSalarySuccess={fetchMatchingList}
                 />
               </div>
             </CSSTransition>

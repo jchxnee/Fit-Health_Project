@@ -86,7 +86,7 @@ const ConfirmButton = styled(ButtonStyle)`
   font-weight: ${theme.fontWeights.semibold};
 `;
 
-const SalaryModal = ({ isOpen, onClose, data }) => {
+const SalaryModal = ({ isOpen, onClose, onSuccess, data }) => {
   const [isLoading, setIsLoading] = useState(false);
   if (!data) return null;
   const { paymentId, userName, productPrice, productName, totalCount, hasSalary } = data;
@@ -103,6 +103,7 @@ const SalaryModal = ({ isOpen, onClose, data }) => {
       console.log('정산 신청 처리 결과:', response);
 
       toast.success('정산 신청이 완료되었습니다!');
+      onSuccess?.();
       onClose();
     } catch (error) {
       console.error('정산 신청 에러:', error);

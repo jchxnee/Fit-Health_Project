@@ -7,7 +7,7 @@ import { IoReload } from 'react-icons/io5';
 import theme from '../styles/theme';
 import SalaryModal from './modal/SalaryModal';
 
-const TrainerTable = ({ data, columns, onRowClick }) => {
+const TrainerTable = ({ data, columns, onRowClick, fetchData }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
   const [openMenuId, setOpenMenuId] = useState(null); // 열려있는 메뉴의 row id를 저장
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 }); // 메뉴 위치 상태 추가
@@ -196,7 +196,15 @@ const TrainerTable = ({ data, columns, onRowClick }) => {
           );
         })()}
 
-      <SalaryModal isOpen={true} onClose={() => setSalaryModalData(null)} data={salaryModalData} />
+      <SalaryModal
+        isOpen={!!salaryModalData}
+        onClose={() => setSalaryModalData(null)}
+        onSuccess={() => {
+          setSalaryModalData(null);
+          fetchData?.(); // 부모에서 내려준 함수로 리렌더
+        }}
+        data={salaryModalData}
+      />
     </StyledTableContainer>
   );
 };

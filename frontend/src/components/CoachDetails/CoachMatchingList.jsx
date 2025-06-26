@@ -71,7 +71,7 @@ const SubWrapper = styled.div`
 `;
 
 // allMatchingData와 함께 onView, currentView prop을 받도록 수정
-const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, currentView }) => {
+const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, currentView, onSalarySuccess }) => {
   // <-- prop 추가
   const selectBarOptions = [
     { label: '전체', value: 'all' },
@@ -153,7 +153,12 @@ const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, curre
             <CoachSubBar onView={onView} currentView={currentView} /> {/* <-- 추가 */}
           </SubWrapper>
         </TableWrapper>
-        <TrainerTable data={currentItems} columns={tableColumns} onRowClick={handleRowClick} />
+        <TrainerTable
+          data={currentItems}
+          columns={tableColumns}
+          onRowClick={handleRowClick}
+          fetchData={onSalarySuccess}
+        />
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
       </ContentWrapper>
 
