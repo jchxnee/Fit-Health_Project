@@ -43,10 +43,11 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Override
     public List<Payment> findPaymentList(String userEmail) {
         String jpql = "SELECT p FROM Payment p " +
-                "JOIN FETCH p.member m " + // 결제자 (사용자) 정보
-                "JOIN FETCH p.responseMember rm " + // 응답자 (트레이너) Member 정보
-                "LEFT JOIN FETCH rm.trainer t " + // 응답자 Member의 Trainer 정보 (트레이너가 아닐 수도 있으므로 LEFT JOIN)
-                "LEFT JOIN FETCH p.reservations r " + // 결제에 포함된 예약 리스트 (completedSessionsCount 계산에 사용)
+                "JOIN FETCH p.member m " +
+                "JOIN FETCH p.responseMember rm " +
+                "LEFT JOIN FETCH rm.trainer t " +
+                "LEFT JOIN FETCH p.reservations r " +
+                "LEFT JOIN FETCH p.review rv " +
                 "WHERE m.userEmail = :userEmail";
 
         return em.createQuery(jpql, Payment.class)

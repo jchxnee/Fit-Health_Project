@@ -3,6 +3,7 @@ package com.fithealth.backend.controller;
 import com.fithealth.backend.dto.Board.BoardCreateDto;
 import com.fithealth.backend.dto.Comment.CommentCreateDto;
 import com.fithealth.backend.dto.Comment.CommentGetDto;
+import com.fithealth.backend.dto.Comment.MyCommentGetDto;
 import com.fithealth.backend.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,12 @@ public class CommentController {
     @GetMapping("/board/{boardNo}")
     public ResponseEntity<List<CommentGetDto>> getCommentsByBoardNo(@PathVariable Long boardNo) {
         return ResponseEntity.ok(commentService.getCommentsByBoardNo(boardNo));
+    }
+
+    @GetMapping("/mycomments")
+    public ResponseEntity<List<MyCommentGetDto>> getMyComments(@RequestParam String userEmail) {
+        return ResponseEntity.ok(commentService.getMyComments(userEmail));
+
     }
 
     @DeleteMapping("/{commentNo}")

@@ -8,6 +8,7 @@ import com.fithealth.backend.entity.Review;
 import com.fithealth.backend.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +22,8 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping
-    public ResponseEntity<Review> create(@RequestBody ReviewCreateDto.Create reviewCreateDto) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Review> create(@ModelAttribute ReviewCreateDto.Create reviewCreateDto) {
         return ResponseEntity.ok(reviewService.createReview(reviewCreateDto));
     }
 
@@ -41,5 +42,10 @@ public class ReviewController {
         return ResponseEntity.ok(myReviews);
     }
 
-
+    @GetMapping("/exsists/{paymentId}")
+    public ResponseEntity<Boolean> findReview(@PathVariable Long paymentId) {
+        System.out.println("프론트에서 받은 결제번호 : " + paymentId);
+        boolean exists = reviewService.findOne(paymentId);
+        return ResponseEntity.ok(exists);
+    }
 }

@@ -36,6 +36,8 @@ public class SelectPaymentDto {
         private String sessions;
         private String startDate;
         private String category;
+        private boolean hasReview;
+        private boolean isRefund;
 
         private List<SelectReservation.Response> history;
 
@@ -99,6 +101,50 @@ public class SelectPaymentDto {
                         .toList();
             }
 
+            boolean hasReview = payment.getReview() != null;
+
+            boolean isRefundable = false;
+
+            if ("취소됨".equals(displayStatus)) {
+                isRefundable = false;
+            } else if(completedSessionsCount ==0){
+                isRefundable = true;
+            } else {
+                Long totalCount = payment.getTotalCount();
+            if (totalCount == 1 || totalCount == 2
+                        || totalCount == 3 || totalCount == 5
+                        || totalCount == 10) {
+                    isRefundable = false;
+                }
+                // 4회 상품: 3회까지 했을 때 환불 가능
+                else if (totalCount == 4) {
+                    if (completedSessionsCount == 3) {
+                        isRefundable = true;
+                    } else {
+                        isRefundable = false;
+                    }
+                }
+                // 6, 7, 8, 9회 상품: 5회까지 했을 때 환불 가능
+                else if (totalCount >= 6 && totalCount <= 9) {
+                    if (completedSessionsCount >= 5) {
+                        isRefundable = true;
+                    } else {
+                        isRefundable = false;
+                    }
+                }
+                // 11회 이상 상품: 10회까지 했을 때 환불 가능
+                else if (totalCount >= 11) {
+                    if (completedSessionsCount >= 10) {
+                        isRefundable = true;
+                    } else {
+                        isRefundable = false;
+                    }
+                }
+            }
+
+
+
+
 
             return Response.builder()
                     .paymentId(payment.getPaymentId())
@@ -116,6 +162,8 @@ public class SelectPaymentDto {
                     .startDate(displayStartDate)
                     .category(category)
                     .history(reservationHistory)
+                    .hasReview(hasReview)
+                    .isRefund(isRefundable)
                     .build();
         }
     }

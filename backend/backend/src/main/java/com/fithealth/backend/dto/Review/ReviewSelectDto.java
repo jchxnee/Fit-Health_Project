@@ -13,8 +13,8 @@ public class ReviewSelectDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
-    @Builder // 빌더 패턴을 사용하여 객체 생성을 편리하게 할 수 있습니다.
-    public static class Select { // private 대신 public으로 변경하여 외부에서 접근 가능하게
+    @Builder
+    public static class Select {
 
         private Long reviewId;
         private String reviewContent;

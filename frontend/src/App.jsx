@@ -49,8 +49,6 @@ import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
 import useUserStore from './store/useUserStore';
 import RefundPage from './pages/PayPage/RefundPage';
 import CoachModify from './pages/coach/CoachModify.jsx';
-import NoticePostCreationPage from './pages/noticePage/NoticePostCreationPage';
-import NoticeDetailPage from './pages/noticePage/NoticeDetailPage';
 
 function AppContent() {
   const location = useLocation();
@@ -85,15 +83,9 @@ function AppContent() {
         <Route path="/coachRegister" element={<CoachRegister />} />
         <Route path="/coach/:id" element={<CoachDetail />} />
         <Route path="/coachModify" element={<CoachModify />} />
-        <Route path="/coachMatching" element={<CoachMatching />} />
+        <Route path="/coachMatching/:trainerNo" element={<CoachMatching />} />
         <Route path="/nextReservation" element={<NextReservation />} />
-        <Route path="/coachReview" element={<CoachReview />} />
-        <Route path="/paymentPage" element={<PaymentPage />} />
-        <Route path="/refundPage/:id" element={<RefundPage />} />
-        <Route path="/coachMatching/:id" element={<CoachMatching />} />
-        <Route path="/coachModify/:trainerNo" element={<CoachModify />} />
-        <Route path="/nextReservation" element={<NextReservation />} />
-        <Route path="/coachReview" element={<CoachReview />} />
+        <Route path="/coachReview/:trainerNo" element={<CoachReview />} />
         <Route path="/paymentPage/:id" element={<PaymentPage />} />
         <Route path="/refundPage/:id" element={<RefundPage />} />
         <Route path="/coachmatchingList" element={<CoachCalendar />} />
@@ -105,10 +97,13 @@ function AppContent() {
         <Route path="/reviewCreationPage" element={<ReviewCreationPage />} />
         <Route path="/communityDetailPage/:id" element={<CommunityPostDetailPage />} />
         <Route path="/notice" element={<NoticePage />} />
+<<<<<<< HEAD
+=======
         <Route path="/notice/:id/edit" element={<NoticePostCreationPage isEditMode={true} />} />
         <Route path="/NoticePostCreationPage" element={<NoticePostCreationPage />} />
         <Route path="/NoticeDetailPage/:noticeNo" element={<NoticeDetailPage />} />
 
+>>>>>>> a4615783f7d858fbecbccf5777771a44787c0d28
         <Route path="/faqPage" element={<FAQPage />} />
         <Route path="/myPostsPage" element={<MyPostsPage />} />
         <Route path="/myCommentsPage" element={<MyCommentsPage />} />

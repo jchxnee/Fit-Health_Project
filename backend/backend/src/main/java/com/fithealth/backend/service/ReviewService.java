@@ -11,4 +11,5 @@ public interface ReviewService {
     Review createReview(ReviewCreateDto.Create reviewCreateDto);
     List<ReviewSelectDto.Select> selectByTrainerNo(Long trainerNo);
     List<SelectMyReviewDto.Select>selectByUserEmail(String userEmail);
+    Boolean findOne(Long paymentId);
 }

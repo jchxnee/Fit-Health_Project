@@ -39,6 +39,7 @@ export const API_ENDPOINTS = {
     CREATE: '/api/review',
     SELECT: '/api/review/',
     MYREVIEW: '/api/review/my',
+    FIND: '/api/review/exsists/',
   },
   BOARD: {
     ALL: 'api/board/all',
@@ -46,6 +47,7 @@ export const API_ENDPOINTS = {
     DETAIL: '/api/board',
     UPDATE: '/api/board',
     DELETE: '/api/board/delete',
+    MYPOSTS: '/api/board/myposts',
   },
   NOTICE: {
     LIST: '/api/notice/all',
@@ -58,6 +60,7 @@ export const API_ENDPOINTS = {
     ALL: 'api/comment',
     CREATE: '/api/comment',
     DELETE: '/api/comment',
+    MYCOMMENTS: '/api/comment/mycomments',
   },
   COACH: {
     LIST: '/api/trainer',
