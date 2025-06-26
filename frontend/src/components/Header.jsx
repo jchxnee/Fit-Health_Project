@@ -177,7 +177,7 @@ function Header({ user }) {
           </HeaderNavLeft>
         </HeaderLeft>
         {user !== null ? (
-          <HeaderRight>
+          <HeaderRight as="div">
             <HeaderNavRight>
               <NotificationWrapper onClick={handleNotificationClick} ref={bellIconRef}>
                 {' '}

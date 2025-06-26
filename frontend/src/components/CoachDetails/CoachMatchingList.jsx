@@ -70,6 +70,13 @@ const SubWrapper = styled.div`
   align-items: center; /* 수직 정렬 */
 `;
 
+const NoDataMessage = styled.div`
+  text-align: center;
+  padding: 50px;
+  font-size: 1.2em;
+  color: #999;
+`;
+
 // allMatchingData와 함께 onView, currentView prop을 받도록 수정
 const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, currentView, onSalarySuccess }) => {
   // <-- prop 추가
@@ -153,12 +160,17 @@ const CoachMatchingList = ({ allMatchingData: initialMatchingData, onView, curre
             <CoachSubBar onView={onView} currentView={currentView} /> {/* <-- 추가 */}
           </SubWrapper>
         </TableWrapper>
-        <TrainerTable
-          data={currentItems}
-          columns={tableColumns}
-          onRowClick={handleRowClick}
-          fetchData={onSalarySuccess}
-        />
+        {currentItems.length === 0 ? (
+          <NoDataMessage>고객님의 코칭 내역이 존재하지 않습니다.</NoDataMessage>
+        ) : (
+          <TrainerTable
+            data={currentItems}
+            columns={tableColumns}
+            onRowClick={handleRowClick}
+            fetchData={onSalarySuccess}
+          />
+        )}
+
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
       </ContentWrapper>
 
