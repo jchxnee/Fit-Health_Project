@@ -177,7 +177,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         // 1. ReviewRepository의 커스텀 메서드를 호출하여 리뷰 목록을 조회합니다.
         // 이 메서드는 Review, Payment, 그리고 Payment에 연결된 Member (작성자 및 트레이너) 정보를 모두 페치 조인하여 가져옵니다.
-        List<Review> reviews = reviewRepository.findReviewsByUserEmailWithPaymentAndMembers(userEmail);
+        List<Review> reviews = reviewRepository.findReviewsByUser(userEmail);
 
         System.out.println("ReviewServiceImpl: 조회된 리뷰 수: " + reviews.size());
 
@@ -221,5 +221,10 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Boolean findOne(Long paymentId) {
         return reviewRepository.findOne(paymentId);
+    }
+
+    @Override
+    public void delete(Long reviewId) {
+        reviewRepository.delete(reviewId);
     }
 }

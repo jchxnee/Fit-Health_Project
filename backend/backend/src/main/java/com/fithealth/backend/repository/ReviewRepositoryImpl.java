@@ -2,6 +2,7 @@ package com.fithealth.backend.repository;
 
 import com.fithealth.backend.entity.Review;
 import com.fithealth.backend.entity.Payment;
+import com.fithealth.backend.enums.CommonEnums.Status;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -44,13 +45,13 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Review> findReviewsByUserEmailWithPaymentAndMembers(String userEmail) {
+    public List<Review> findReviewsByUser(String userEmail) {
         return em.createQuery(
                         "SELECT r FROM Review r " +
                                 "JOIN FETCH r.payment p " +          // Review와 Payment 조인
                                 "JOIN FETCH p.member m " +           // Payment와 결제자(리뷰 작성자) Member 조인
                                 "JOIN FETCH p.responseMember rm " +  // Payment와 응답자(트레이너) Member 조인
-                                "WHERE m.userEmail = :userEmail " +  // 리뷰 작성자(Member)의 이메일로 필터링
+                                "WHERE m.userEmail = :userEmail AND r.status = 'Y' " +  // 리뷰 작성자(Member)의 이메일로 필터링
                                 "ORDER BY r.createdDate DESC", Review.class) // 최신순 정렬 (선택 사항)
                 .setParameter("userEmail", userEmail)
                 .getResultList();
@@ -76,6 +77,17 @@ public class ReviewRepositoryImpl implements ReviewRepository {
                 System.err.println("결제번호로 리뷰를 찾을 수 없습니다. " + e.getMessage());
                 return false;
             }
+        }
+    }
+
+    @Override
+    public void delete(Long reviewId) {
+        Review review = em.find(Review.class, reviewId);
+        if(review != null){
+            review.setStatus(Status.N);
+            em.merge(review);
+        }else{
+            throw new IllegalArgumentException("해당 리뷰아이디 :  " + reviewId + "에 대한 리뷰가 없습니다.");
         }
     }
 

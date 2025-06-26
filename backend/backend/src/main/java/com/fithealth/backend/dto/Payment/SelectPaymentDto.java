@@ -101,7 +101,12 @@ public class SelectPaymentDto {
                         .toList();
             }
 
-            boolean hasReview = payment.getReview() != null;
+            boolean hasReview = false;
+            if (payment.getReview() != null && payment.getReview().getStatus() == CommonEnums.Status.Y) {
+                hasReview = true;
+            } else {
+                hasReview = false;
+            }
 
             boolean isRefundable = false;
 

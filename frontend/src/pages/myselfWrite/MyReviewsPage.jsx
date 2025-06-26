@@ -19,7 +19,6 @@ function MyReviewsPage() {
   const [error, setError] = useState(null);
   const sortMenuRef = useRef(null);
 
-  // --- 모달 관련 상태 및 Ref 추가 ---
   const [modalOpenReviewId, setModalOpenReviewId] = useState(null);
   const modalRef = useRef(null);
 
@@ -36,13 +35,10 @@ function MyReviewsPage() {
     setError(null); // 새로운 요청 전에 에러 초기화
 
     try {
-      // 백엔드 API 호출: /api/review/my?userEmail=사용자이메일
       const response = await api.get(API_ENDPOINTS.REVIEW.MYREVIEW, {
         params: { userEmail: email }, // 쿼리 파라미터로 userEmail 전달
       });
       console.log('백엔드에서 받은 리뷰 데이터:', response.data);
-
-      // 데이터를 받아온 후, 현재 정렬 기준에 맞게 정렬하여 상태 업데이트
       const fetchedReviews = response.data.map((review) => ({
         id: review.reviewId,
         coachName: review.trainerName,
@@ -78,12 +74,10 @@ function MyReviewsPage() {
     }
   };
 
-  // 컴포넌트 마운트 시 또는 userEmail, sortCriteria 변경 시 데이터 불러오기
   useEffect(() => {
     fetchMyReviews(userEmail, sortCriteria);
   }, [userEmail, sortCriteria]); // userEmail 또는 sortCriteria가 변경될 때마다 데이터 다시 불러오고 정렬
 
-  // 추천 버튼 토글 핸들러 (더미 데이터가 아닌 실제 업데이트를 위한 API 호출 필요)
   const handleRecommendToggle = (id) => {
     setReviews((prevReviews) =>
       prevReviews.map((review) =>
@@ -157,29 +151,22 @@ function MyReviewsPage() {
     return stars;
   };
 
-  // 리뷰 수정 핸들러 (실제 API 호출 필요)
-  const handleEditReview = (reviewId) => {
-    alert(`리뷰 ID: ${reviewId} 수정 기능 구현 예정`);
-    setModalOpenReviewId(null); // 모달 닫기
-  };
-
-  // 리뷰 삭제 핸들러 (실제 API 호출 필요)
+  // 리뷰 삭제 핸들러
   const handleDeleteReview = async (reviewId) => {
     if (window.confirm('정말 이 리뷰를 삭제하시겠습니까?')) {
       try {
         // 백엔드 삭제 API 호출 (DELETE /api/review/{reviewId} 가정)
-        await api.delete(`${API_ENDPOINTS.REVIEW.SELECT}${reviewId}`);
+        await api.delete(`${API_ENDPOINTS.REVIEW.DELETE}${reviewId}`);
         toast.success('리뷰가 삭제되었습니다.');
-        // 성공 시 리뷰 목록에서 해당 리뷰 제거
         setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
       } catch (err) {
         console.error('리뷰 삭제 실패:', err);
         toast.error('리뷰 삭제에 실패했습니다.');
       } finally {
-        setModalOpenReviewId(null); // 모달 닫기
+        setModalOpenReviewId(null);
       }
     } else {
-      setModalOpenReviewId(null); // 모달 닫기
+      setModalOpenReviewId(null);
     }
   };
 
@@ -217,7 +204,7 @@ function MyReviewsPage() {
         <ContentWrapper>
           <ReviewListSection>
             <TopReviewBar>
-              <TotalReviewsCount>내가 쓴 리뷰 {reviews.length}개</TotalReviewsCount>
+              <TotalReviewsCount>내가 작성한 리뷰 {reviews.length}개</TotalReviewsCount>
               <SortDropdownContainer ref={sortMenuRef}>
                 <SortButton onClick={() => setSortMenuOpen(!sortMenuOpen)}>
                   {getSortButtonText()} <FaChevronDown size={12} color="#757575" />
@@ -264,7 +251,6 @@ function MyReviewsPage() {
                         </MenuButton>
                         {modalOpenReviewId === review.id && (
                           <ReviewActionsModal ref={modalRef}>
-                            <ModalActionButton onClick={() => handleEditReview(review.id)}>수정</ModalActionButton>
                             <ModalActionButton onClick={() => handleDeleteReview(review.id)}>삭제</ModalActionButton>
                           </ReviewActionsModal>
                         )}
@@ -295,8 +281,6 @@ function MyReviewsPage() {
 }
 
 export default MyReviewsPage;
-
-// --- 스타일 컴포넌트 ---
 
 const PageContainer = styled.div`
   width: 100%;

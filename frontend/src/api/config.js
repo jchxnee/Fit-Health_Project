@@ -41,6 +41,7 @@ export const API_ENDPOINTS = {
     SELECT: '/api/review/',
     MYREVIEW: '/api/review/my',
     FIND: '/api/review/exsists/',
+    DELETE: '/api/review/delete/',
   },
   BOARD: {
     ALL: 'api/board/all',
