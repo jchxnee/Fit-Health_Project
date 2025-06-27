@@ -82,7 +82,7 @@ function SignUpPage() {
 
       // 인증번호 발송 API 호출 (여기서 실제 서버 요청 필요)
       console.log(`인증번호 발송 요청: ${email}`);
-      alert('인증번호가 이메일로 발송되었습니다. 확인해주세요.');
+      toast.success('인증번호가 이메일로 발송되었습니다. 확인해주세요.');
       setEmailAuthMessage('인증번호가 발송되었습니다. 이메일을 확인해주세요.');
     } catch (error) {
       console.error('이메일 확인 중 오류:', error);

@@ -353,7 +353,7 @@ const AlertBar = styled.div`
 // New styled component for the FaBell icon
 const StyledFaBell = styled(FaBell)`
   font-size: ${({ theme }) => theme.fontSizes.lg}; /* Adjust size if needed, e.g., 18px */
-  color: #856404; /* Match the text color of the alert bar */
+  color: #856404;
   flex-shrink: 0; /* Prevent the icon from shrinking */
 `;
 

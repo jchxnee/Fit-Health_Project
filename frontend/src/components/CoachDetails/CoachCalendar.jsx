@@ -125,9 +125,8 @@ function CoachCalendar() {
 
     switch (event.status) {
       case '완료됨':
-        newStyle.backgroundColor = '#DBFCDA'; // 연한 녹색
-        newStyle.color = '#26B326'; // 진한 녹색 텍스트
-        newStyle.border = '1px solid #B4F8B4';
+        newStyle.backgroundColor = '#22c55e';
+        newStyle.color = '#FFFFFF';
         break;
       case '진행중':
         newStyle.backgroundColor = '#D9EDF7';
@@ -143,12 +142,8 @@ function CoachCalendar() {
         newStyle.backgroundColor = '#f6e071';
         newStyle.color = '#1a1919';
         break;
-      default:
-        newStyle.backgroundColor = '#D0E3FC';
-        newStyle.color = '#2667B3';
-        newStyle.border = '1px solid #B4D6F8';
-        break;
     }
+
     return {
       className: '',
       style: newStyle,
@@ -173,6 +168,18 @@ function CoachCalendar() {
     setView(newView);
   };
 
+  const formats = useMemo(
+    () => ({
+      weekdayFormat: (date, culture, localizer) => localizer.format(date, 'ddd', culture), // 'ddd'는 '일', '월', '화' 등 축약된 요일을 의미합니다.
+
+      dayFormat: (date, culture, localizer) => localizer.format(date, 'dd일', culture),
+      monthHeaderFormat: 'YYYY년 MM월',
+      dayHeaderFormat: 'MM월 DD일(ddd)',
+      dateFormat: 'D',
+    }),
+    []
+  );
+
   return (
     <>
       <ContentWrapper>
@@ -190,16 +197,22 @@ function CoachCalendar() {
             >
               <div ref={calendarRef} className="view-transition-wrapper">
                 <Calendar
+                  culture="ko"
+                  formats={formats}
                   localizer={localizer}
                   events={calendarEvents}
                   startAccessor="start"
                   endAccessor="end"
                   style={{ height: '100%' }}
                   defaultView="month"
+                  messages={{
+                    showMore: () => `+ 일정 더보기`,
+                  }}
                   toolbar={true}
                   views={['month']} // Calendar 컴포넌트가 내부적으로 지원하는 뷰는 'month'만
                   date={currentDate}
                   onNavigate={(newDate) => setCurrentDate(newDate)}
+                  popup
                   components={{
                     toolbar: (props) => (
                       <CustomToolbar
