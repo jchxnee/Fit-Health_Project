@@ -143,8 +143,6 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
     } else if (action === '정산내역') {
       setSalaryModalData(rowData); // 정산내역도 동일 모달 사용
     }
-    // 기존 alert는 그대로 유지 요청하셨으므로 남겨둡니다.
-    alert(`${rowData.coachName} 코치의 ${action} 선택됨!`);
 
     // 메뉴 닫힘 관련 상태 업데이트는 한 번만 수행
     setOpenMenuId(null);
