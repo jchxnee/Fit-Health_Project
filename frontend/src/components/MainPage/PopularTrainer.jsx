@@ -72,31 +72,33 @@ const Name = styled.div`
   color: ${({ theme }) => theme.colors.primary};
 `;
 
-const trainers = [
-  { name: '김순자 트레이너', img: 'src/assets/test.jpg' },
-  { name: '정나미 트레이너', img: 'src/assets/test.jpg' },
-  { name: '고훈 트레이너', img: 'src/assets/test.jpg' },
-];
-
-const PopularTrainer = () => (
-    <Wrapper>
-      <Container>
-        <TitleRow>
-          <Title>이 달의 인기 트레이너</Title>
-          <NavItem to="/coachList">
-            <ViewAll>전체보기</ViewAll>
-          </NavItem>
-        </TitleRow>
-        <List>
-          {trainers.map((t) => (
-              <TrainerCard key={t.name}>
-                <ProfileImg src={t.img} alt={t.name} />
-                <Name>{t.name}</Name>
-              </TrainerCard>
-          ))}
-        </List>
-      </Container>
-    </Wrapper>
+const PopularTrainer = ({ trainers }) => (
+  <Wrapper>
+    <Container>
+      <TitleRow>
+        <Title>이 달의 인기 트레이너</Title>
+        <NavItem to="/coachList">
+          <ViewAll>전체보기</ViewAll>
+        </NavItem>
+      </TitleRow>
+      <List>
+        {trainers && trainers.length > 0 ? (
+          <List>
+            {trainers.map((t) => (
+              <Link key={t.trainer_no} to={`/trainerDetail/${t.trainer_no}`} style={{ textDecoration: 'none' }}>
+                <TrainerCard>
+                  <ProfileImg src={t.profile_image} alt={t.trainer_name} />
+                  <Name>{t.trainer_name}</Name>
+                </TrainerCard>
+              </Link>
+            ))}
+          </List>
+        ) : (
+          <div style={{ textAlign: 'center', fontSize: '1.1rem', color: '#999' }}>인기 트레이너가 없습니다.</div>
+        )}
+      </List>
+    </Container>
+  </Wrapper>
 );
 
 export default PopularTrainer;

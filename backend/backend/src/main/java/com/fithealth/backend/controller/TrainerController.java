@@ -1,6 +1,7 @@
 package com.fithealth.backend.controller;
 
 import com.fithealth.backend.dto.Trainer.SelectTrainerDto;
+import com.fithealth.backend.dto.Trainer.Top3TrainerDto;
 import com.fithealth.backend.dto.Trainer.TrainerDetailDto;
 import com.fithealth.backend.dto.Trainer.addTrainerDto;
 import com.fithealth.backend.dto.Trainer.UpdateTrainerDto;
@@ -85,6 +86,11 @@ public class TrainerController {
         result.put("originName", originName);
         result.put("changeName", changeName);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/top3")
+    public ResponseEntity<List<Top3TrainerDto.Response>> getTrainertop3() {
+        return ResponseEntity.ok(trainerService.getTrainerTop3());
     }
 }
 

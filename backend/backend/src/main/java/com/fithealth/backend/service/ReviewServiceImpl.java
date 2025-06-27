@@ -6,11 +6,17 @@ import com.fithealth.backend.dto.Review.SelectMyReviewDto;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.entity.Payment;
 import com.fithealth.backend.entity.Review;
+import com.fithealth.backend.enums.CommonEnums.Status;
 import com.fithealth.backend.repository.MemberRepository;
 import com.fithealth.backend.repository.PaymentRepository;
 import com.fithealth.backend.repository.ReviewRepository;
 import com.fithealth.backend.repository.TrainerRepository;
 import jakarta.persistence.EntityNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +35,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
     private final TrainerRepository trainerRepository;
-
+    private final String UPLOAD_PATH = "C:\\Wallpaper";
     @Override
     public Review createReview(ReviewCreateDto.Create reviewCreateDto) { // 반환 타입을 Review로 변경
 
@@ -37,19 +43,50 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다."));
 
 
-        if (payment.getReview() != null) {
+        if (payment.getReview() != null && payment.getReview().getStatus() == Status.Y) {
             throw new IllegalStateException("이미 이 결제에 대한 리뷰가 존재합니다.");
         }
 
-        String savedImageUrl = null;
+        String originName = null;
+        String changeName = null;
         MultipartFile imageFile = reviewCreateDto.getReviewImageFile();
 
+
+        // 파일이 존재하고 비어있지 않으면 파일 저장 로직 실행
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                originName = imageFile.getOriginalFilename();
+                String fileExtension = "";
+                int dotIndex = originName.lastIndexOf('.');
+                if (dotIndex > 0 && dotIndex < originName.length() - 1) {
+                    fileExtension = originName.substring(dotIndex); // .jpg, .png 등
+                }
+
+                changeName = UUID.randomUUID().toString() + fileExtension; // 유니크한 파일명 생성
+
+                // 파일 저장 경로 생성 (없으면 생성)
+                Path uploadPath = Paths.get(UPLOAD_PATH);
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+
+                // 파일 저장
+                Path filePath = uploadPath.resolve(changeName);
+                Files.copy(imageFile.getInputStream(), filePath);
+
+            } catch (IOException e) {
+
+                throw new RuntimeException("리뷰 이미지 파일 저장 실패: " + e.getMessage(), e);
+            }
+        }
 
         Review review = Review.builder()
                 .payment(payment)
                 .reviewContent(reviewCreateDto.getReviewContent())
                 .rating(reviewCreateDto.getRating())
                 .heart(reviewCreateDto.getHeart())
+                .originName(originName)
+                .changeName(changeName)
                 .build();
 
         Review savedReview = reviewRepository.save(review);
@@ -141,7 +178,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         // 1. ReviewRepository의 커스텀 메서드를 호출하여 리뷰 목록을 조회합니다.
         // 이 메서드는 Review, Payment, 그리고 Payment에 연결된 Member (작성자 및 트레이너) 정보를 모두 페치 조인하여 가져옵니다.
-        List<Review> reviews = reviewRepository.findReviewsByUserEmailWithPaymentAndMembers(userEmail);
+        List<Review> reviews = reviewRepository.findReviewsByUser(userEmail);
 
         System.out.println("ReviewServiceImpl: 조회된 리뷰 수: " + reviews.size());
 
@@ -180,5 +217,15 @@ public class ReviewServiceImpl implements ReviewService {
                 })
                 .collect(Collectors.toList());
 
+    }
+
+    @Override
+    public Boolean findOne(Long paymentId) {
+        return reviewRepository.findOne(paymentId);
+    }
+
+    @Override
+    public void delete(Long reviewId) {
+        reviewRepository.delete(reviewId);
     }
 }

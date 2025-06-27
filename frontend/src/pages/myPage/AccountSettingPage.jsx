@@ -169,7 +169,7 @@ function AccountSettingsPage() {
             <LabelWrapper>
               <Label>이름</Label>
               <ActionLink onClick={handleNameEdit} disabled={isLoading}>
-                {isLoading ? <BeatLoader /> : '수정'}
+                수정
               </ActionLink>
             </LabelWrapper>
             <DisplayInput type="text" {...register('username')} />
@@ -180,7 +180,7 @@ function AccountSettingsPage() {
             <LabelWrapper>
               <Label>생년월일</Label>
               <ActionLink onClick={handleBirthEdit} disabled={isLoading}>
-                {isLoading ? <BeatLoader /> : '수정'}
+                수정
               </ActionLink>
             </LabelWrapper>
             <DisplayInput type="date" {...register('birth')} />

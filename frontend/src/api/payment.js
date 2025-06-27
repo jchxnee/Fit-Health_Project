@@ -57,4 +57,50 @@ export const paymentService = {
       throw new Error(message);
     }
   },
+
+  //진행된 레슨 회차 정보 조회
+  getReservationData: async (paymentId) => {
+    try {
+      const { data } = await api.get(API_ENDPOINTS.PAYMENT.RESERVATION, {
+        params: {
+          paymentId: paymentId,
+        },
+      });
+
+      return data;
+    } catch (error) {
+      const message = error.response?.data?.message || '결제 정보 조회에 실패했습니다.';
+      throw new Error(message);
+    }
+  },
+
+  //환불 진행
+  goRefund: async (paymentId, refundPrice, refundFee) => {
+    try {
+      const { data } = await api.put(API_ENDPOINTS.PAYMENT.REFUND, {
+        payment_id: paymentId,
+        refund_price: refundPrice,
+        refund_fee: refundFee,
+      });
+      return data;
+    } catch (error) {
+      const message = error.response?.data?.message || '환불 하는데 실패했습니다.';
+      throw new Error(message);
+    }
+  },
+
+  //정산 신청 진행
+  goSalary: async (paymentId, salaryPrice, salaryFee) => {
+    try {
+      const { data } = await api.put(API_ENDPOINTS.PAYMENT.SALARY, {
+        payment_id: paymentId,
+        salary_price: salaryPrice,
+        salary_fee: salaryFee,
+      });
+      return data;
+    } catch (error) {
+      const message = error.response?.data?.message || '환불 하는데 실패했습니다.';
+      throw new Error(message);
+    }
+  },
 };

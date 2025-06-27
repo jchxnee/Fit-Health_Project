@@ -207,7 +207,7 @@ const TimeSlotButton = styled.button`
   }
 `;
 
-const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeChange }) => {
+const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeChange, minDate }) => {
   // currentDisplayDate를 selectedDate prop을 기반으로 초기화
   // selectedDate가 유효한 날짜 문자열이라면 그 날짜로 Date 객체 생성
   // 유효하지 않다면 (예: null) 현재 날짜로 초기화
@@ -297,7 +297,7 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
     <>
       <TimeReservationText>P.T 시간(핏코치의 이동시간 포함 1시간 30분 단위로 예약 가능)</TimeReservationText>
       <DatePickerContainer>
-        <StyledDateInput type="date" value={selectedDate} onChange={onDateChange} />
+        <StyledDateInput type="date" value={selectedDate} onChange={onDateChange} min={minDate} />
         <StyledTimeInput type="time" value={selectedTime || ''} onChange={onTimeChange} />
       </DatePickerContainer>
 
@@ -328,8 +328,12 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
                 : null;
 
               const isSelected = !dayInfo.isPlaceholder && formattedDayInfoDate === selectedDate;
-
               const isWeekend = dayInfo.date && (dayInfo.date.getDay() === 0 || dayInfo.date.getDay() === 6);
+
+              // ✅ 날짜 비교 시 시간 제거
+              const stripTime = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+              const isBeforeMinDate = minDate && dayInfo.date && stripTime(dayInfo.date) < stripTime(new Date(minDate));
+
               return (
                 <CalendarDay
                   key={index}
@@ -337,7 +341,7 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
                   isSelected={isSelected}
                   isWeekend={isWeekend}
                   onClick={
-                    dayInfo.isPlaceholder
+                    dayInfo.isPlaceholder || isBeforeMinDate
                       ? null
                       : () => {
                           const year = dayInfo.date.getFullYear();
@@ -346,7 +350,7 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
                           onDateChange({ target: { value: `${year}-${month}-${day}` } });
                         }
                   }
-                  disabled={dayInfo.isPlaceholder}
+                  disabled={dayInfo.isPlaceholder || isBeforeMinDate}
                 >
                   {dayInfo.day}
                 </CalendarDay>

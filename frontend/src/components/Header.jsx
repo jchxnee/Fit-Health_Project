@@ -32,8 +32,10 @@ function NotificationList() {
 // UserMenu 컴포넌트 (제공된 코드)
 function UserMenu({ onMenuItemClick }) {
   const logout = useUserStore((state) => state.logout);
+  const updateUser = useUserStore((state) => state.updateUser);
+  const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
-
+  console.log(user.trainerNo);
   const handleLogout = () => {
     logout(); // 상태 초기화
     toast.success('로그아웃되었습니다.');
@@ -41,15 +43,34 @@ function UserMenu({ onMenuItemClick }) {
   };
 
   // 신청 내역으로 이동하면서 이메일을 쿼리 파라미터로 넘기는 함수
+  const handleToggleGrade = async () => {
+    if (!user) return;
+
+    const newGrade = user.grade === 'U' ? 'C' : 'U';
+
+    try {
+      await updateUser({ grade: newGrade });
+
+      toast.success(newGrade === 'C' ? '핏코치로 전환되었습니다.' : '일반 유저로 전환되었습니다.');
+      onMenuItemClick(); // 메뉴 닫기
+    } catch (error) {
+      toast.error('전환 실패: ' + (error?.message || '알 수 없는 오류'));
+    }
+  };
 
   const menuItems = [
     { name: '마이페이지', to: '/mypage' },
-    { name: '신청 내역', to: '/matchingList' },
     {
-      name: '핏코치 등록',
-      to: '/coachRegister',
-      icon: <StyledFaSyncAlt />,
+      name: user.grade === 'U' ? '신청 내역' : '코칭 내역',
+      to: user.grade === 'U' ? '/matchingList' : '/coachmatchingList',
     },
+    user?.trainerNo == null
+      ? { name: '핏코치 등록', to: '/coachRegister', icon: <StyledFaSyncAlt /> }
+      : {
+          name: user.grade === 'U' ? '핏코치 전환' : '일반 유저 전환',
+          action: handleToggleGrade,
+          icon: <StyledFaSyncAlt />,
+        },
     { name: '로그아웃', action: handleLogout },
   ];
 
@@ -157,7 +178,7 @@ function Header({ user }) {
           </HeaderNavLeft>
         </HeaderLeft>
         {user !== null ? (
-          <HeaderRight>
+          <HeaderRight as="div">
             <HeaderNavRight>
               <NotificationWrapper onClick={handleNotificationClick} ref={bellIconRef}>
                 {' '}

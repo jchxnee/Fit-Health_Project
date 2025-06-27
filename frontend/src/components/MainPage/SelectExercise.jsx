@@ -20,13 +20,13 @@ const Item = styled.div`
   cursor: pointer;
 `;
 const IconBox = styled.div`
-    width: ${({ theme }) => theme.spacing[10]};
-    height: ${({ theme }) => theme.spacing[10]};
-    border-radius: ${({ theme }) => theme.borderRadius.ten};
-    margin-bottom: ${({ theme }) => theme.spacing[2]};
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  width: ${({ theme }) => theme.spacing[10]};
+  height: ${({ theme }) => theme.spacing[10]};
+  border-radius: ${({ theme }) => theme.borderRadius.ten};
+  margin-bottom: ${({ theme }) => theme.spacing[2]};
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const IconImage = styled.img`
@@ -43,23 +43,20 @@ const NavItem = styled(Link)`
 `;
 
 const items = [
-    { label: '전체보기', img: 'src/assets/MainPage/All.png'},
-    { label: '헬스', img: 'src/assets/MainPage/health.png' },
-    { label: '요가', img: 'src/assets/MainPage/yoga.png' },
-    { label: '도수', img: 'src/assets/MainPage/therapy.png' },
-    { label: '재활', img: 'src/assets/MainPage/rehabilitation.png' }
+  { label: '전체보기', img: 'src/assets/MainPage/All.png' },
+  { label: '헬스', img: 'src/assets/MainPage/health.png' },
+  { label: '요가', img: 'src/assets/MainPage/yoga.png' },
+  { label: '도수', img: 'src/assets/MainPage/therapy.png' },
+  { label: '재활', img: 'src/assets/MainPage/rehabilitation.png' },
 ];
-
 
 const SelectExercise = () => (
   <Wrapper>
     <List>
       {items.map((item) => (
-        <NavItem to="/coachList">
+        <NavItem to="/coachList" state={{ category: item.label }} key={item.label}>
           <Item key={item.label}>
-            <IconBox>
-                {item.img && <IconImage src={item.img} alt={item.label} />}
-            </IconBox>
+            <IconBox>{item.img && <IconImage src={item.img} alt={item.label} />}</IconBox>
             <Label>{item.label}</Label>
           </Item>
         </NavItem>

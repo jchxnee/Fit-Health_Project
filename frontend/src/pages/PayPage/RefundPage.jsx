@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   InfoKey,
   InfoRow,
@@ -16,11 +17,70 @@ import {
 import { CiCircleInfo } from 'react-icons/ci';
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
+import useUserStore from '../../store/useUserStore';
+import { paymentService } from '../../api/payment';
+import { toast } from 'react-toastify';
 
 const RefundPage = () => {
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false); // 취소 규정 모달 상태
+  const { user } = useUserStore();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [paymentData, setPaymentData] = useState(null); // <- 결제 정보 상태 저장
+  const [reservationData, setReservationData] = useState(null); // <- 예약 횟수 저장
+  const [isLoading, setIsLoading] = useState(false);
 
-  // 취소 규정 모달 열기/닫기 핸들러
+  useEffect(() => {
+    if (!user?.email || !id) return;
+    console.log('paymentId:', id);
+
+    const fetchPaymentData = async () => {
+      const payments = await paymentService.getPaymentData(id);
+      const reservations = await paymentService.getReservationData(id);
+      setPaymentData(payments);
+      setReservationData(reservations);
+    };
+
+    fetchPaymentData();
+  }, [user.email, id]);
+
+  const getValidReservationCount = (reservations) => {
+    const now = new Date();
+    const limitTime = new Date(now.getTime() - 24 * 60 * 60 * 1000); // 24시간 전
+
+    return reservations.filter((reservation) => {
+      const date = new Date(reservation.selectDate);
+      return date >= limitTime; // 24시간 이내만 포함
+    }).length;
+  };
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const getRefundAmount = (paymentData, reservationData) => {
+    if (!paymentData || !reservationData) return { refund: 0, used: 0, fee: 0 };
+
+    const unitPrice = paymentData.product_price;
+    const usedCount = getValidReservationCount(reservationData);
+    const usedAmount = unitPrice * usedCount;
+    const cancelFee = (unitPrice - usedAmount) * 0.1;
+    const refundAmount = paymentData.product_price - usedAmount - cancelFee;
+
+    return {
+      used: Math.floor(usedAmount),
+      fee: Math.floor(cancelFee),
+      refund: Math.floor(refundAmount),
+    };
+  };
+
+  const { used, fee, refund } = getRefundAmount(paymentData, reservationData);
+
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+
   const handleOpenCancelModal = () => {
     setIsCancelModalOpen(true);
   };
@@ -29,103 +89,121 @@ const RefundPage = () => {
     setIsCancelModalOpen(false);
   };
 
+  const handleRefund = async () => {
+    try {
+      setIsLoading(true);
+      const response = await paymentService.goRefund(id, refund, fee);
+      console.log('결제 처리 결과:', response);
+
+      toast.success('환불 처리가 완료되었습니다!');
+      navigate('/');
+    } catch (error) {
+      console.error('결제 에러:', error);
+      toast.error('결제 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!paymentData) {
+    return <div>결제 정보를 불러올 수 없습니다.</div>;
+  }
+
   return (
     <PaymentContainer>
       <TitleBar title={'환불'} />
       <PaymentContentBox>
-        {/* 레슨 정보 */}
         <section>
-          <SectionTitle>요가 레슨</SectionTitle>
+          <SectionTitle>{paymentData.product_name} 레슨</SectionTitle>
           <InfoStackedRow>
-            <InfoKey>김요가 트레이너</InfoKey>
-            <InfoValue>2025.06.12 PM 6시 30분</InfoValue>
-            <InfoValue>진행 회차 : 3회차</InfoValue>
+            <InfoKey>{paymentData.trainer_name} 트레이너</InfoKey>
           </InfoStackedRow>
           <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
         </section>
 
-        {/* 예약자 정보 */}
         <section>
           <SectionTitle>예약자 정보</SectionTitle>
           <InfoRow className="horizontal-start">
-            <InfoKey>김현아</InfoKey>
-            <InfoValue>010-5028-0682</InfoValue>
+            <InfoKey>{paymentData.user_name}</InfoKey>
+            <InfoValue>{paymentData.user_phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}</InfoValue>
           </InfoRow>
           <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
         </section>
 
-        {/* 환불 정보 */}
+        <section>
+          <SectionTitle>회차 정보</SectionTitle>
+          <InfoStackedRow className="horizontal-start">
+            {reservationData.map((reservation, index) => (
+              <InfoKey key={index}>
+                {index + 1}회차 예약 날짜 : {formatDate(reservation.selectDate)}
+              </InfoKey>
+            ))}
+            <br />
+            <InfoKey>진행된 회차 : {getValidReservationCount(reservationData)}회</InfoKey>
+            <InfoKey>전체 회차 : {paymentData.total_count}회</InfoKey>
+          </InfoStackedRow>
+          <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
+        </section>
+
         <PaymentAmountSection>
           <SectionTitle>환불 정보</SectionTitle>
           <InfoRow>
             <InfoKey>결제 금액</InfoKey>
-            <InfoValue>237,500원</InfoValue>
+            <InfoValue>{paymentData.product_price.toLocaleString()}원</InfoValue>
+          </InfoRow>
+          <InfoRow>
+            <InfoKey>사용된 금액</InfoKey>
+            <InfoValue>{used.toLocaleString()}원</InfoValue>
           </InfoRow>
           <InfoRow>
             <CancleInfoKey>
               취소 수수료
               <CiCircleInfo style={{ cursor: 'pointer' }} onClick={handleOpenCancelModal} />
             </CancleInfoKey>
-            <InfoValue>3,750원</InfoValue>
+            <InfoValue>{fee.toLocaleString()}원</InfoValue>
           </InfoRow>
           <TotalAmountRow>
-            <TotalAmountKey>환불 금액</TotalAmountKey>
-            <TotalAmountValue $isRed>233,750원</TotalAmountValue>
+            <TotalAmountKey>환불 예정 금액</TotalAmountKey>
+            <TotalAmountValue $isRed>{refund.toLocaleString()}원</TotalAmountValue>
           </TotalAmountRow>
           <InfoRow style={{ borderBottom: `1px solid #e5e7eb` }} />
         </PaymentAmountSection>
 
-        {/* 결제하기 버튼 */}
-        <PaymentButton>환불 신청</PaymentButton>
+        <PaymentButton onClick={handleRefund} disabled={isLoading}>
+          환불 신청
+        </PaymentButton>
       </PaymentContentBox>
 
-      {/* 취소 규정 모달 */}
       {isCancelModalOpen && (
         <ModalOverlay onClick={handleCloseCancelModal}>
           <ModalContent onClick={(e) => e.stopPropagation()}>
-            {' '}
-            {/* 모달 바깥 클릭 시 닫히도록 */}
             <ModalHeader>
-              <ModalTitle>취소 규정</ModalTitle>
+              <ModalTitle>취소 수수료 안내</ModalTitle>
               <CloseButton onClick={handleCloseCancelModal}>&times;</CloseButton>
             </ModalHeader>
-            <Table>
-              <thead>
-                <tr>
-                  <th>기간</th>
-                  <th>취소 수수료율</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>코칭 7일(168시간) 전 취소시</td>
-                  <td>전액 환불</td>
-                </tr>
-                <tr>
-                  <td>코칭 5일(168시간) 전 취소시</td>
-                  <td>총 코칭비의 10%</td>
-                </tr>
-                <tr>
-                  <td>코칭 3일(168시간) 전 취소시</td>
-                  <td>총 코칭비의 50%</td>
-                </tr>
-                <tr>
-                  <td>코칭 2일(48시간) 전 취소시</td>
-                  <td>총 코칭비의 80%</td>
-                </tr>
-                <tr>
-                  <td>코칭 하루전(24시간) 전 취소시</td>
-                  <td>취소 및 환불 불가</td>
-                </tr>
-              </tbody>
-            </Table>
-            <PolicyList>
-              <li>취소 규정은 예약일자 기준으로 적용됩니다.</li>
-              <li>당일 예약건에 한해 예약시간 기준 1시간 이내 취소시 전액 환불됩니다.</li>
+
+            <p>
+              할인 패키지(3회, 5회, 10회 등)를 결제한 경우, 패키지별 최소 이행 회차 기준을 충족한 뒤 남은 회차에 대해
+              아래와 같이 환불 및 취소 수수료가 적용됩니다.
+            </p>
+
+            <br />
+
+            <strong>📌 취소 수수료 기준</strong>
+            <ul>
               <li>
-                취소 수수료는 쿠폰 및 포인트와 같은 할인금액을 제외하지 않은 전체 예약 금액을 기준으로 계산됩니다.
+                환불 가능한 회차에 대해 <strong>총 결제 금액 ÷ 전체 예약 회차 × 미사용 회차</strong>로 환불 금액을
+                계산합니다.
               </li>
-            </PolicyList>
+              <li>
+                이 환불 금액의 <strong>10%</strong>는 취소 수수료로 공제되며, 나머지가 환불됩니다.
+              </li>
+              <li>
+                <strong>예시:</strong> 10회 중 7회만 진행하고 환불 요청 시, <br />
+                → 총 결제 금액 ÷ 10 × 3 = 미사용 금액
+                <br />→ 이 금액의 10% 공제 후 환불
+              </li>
+            </ul>
           </ModalContent>
         </ModalOverlay>
       )}

@@ -9,7 +9,7 @@ import api from '../../api/axios';
 import { API_ENDPOINTS } from '../../api/config';
 
 function CoachReview() {
-  const { trainerEmail } = useParams(); // URL에서 trainerEmail 가져오기
+  const { trainerNo } = useParams(); // URL에서 trainerEmail 가져오기
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const [sortCriteria, setSortCriteria] = useState('highestRating'); // 초기 정렬 기준: 높은순
   const sortMenuRef = useRef(null);
@@ -17,6 +17,8 @@ function CoachReview() {
   const [reviews, setReviews] = useState([]); // 실제 리뷰 데이터를 저장할 상태
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [error, setError] = useState(null); // 에러 상태
+
+  const [trainerName, setTrainerName] = useState('');
 
   // '높은 순' 드롭다운 외부 클릭 감지
   useEffect(() => {
@@ -34,7 +36,7 @@ function CoachReview() {
   // API로부터 리뷰 데이터를 가져오는 useEffect
   useEffect(() => {
     const fetchReviews = async () => {
-      if (!trainerEmail) {
+      if (!trainerNo) {
         // trainerEmail이 없으면 API 호출하지 않음
         setLoading(false);
         setError('트레이너 이메일이 제공되지 않았습니다.');
@@ -43,8 +45,10 @@ function CoachReview() {
       setLoading(true);
       setError(null);
       try {
-        // API_ENDPOINTS.REVIEW.SELECT와 trainerEmail을 조합하여 요청
-        const response = await api.get(`${API_ENDPOINTS.REVIEW.SELECT}${trainerEmail}`);
+        const trainerResponse = await api.get(`${API_ENDPOINTS.COACH.LIST}${trainerNo}`);
+        setTrainerName(trainerResponse.data.trainerName);
+        console.log('백에서 가져온 트레이너 데이터 : ', trainerResponse.data);
+        const response = await api.get(`${API_ENDPOINTS.REVIEW.SELECT}${trainerNo}`);
         // 백엔드 DTO 구조에 맞춰 데이터 매핑
         const fetchedReviews = response.data.map((review) => ({
           id: review.reviewId, // 백엔드 reviewId를 id로 매핑
@@ -67,7 +71,7 @@ function CoachReview() {
     };
 
     fetchReviews();
-  }, [trainerEmail]); // trainerEmail이 변경될 때마다 리뷰를 다시 불러옴
+  }, [trainerNo]); // trainerEmail이 변경될 때마다 리뷰를 다시 불러옴
 
   // 별점 렌더링 함수 (FaStar, FaStarHalfAlt, FaRegStar 사용)
   const renderStars = (rating) => {
@@ -154,8 +158,7 @@ function CoachReview() {
         <TitleBar title="코치 후기" /> {/* TitleBar 컴포넌트 사용 */}
         <MainContentWrapper>
           <CoachInfoSection>
-            {/* 실제 트레이너 이름은 백엔드에서 받아와야 하지만, 현재는 더미 데이터 또는 상위 컴포넌트에서 전달받아야 함 */}
-            <CoachName>{trainerEmail} 트레이너</CoachName> {/* 임시로 이메일 표시 */}
+            <CoachName>{trainerName} 트레이너</CoachName>
             <ReviewCount>총 {reviews.length}개의 후기</ReviewCount>
             <SortDropdownContainer ref={sortMenuRef}>
               <SortButton onClick={() => setSortMenuOpen(!sortMenuOpen)}>

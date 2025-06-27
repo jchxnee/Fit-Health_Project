@@ -49,6 +49,8 @@ import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
 import useUserStore from './store/useUserStore';
 import RefundPage from './pages/PayPage/RefundPage';
 import CoachModify from './pages/coach/CoachModify.jsx';
+import NoticePostCreationPage from './pages/noticePage/NoticePostCreationPage';
+import NoticeDetailPage from './pages/noticePage/NoticeDetailPage';
 
 function AppContent() {
   const location = useLocation();
@@ -82,13 +84,13 @@ function AppContent() {
         <Route path="/coachList" element={<CoachList />} />
         <Route path="/coachRegister" element={<CoachRegister />} />
         <Route path="/coach/:id" element={<CoachDetail />} />
+        <Route path="/coachModify" element={<CoachModify />} />
         <Route path="/coachMatching/:id" element={<CoachMatching />} />
-        <Route path="/coachModify/:trainerNo" element={<CoachModify />} />
         <Route path="/nextReservation" element={<NextReservation />} />
-        <Route path="/coachReview" element={<CoachReview />} />
+        <Route path="/coachReview/:trainerNo" element={<CoachReview />} />
         <Route path="/paymentPage/:id" element={<PaymentPage />} />
-        <Route path="/refundPage" element={<RefundPage />} />
-          <Route path="/coachmatchingList" element={<CoachCalendar />} />
+        <Route path="/refundPage/:id" element={<RefundPage />} />
+        <Route path="/coachmatchingList" element={<CoachCalendar />} />
 
         {/* 커뮤니티 */}
         <Route path="/community" element={<CommunityPage />} />
@@ -97,6 +99,10 @@ function AppContent() {
         <Route path="/reviewCreationPage" element={<ReviewCreationPage />} />
         <Route path="/communityDetailPage/:id" element={<CommunityPostDetailPage />} />
         <Route path="/notice" element={<NoticePage />} />
+        <Route path="/notice/:id/edit" element={<NoticePostCreationPage isEditMode={true} />} />
+        <Route path="/NoticePostCreationPage" element={<NoticePostCreationPage />} />
+        <Route path="/NoticeDetailPage/:noticeNo" element={<NoticeDetailPage />} />
+
         <Route path="/faqPage" element={<FAQPage />} />
         <Route path="/myPostsPage" element={<MyPostsPage />} />
         <Route path="/myCommentsPage" element={<MyCommentsPage />} />

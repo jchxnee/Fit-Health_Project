@@ -1,3 +1,5 @@
+// src/main/components/modal/HistoryModal.jsx
+
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Calendar from 'react-calendar';
@@ -159,6 +161,21 @@ const CalendarWrapper = styled.div`
     align-items: center;
   }
 
+  // ⭐ 추가된 스타일: 거절된 날짜를 위한 빨간색 원 ⭐
+  .react-calendar__tile.rejected-day {
+    background-color: ${theme.colors.dangerLight} !important; /* 연한 빨강 */
+    border-radius: 50%;
+    color: ${theme.colors.danger} !important; /* 진한 빨강 텍스트 */
+    font-weight: ${theme.fontWeights.bold};
+    width: 38px;
+    height: 38px;
+    line-height: 38px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid ${theme.colors.danger}; /* 빨간색 테두리 */
+  }
+
   /* 이전 달/다음 달 날짜 색상 투명하게 (보이지 않게) */
   .react-calendar__month-view__days__day--neighboringMonth {
     color: transparent !important;
@@ -206,29 +223,39 @@ const HistoryListItem = styled.div`
   font-size: ${theme.fontSizes.md};
   color: ${theme.colors.gray['800']};
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
   box-shadow: ${theme.shadows.sm};
   transition: background-color 0.2s ease-in-out;
 `;
 
-const HistoryDate = styled.span`
-  font-weight: ${theme.fontWeights.medium};
+const HistoryItemTopRow = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
 `;
 
-const HistorySession = styled.span`
+const HistoryDate = styled.span`
+  font-weight: ${theme.fontWeights.medium};
+  font-size: ${theme.fontSizes.base};
+`;
+
+const HistorySessionStatus = styled.span`
   color: ${theme.colors.gray['600']};
+  font-size: ${theme.fontSizes.sm}; /* 좀 더 작게 */
+`;
+
+const RejectComment = styled.p`
+  color: ${theme.colors.danger};
+  font-size: ${theme.fontSizes.sm};
+  margin-top: ${theme.spacing[1]};
+  margin-bottom: 0;
 `;
 
 const HistoryModal = ({ isOpen, onClose, coachName, history }) => {
   if (!isOpen) return null;
 
   const [activeDate, setActiveDate] = useState(new Date());
-
-  const sessionDates = history.map((item) => {
-    const [year, month, day] = item.date.split('/').map(Number);
-    return new Date(year, month - 1, day);
-  });
 
   const isSameDay = (date1, date2) => {
     return (
@@ -238,10 +265,31 @@ const HistoryModal = ({ isOpen, onClose, coachName, history }) => {
     );
   };
 
+  const sessionDates = [];
+  const rejectedDates = [];
+
+  history.forEach((item) => {
+    const datePart = item.selectDate.split(' ')[0];
+    const [year, month, day] = datePart.split('-').map(Number);
+    const dateObj = new Date(year, month - 1, day);
+
+    if (item.status === 'N' && item.rejectComment) {
+      rejectedDates.push(dateObj);
+    } else if (item.status === 'Y') {
+      sessionDates.push(dateObj);
+    }
+  });
+
   const tileClassName = ({ date, view }) => {
     if (view === 'month') {
+      const isRejectedDay = rejectedDates.some((rejectedDate) => isSameDay(rejectedDate, date));
+      if (isRejectedDay) {
+        return 'rejected-day';
+      }
       const isSessionDay = sessionDates.some((sessionDate) => isSameDay(sessionDate, date));
-      return isSessionDay ? 'session-day' : null;
+      if (isSessionDay) {
+        return 'session-day';
+      }
     }
     return null;
   };
@@ -268,14 +316,29 @@ const HistoryModal = ({ isOpen, onClose, coachName, history }) => {
           <HistoryListWrapper>
             {history.length > 0 ? (
               history.map((item, index) => {
-                const [year, month, day] = item.date.split('/').map(Number);
+                // 이 부분은 캘린더 하이라이트와는 별개로, 리스트 아이템의 배경색을 결정
+                const datePartForHighlight = item.selectDate.split(' ')[0];
+                const [year, month, day] = datePartForHighlight.split('-').map(Number);
                 const safeItemDate = new Date(year, month - 1, day);
 
+                // 리스트 아이템의 배경색은 승인된 세션 날짜인 경우만 구분
                 const isItemSessionDate = sessionDates.some((sessionDate) => isSameDay(sessionDate, safeItemDate));
+
                 return (
                   <HistoryListItem key={index} $isSessionDate={isItemSessionDate}>
-                    <HistoryDate>{item.date}</HistoryDate>
-                    <HistorySession>{item.session}</HistorySession>
+                    <HistoryItemTopRow>
+                      <HistoryDate>
+                        {index + 1}회차: {item.selectDate.split(' ')[0]} {/* 리스트에서도 날짜만 표시 */}
+                        {item.status === 'Y' && <HistorySessionStatus>(승인됨)</HistorySessionStatus>}
+                        {item.status === 'N' && !item.rejectComment && (
+                          <HistorySessionStatus>(승인 대기중)</HistorySessionStatus>
+                        )}
+                        {item.status === 'N' && item.rejectComment && (
+                          <HistorySessionStatus>(거절됨)</HistorySessionStatus>
+                        )}
+                      </HistoryDate>
+                    </HistoryItemTopRow>
+                    {item.rejectComment && <RejectComment>거절 사유: {item.rejectComment}</RejectComment>}
                   </HistoryListItem>
                 );
               })

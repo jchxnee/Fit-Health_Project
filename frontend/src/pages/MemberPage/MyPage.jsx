@@ -15,37 +15,12 @@ import emailIcon from '../../../public/img/email.png';
 import { useHealthForm } from '../../hooks/member/useHealthForm';
 import { healthService } from '../../api/health';
 import { toast } from 'react-toastify';
+import HealthChart from '../../components/HealthChart';
 
 const MyPage = () => {
   const { user } = useUserStore();
 
-  // raw 데이터 → 차트용 데이터 변환
-  const transformHealthData = (rawData) => {
-    console.log(rawData);
-    const weightData = [];
-    const skeletalMuscleData = [];
-    const bodyFatData = [];
-
-    rawData.forEach((item) => {
-      const date = new Date(item.create_date); // 소문자 필드명
-      const formattedDate = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(
-        date.getDate()
-      ).padStart(2, '0')}`;
-
-      weightData.push({ x: formattedDate, y: item.weight });
-      skeletalMuscleData.push({ x: formattedDate, y: item.skeletal_muscle });
-      bodyFatData.push({ x: formattedDate, y: item.body_fat });
-    });
-
-    return [
-      { id: '체중 (kg)', data: weightData },
-      { id: '골격근량 (kg)', data: skeletalMuscleData },
-      { id: '체지방량 (kg)', data: bodyFatData },
-    ];
-  };
-
-  // 차트 데이터 상태
-  const [chartData, setChartData] = useState([]);
+  const [rawHealthData, setRawHealthData] = useState([]);
   const [isHealthInputModalOpen, setIsHealthInputModalOpen] = useState(false);
 
   // 🧾 건강 정보 입력 폼 Hook
@@ -54,8 +29,7 @@ const MyPage = () => {
     onSuccess: async () => {
       try {
         const freshData = await healthService.getHealthData(user.email);
-        const transformed = transformHealthData(freshData);
-        setChartData(transformed); // 최신 데이터 반영
+        setRawHealthData(freshData);
       } catch (err) {
         toast.error('차트 데이터 업데이트에 실패했습니다.');
         console.error(err);
@@ -70,8 +44,7 @@ const MyPage = () => {
     const fetchHealthData = async () => {
       try {
         const raw = await healthService.getHealthData(user.email);
-        const converted = transformHealthData(raw);
-        setChartData(converted);
+        setRawHealthData(raw);
       } catch (err) {
         console.error('건강 정보 조회 실패', err);
       }
@@ -109,148 +82,34 @@ const MyPage = () => {
         </AlertBar>
 
         {/* 건강 정보 섹션 추가 */}
-        <HealthInfoContainer>
-          <HealthInfoSectionHeader>
-            <SectionHeader>
-              건강 정보
-              <MdOutlineHealthAndSafety />
-            </SectionHeader>
-            <HealthInfoInputButton onClick={openHealthInputModal}>건강정보 입력</HealthInfoInputButton>
-          </HealthInfoSectionHeader>
-          <ChartContainer>
-            <div style={{ height: '400px' }}>
-              {chartData.length === 0 || chartData.every((item) => item.data.length === 0) ? (
-                <p style={{ textAlign: 'center', padding: '2rem' }}>건강 데이터가 없습니다.</p>
-              ) : (
-                <ResponsiveLine
-                  data={chartData}
-                  margin={{ top: 50, right: 140, bottom: 70, left: 50 }}
-                  xScale={{ type: 'point' }}
-                  yScale={{
-                    type: 'linear',
-                    min: 'auto',
-                    max: 'auto',
-                    stacked: false,
-                    reverse: false,
-                  }}
-                  yFormat=" >-.2f"
-                  axisTop={null}
-                  axisRight={null}
-                  axisBottom={{
-                    tickSize: 5,
-                    tickPadding: 5,
-                    tickRotation: -45,
-                    legend: '날짜',
-                    legendOffset: 50,
-                    legendPosition: 'middle',
-                    truncateTickAt: 0,
-                    format: (value) => {
-                      const parts = value.split('.');
-                      return parts.length === 3 ? `${parts[1]}.${parts[2]}` : value;
-                    },
-                  }}
-                  axisLeft={{
-                    tickSize: 5,
-                    tickPadding: 5,
-                    tickRotation: 0,
-                    legend: '값 (kg)',
-                    legendOffset: -40,
-                    legendPosition: 'middle',
-                  }}
-                  pointSize={10}
-                  pointColor={{ theme: 'background' }}
-                  pointBorderWidth={2}
-                  pointBorderColor={{ from: 'serieColor' }}
-                  pointLabelYOffset={-12}
-                  useMesh={true}
-                  colors={['#FF5733', '#3366FF', '#33CC33']}
-                  theme={{
-                    axis: {
-                      domain: {
-                        line: {
-                          stroke: '#d4d4d4',
-                          strokeWidth: 1,
-                        },
-                      },
-                      ticks: {
-                        line: {
-                          stroke: '#d4d4d4',
-                          strokeWidth: 1,
-                        },
-                        text: {
-                          fontSize: 11,
-                          fill: '#333333',
-                        },
-                      },
-                      legend: {
-                        text: {
-                          fontSize: 12,
-                          fill: '#333333',
-                          fontWeight: 'bold',
-                        },
-                      },
-                    },
-                    grid: {
-                      line: {
-                        stroke: '#e0e0e0',
-                        strokeWidth: 1,
-                      },
-                    },
-                    legends: {
-                      text: {
-                        fontSize: 12,
-                        fill: '#333333',
-                      },
-                    },
-                    tooltip: {
-                      container: {
-                        background: 'white',
-                        color: '#333333',
-                        fontSize: 12,
-                        borderRadius: '4px',
-                        boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.1)',
-                      },
-                    },
-                  }}
-                  legends={[
-                    {
-                      anchor: 'bottom-right',
-                      direction: 'column',
-                      justify: false,
-                      translateX: 120,
-                      translateY: 0,
-                      itemsSpacing: 0,
-                      itemDirection: 'left-to-right',
-                      itemWidth: 80,
-                      itemHeight: 20,
-                      itemOpacity: 0.75,
-                      symbolSize: 12,
-                      symbolShape: 'circle',
-                      symbolBorderColor: 'rgba(0, 0, 0, .5)',
-                      effects: [
-                        {
-                          on: 'hover',
-                          style: {
-                            itemBackground: 'rgba(0, 0, 0, .03)',
-                            itemOpacity: 1,
-                          },
-                        },
-                      ],
-                    },
-                  ]}
-                />
-              )}
-            </div>
-          </ChartContainer>
-          <Divider />
-        </HealthInfoContainer>
+        {user.grade === 'U' && (
+          <HealthInfoContainer>
+            <HealthInfoSectionHeader>
+              <SectionHeader>
+                건강 정보
+                <MdOutlineHealthAndSafety />
+              </SectionHeader>
+              <HealthInfoInputButton onClick={openHealthInputModal}>건강정보 입력</HealthInfoInputButton>
+            </HealthInfoSectionHeader>
+            <ChartContainer>
+              <div style={{ height: '400px' }}>
+                <HealthChart rawData={rawHealthData} isLoading={isLoading} />
+              </div>
+            </ChartContainer>
+            <Divider />
+          </HealthInfoContainer>
+        )}
 
         <SectionBlock>
           <SectionHeader>
             내역
             <LuClipboardList />
           </SectionHeader>
-          <SectionLink to="/matchingList">신청 내역</SectionLink>
+          {user.grade === 'U' ? (
+            <SectionLink to="/matchingList">신청 내역</SectionLink>
+          ) : (
+            <SectionLink to="/coachmatchingList">코칭 내역</SectionLink>
+          )}
           <Divider />
         </SectionBlock>
 
@@ -259,11 +118,13 @@ const MyPage = () => {
             관리
             <AiOutlineTool />
           </SectionHeader>
-          <SectionLink to={`/coachModify/${user.trainerNo}`}>핏코치 정보 수정</SectionLink>
+          {user.grade === 'C' && <SectionLink to={`/coachModify/${user.trainerNo}`}>핏코치 정보 수정</SectionLink>}
           <SectionLink to="/myPostsPage">내가 작성한 게시물/댓글</SectionLink>
-          <SectionLink to="/myReviewsPage" state={{ userEmail: user.email }}>
-            내가 작성한 리뷰
-          </SectionLink>
+          {user.grade === 'U' && (
+            <SectionLink to="/myReviewsPage" state={{ userEmail: user.email }}>
+              내가 작성한 리뷰
+            </SectionLink>
+          )}
           <Divider />
         </SectionBlock>
 

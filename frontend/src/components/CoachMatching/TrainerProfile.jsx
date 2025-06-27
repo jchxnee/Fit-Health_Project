@@ -172,7 +172,7 @@ const BackDiv = styled.div`
   justify-content: end;
 `;
 
-const TrainerProfile = ({ trainer }) => {
+const TrainerProfile = ({ trainer, user }) => {
   const getInstagramProfileUrl = (instagramId) => {
     if (!instagramId) return '#';
     return `https://www.instagram.com/${instagramId}/`;
@@ -233,9 +233,11 @@ const TrainerProfile = ({ trainer }) => {
         </Location>
         <Introduction>{trainer.introduction}</Introduction>
         <BackDiv>
-          <NavItem to={`/coachMatching/${trainer.id}`}>
-            <ApplyButton>신청하기</ApplyButton>
-          </NavItem>
+          {user.grade === 'U' && user.trainerNo !== trainer.id && (
+            <NavItem to={`/coachMatching/${trainer.id}`}>
+              <ApplyButton>신청하기</ApplyButton>
+            </NavItem>
+          )}
         </BackDiv>
       </ProfileInfo>
     </ProfileCard>

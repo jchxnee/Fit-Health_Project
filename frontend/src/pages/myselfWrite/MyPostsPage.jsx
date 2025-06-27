@@ -1,49 +1,13 @@
-import React, { useState, useEffect } from 'react'; // useEffect import 추가
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import GeneralPostsList from '../../components/GeneralPostsList';
 import BasicFilter from '../../components/filter/BasicFilter';
 import TitleBar from '../../components/TitleBar';
 import { Link } from 'react-router-dom';
-
-// --- 임시 데이터는 컴포넌트 외부로 이동 ---
-const MY_POSTS_DATA = [
-  {
-    id: 1,
-    category: '운동해요!',
-    title: '이거 어떻게 쓰는 거예요?',
-    content: '아니 바 사니까 이것도 같이 딸려오는데 이게 뭔가요 악력키우기인가요?',
-    heart: 20,
-    comments: 2,
-    timeAgo: '2025.06.07',
-  },
-  {
-    id: 2,
-    category: '운동해요!',
-    title: '이거 어떻게 쓰는 거예요?',
-    content: '아니 바 사니까 이것도 같이 딸려오는데 이게 뭔가요 악력키우기인가요?',
-    heart: 20,
-    comments: 2,
-    timeAgo: '2025.06.07',
-  },
-  {
-    id: 3,
-    category: '운동해요!',
-    title: '이거 어떻게 쓰는 거예요?',
-    content: '아니 바 사니까 이것도 같이 딸려오는데 이게 뭔가요 악력키우기인가요?',
-    heart: 20,
-    comments: 2,
-    timeAgo: '2025.06.07',
-  },
-  {
-    id: 4,
-    category: '운동해요!',
-    title: '이거 어떻게 쓰는 거예요?',
-    content: '아니 바 사니까 이것도 같이 딸려오는데 이게 뭔가요 악력키우기인가요?',
-    heart: 20,
-    comments: 2,
-    timeAgo: '2025.06.07',
-  },
-];
+import Pagination from '../../components/Pagination';
+import api from '../../api/axios';
+import { API_ENDPOINTS } from '../../api/config';
+import useUserStore from '../../store/useUserStore';
 
 // --- 스타일 컴포넌트 ---
 const PageContainer = styled.div`
@@ -72,9 +36,9 @@ const MainContentArea = styled.div`
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
-  flex-wrap: wrap; /* BasicFilter가 줄바꿈될 때를 대비하여 flex-wrap 추가 */
-  gap: ${({ theme }) => theme.spacing[2]}; /* 자식 요소 사이 간격 */
-  align-items: flex-end; /* 탭과 필터가 하단에 정렬되도록 */
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing[2]};
+  align-items: flex-end;
 
   @media (max-width: ${({ theme }) => theme.width.md}) {
     flex-direction: column;
@@ -101,13 +65,42 @@ const TabButton = styled(Link)`
   transition: all 0.2s ease-in-out;
 `;
 
+// 디바운싱을 위한 커스텀 훅
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 function MyPostsPage() {
-  const [filteredPosts, setFilteredPosts] = useState([]);
+  const { user, isAuthenticated } = useUserStore();
+
+  const [posts, setPosts] = useState([]); // 필터링된 게시물 목록
   const [filters, setFilters] = useState({
     search: '',
     category: 'all',
-    sort: 'latest',
+    sort: 'latest', // 백엔드 정렬 파라미터와 맞춤
   });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(10);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [totalPostsCount, setTotalPostsCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  // 검색어 디바운싱 (500ms 지연)
+  const debouncedSearchTerm = useDebounce(filters.search, 500);
 
   // 필터 옵션
   const filterOptions = [
@@ -122,16 +115,72 @@ function MyPostsPage() {
       ],
     },
     {
-      label: '최신순',
+      label: '정렬', // 레이블을 '최신순'이 아닌 '정렬'로 변경하거나 첫 번째 옵션으로 '최신순'을 기본 선택되도록 할 수 있음
       key: 'sort',
       options: [
         { label: '최신순', value: 'latest' },
         { label: '오래된순', value: 'oldest' },
         { label: '조회순', value: 'views' },
-        { label: '댓글순', value: 'comments' },
       ],
     },
   ];
+
+  // 백엔드에서 데이터를 가져오는 함수
+  const fetchMyPosts = useCallback(async () => {
+    if (!isAuthenticated || !user || !user.email) {
+      setLoading(false);
+      setError('로그인 정보가 없거나 유효하지 않습니다.');
+      setPosts([]);
+      setTotalPostsCount(0);
+      setTotalPages(0);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // 백엔드 API 호출 시 필터 및 페이지 정보 전달
+      const response = await api.get(API_ENDPOINTS.BOARD.MYPOSTS, {
+        params: {
+          userEmail: user.email,
+          category: filters.category,
+          search: debouncedSearchTerm,
+          page: currentPage - 1, // 백엔드 페이지는 0부터 시작
+          size: postsPerPage,
+          // 백엔드 sort 파라미터는 '필드명,정렬방식' 형태
+          sort: (() => {
+            switch (filters.sort) {
+              case 'latest':
+                return 'createdDate,desc';
+              case 'oldest':
+                return 'createdDate,asc';
+              case 'views':
+                return 'count,desc';
+              default:
+                return 'createdDate,desc';
+            }
+          })(),
+        },
+      });
+
+      const fetchedPageResponse = response.data;
+      setPosts(fetchedPageResponse.content || []);
+      setTotalPostsCount(fetchedPageResponse.totalElements || 0);
+      setTotalPages(fetchedPageResponse.totalPages || 0);
+    } catch (err) {
+      console.error('내 게시물 데이터를 불러오는 중 오류 발생:', err);
+      setError(err.response?.data?.message || '내 게시물을 불러오는데 실패했습니다.');
+      setPosts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [isAuthenticated, user, filters, debouncedSearchTerm, currentPage, postsPerPage]);
+
+  // 필터, 검색어, 페이지 변경 시 데이터 다시 로딩
+  useEffect(() => {
+    fetchMyPosts();
+  }, [fetchMyPosts]);
 
   // 필터 변경 핸들러
   const handleFilterChange = (key, value) => {
@@ -139,66 +188,74 @@ function MyPostsPage() {
       ...prevFilters,
       [key]: value,
     }));
+    setCurrentPage(1); // 필터 변경 시 첫 페이지로
   };
 
-  // 필터링 및 정렬 로직
-  useEffect(() => {
-    let tempPosts = [...MY_POSTS_DATA]; // 컴포넌트 외부에서 정의된 상수 사용
+  // 페이지 변경 핸들러
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0);
+  };
 
-    // 검색 필터링
-    if (filters.search) {
-      tempPosts = tempPosts.filter(
-        (post) =>
-          post.title.includes(filters.search) ||
-          post.content.includes(filters.search) ||
-          post.category.includes(filters.search)
-      );
-    }
-
-    // 카테고리 필터링
-    if (filters.category !== 'all') {
-      tempPosts = tempPosts.filter((post) => post.category === filters.category);
-    }
-
-    // 정렬
-    tempPosts.sort((a, b) => {
-      if (filters.sort === 'latest') {
-        // 실제 날짜 객체로 변환하여 비교
-        return new Date(b.timeAgo) - new Date(a.timeAgo);
-      } else if (filters.sort === 'oldest') {
-        // 실제 날짜 객체로 변환하여 비교
-        return new Date(a.timeAgo) - new Date(b.timeAgo);
-      } else if (filters.sort === 'views') {
-        return b.heart - a.heart; // 예시로 heart를 조회수로 사용
-      } else if (filters.sort === 'comments') {
-        return b.comments - a.comments;
-      }
-      return 0;
-    });
-
-    setFilteredPosts(tempPosts);
-  }, [filters]); // 의존성 배열에서 MY_POSTS_DATA 제거
-
-  return (
-    <>
+  if (loading) {
+    return (
       <PageContainer>
         <MainContentArea>
           <TitleBar title="내가 작성한 게시물/댓글" />
-          <Container>
-            <TabContainer>
-              <TabButton style={{ borderBottom: '1px solid #6b7280' }} to="/myPostPage">
-                나의 게시물
-              </TabButton>
-              <TabButton to="/myCommentsPage">나의 댓글</TabButton>
-            </TabContainer>
-            <BasicFilter filterOptions={filterOptions} onFilterChange={handleFilterChange} />
-          </Container>
-
-          {/* 게시물 목록 */}
-          <GeneralPostsList posts={filteredPosts} />
+          <div style={{ textAlign: 'center', padding: '20px' }}>내 게시물을 불러오는 중입니다...</div>
         </MainContentArea>
       </PageContainer>
-    </>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageContainer>
+        <MainContentArea>
+          <TitleBar title="내가 작성한 게시물/댓글" />
+          <div style={{ textAlign: 'center', padding: '20px', color: 'red' }}>오류: {error}</div>
+        </MainContentArea>
+      </PageContainer>
+    );
+  }
+
+  return (
+    <PageContainer>
+      <MainContentArea>
+        <TitleBar title="내가 작성한 게시물/댓글" />
+        <Container>
+          <TabContainer>
+            <TabButton $active={true} to="/myPostsPage">
+              나의 게시물
+            </TabButton>
+            <TabButton $active={false} to="/myCommentsPage">
+              나의 댓글
+            </TabButton>
+          </TabContainer>
+          <BasicFilter
+            filterOptions={filterOptions}
+            onFilterChange={handleFilterChange}
+            currentSearch={filters.search}
+            currentCategory={filters.category} // BasicFilter에 category 값 전달
+            currentSort={filters.sort} // BasicFilter에 sort 값 전달
+          />
+        </Container>
+
+        {posts.length > 0 ? (
+          <GeneralPostsList posts={posts} />
+        ) : (
+          <div style={{ textAlign: 'center', padding: '50px', color: '#666' }}>
+            {filters.search || filters.category !== 'all'
+              ? '검색 조건에 맞는 게시물이 없습니다.'
+              : '작성한 게시물이 없습니다.'}
+          </div>
+        )}
+
+        {totalPages > 0 && (
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+        )}
+      </MainContentArea>
+    </PageContainer>
   );
 }
 

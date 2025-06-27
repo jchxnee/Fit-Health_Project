@@ -17,13 +17,16 @@ public class Notice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long NoticeNo;
+    private Long noticeNo;
 
     @Column(name = "NOTICE_TITLE", nullable = false)
     private String noticeTitle;
 
     @Column(name = "NOTICE_CONTENT", nullable = false)
     private String noticeContent;
+
+    @Column(name = "NOTICE_CATEGORY_NAME")
+    private String noticeCategoryName;
 
     @Column(name = "CREATED_DATE")
     private LocalDateTime createdDate;
@@ -45,4 +48,16 @@ public class Notice {
     }
 
 
+    public void changeMember(Member member) {
+        this.member = member;
+        if(!member.getNotices().contains(this)) {
+            member.getNotices().add(this);
+        }
+    }
+
+    public void updateNoticeDetails(String noticeTitle, String noticeContent, String noticeCategoryName) {
+        this.noticeTitle = noticeTitle;
+        this.noticeContent = noticeContent;
+        this.noticeCategoryName = noticeCategoryName;
+    }
 }

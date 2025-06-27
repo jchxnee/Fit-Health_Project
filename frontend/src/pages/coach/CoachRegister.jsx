@@ -11,6 +11,9 @@ import SubmitSection from '../../components/CoachRegister/SubmitSection.jsx';
 import TitleBar from '../../components/TitleBar.jsx';
 import styled from 'styled-components';
 import useCoachRegisterForm from '../../hooks/coach/Form';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import useUserStore from '../../store/useUserStore.js';
 
 const MainContainer = styled.section`
   max-width: 1008px;
@@ -26,26 +29,43 @@ const MainContainer = styled.section`
 
 function CoachRegister() {
   const {
-    photos, setPhotos,
-    careers, setCareers,
-    kakaoId, setKakaoId,
-    instaId, setInstaId,
-    price, setPrice,
-    discount3, setDiscount3,
-    discount5, setDiscount5,
-    discount10, setDiscount10,
-    intro, setIntro,
-    majorName, setMajorName,
-    wishArea, setWishArea,
-    loading, error,
+    photos,
+    setPhotos,
+    careers,
+    setCareers,
+    kakaoId,
+    setKakaoId,
+    instaId,
+    setInstaId,
+    price,
+    setPrice,
+    discount3,
+    setDiscount3,
+    discount5,
+    setDiscount5,
+    discount10,
+    setDiscount10,
+    intro,
+    setIntro,
+    majorName,
+    setMajorName,
+    wishArea,
+    setWishArea,
+    loading,
+    error,
     submitForm,
   } = useCoachRegisterForm();
+
+  const navigate = useNavigate();
+  const updateUser = useUserStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const ok = await submitForm();
-    if (ok) {
-      alert('코치 등록이 완료됐습니다!');
+    if (ok !== 0) {
+      toast.success('코치 등록이 완료됐습니다!');
+      updateUser({ trainerNo: ok });
+      navigate('/coachList');
     } else {
       alert('등록 실패: ' + (error?.message || '오류'));
     }
@@ -57,12 +77,7 @@ function CoachRegister() {
         <TitleBar title="핏코치 등록" />
         <FieldSection majorName={majorName} setMajorName={setMajorName} />
         <RegionSection wishArea={wishArea} setWishArea={setWishArea} />
-        <IdSection
-          kakaoId={kakaoId}
-          setKakaoId={setKakaoId}
-          instaId={instaId}
-          setInstaId={setInstaId}
-        />
+        <IdSection kakaoId={kakaoId} setKakaoId={setKakaoId} instaId={instaId} setInstaId={setInstaId} />
         <PriceDiscountSection
           price={price}
           setPrice={setPrice}

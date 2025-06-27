@@ -12,4 +12,5 @@ public interface PaymentRepository {
     Optional<Payment> findOneLast(String userEmail);
     List<Long> findByResponseEmail(String trainerEmail);
     List<Payment> findPaymentList(String userEmail);
+    List<Payment> findPaymentListTrainer(String userEmail);
 }

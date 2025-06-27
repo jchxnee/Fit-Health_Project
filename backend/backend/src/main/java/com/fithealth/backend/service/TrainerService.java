@@ -1,6 +1,7 @@
 package com.fithealth.backend.service;
 
 import com.fithealth.backend.dto.Trainer.SelectTrainerDto;
+import com.fithealth.backend.dto.Trainer.Top3TrainerDto;
 import com.fithealth.backend.dto.Trainer.TrainerDetailDto;
 import com.fithealth.backend.dto.Trainer.addTrainerDto;
 import com.fithealth.backend.dto.Trainer.UpdateTrainerDto;
@@ -16,4 +17,5 @@ public interface TrainerService {
     void updateTrainer(UpdateTrainerDto.Request requestDto);
     void patchTrainer(Long trainerNo, java.util.Map<String, Object> updates);
     TrainerDetailDto.ResponseRequest getTrainerRequest(Long trainerNo);
+    List<Top3TrainerDto.Response> getTrainerTop3();
 }

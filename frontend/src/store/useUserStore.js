@@ -12,6 +12,7 @@ const useUserStore = create(
         set({
           user: {
             email: userData.useremail,
+            trainerNo: userData.trainerNo,
             name: userData.username,
             birth: userData.birth,
             phone: userData.phone,

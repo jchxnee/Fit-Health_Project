@@ -36,7 +36,6 @@ export const useLoginForm = () => {
 
       // 로그인 API 호출
       const user = await memberService.login(data);
-
       // 로그인 실패 시 알림 표시
       if (!user) {
         toast.error('이메일 또는 비밀번호가 일치하지 않습니다.');
@@ -46,6 +45,7 @@ export const useLoginForm = () => {
       // 로그인 성공 시 사용자 정보 상태 저장
       login({
         useremail: user.user_email,
+        trainerNo: user.trainer_no,
         username: user.user_name,
         birth: user.birth,
         phone: user.phone,

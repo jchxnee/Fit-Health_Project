@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import BasicFilter from '../../components/filter/BasicFilter';
 import CoachListItem from '../../components/CoachMatching/CoachListItem';
 import theme from '../../styles/theme';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Pagination from '../../components/Pagination';
 import api from '../../api/axios';
 import { API_ENDPOINTS } from '../../api/config';
@@ -75,11 +75,14 @@ const CoachListContainer = styled.div`
 `;
 
 const CoachList = () => {
+  const location = useLocation();
+  const initialCategory = location.state?.category || '전체';
+
   const [coaches, setCoaches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [selectedCategory, setSelectedCategory] = useState('전체');
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
 
   const [selectedRegion, setSelectedRegion] = useState('전체');
 
