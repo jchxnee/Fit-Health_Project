@@ -298,6 +298,7 @@ const UserTable = ({ data, columns, onRowClick }) => {
           state: {
             paymentId: rowData.paymentId,
             trainerName: rowData.trainerName,
+            trainerNo: rowData.trainerNo,
           },
         });
       } else if (rowData.hasReview) {

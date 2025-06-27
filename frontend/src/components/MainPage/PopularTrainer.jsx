@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import basicProfile from '../../../public/img/basicProfile.jpg';
 
 const Wrapper = styled.section`
   width: 100%;
@@ -55,19 +56,25 @@ const TrainerCard = styled.div`
   border-radius: ${({ theme }) => theme.borderRadius['2xl']};
   justify-content: center;
   overflow: hidden;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-8px);
+  }
 `;
 
 const ProfileImg = styled.img`
   width: 100%;
   height: 80%;
   object-fit: cover;
-  object-position: top;
+  object-position: center;
   border-radius: ${({ theme }) => `${theme.borderRadius['2xl']} ${theme.borderRadius['2xl']} 0 0`};
   margin-bottom: ${({ theme }) => theme.spacing[4]};
 `;
 
 const Name = styled.div`
-  font-family: 'SUITE', sans-serif;
   font-size: ${({ theme }) => theme.fontSizes.xl};
   color: ${({ theme }) => theme.colors.primary};
 `;
@@ -85,10 +92,10 @@ const PopularTrainer = ({ trainers }) => (
         {trainers && trainers.length > 0 ? (
           <List>
             {trainers.map((t) => (
-              <Link key={t.trainer_no} to={`/trainerDetail/${t.trainer_no}`} style={{ textDecoration: 'none' }}>
+              <Link key={t.trainer_no} to={`/coach/${t.trainer_no}`} style={{ textDecoration: 'none' }}>
                 <TrainerCard>
-                  <ProfileImg src={t.profile_image} alt={t.trainer_name} />
-                  <Name>{t.trainer_name}</Name>
+                  <ProfileImg src={t.profile_image ? t.profile_image : basicProfile} alt={t.trainer_name} />
+                  <Name>{t.trainer_name} 트레이너</Name>
                 </TrainerCard>
               </Link>
             ))}

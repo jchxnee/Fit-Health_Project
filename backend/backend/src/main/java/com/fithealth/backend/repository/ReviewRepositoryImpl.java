@@ -2,6 +2,7 @@ package com.fithealth.backend.repository;
 
 import com.fithealth.backend.entity.Review;
 import com.fithealth.backend.entity.Payment;
+import com.fithealth.backend.enums.CommonEnums;
 import com.fithealth.backend.enums.CommonEnums.Status;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -91,5 +92,13 @@ public class ReviewRepositoryImpl implements ReviewRepository {
         }
     }
 
+    @Override
+    public List<Review> getTop6(CommonEnums.Status status) {
+        String jpql = "SELECT r FROM Review r WHERE r.status = :status ORDER BY r.createdDate DESC";
 
+        return em.createQuery(jpql, Review.class)
+                .setParameter("status", status)
+                .setMaxResults(6)
+                .getResultList();
+    }
 }

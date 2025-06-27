@@ -11,9 +11,12 @@ import api from '../api/axios.js';
 
 function MainPage() {
   const [popularTrainerList, setPopularTrainerList] = useState([]);
+  const [popularBoardList, setPopularBoardList] = useState([]);
+  const [recentReviewList, setRecentReviewList] = useState([]);
   useEffect(() => {
     api.get('/api/trainer/top3').then((res) => setPopularTrainerList(res.data));
-    console.log(popularTrainerList);
+    api.get('/api/board/top5').then((res) => setPopularBoardList(res.data));
+    api.get('/api/review/top6').then((res) => setRecentReviewList(res.data));
   }, []);
 
   return (
@@ -21,10 +24,10 @@ function MainPage() {
       <MainTitle />
       <SelectExercise />
       <AdBanner />
-      <PopularTrainer data={popularTrainerList} />
-      <PopularPosts />
+      <PopularTrainer trainers={popularTrainerList} />
+      <PopularPosts boards={popularBoardList} />
       <SelectGoal />
-      <ReviewList />
+      <ReviewList reviews={recentReviewList} />
     </>
   );
 }

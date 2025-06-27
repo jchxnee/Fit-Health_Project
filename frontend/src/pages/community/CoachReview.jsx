@@ -45,7 +45,7 @@ function CoachReview() {
       setLoading(true);
       setError(null);
       try {
-        const trainerResponse = await api.get(`${API_ENDPOINTS.COACH.LIST}${trainerNo}`);
+        const trainerResponse = await api.get(`${API_ENDPOINTS.COACH.LIST}/${trainerNo}`);
         setTrainerName(trainerResponse.data.trainerName);
         console.log('백에서 가져온 트레이너 데이터 : ', trainerResponse.data);
         const response = await api.get(`${API_ENDPOINTS.REVIEW.SELECT}${trainerNo}`);

@@ -278,7 +278,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public List<Top3TrainerDto.Response> getTrainerTop3() {
-        return trainerRepository.getTop3().stream()
+        return trainerRepository.getTop3(CommonEnums.Status.Y).stream()
                 .map(Top3TrainerDto.Response::fromEntity)
                 .collect(Collectors.toList());
     }

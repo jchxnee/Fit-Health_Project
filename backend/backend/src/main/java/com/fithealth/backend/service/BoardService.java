@@ -4,6 +4,7 @@
     import com.fithealth.backend.dto.Board.BoardGetDto;
     import com.fithealth.backend.dto.Board.BoardGetDto.Response;
     import com.fithealth.backend.dto.Board.BoardUpdateDto;
+    import com.fithealth.backend.dto.Board.Top5BoardDto;
     import com.fithealth.backend.dto.PageResponse;
     import org.springframework.data.domain.Pageable;
     import org.springframework.web.multipart.MultipartFile;
@@ -25,4 +26,6 @@
         PageResponse<Response> getMyBoardList(String userEmail, String category, Pageable pageable);
 
         PageResponse<Response> getMyBoardListWithSearch(String userEmail, String category, String search, Pageable pageable);
+
+        List<Top5BoardDto.Response> getBoardTop5();
     }

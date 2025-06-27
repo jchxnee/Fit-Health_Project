@@ -3,9 +3,12 @@ package com.fithealth.backend.service;
 import com.fithealth.backend.dto.Review.ReviewCreateDto;
 import com.fithealth.backend.dto.Review.ReviewSelectDto;
 import com.fithealth.backend.dto.Review.SelectMyReviewDto;
+import com.fithealth.backend.dto.Review.Top6ReviewDto;
+import com.fithealth.backend.dto.Review.Top6ReviewDto.Response;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.entity.Payment;
 import com.fithealth.backend.entity.Review;
+import com.fithealth.backend.enums.CommonEnums;
 import com.fithealth.backend.enums.CommonEnums.Status;
 import com.fithealth.backend.repository.MemberRepository;
 import com.fithealth.backend.repository.PaymentRepository;
@@ -227,5 +230,12 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void delete(Long reviewId) {
         reviewRepository.delete(reviewId);
+    }
+
+    @Override
+    public List<Top6ReviewDto.Response> getReviewTop6() {
+        return reviewRepository.getTop6(CommonEnums.Status.Y).stream()
+                .map(Top6ReviewDto.Response::fromEntity)
+                .collect(Collectors.toList());
     }
 }

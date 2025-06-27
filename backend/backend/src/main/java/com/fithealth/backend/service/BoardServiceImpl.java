@@ -4,6 +4,7 @@ import com.fithealth.backend.dto.Board.BoardCreateDto;
 import com.fithealth.backend.dto.Board.BoardGetDto;
 import com.fithealth.backend.dto.Board.BoardGetDto.Response;
 import com.fithealth.backend.dto.Board.BoardUpdateDto;
+import com.fithealth.backend.dto.Board.Top5BoardDto;
 import com.fithealth.backend.dto.PageResponse;
 import com.fithealth.backend.entity.Board;
 import com.fithealth.backend.entity.BoardFile;
@@ -257,4 +258,11 @@ public class BoardServiceImpl implements BoardService {
 
         return new PageResponse<>(dtoPage);
     }
+
+    @Override
+    public List<Top5BoardDto.Response> getBoardTop5() {
+        return boardRepository.findTop5ByStatusOrderByCountDesc(CommonEnums.Status.Y).stream()
+                .map(Top5BoardDto.Response::fromEntity).collect(Collectors.toList());
+    }
+
 }
