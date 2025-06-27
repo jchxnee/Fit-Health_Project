@@ -130,26 +130,21 @@ function CoachCalendar() {
 
     switch (event.status) {
       case '완료됨':
-        newStyle.backgroundColor = '#DBFCDA'; // 연한 녹색
-        newStyle.color = '#26B326'; // 진한 녹색 텍스트
-        newStyle.border = '1px solid #B4F8B4';
+        newStyle.backgroundColor = '#22c55e';
+        newStyle.color = '#FFFFFF';
         break;
       case '진행중':
-        newStyle.backgroundColor = '#D9EDF7'; // 연한 파란색
-        newStyle.color = '#31708F'; // 진한 파란색 텍스트
-        newStyle.border = '1px solid #BCE8F1';
+        newStyle.backgroundColor = '#f59e0b';
+        newStyle.color = '#FFFFFF';
         break;
       case '취소됨':
-        newStyle.backgroundColor = '#FCDADA'; // 연한 빨간색
-        newStyle.color = '#B32626'; // 진한 빨간색 텍스트
-        newStyle.border = '1px solid #F8B4F4';
+        newStyle.backgroundColor = '#9ca3af';
+        newStyle.color = '#FFFFFF';
         break;
-      case '승인 대기중': // '승인 대기중' 상태에 대한 스타일 추가
+      case '승인 대기중':
       default:
-        // 정의되지 않은 상태에 대한 기본값 (혹은 없는 경우)
         newStyle.backgroundColor = '#D0E3FC';
         newStyle.color = '#2667B3';
-        newStyle.border = '1px solid #B4D6F8';
         break;
     }
     return {
@@ -162,12 +157,6 @@ function CoachCalendar() {
   const Event = ({ event }) => {
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        {/* 코치 이름의 첫 글자를 initial로 표시 */}
-        {event.initial && (
-          <span className="event-initial" style={{ fontWeight: 'bold' }}>
-            {event.initial}
-          </span>
-        )}
         <span className="event-title">{event.title}</span>
       </div>
     );
@@ -177,6 +166,18 @@ function CoachCalendar() {
   const handleViewChange = (newView) => {
     setView(newView);
   };
+
+  const formats = useMemo(() => ({
+    weekdayFormat: (date, culture, localizer) =>
+      localizer.format(date, 'ddd', culture), // 'ddd'는 '일', '월', '화' 등 축약된 요일을 의미합니다.
+
+    dayFormat: (date, culture, localizer) =>
+      localizer.format(date, 'dd일', culture),
+    monthHeaderFormat: 'YYYY년 MM월',
+    dayHeaderFormat: 'MM월 DD일(ddd)',
+    dateFormat: 'D',
+  }), []);
+
 
   return (
     <>
@@ -195,16 +196,23 @@ function CoachCalendar() {
             >
               <div ref={calendarRef} className="view-transition-wrapper">
                 <Calendar
+                  culture='ko'
+                  formats={formats}
                   localizer={localizer}
                   events={calendarEvents}
                   startAccessor="start"
                   endAccessor="end"
                   style={{ height: '100%' }}
                   defaultView="month"
+                  messages={{
+                    showMore: () => `+ 일정 더보기`,
+                  }}
                   toolbar={true}
                   views={['month']} // Calendar 컴포넌트가 내부적으로 지원하는 뷰는 'month'만
                   date={currentDate}
                   onNavigate={(newDate) => setCurrentDate(newDate)}
+                  popup
+
                   components={{
                     toolbar: (props) => (
                       <CustomToolbar
@@ -217,6 +225,7 @@ function CoachCalendar() {
                   }}
                   eventPropGetter={eventPropGetter}
                 />
+
               </div>
             </CSSTransition>
           )}
@@ -237,6 +246,7 @@ function CoachCalendar() {
               </div>
             </CSSTransition>
           )}
+
         </TransitionGroup>
       </CalendarContainer>
     </>
