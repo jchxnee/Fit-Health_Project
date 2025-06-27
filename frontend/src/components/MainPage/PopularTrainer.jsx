@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import basicProfile from '../../../public/img/basicProfile.jpg';
+import { BeatLoader } from 'react-spinners';
 
 const Wrapper = styled.section`
   width: 100%;
@@ -79,7 +80,14 @@ const Name = styled.div`
   color: ${({ theme }) => theme.colors.primary};
 `;
 
-const PopularTrainer = ({ trainers }) => (
+const LoaderWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+`;
+
+const PopularTrainer = ({ trainers, isLoading }) => (
   <Wrapper>
     <Container>
       <TitleRow>
@@ -89,17 +97,19 @@ const PopularTrainer = ({ trainers }) => (
         </NavItem>
       </TitleRow>
       <List>
-        {trainers && trainers.length > 0 ? (
-          <List>
-            {trainers.map((t) => (
-              <Link key={t.trainer_no} to={`/coach/${t.trainer_no}`} style={{ textDecoration: 'none' }}>
-                <TrainerCard>
-                  <ProfileImg src={t.profile_image ? t.profile_image : basicProfile} alt={t.trainer_name} />
-                  <Name>{t.trainer_name} 트레이너</Name>
-                </TrainerCard>
-              </Link>
-            ))}
-          </List>
+        {isLoading ? (
+          <LoaderWrapper>
+            <BeatLoader color="#d1d5db" />
+          </LoaderWrapper>
+        ) : trainers && trainers.length > 0 ? (
+          trainers.map((t) => (
+            <Link key={t.trainer_no} to={`/coach/${t.trainer_no}`} style={{ textDecoration: 'none' }}>
+              <TrainerCard>
+                <ProfileImg src={t.profile_image ? t.profile_image : basicProfile} alt={t.trainer_name} />
+                <Name>{t.trainer_name} 트레이너</Name>
+              </TrainerCard>
+            </Link>
+          ))
         ) : (
           <div style={{ textAlign: 'center', fontSize: '1.1rem', color: '#999' }}>인기 트레이너가 없습니다.</div>
         )}

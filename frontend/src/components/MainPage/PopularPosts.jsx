@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { FaRegEye, FaThumbsUp } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { BeatLoader } from 'react-spinners';
 
 const Wrapper = styled.section`
   width: 100%;
@@ -89,10 +90,30 @@ const ViewAllBtn = styled(Link)`
   padding: 0;
   margin: 0;
 `;
+const LoaderWrapper = styled.div`
+  width: 100%;
+  min-height: 300px; /* 충분한 높이 확보 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
-const PopularPosts = ({ boards }) => {
+const PopularPosts = ({ boards, isLoading }) => {
   const leftPosts = boards.slice(0, 3);
   const rightPosts = boards.slice(3, 5);
+
+  if (isLoading) {
+    return (
+      <Wrapper>
+        <Container>
+          <Title>커뮤니티 인기 글</Title>
+          <LoaderWrapper>
+            <BeatLoader color="#d1d5db" />
+          </LoaderWrapper>
+        </Container>
+      </Wrapper>
+    );
+  }
 
   return (
     <Wrapper>
@@ -121,7 +142,7 @@ const PopularPosts = ({ boards }) => {
                 <StatsRow>
                   <FaRegEye />
                   {b.count}
-                  <FcLike />
+                  <FaThumbsUp />
                   {b.heart}
                 </StatsRow>
               </PostBox>

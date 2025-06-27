@@ -13,10 +13,25 @@ function MainPage() {
   const [popularTrainerList, setPopularTrainerList] = useState([]);
   const [popularBoardList, setPopularBoardList] = useState([]);
   const [recentReviewList, setRecentReviewList] = useState([]);
+
+  // 로딩 상태 관리 (각 API 별로 따로 관리할 수도 있지만, 일단 통합)
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    api.get('/api/trainer/top3').then((res) => setPopularTrainerList(res.data));
-    api.get('/api/board/top5').then((res) => setPopularBoardList(res.data));
-    api.get('/api/review/top6').then((res) => setRecentReviewList(res.data));
+    setIsLoading(true);
+
+    Promise.all([api.get('/api/trainer/top3'), api.get('/api/board/top5'), api.get('/api/review/top6')])
+      .then(([trainerRes, boardRes, reviewRes]) => {
+        setPopularTrainerList(trainerRes.data);
+        setPopularBoardList(boardRes.data);
+        setRecentReviewList(reviewRes.data);
+      })
+      .catch((error) => {
+        console.error('데이터 로드 중 에러:', error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   return (
@@ -24,10 +39,10 @@ function MainPage() {
       <MainTitle />
       <SelectExercise />
       <AdBanner />
-      <PopularTrainer trainers={popularTrainerList} />
-      <PopularPosts boards={popularBoardList} />
+      <PopularTrainer trainers={popularTrainerList} isLoading={isLoading} />
+      <PopularPosts boards={popularBoardList} isLoading={isLoading} />
       <SelectGoal />
-      <ReviewList reviews={recentReviewList} />
+      <ReviewList reviews={recentReviewList} isLoading={isLoading} />
     </>
   );
 }

@@ -6,6 +6,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import basicProfile from '../../../public/img/basicProfile.jpg';
 import { Link } from 'react-router-dom';
+import { BeatLoader } from 'react-spinners';
 
 const Wrapper = styled.section`
   width: 100%;
@@ -89,6 +90,14 @@ const StatsTime = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.xs};
 `;
 
+const LoaderWrapper = styled.div`
+  width: 100%;
+  min-height: 300px; /* 충분한 높이 확보 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const StarRating = ({ rating = 0 }) => {
   const stars = [];
 
@@ -105,7 +114,7 @@ const StarRating = ({ rating = 0 }) => {
   return <StarWrapper>{stars}</StarWrapper>;
 };
 
-const ReviewList = ({ reviews }) => {
+const ReviewList = ({ reviews, isLoading }) => {
   const leftPosts = reviews.slice(0, 3);
   const rightPosts = reviews.slice(3, 6);
 
@@ -113,6 +122,19 @@ const ReviewList = ({ reviews }) => {
     const date = new Date(dateStr);
     return formatDistanceToNow(date, { addSuffix: true, locale: ko });
   };
+
+  if (isLoading) {
+    return (
+      <Wrapper>
+        <Container>
+          <Title>리뷰</Title>
+          <LoaderWrapper>
+            <BeatLoader color="#d1d5db" />
+          </LoaderWrapper>
+        </Container>
+      </Wrapper>
+    );
+  }
 
   return (
     <Wrapper>
@@ -136,7 +158,7 @@ const ReviewList = ({ reviews }) => {
           </PostCol>
           <PostCol>
             {rightPosts.map((r) => (
-              <PostBox key={r.review_no}>
+              <PostBox key={r.review_no} to={`/coachReview/${r.trainer_no}`}>
                 <PostWriter>
                   <ProfileImg src={r.profile_image ? r.profile_image : basicProfile} alt={`${r.user_name}의 프로필`} />
                   {r.user_name} ({r.trainer_name} 트레이너)
