@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import useUserStore from '../../store/useUserStore';
 import { API_ENDPOINTS } from '../../api/config';
 import api from '../../api/axios';
+import { toast } from 'react-toastify';
 
 const ErrorMessage = styled.p`
   color: red;
@@ -60,7 +61,7 @@ function CommunityPostCreationPage({ isEditMode = false }) {
           );
         } catch (error) {
           console.error('게시글 데이터를 불러오는 데 실패했습니다:', error);
-          alert('게시글 데이터를 불러오는 데 실패했습니다.');
+          toast.error('게시글 데이터를 불러오는 데 실패했습니다.');
           navigate('/community'); // 에러 발생 시 커뮤니티 목록으로 돌아갑니다.
         }
       };
@@ -96,7 +97,7 @@ function CommunityPostCreationPage({ isEditMode = false }) {
 
   const handleImageUploadClick = () => {
     if (imageCount >= 15) {
-      alert('이미지는 최대 15개까지 업로드할 수 있습니다.');
+      toast.error('이미지는 최대 15개까지 업로드할 수 있습니다.');
       return;
     }
     fileInputRef.current.click();
@@ -108,7 +109,7 @@ function CommunityPostCreationPage({ isEditMode = false }) {
     const filesToAdd = selectedFiles.slice(0, 15 - totalCurrentImages); // 15개 제한에 맞춰 파일 추가
 
     if (filesToAdd.length < selectedFiles.length) {
-      alert(
+      toast.error(
         `최대 15개의 이미지만 업로드할 수 있습니다. 이미 ${totalCurrentImages}개의 이미지가 있으며, ${filesToAdd.length}개의 새로운 이미지만 추가됩니다.`
       );
     }
@@ -142,7 +143,7 @@ function CommunityPostCreationPage({ isEditMode = false }) {
     }
 
     if (!user || !user.email) {
-      alert('로그인 후에 게시글을 작성/수정할 수 있습니다.');
+      toast.error('로그인 후에 게시글을 작성/수정할 수 있습니다.');
       navigate('/login');
       return;
     }
@@ -181,7 +182,7 @@ function CommunityPostCreationPage({ isEditMode = false }) {
             'Content-Type': 'multipart/form-data',
           },
         });
-        alert('게시글이 성공적으로 수정되었습니다!');
+        toast.success('게시글이 성공적으로 수정되었습니다!');
       } else {
         // 생성 API 호출
         response = await api.post(API_ENDPOINTS.BOARD.CREATE, formData, {
@@ -189,14 +190,14 @@ function CommunityPostCreationPage({ isEditMode = false }) {
             'Content-Type': 'multipart/form-data',
           },
         });
-        alert('게시글이 성공적으로 등록되었습니다!');
+        toast.success('게시글이 성공적으로 등록되었습니다!');
       }
 
       console.log('게시글 처리 성공:', response.data);
       navigate('/community');
     } catch (error) {
       console.error('게시글 처리 실패:', error.response ? error.response.data : error.message);
-      alert(`게시글 처리 실패: ${error.response ? error.response.data || error.message : error.message}`);
+      toast.error(`게시글 처리 실패: ${error.response ? error.response.data || error.message : error.message}`);
     } finally {
       setIsSubmitting(false);
     }

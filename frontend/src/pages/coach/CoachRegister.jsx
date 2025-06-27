@@ -67,7 +67,7 @@ function CoachRegister() {
       updateUser({ trainerNo: ok });
       navigate('/coachList');
     } else {
-      alert('등록 실패: ' + (error?.message || '오류'));
+      toast.error('등록 실패: ' + (error?.message || '오류'));
     }
   };
 
