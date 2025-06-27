@@ -252,7 +252,7 @@ export default function Footer() {
               <Link to="/privacyPolicy">개인정보처리방침</Link>
             </li>
             <li>
-              <Link to="/termOfService">이용약관</Link>
+              <Link to="/termOfServicePage">이용약관</Link>
             </li>
             <li>
               <Link to="/operatingPolicy">운영정책</Link>
