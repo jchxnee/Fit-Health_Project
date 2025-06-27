@@ -6,6 +6,7 @@ import TitleBar from '../../components/TitleBar';
 import { API_ENDPOINTS } from '../../api/config'; // API 엔드포인트 가져오기
 import api from '../../api/axios'; // axios 인스턴스 가져오기
 import useUserStore from '../../store/useUserStore';
+import { toast } from 'react-toastify';
 
 function NoticeDetailPage() {
   const { noticeNo } = useParams(); // URL 파라미터에서 noticeNo 추출
@@ -22,11 +23,11 @@ function NoticeDetailPage() {
     }
     try {
       await api.put(`${API_ENDPOINTS.NOTICE.DELETE}/${noticeNo}`);
-      alert('공지글이 삭제되었습니다.');
+      toast.success('공지글이 삭제되었습니다.');
       navigate('/notice');
     } catch (err) {
       console.error('공지글 삭제 중 오류 발생:', err);
-      alert('공지글 삭제에 실패했습니다.');
+      toast.error('공지글 삭제에 실패했습니다.');
     }
   };
 

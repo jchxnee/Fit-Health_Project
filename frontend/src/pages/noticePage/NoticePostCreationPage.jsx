@@ -6,6 +6,7 @@ import useUserStore from '../../store/useUserStore';
 import { API_ENDPOINTS } from '../../api/config';
 import api from '../../api/axios';
 import { GoTriangleDown } from 'react-icons/go'; // GoTriangleDown 아이콘 추가
+import { toast } from 'react-toastify';
 
 const ErrorMessage = styled.p`
   color: red;
@@ -43,7 +44,7 @@ function NoticePostCreationPage({ isEditMode = false }) {
           setSelectedCategory(postData.notice_category || '서비스'); // ⭐ 카테고리 데이터 로드
         } catch (error) {
           console.error('공지사항 데이터를 불러오는 데 실패했습니다:', error);
-          alert('공지사항 데이터를 불러오는 데 실패했습니다.');
+          toast.error('공지사항 데이터를 불러오는 데 실패했습니다.');
           navigate('/notice');
         }
       };
@@ -104,14 +105,14 @@ function NoticePostCreationPage({ isEditMode = false }) {
     }
 
     if (!user || !user.email) {
-      alert('로그인 후에 공지사항을 작성/수정할 수 있습니다.');
+      toast.error('로그인 후에 공지사항을 작성/수정할 수 있습니다.');
       navigate('/login');
       return;
     }
 
     // 관리자(GRADE 'A')가 아니면 공지사항을 등록/수정할 수 없도록 추가
     if (user.grade !== 'A') {
-      alert('공지사항은 관리자만 작성/수정할 수 있습니다.');
+      toast.error('공지사항은 관리자만 작성/수정할 수 있습니다.');
       navigate('/notice'); // 권한 없는 경우 공지사항 목록으로 돌려보냄
       return;
     }
@@ -137,21 +138,21 @@ function NoticePostCreationPage({ isEditMode = false }) {
             'Content-Type': 'multipart/form-data',
           },
         });
-        alert('공지사항이 성공적으로 수정되었습니다!');
+        toast.success('공지사항이 성공적으로 수정되었습니다!');
       } else {
         response = await api.post(API_ENDPOINTS.NOTICE.CREATE, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-        alert('공지사항이 성공적으로 등록되었습니다!');
+        toast.success('공지사항이 성공적으로 등록되었습니다!');
       }
 
       console.log('공지사항 처리 성공:', response.data);
       navigate('/notice');
     } catch (error) {
       console.error('공지사항 처리 실패:', error.response ? error.response.data : error.message);
-      alert(`공지사항 처리 실패: ${error.response ? error.response.data || error.message : error.message}`);
+      toast.error(`공지사항 처리 실패: ${error.response ? error.response.data || error.message : error.message}`);
     } finally {
       setIsSubmitting(false);
     }
