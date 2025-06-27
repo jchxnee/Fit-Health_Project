@@ -86,33 +86,28 @@ function CoachCalendar() {
   const calendarEvents = useMemo(() => {
     const events = [];
     matchingList.forEach((match) => {
-      // API 응답의 `history` 배열 필드를 확인합니다.
-      // `history`는 `selectDate` 필드를 포함해야 합니다.
       if (match.history && match.history.length > 0) {
         match.history.forEach((session) => {
-          // session.date 대신 session.selectDate를 사용합니다.
-          if (!session.selectDate) return; // selectDate가 없으면 해당 session 건너뜀
+          if (!session.selectDate) return;
 
-          // "YYYY-MM-DD HH:MM:SS" 형식에서 날짜만 파싱
           const datePart = session.selectDate.split(' ')[0];
           const [year, month, day] = datePart.split('-').map(Number);
-          const eventDate = new Date(year, month - 1, day); // month는 0부터 시작
+          const eventDate = new Date(year, month - 1, day);
 
           events.push({
-            // 고객 이름을 `userName` 필드에서 가져오고, 없으면 `coachName` 사용
-            title: `${match.userName || match.coachName} - ${match.sessions}회차`, // `match.sessions`는 전체 횟수를 나타내는 것으로 가정
+            title: `${match.userName} - ${match.sessions}회차`,
             start: eventDate,
             end: moment(eventDate).endOf('day').toDate(),
             type: 'session',
-            matchId: match.reservationId, // 매칭 자체의 고유 ID (예약 ID)
-            status: match.status, // 매칭의 상태 (완료됨, 진행중, 취소됨, 승인 대기중)
-            initial: (match.userName || match.coachName)?.charAt(0) || '', // 고객 이름의 첫 글자
+            matchId: match.reservationId,
+            status: match.status,
+            initial: (match.userName || match.coachName)?.charAt(0) || '',
           });
         });
       }
     });
     return events;
-  }, [matchingList]); // matchingList가 변경될 때마다 다시 계산
+  }, [matchingList]);
 
   // 이벤트 Prop Getter (캘린더 이벤트 스타일링)
   const eventPropGetter = (event) => {
@@ -130,39 +125,34 @@ function CoachCalendar() {
 
     switch (event.status) {
       case '완료됨':
-        newStyle.backgroundColor = '#DBFCDA'; // 연한 녹색
-        newStyle.color = '#26B326'; // 진한 녹색 텍스트
-        newStyle.border = '1px solid #B4F8B4';
+        newStyle.backgroundColor = '#22c55e';
+        newStyle.color = '#FFFFFF';
         break;
       case '진행중':
-        newStyle.backgroundColor = '#D9EDF7'; // 연한 파란색
-        newStyle.color = '#31708F'; // 진한 파란색 텍스트
+        newStyle.backgroundColor = '#D9EDF7';
+        newStyle.color = '#31708F';
         newStyle.border = '1px solid #BCE8F1';
         break;
       case '취소됨':
-        newStyle.backgroundColor = '#FCDADA'; // 연한 빨간색
-        newStyle.color = '#B32626'; // 진한 빨간색 텍스트
+        newStyle.backgroundColor = '#FCDADA';
+        newStyle.color = '#B32626';
         newStyle.border = '1px solid #F8B4F4';
         break;
-      case '승인 대기중': // '승인 대기중' 상태에 대한 스타일 추가
-      default:
-        // 정의되지 않은 상태에 대한 기본값 (혹은 없는 경우)
-        newStyle.backgroundColor = '#D0E3FC';
-        newStyle.color = '#2667B3';
-        newStyle.border = '1px solid #B4D6F8';
+      case '승인 대기중':
+        newStyle.backgroundColor = '#f6e071';
+        newStyle.color = '#1a1919';
         break;
     }
+
     return {
       className: '',
       style: newStyle,
     };
   };
 
-  // 이벤트 렌더링 컴포넌트 (캘린더 내 각 이벤트 블록의 내용)
   const Event = ({ event }) => {
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        {/* 코치 이름의 첫 글자를 initial로 표시 */}
         {event.initial && (
           <span className="event-initial" style={{ fontWeight: 'bold' }}>
             {event.initial}
@@ -177,6 +167,18 @@ function CoachCalendar() {
   const handleViewChange = (newView) => {
     setView(newView);
   };
+
+  const formats = useMemo(
+    () => ({
+      weekdayFormat: (date, culture, localizer) => localizer.format(date, 'ddd', culture), // 'ddd'는 '일', '월', '화' 등 축약된 요일을 의미합니다.
+
+      dayFormat: (date, culture, localizer) => localizer.format(date, 'dd일', culture),
+      monthHeaderFormat: 'YYYY년 MM월',
+      dayHeaderFormat: 'MM월 DD일(ddd)',
+      dateFormat: 'D',
+    }),
+    []
+  );
 
   return (
     <>
@@ -195,16 +197,22 @@ function CoachCalendar() {
             >
               <div ref={calendarRef} className="view-transition-wrapper">
                 <Calendar
+                  culture="ko"
+                  formats={formats}
                   localizer={localizer}
                   events={calendarEvents}
                   startAccessor="start"
                   endAccessor="end"
                   style={{ height: '100%' }}
                   defaultView="month"
+                  messages={{
+                    showMore: () => `+ 일정 더보기`,
+                  }}
                   toolbar={true}
                   views={['month']} // Calendar 컴포넌트가 내부적으로 지원하는 뷰는 'month'만
                   date={currentDate}
                   onNavigate={(newDate) => setCurrentDate(newDate)}
+                  popup
                   components={{
                     toolbar: (props) => (
                       <CustomToolbar
@@ -230,9 +238,9 @@ function CoachCalendar() {
               <div ref={listRef} className="view-transition-wrapper">
                 <CoachMatchingList
                   allMatchingData={matchingList}
-                  onView={handleViewChange} // CoachSubBar에 뷰 변경 핸들러 전달
-                  currentView={view} // CoachSubBar에 현재 뷰 상태 전달
-                  onDataUpdate={fetchMatchingList} // 하위 컴포넌트에서 데이터 갱신 요청 시 호출될 콜백
+                  onView={handleViewChange}
+                  currentView={view}
+                  onDataUpdate={fetchMatchingList}
                 />
               </div>
             </CSSTransition>

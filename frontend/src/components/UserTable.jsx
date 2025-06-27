@@ -354,8 +354,7 @@ const UserTable = ({ data, columns, onRowClick }) => {
   // 메뉴가 보여야 하는 조건:
   // 1. 코치 승인된 가장 최근 예약일로부터 24시간이 경과했거나,
   // 2. (코치 승인 대기 중이 아니거나) OR (코치 승인 대기 중이지만 거절 사유가 있을 때)
-  const shouldShowActionMenus =
-    !isWithin24HoursOfLatestApprovedBooking && (latestStatus !== 'N' || latestRejectCommentExists);
+  const nextActionMenu = latestStatus == 'Y' || (latestStatus == 'N' && latestRejectCommentExists);
 
   return (
     <StyledTableContainer ref={tableContainerRef}>
@@ -403,7 +402,7 @@ const UserTable = ({ data, columns, onRowClick }) => {
                 1. '진행중' 상태
                 2. 'shouldShowActionMenus' (통합 조건)가 true일 때
           */}
-          {selectedRowData.status === '진행중' && shouldShowActionMenus && (
+          {selectedRowData.status === '진행중' && nextActionMenu && (
             <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '다음 회차예약', selectedRowData)}>
               다음 회차예약
             </PopupMenuItem>
@@ -412,7 +411,7 @@ const UserTable = ({ data, columns, onRowClick }) => {
                 1. 'refund'가 true
                 2. 'shouldShowActionMenus' (통합 조건)가 true일 때
           */}
-          {selectedRowData.refund && shouldShowActionMenus && (
+          {selectedRowData.refund && !isWithin24HoursOfLatestApprovedBooking && (
             <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '결제취소', selectedRowData)} $isDelete>
               결제취소
             </PopupMenuItem>

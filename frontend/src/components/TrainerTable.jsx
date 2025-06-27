@@ -7,6 +7,7 @@ import { IoReload } from 'react-icons/io5';
 import theme from '../styles/theme';
 import SalaryModal from './modal/SalaryModal';
 import HealthChartModal from './modal/HealthChartModal';
+import { toast } from 'react-toastify';
 
 const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onReject }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
@@ -143,8 +144,10 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
     } else if (action === '정산내역') {
       setSalaryModalData(rowData); // 정산내역도 동일 모달 사용
     }
-    // 기존 alert는 그대로 유지 요청하셨으므로 남겨둡니다.
-    alert(`${rowData.coachName} 코치의 ${action} 선택됨!`);
+<<<<<<< HEAD
+=======
+    toast.success(`${rowData.coachName} 코치의 ${action} 선택됨!`);
+>>>>>>> 44749a4308b126620321b2b22a2f31ffb8ba3c6f
 
     // 메뉴 닫힘 관련 상태 업데이트는 한 번만 수행
     setOpenMenuId(null);

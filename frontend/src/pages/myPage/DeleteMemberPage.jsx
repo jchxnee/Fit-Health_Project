@@ -19,13 +19,13 @@ const DeleteMemberPage = () => {
     if (isLoading) return; // 로딩 중이면 아무 작업도 하지 않음
 
     if (currentPassword === '') {
-      alert('현재 비밀번호를 입력해주세요.');
+      toast.error('현재 비밀번호를 입력해주세요.');
       return;
     }
 
     const confirmWithdrawal = window.confirm('정말 탈퇴하시겠습니까?');
     if (!confirmWithdrawal) {
-      alert('회원 탈퇴가 취소되었습니다.');
+      toast.error('회원 탈퇴가 취소되었습니다.');
       console.log('회원 탈퇴 취소');
       return;
     }

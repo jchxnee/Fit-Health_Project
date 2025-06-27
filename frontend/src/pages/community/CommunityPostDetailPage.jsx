@@ -8,6 +8,7 @@ import axios from 'axios';
 import api from '../../api/axios';
 import { API_ENDPOINTS } from '../../api/config';
 import useUserStore from '../../store/useUserStore';
+import { toast } from 'react-toastify';
 
 function CommunityPostDetailPage() {
   const { user } = useUserStore();
@@ -67,7 +68,7 @@ function CommunityPostDetailPage() {
       setLikesCount((prevCount) => (newLikedStatus ? prevCount + 1 : prevCount - 1));
     } catch (err) {
       console.error('좋아요 토글 중 오류 발생:', err);
-      alert('좋아요 처리에 실패했습니다.');
+      toast.error('좋아요 처리에 실패했습니다.');
     }
   };
 
@@ -92,7 +93,7 @@ function CommunityPostDetailPage() {
       setCommentInput('');
     } catch (err) {
       console.error('댓글 작성 중 오류 발생:', err);
-      alert('댓글 작성에 실패했습니다.');
+      toast.error('댓글 작성에 실패했습니다.');
     }
   };
 
@@ -103,7 +104,7 @@ function CommunityPostDetailPage() {
     }
     try {
       await api.delete(`${API_ENDPOINTS.COMMENT.DELETE}/${commentNo}`);
-      alert('댓글이 삭제되었습니다.');
+      toast.success('댓글이 삭제되었습니다.');
       // 댓글 삭제 후 게시글 정보를 다시 불러와 댓글 목록 업데이트
       const updatedPostResponse = await api.get(
         `${API_ENDPOINTS.BOARD.DETAIL}/${boardNo}?userEmail=${currentUserEmail}`
@@ -111,7 +112,7 @@ function CommunityPostDetailPage() {
       setPost(updatedPostResponse.data);
     } catch (err) {
       console.error('댓글 삭제 중 오류 발생:', err);
-      alert('댓글 삭제에 실패했습니다.');
+      toast.error('댓글 삭제에 실패했습니다.');
     }
   };
 
@@ -121,11 +122,11 @@ function CommunityPostDetailPage() {
     }
     try {
       await api.put(`${API_ENDPOINTS.BOARD.DELETE}/${boardNo}`);
-      alert('게시글이 삭제되었습니다.');
+      toast.success('게시글이 삭제되었습니다.');
       navigate('/community'); // 삭제 후 목록 페이지로 이동
     } catch (err) {
       console.error('게시글 삭제 중 오류 발생:', err);
-      alert('게시글 삭제에 실패했습니다.');
+      toast.error('게시글 삭제에 실패했습니다.');
     }
   };
 

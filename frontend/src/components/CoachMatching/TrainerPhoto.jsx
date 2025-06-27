@@ -20,7 +20,6 @@ const PhotoItem = styled.div`
     width: 100%;
     padding-top: 100%; /* 1:1 Aspect Ratio */
     position: relative;
-    background-color: #f0f0f0; /* Placeholder color */
     border-radius: ${theme.borderRadius.md};
     overflow: hidden;
 `;
