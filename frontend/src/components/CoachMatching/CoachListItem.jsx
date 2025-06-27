@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import theme from '../../styles/theme';
+import basicProfile from '../../../public/img/basicProfile.jpg';
 
 const CoachCard = styled.div`
   display: flex;
@@ -92,7 +93,7 @@ const ReviewCount = styled.div`
 const CoachListItem = ({ coach }) => {
   return (
     <CoachCard>
-      <ProfileImage src={coach.imageUrl} alt={coach.name} />
+      <ProfileImage src={coach.img ? coach.img : basicProfile} alt="프로필 이미지" />
       <CoachInfo>
         <NameAndSpecialization>
           <Name>{coach.name} 트레이너</Name>
