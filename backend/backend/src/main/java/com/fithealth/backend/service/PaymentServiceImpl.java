@@ -135,9 +135,15 @@ public class PaymentServiceImpl implements  PaymentService {
             throw new NoSuchElementException("예약번호에 해당하는 예약이 없어서 오류남ㅋ , " + dto.getReservationNo());
         }
 
-
         CommonEnums.Status newStatus = CommonEnums.Status.valueOf(dto.getStatus());
         reservation.setStatus(newStatus);
+
+        if (CommonEnums.Status.Y.equals(newStatus)) {
+            // 승인 시 회차 증가
+            Payment payment = reservation.getPayment();
+            if (payment.getUsedCount() == null) payment.setUsedCount(0L);
+            payment.setUsedCount(payment.getUsedCount() + 1);
+        }
 
        if (CommonEnums.Status.N.equals(newStatus)){
             reservation.setRejectComment(dto.getRejectReason());

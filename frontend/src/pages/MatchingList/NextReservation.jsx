@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
 import ReservationCalendar from '../../components/CoachMatching/ReservationCalendar';
 import TitleBar from '../../components/TitleBar';
 import theme from '../../styles/theme';
+import { reservationService } from '../../api/reservation';
 
 const PageWrapper = styled.div`
   width: 100%;
@@ -81,10 +82,20 @@ const NextReservation = () => {
   };
 
   // 신청하기 버튼 클릭 핸들러
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (selectedDate && selectedTime) {
-      // 선택된 날짜와 시간이 있을 경우에만 페이지 이동
+      try {
+        // 날짜와 시간 합치기 (예: 2024-06-01T15:00:00)
+        const selectDate = `${selectedDate}T${selectedTime}:00`;
+        // paymentId는 실제로는 props/location 등에서 받아와야 함. 임시로 1번 사용
+        await reservationService.createReservation({
+          paymentId: trainerId, // 실제 paymentId로 교체 필요
+          selectDate,
+        });
       navigate('/matchingList');
+      } catch (error) {
+        alert(error.message);
+      }
     }
     // disabled 상태일 때는 이 함수 자체가 호출되지 않거나, 호출되더라도 아무것도 하지 않습니다.
   };

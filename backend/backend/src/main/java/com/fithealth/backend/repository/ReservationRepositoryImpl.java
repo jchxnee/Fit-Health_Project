@@ -23,8 +23,12 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     @Override
     public List<Reservation> findByPaymentId(Long paymentId, CommonEnums.Status status) {
-        String sql = "SELECT r FROM Reservation r WHERE r.payment.id = :paymentId AND r.status = : status ORDER BY r.reservationNo ASC";
-        return em.createQuery(sql, Reservation.class)
+        String jpql = "SELECT r FROM Reservation r " +
+                "JOIN FETCH r.payment p " +
+                "JOIN FETCH p.responseMember rm " +
+                "JOIN FETCH p.member m " +
+                "WHERE p.paymentId = :paymentId AND r.status = :status ORDER BY r.reservationNo ASC";
+        return em.createQuery(jpql, Reservation.class)
                 .setParameter("paymentId", paymentId)
                 .setParameter("status", status)
                 .getResultList();

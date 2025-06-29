@@ -48,9 +48,9 @@ import ChangePwdPage from './pages/myPage/ChangePwdPage';
 import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
 import useUserStore from './store/useUserStore';
 import RefundPage from './pages/PayPage/RefundPage';
-import CoachModify from './pages/coach/CoachModify.jsx';
 import NoticePostCreationPage from './pages/noticePage/NoticePostCreationPage';
 import NoticeDetailPage from './pages/noticePage/NoticeDetailPage';
+import CoachModify from './pages/coach/CoachModify.jsx';
 
 function AppContent() {
   const location = useLocation();
