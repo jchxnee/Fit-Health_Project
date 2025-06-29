@@ -68,4 +68,20 @@ public class SelectReservation {
                     .build();
         }
     }
+
+    @Setter
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class AbleReservationResponse {
+
+        private LocalDateTime selectDate;
+
+        public static AbleReservationResponse fromEntity(Reservation reservation) {
+            return AbleReservationResponse.builder()
+                    .selectDate(reservation.getSelectDate())
+                    .build();
+        }
+    }
 }
