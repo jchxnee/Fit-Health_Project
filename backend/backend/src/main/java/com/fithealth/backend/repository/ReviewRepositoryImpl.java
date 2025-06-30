@@ -94,11 +94,18 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 
     @Override
     public List<Review> getTop6(CommonEnums.Status status) {
-        String jpql = "SELECT r FROM Review r WHERE r.status = :status ORDER BY r.createdDate DESC";
+        String jpql = "SELECT r FROM Review r " +
+                "JOIN r.payment p " +
+                "JOIN p.responseMember m " +
+                "WHERE r.status = :reviewStatus " +
+                "AND m.status = :memberStatus " +
+                "ORDER BY r.createdDate DESC";
 
         return em.createQuery(jpql, Review.class)
-                .setParameter("status", status)
+                .setParameter("reviewStatus", status)
+                .setParameter("memberStatus", CommonEnums.Status.Y)
                 .setMaxResults(6)
                 .getResultList();
     }
+
 }

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
+import { useLocation, useNavigate } from 'react-router-dom'; // useNavigate 훅 import
 import ReservationCalendar from '../../components/CoachMatching/ReservationCalendar';
 import TitleBar from '../../components/TitleBar';
 import theme from '../../styles/theme';
 import { reservationService } from '../../api/reservation';
 import api from '../../api/axios';
+import { toast } from 'react-toastify';
 
 const PageWrapper = styled.div`
   width: 100%;
@@ -38,38 +39,62 @@ const SubmitButton = styled.button`
 
 const NextReservation = () => {
   const navigate = useNavigate(); // useNavigate 훅 사용
+  const location = useLocation();
 
-  const getTodayDateString = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = (today.getMonth() + 1).toString().padStart(2, '0');
-    const day = today.getDate().toString().padStart(2, '0');
+  const lessonData = location.state?.currentLesson;
+  const [trainerNo, setTrainerNo] = useState(null);
+  const [paymentId, setPaymentId] = useState(null);
+
+  useEffect(() => {
+    console.log('lessonData:', lessonData); // 구조 확인
+    console.log('lessonData.trainerNo:', lessonData?.trainerNo); // 실제 값 확인
+
+    if (lessonData?.trainerNo) {
+      setTrainerNo(lessonData.trainerNo);
+    }
+
+    if (lessonData?.paymentId) {
+      setPaymentId(lessonData.paymentId);
+    }
+  }, [lessonData]);
+
+  // 오늘로부터 2일 후 날짜 구하기
+  const getTwoDaysLaterDateString = () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 2); // 이틀 후
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
 
-  const [selectedDate, setSelectedDate] = useState(getTodayDateString());
+  const minDate = getTwoDaysLaterDateString();
+
+  const [selectedDate, setSelectedDate] = useState(minDate); // 초기값도 이틀 후로
   const [selectedTime, setSelectedTime] = useState(null);
 
-  const [trainerId, setTrainerId] = useState(1);
+  const [disabledDateTimes, setDisabledDateTimes] = useState([]);
   const [trainerInfo, setTrainerInfo] = useState(null);
   const [oneTimePrice, setOneTimePrice] = useState(0);
 
   useEffect(() => {
     const fetchTrainerInfo = async () => {
       try {
-        const res = await api.get(`/api/trainer/${trainerId}`);
+        const res = await api.get(`/api/trainer/${trainerNo}`);
+        const { data: disabledList } = await api.get(`/api/reservation/disabledate/${trainerNo}`);
         setTrainerInfo(res.data);
         setOneTimePrice(res.data.oncePrice); // 실제 필드명에 맞게 수정
+        setDisabledDateTimes(disabledList.map((d) => new Date(d)));
       } catch (error) {
         setTrainerInfo(null);
         setOneTimePrice(0);
       }
     };
 
-    if (trainerId) {
+    if (trainerNo) {
       fetchTrainerInfo();
     }
-  }, [trainerId]);
+  }, [trainerNo]);
 
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
@@ -87,11 +112,13 @@ const NextReservation = () => {
         const selectDate = `${selectedDate}T${selectedTime}:00`;
         // paymentId는 실제로는 props/location 등에서 받아와야 함. 임시로 1번 사용
         await reservationService.createReservation({
-          paymentId: trainerId, // 실제 paymentId로 교체 필요
+          paymentId: paymentId, // 실제 paymentId로 교체 필요
           selectDate,
         });
+        toast.success('다음 회차 예약이 완료되었습니다. 코치의 승인을 기다려주세요!');
         navigate('/matchingList');
       } catch (error) {
+        toast.error('다음 회차 예약에 실패하였습니다.');
         alert(error.message);
       }
     }
@@ -108,6 +135,8 @@ const NextReservation = () => {
         onDateChange={handleDateChange}
         selectedTime={selectedTime}
         onTimeChange={handleTimeChange}
+        minDate={minDate}
+        disabledDateTimes={disabledDateTimes}
       />
       {/* SubmitButton은 실제 button 태그로 유지하고 onClick 핸들러 추가 */}
       <SubmitButton onClick={handleSubmit} disabled={!selectedDate || !selectedTime}>

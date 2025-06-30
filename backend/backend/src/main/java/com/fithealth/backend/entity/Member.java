@@ -140,4 +140,8 @@ public class Member {
         this.status = status;
     }
 
+    public void changeGrade(CommonEnums.Grade grade){
+        this.grade = grade;
+    }
+
 }

@@ -27,12 +27,13 @@ public class TrainerRepositoryImpl implements TrainerRepository {
                 "JOIN t.member m " +
                 "JOIN Payment p ON p.responseMember = m " +
                 "JOIN Review r ON r.payment = p " +
-                "WHERE r.status = :status " +
+                "WHERE r.status = :status AND m.status = :memberStatus " +
                 "GROUP BY t " +
                 "ORDER BY COUNT(r) DESC";
 
         return em.createQuery(query, Trainer.class)
-                .setParameter("status", status)
+                .setParameter("status", status) // 리뷰 상태
+                .setParameter("memberStatus", CommonEnums.Status.Y) // 회원 상태
                 .setMaxResults(3)
                 .getResultList();
     }

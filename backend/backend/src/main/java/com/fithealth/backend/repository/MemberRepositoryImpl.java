@@ -46,8 +46,9 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
         // GRADE가 'C' (코치)인 멤버들을 조회합니다.
         // Member와 Trainer를 LEFT JOIN FETCH 하여 N+1 문제 방지
         TypedQuery<Member> query = em.createQuery(
-                "SELECT m FROM Member m LEFT JOIN FETCH m.trainer t WHERE m.grade = :grade", Member.class);
+                "SELECT m FROM Member m LEFT JOIN FETCH m.trainer t WHERE m.grade = :grade AND m.status = :status", Member.class);
         query.setParameter("grade", CommonEnums.Grade.C);
+        query.setParameter("status", CommonEnums.Status.Y);
         return query.getResultList();
     }
 
