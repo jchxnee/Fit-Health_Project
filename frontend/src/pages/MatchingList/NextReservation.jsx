@@ -9,32 +9,32 @@ import api from '../../api/axios';
 import { toast } from 'react-toastify';
 
 const PageWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `;
 
 const SubmitButton = styled.button`
-  background-color: ${theme.colors.button};
-  color: ${theme.colors.white};
-  border: none;
-  border-radius: 10px;
-  padding: 18px 35px;
-  font-size: 1.2em;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 40px;
-  margin-bottom: 40px;
-  width: 80%;
-  max-width: 400px;
-  &:hover {
-    opacity: 90%;
-  }
-  &:disabled {
-    background-color: ${theme.colors.gray[400]};
-    cursor: not-allowed;
-  }
+    background-color: ${theme.colors.button};
+    color: ${theme.colors.white};
+    border: none;
+    border-radius: 10px;
+    padding: 18px 35px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    width: 80%;
+    max-width: 400px;
+    &:hover {
+        opacity: 90%;
+    }
+    &:disabled {
+        background-color: ${theme.colors.gray[400]};
+        cursor: not-allowed;
+    }
 `;
 
 const NextReservation = () => {
@@ -74,25 +74,19 @@ const NextReservation = () => {
   const [selectedTime, setSelectedTime] = useState(null);
 
   const [disabledDateTimes, setDisabledDateTimes] = useState([]);
-  const [trainerInfo, setTrainerInfo] = useState(null);
-  const [oneTimePrice, setOneTimePrice] = useState(0);
 
   useEffect(() => {
-    const fetchTrainerInfo = async () => {
+    const fetchDisableInfo = async () => {
       try {
-        const res = await api.get(`/api/trainer/${trainerNo}`);
         const { data: disabledList } = await api.get(`/api/reservation/disabledate/${trainerNo}`);
-        setTrainerInfo(res.data);
-        setOneTimePrice(res.data.oncePrice); // 실제 필드명에 맞게 수정
         setDisabledDateTimes(disabledList.map((d) => new Date(d)));
       } catch (error) {
-        setTrainerInfo(null);
-        setOneTimePrice(0);
+        setDisabledDateTimes(null);
       }
     };
 
     if (trainerNo) {
-      fetchTrainerInfo();
+      fetchDisableInfo();
     }
   }, [trainerNo]);
 

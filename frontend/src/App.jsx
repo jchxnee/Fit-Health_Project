@@ -86,7 +86,7 @@ function AppContent() {
         <Route path="/coachList" element={<CoachList />} />
         <Route path="/coachRegister" element={<CoachRegister />} />
         <Route path="/coach/:id" element={<CoachDetail />} />
-        <Route path="/coachModify" element={<CoachModify />} />
+        <Route path="/coachModify/:trainerNo" element={<CoachModify />} />
         <Route path="/coachMatching/:id" element={<CoachMatching />} />
         <Route path="/nextReservation" element={<NextReservation />} />
         <Route path="/coachReview/:trainerNo" element={<CoachReview />} />
