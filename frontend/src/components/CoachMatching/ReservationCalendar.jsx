@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import theme from '../../styles/theme';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-// 스타일 컴포넌트들은 변경 없음
 const TimeReservationText = styled.p`
   font-size: 0.95em;
   color: ${theme.colors.gray[600]};
@@ -202,27 +201,33 @@ const TimeSlotButton = styled.button`
   transition: all 0.2s ease-in-out;
   outline: none;
   &:hover {
-    background-color: ${(props) => !props.isSelected && theme.colors.gray[200]};
-    transform: ${(props) => !props.isSelected && 'translateY(-2px)'};
+    background-color: ${(props) => !props.isDisabled && !props.isSelected && theme.colors.gray[200]};
+    transform: ${(props) => !props.isDisabled && !props.isSelected && 'translateY(-2px)'};
+  }
+  &:disabled {
+    cursor: not-allowed;
+    background-color: ${theme.colors.gray[200]};
+    color: ${theme.colors.gray[500]};
+    border-color: ${theme.colors.gray[400]};
+    opacity: 0.8;
   }
 `;
 
-const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeChange, minDate }) => {
-  // currentDisplayDate를 selectedDate prop을 기반으로 초기화
-  // selectedDate가 유효한 날짜 문자열이라면 그 날짜로 Date 객체 생성
-  // 유효하지 않다면 (예: null) 현재 날짜로 초기화
+const ReservationCalendar = ({
+  selectedDate,
+  onDateChange,
+  selectedTime,
+  onTimeChange,
+  minDate,
+  reservedTimes = [],
+}) => {
   const [currentDisplayDate, setCurrentDisplayDate] = useState(() => {
     return selectedDate ? new Date(selectedDate) : new Date();
   });
 
   useEffect(() => {
-    // selectedDate prop이 변경될 때, 캘린더 표시 월을 해당 날짜로 업데이트
-    // 이펙트 내부에서 new Date(selectedDate)를 사용하여 새 Date 객체를 생성하고,
-    // currentDisplayDate가 현재 prop의 날짜와 다른 경우에만 업데이트하여 불필요한 렌더링 방지.
-    // 주의: currentDisplayDate를 의존성 배열에서 제거해야 무한 루프를 막을 수 있습니다.
     if (selectedDate) {
       const newDateFromProp = new Date(selectedDate);
-      // 현재 표시 중인 월/년도와 prop으로 받은 날짜의 월/년도가 다를 때만 업데이트
       if (
         newDateFromProp.getFullYear() !== currentDisplayDate.getFullYear() ||
         newDateFromProp.getMonth() !== currentDisplayDate.getMonth()
@@ -230,8 +235,6 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
         setCurrentDisplayDate(newDateFromProp);
       }
     } else {
-      // selectedDate가 null/undefined가 되면 현재 월로 돌아오도록 처리
-      // 이 부분은 필요에 따라 제거하거나 다른 로직으로 변경할 수 있습니다.
       const today = new Date();
       if (
         today.getFullYear() !== currentDisplayDate.getFullYear() ||
@@ -240,25 +243,22 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
         setCurrentDisplayDate(today);
       }
     }
-  }, [selectedDate]); // **currentDisplayDate를 의존성 배열에서 제거했습니다!**
+  }, [selectedDate]);
 
   const getCalendarDays = (year, month) => {
     const days = [];
     const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0:일, 1:월, ..., 6:토
     const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
 
-    // 이전 달의 플레이스홀더 날짜
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push({ day: '', isPlaceholder: true });
     }
 
-    // 현재 달의 날짜
     for (let i = 1; i <= lastDayOfMonth; i++) {
       const date = new Date(year, month, i);
       days.push({ day: i, isPlaceholder: false, date: date });
     }
 
-    // 다음 달의 플레이스홀더 날짜 (총 6주, 42칸을 채우기 위함)
     const totalCells = days.length;
     const remainingCells = 42 - totalCells;
     for (let i = 1; i <= remainingCells; i++) {
@@ -269,7 +269,7 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
   };
 
   const year = currentDisplayDate.getFullYear();
-  const month = currentDisplayDate.getMonth(); // getMonth()는 0부터 시작
+  const month = currentDisplayDate.getMonth();
 
   const calendarDays = getCalendarDays(year, month);
 
@@ -297,6 +297,7 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
     <>
       <TimeReservationText>P.T 시간(핏코치의 이동시간 포함 1시간 30분 단위로 예약 가능)</TimeReservationText>
       <DatePickerContainer>
+        {/* ⭐️ minDate prop을 StyledDateInput에 전달 */}
         <StyledDateInput type="date" value={selectedDate} onChange={onDateChange} min={minDate} />
         <StyledTimeInput type="time" value={selectedTime || ''} onChange={onTimeChange} />
       </DatePickerContainer>
@@ -330,9 +331,22 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
               const isSelected = !dayInfo.isPlaceholder && formattedDayInfoDate === selectedDate;
               const isWeekend = dayInfo.date && (dayInfo.date.getDay() === 0 || dayInfo.date.getDay() === 6);
 
-              // ✅ 날짜 비교 시 시간 제거
-              const stripTime = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
-              const isBeforeMinDate = minDate && dayInfo.date && stripTime(dayInfo.date) < stripTime(new Date(minDate));
+              // ⭐️ 날짜 비교 시 시간 제거 (Date 객체를 YYYY-MM-DD 문자열로 변환하여 비교)
+              const minDateObj = minDate ? new Date(minDate) : null;
+              const dayInfoDateWithoutTime = dayInfo.date
+                ? new Date(dayInfo.date.getFullYear(), dayInfo.date.getMonth(), dayInfo.date.getDate())
+                : null;
+              const minDateWithoutTime = minDateObj
+                ? new Date(minDateObj.getFullYear(), minDateObj.getMonth(), minDateObj.getDate())
+                : null;
+
+              const isBeforeMinDate =
+                minDateWithoutTime && dayInfoDateWithoutTime && dayInfoDateWithoutTime < minDateWithoutTime;
+
+              // 오늘 날짜 이전의 날짜도 비활성화 (2일 뒤 예약 정책에 따라 필요)
+              const today = new Date();
+              const todayWithoutTime = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+              const isBeforeToday = dayInfoDateWithoutTime && dayInfoDateWithoutTime < todayWithoutTime;
 
               return (
                 <CalendarDay
@@ -341,7 +355,7 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
                   isSelected={isSelected}
                   isWeekend={isWeekend}
                   onClick={
-                    dayInfo.isPlaceholder || isBeforeMinDate
+                    dayInfo.isPlaceholder || isBeforeMinDate || isBeforeToday // ⭐️ 2일 뒤 이전 날짜 비활성화
                       ? null
                       : () => {
                           const year = dayInfo.date.getFullYear();
@@ -350,7 +364,7 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
                           onDateChange({ target: { value: `${year}-${month}-${day}` } });
                         }
                   }
-                  disabled={dayInfo.isPlaceholder || isBeforeMinDate}
+                  disabled={dayInfo.isPlaceholder || isBeforeMinDate || isBeforeToday} // ⭐️ 2일 뒤 이전 날짜 비활성화
                 >
                   {dayInfo.day}
                 </CalendarDay>
@@ -360,15 +374,20 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
         </CalendarContainerWrapper>
 
         <TimeSlotsContainer>
-          {timeSlots.map((time) => (
-            <TimeSlotButton
-              key={time}
-              isSelected={time === selectedTime}
-              onClick={() => onTimeChange({ target: { value: time } })}
-            >
-              {time}
-            </TimeSlotButton>
-          ))}
+          {timeSlots.map((time) => {
+            const isTimeReserved = reservedTimes.includes(time); // ⭐️ 해당 시간이 예약되어 있는지 확인
+            return (
+              <TimeSlotButton
+                key={time}
+                isSelected={time === selectedTime}
+                onClick={() => onTimeChange({ target: { value: time } })}
+                disabled={isTimeReserved} // ⭐️ 예약된 시간대는 비활성화
+                isDisabled={isTimeReserved} // 스타일 컴포넌트에서 disabled 상태를 위한 prop
+              >
+                {time}
+              </TimeSlotButton>
+            );
+          })}
         </TimeSlotsContainer>
       </HorizontalContainer>
     </>
