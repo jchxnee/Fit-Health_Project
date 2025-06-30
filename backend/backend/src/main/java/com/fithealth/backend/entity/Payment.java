@@ -82,8 +82,7 @@ public class Payment {
     private LocalDateTime appliedAt;
 
     @Column(name = "USED_COUNT", nullable = false)
-    private Long usedCount;
-    
+    private Long usedCount = 0L;
 
     @PrePersist
     public void prePersist() {
