@@ -163,14 +163,7 @@ function CommunityPage() {
                       <PhotoPostCard>
                         {/* file_url은 백엔드에서 제공하는 실제 파일 경로여야 합니다. */}
                         {/* 예시: http://localhost:8080/files/ {post.files[0]?.change_name} 과 같이 백엔드에서 파일 제공하는 API 경로를 구성해야 합니다. */}
-                        <PhotoPostImage
-                          src={
-                            post.files[0]?.file_url ||
-                            `http://localhost:7961/files/${post.files[0]?.change_name}` ||
-                            'https://via.placeholder.com/300x200?text=No+Image'
-                          }
-                          alt={post.board_title}
-                        />
+                        <PhotoPostImage src={'https://picsum.photos/200'} alt={post.board_title} />
                         <PhotoPostContent>
                           <PhotoPostTitle>{post.board_title}</PhotoPostTitle>
                           <PhotoPostText>{post.board_content}</PhotoPostText>

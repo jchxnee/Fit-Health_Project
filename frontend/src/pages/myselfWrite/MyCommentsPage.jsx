@@ -303,7 +303,9 @@ function MyCommentsPage() {
 
           {/* 댓글이 없을 경우 메시지 표시 */}
           {filteredComments.length === 0 && !loading && !error ? (
-            <p>작성한 댓글이 없습니다.</p>
+            <div style={{ textAlign: 'center', padding: '50px', color: '#666' }}>
+              <p>작성한 댓글이 없습니다.</p>
+            </div>
           ) : (
             <CommentsList comments={filteredComments} />
           )}

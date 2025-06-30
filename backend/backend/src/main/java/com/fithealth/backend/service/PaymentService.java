@@ -5,6 +5,7 @@ import com.fithealth.backend.dto.Payment.ResponsePaymentDto;
 import com.fithealth.backend.dto.Payment.SelectPaymentDto;
 
 import com.fithealth.backend.dto.Refund.RefundCreateDto;
+import com.fithealth.backend.dto.Reservation.ReservationCreateDto.Create;
 import com.fithealth.backend.dto.Reservation.UpdateReservationDto;
 import com.fithealth.backend.dto.Salary.SalaryCreateDto;
 import java.time.LocalDateTime;
@@ -22,4 +23,6 @@ public interface PaymentService {
     Long goRefund(RefundCreateDto.Create createDto);
     Long goSalary(SalaryCreateDto.Create createDto);
     void updateReservationStatus(UpdateReservationDto dto);
+
+    Long insertReservation(Create createDto);
 }

@@ -155,4 +155,20 @@ public class PaymentServiceImpl implements  PaymentService {
        reservationRepository.save(reservation);
 
     }
+
+    @Override
+    @Transactional
+    public Long insertReservation(ReservationCreateDto.Create createDto) {
+        // DTO를 엔티티로 변환하고 저장하는 로직
+        // 예시:
+        // Reservation reservation = Reservation.builder()
+        //     .paymentId(createDto.getPaymentId())
+        //     .selectDate(LocalDateTime.parse(createDto.getSelectDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+        //     .status("Y") // 기본 상태 'Y' (승인 대기 또는 완료)
+        //     // 기타 필드 설정 (필요하다면 trainerId, userId 등)
+        //     .build();
+        // Reservation savedReservation = reservationRepository.save(reservation);
+        // return savedReservation.getReservationNo(); // 저장 후 ID 반환
+        throw new UnsupportedOperationException("Not implemented yet"); // 실제 구현 필요
+    }
 }

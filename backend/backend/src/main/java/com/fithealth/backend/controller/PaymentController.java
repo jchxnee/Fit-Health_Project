@@ -55,6 +55,14 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.findPaymentListByTrainer(userEmail));
     }
 
+    // ⭐️ 레슨 회차(예약) 생성 API
+    @PostMapping("/reservation")
+    public ResponseEntity<Long> insertReservation(@RequestBody ReservationCreateDto.Create createDto) {
+        // PaymentService의 새로운 메서드를 호출하여 예약을 생성
+        Long reservationNo = paymentService.insertReservation(createDto);
+        return ResponseEntity.ok(reservationNo);
+    }
+
     //진행된 레슨 회차 정보 조회 API
     @GetMapping("/reservation")
     public ResponseEntity<List<SelectReservation.RefundResponse>> findReservation(@RequestParam Long paymentId) {

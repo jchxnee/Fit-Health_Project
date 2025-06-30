@@ -51,6 +51,7 @@ import RefundPage from './pages/PayPage/RefundPage';
 import NoticePostCreationPage from './pages/noticePage/NoticePostCreationPage';
 import NoticeDetailPage from './pages/noticePage/NoticeDetailPage';
 import CoachModify from './pages/coach/CoachModify.jsx';
+import ScrollToTop from './components/ScrollToTop';
 
 function AppContent() {
   const location = useLocation();
@@ -61,6 +62,7 @@ function AppContent() {
   return (
     <>
       {!isHeaderHidden && <Header user={user} />}
+      <ScrollToTop />
       <Routes>
         {/* 공통 */}
         <Route path="/" element={<MainPage />} />

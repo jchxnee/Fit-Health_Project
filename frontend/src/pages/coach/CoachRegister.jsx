@@ -57,7 +57,7 @@ function CoachRegister() {
   } = useCoachRegisterForm();
 
   const navigate = useNavigate();
-  const updateUser = useUserStore();
+  const { updateUser } = useUserStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
