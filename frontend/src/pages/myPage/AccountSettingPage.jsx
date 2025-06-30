@@ -207,7 +207,6 @@ const SettingsContainer = styled.div`
   min-height: calc(100vh - 60px);
   box-sizing: border-box;
   width: 100%;
-  font-family: 'Noto Sans KR', sans-serif;
 `;
 
 const SettingsForm = styled.div`

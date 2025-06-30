@@ -10,7 +10,6 @@ const Wrapper = styled.section`
   background: ${({ theme }) => theme.colors.white};
 `;
 const Title = styled.h1`
-  font-family: 'SUITE', sans-serif;
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   font-size: ${({ theme }) => theme.fontSizes['2xl']};
   color: ${({ theme }) => theme.colors.primary};
