@@ -92,7 +92,7 @@ const NextReservation = () => {
           paymentId: trainerId, // 실제 paymentId로 교체 필요
           selectDate,
         });
-      navigate('/matchingList');
+        navigate('/matchingList');
       } catch (error) {
         alert(error.message);
       }
