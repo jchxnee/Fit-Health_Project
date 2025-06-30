@@ -5,6 +5,7 @@ import ReservationCalendar from '../../components/CoachMatching/ReservationCalen
 import TitleBar from '../../components/TitleBar';
 import theme from '../../styles/theme';
 import { reservationService } from '../../api/reservation';
+import api from '../../api/axios';
 
 const PageWrapper = styled.div`
   width: 100%;
@@ -55,17 +56,14 @@ const NextReservation = () => {
 
   useEffect(() => {
     const fetchTrainerInfo = async () => {
-      const dbTrainersData = {
-        1: { id: 1, name: '김성은', specialization: '헬스', pricePerSession: 50000 },
-        2: { id: 2, name: '박트레이너', specialization: '필라테스', pricePerSession: 60000 },
-      };
-      setTimeout(() => {
-        const fetchedInfo = dbTrainersData?.[trainerId];
-        setTrainerInfo(fetchedInfo);
-        if (fetchedInfo) {
-          setOneTimePrice(fetchedInfo.pricePerSession);
-        }
-      }, 500);
+      try {
+        const res = await api.get(`/api/trainer/${trainerId}`);
+        setTrainerInfo(res.data);
+        setOneTimePrice(res.data.oncePrice); // 실제 필드명에 맞게 수정
+      } catch (error) {
+        setTrainerInfo(null);
+        setOneTimePrice(0);
+      }
     };
 
     if (trainerId) {
