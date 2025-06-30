@@ -4,7 +4,7 @@ import TitleBar from '../../components/TitleBar';
 import { FaCamera, FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import api from '../../api/axios.js';
 import { API_ENDPOINTS } from '../../api/config.js';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'; // toast 메시지를 위한 임포트 추가
 
 // ===========================================
@@ -255,7 +255,8 @@ const RemoveImageButton = styled.button`
 
 function ReviewCreationPage() {
   const location = useLocation();
-  const { paymentId, trainerName } = location.state || {};
+  const { paymentId, trainerName, trainerNo } = location.state || {};
+  const navigate = useNavigate();
 
   const [content, setContent] = useState('');
   const [file, setFile] = useState(null); // 단일 파일 저장을 위한 상태
@@ -323,10 +324,9 @@ function ReviewCreationPage() {
     formData.append('reviewContent', content);
     formData.append('rating', selectedRating);
     formData.append('heart', 0);
-    formData.append('reviewImageFile', file);
 
     if (file) {
-      formData.append('file', file);
+      formData.append('reviewImageFile', file);
     }
 
     console.log('전송할 리뷰 데이터 (FormData):', Object.fromEntries(formData.entries()));
@@ -339,6 +339,7 @@ function ReviewCreationPage() {
       });
       console.log('리뷰 등록 성공:', response.data);
       toast.success('리뷰가 성공적으로 등록되었습니다!');
+      navigate(`/coachReview/${trainerNo}`);
 
       setContent('');
       setFile(null);

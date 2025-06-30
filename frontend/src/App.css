@@ -9,7 +9,8 @@ input,
 div,
 button,
 select,
-p {
+p,
+textarea {
   box-sizing: border-box;
   font-family: 'SUITE', sans-serif;
 }

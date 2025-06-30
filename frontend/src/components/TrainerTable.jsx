@@ -144,7 +144,6 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
     } else if (action === '정산내역') {
       setSalaryModalData(rowData); // 정산내역도 동일 모달 사용
     }
-    toast.success(`${rowData.coachName} 코치의 ${action} 선택됨!`);
 
     // 메뉴 닫힘 관련 상태 업데이트는 한 번만 수행
     setOpenMenuId(null);

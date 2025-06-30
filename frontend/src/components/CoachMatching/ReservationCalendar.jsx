@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import theme from '../../styles/theme';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
+// 스타일 컴포넌트들은 변경 없음
 const TimeReservationText = styled.p`
   font-size: 0.95em;
   color: ${theme.colors.gray[600]};
@@ -190,26 +191,32 @@ const TimeSlotsContainer = styled.div`
 `;
 
 const TimeSlotButton = styled.button`
-  background-color: ${(props) => (props.isSelected ? theme.colors.primary : theme.colors.gray[100])};
-  color: ${(props) => (props.isSelected ? theme.colors.white : theme.colors.black)};
-  border: 1px solid ${(props) => (props.isSelected ? theme.colors.primary : theme.colors.gray[300])};
+  background-color: ${(props) =>
+    props.isSelected
+      ? theme.colors.primary
+      : props.disabled
+        ? theme.colors.gray[200] // ❗️불가능한 시간은 흐린 배경
+        : theme.colors.gray[100]};
+  color: ${(props) =>
+    props.isSelected
+      ? theme.colors.white
+      : props.disabled
+        ? theme.colors.gray[500] // ❗️불가능한 시간은 흐린 텍스트
+        : theme.colors.black};
+  border: 1px solid
+    ${(props) =>
+      props.isSelected ? theme.colors.primary : props.disabled ? theme.colors.gray[300] : theme.colors.gray[300]};
   border-radius: 8px;
   padding: 12px 10px;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
   font-size: 0.95em;
   font-weight: ${(props) => (props.isSelected ? 'bold' : 'normal')};
   transition: all 0.2s ease-in-out;
   outline: none;
+
   &:hover {
-    background-color: ${(props) => !props.isDisabled && !props.isSelected && theme.colors.gray[200]};
-    transform: ${(props) => !props.isDisabled && !props.isSelected && 'translateY(-2px)'};
-  }
-  &:disabled {
-    cursor: not-allowed;
-    background-color: ${theme.colors.gray[200]};
-    color: ${theme.colors.gray[500]};
-    border-color: ${theme.colors.gray[400]};
-    opacity: 0.8;
+    background-color: ${(props) => !props.disabled && !props.isSelected && theme.colors.gray[200]};
+    transform: ${(props) => !props.disabled && !props.isSelected && 'translateY(-2px)'};
   }
 `;
 
@@ -219,11 +226,11 @@ const ReservationCalendar = ({
   selectedTime,
   onTimeChange,
   minDate,
-  reservedTimes = [],
+  disabledDateTimes = [], // 예약 불가능한 날짜+시간 Date 객체 배열
 }) => {
-  const [currentDisplayDate, setCurrentDisplayDate] = useState(() => {
-    return selectedDate ? new Date(selectedDate) : new Date();
-  });
+  const [currentDisplayDate, setCurrentDisplayDate] = useState(() =>
+    selectedDate ? new Date(selectedDate) : new Date()
+  );
 
   useEffect(() => {
     if (selectedDate) {
@@ -247,7 +254,7 @@ const ReservationCalendar = ({
 
   const getCalendarDays = (year, month) => {
     const days = [];
-    const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0:일, 1:월, ..., 6:토
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
     const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
 
     for (let i = 0; i < firstDayOfMonth; i++) {
@@ -270,7 +277,6 @@ const ReservationCalendar = ({
 
   const year = currentDisplayDate.getFullYear();
   const month = currentDisplayDate.getMonth();
-
   const calendarDays = getCalendarDays(year, month);
 
   const goToPreviousMonth = () => {
@@ -290,14 +296,23 @@ const ReservationCalendar = ({
   };
 
   const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-
   const timeSlots = ['09:00', '10:30', '12:00', '13:30', '15:00', '16:30', '18:00', '19:30'];
+
+  const stripDate = (date) => {
+    // YYYY-MM-DD 로컬 기준으로 안전하게 출력
+    return `${date.getFullYear()}-${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+  };
+  const stripTime = (date) => {
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  };
 
   return (
     <>
       <TimeReservationText>P.T 시간(핏코치의 이동시간 포함 1시간 30분 단위로 예약 가능)</TimeReservationText>
+
       <DatePickerContainer>
-        {/* ⭐️ minDate prop을 StyledDateInput에 전달 */}
         <StyledDateInput type="date" value={selectedDate} onChange={onDateChange} min={minDate} />
         <StyledTimeInput type="time" value={selectedTime || ''} onChange={onTimeChange} />
       </DatePickerContainer>
@@ -309,12 +324,16 @@ const ReservationCalendar = ({
               <FaChevronLeft />
             </NavButton>
             <MonthYearText>
-              {currentDisplayDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' })}
+              {currentDisplayDate.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+              })}
             </MonthYearText>
             <NavButton onClick={goToNextMonth}>
               <FaChevronRight />
             </NavButton>
           </CalendarHeader>
+
           <DayNames>
             {dayNames.map((day, index) => (
               <DayHeader key={day} isWeekend={index === 0 || index === 6}>
@@ -322,31 +341,24 @@ const ReservationCalendar = ({
               </DayHeader>
             ))}
           </DayNames>
+
           <CalendarGrid>
             {calendarDays.map((dayInfo, index) => {
-              const formattedDayInfoDate = dayInfo.date
-                ? `${dayInfo.date.getFullYear()}-${(dayInfo.date.getMonth() + 1).toString().padStart(2, '0')}-${dayInfo.date.getDate().toString().padStart(2, '0')}`
-                : null;
+              const date = dayInfo.date;
+              const dateStr = date ? stripDate(date) : null;
 
-              const isSelected = !dayInfo.isPlaceholder && formattedDayInfoDate === selectedDate;
-              const isWeekend = dayInfo.date && (dayInfo.date.getDay() === 0 || dayInfo.date.getDay() === 6);
+              const isSelected = !dayInfo.isPlaceholder && dateStr === selectedDate;
+              const isWeekend = date && (date.getDay() === 0 || date.getDay() === 6);
 
-              // ⭐️ 날짜 비교 시 시간 제거 (Date 객체를 YYYY-MM-DD 문자열로 변환하여 비교)
-              const minDateObj = minDate ? new Date(minDate) : null;
-              const dayInfoDateWithoutTime = dayInfo.date
-                ? new Date(dayInfo.date.getFullYear(), dayInfo.date.getMonth(), dayInfo.date.getDate())
-                : null;
-              const minDateWithoutTime = minDateObj
-                ? new Date(minDateObj.getFullYear(), minDateObj.getMonth(), minDateObj.getDate())
-                : null;
+              const isBeforeMinDate = minDate && date && new Date(stripDate(date)) < new Date(minDate);
 
-              const isBeforeMinDate =
-                minDateWithoutTime && dayInfoDateWithoutTime && dayInfoDateWithoutTime < minDateWithoutTime;
+              const isDateFullyDisabled = (() => {
+                if (!date) return false;
+                const disabledTimes = disabledDateTimes.filter((dt) => stripDate(dt) === stripDate(date));
+                return disabledTimes.length === timeSlots.length;
+              })();
 
-              // 오늘 날짜 이전의 날짜도 비활성화 (2일 뒤 예약 정책에 따라 필요)
-              const today = new Date();
-              const todayWithoutTime = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-              const isBeforeToday = dayInfoDateWithoutTime && dayInfoDateWithoutTime < todayWithoutTime;
+              const isDisabled = dayInfo.isPlaceholder || isBeforeMinDate || isDateFullyDisabled;
 
               return (
                 <CalendarDay
@@ -355,16 +367,16 @@ const ReservationCalendar = ({
                   isSelected={isSelected}
                   isWeekend={isWeekend}
                   onClick={
-                    dayInfo.isPlaceholder || isBeforeMinDate || isBeforeToday // ⭐️ 2일 뒤 이전 날짜 비활성화
+                    isDisabled
                       ? null
                       : () => {
-                          const year = dayInfo.date.getFullYear();
-                          const month = (dayInfo.date.getMonth() + 1).toString().padStart(2, '0');
-                          const day = dayInfo.date.getDate().toString().padStart(2, '0');
+                          const year = date.getFullYear();
+                          const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                          const day = date.getDate().toString().padStart(2, '0');
                           onDateChange({ target: { value: `${year}-${month}-${day}` } });
                         }
                   }
-                  disabled={dayInfo.isPlaceholder || isBeforeMinDate || isBeforeToday} // ⭐️ 2일 뒤 이전 날짜 비활성화
+                  disabled={isDisabled}
                 >
                   {dayInfo.day}
                 </CalendarDay>
@@ -375,14 +387,16 @@ const ReservationCalendar = ({
 
         <TimeSlotsContainer>
           {timeSlots.map((time) => {
-            const isTimeReserved = reservedTimes.includes(time); // ⭐️ 해당 시간이 예약되어 있는지 확인
+            const isDisabledTime = disabledDateTimes.some(
+              (dt) => stripDate(dt) === selectedDate && stripTime(dt) === time
+            );
+
             return (
               <TimeSlotButton
                 key={time}
                 isSelected={time === selectedTime}
+                disabled={isDisabledTime}
                 onClick={() => onTimeChange({ target: { value: time } })}
-                disabled={isTimeReserved} // ⭐️ 예약된 시간대는 비활성화
-                isDisabled={isTimeReserved} // 스타일 컴포넌트에서 disabled 상태를 위한 prop
               >
                 {time}
               </TimeSlotButton>

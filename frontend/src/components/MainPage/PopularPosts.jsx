@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FiMessageCircle } from 'react-icons/fi';
-import { FaRegEye } from 'react-icons/fa';
+import { FaRegEye, FaThumbsUp } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { BeatLoader } from 'react-spinners';
 
 const Wrapper = styled.section`
   width: 100%;
@@ -35,7 +35,7 @@ const PostCol = styled.div`
   flex-direction: column;
   gap: 0;
 `;
-const PostBox = styled.div`
+const PostBox = styled(Link)`
   background: ${({ theme }) => theme.colors.white};
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
   padding: ${({ theme }) => `${theme.spacing[4]} 0 ${theme.spacing[2]} 0`};
@@ -90,78 +90,72 @@ const ViewAllBtn = styled(Link)`
   padding: 0;
   margin: 0;
 `;
+const LoaderWrapper = styled.div`
+  width: 100%;
+  min-height: 300px; /* 충분한 높이 확보 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
-const posts = [
-  {
-    title: '제목입니다',
-    content:
-      '안녕하세요. 저는 서울사는 김현아라고 하고 저는 진격거를 좋아합니다.\n특히, 한지를 제일 좋아합니다. 트레이너분이 진격거를 좋아하면 좋겠습니다.',
-    views: 3700,
-    comments: 10,
-  },
-  {
-    title: '제목입니다',
-    content:
-      '안녕하세요. 저는 서울사는 김현아라고 하고 저는 진격거를 좋아합니다.\n특히, 한지를 제일 좋아합니다. 트레이너분이 진격거를 좋아하면 좋겠습니다.',
-    views: 3700,
-    comments: 10,
-  },
-  {
-    title: '제목입니다',
-    content:
-      '안녕하세요. 저는 서울사는 김현아라고 하고 저는 진격거를 좋아합니다.\n특히, 한지를 제일 좋아합니다. 트레이너분이 진격거를 좋아하면 좋겠습니다.',
-    views: 3700,
-    comments: 10,
-  },
-  {
-    title: '제목입니다',
-    content:
-      '안녕하세요. 저는 서울사는 김현아라고 하고 저는 진격거를 좋아합니다.\n특히, 한지를 제일 좋아합니다. 트레이너분이 진격거를 좋아하면 좋겠습니다.',
-    views: 3700,
-    comments: 10,
-  },
-];
+const PopularPosts = ({ boards, isLoading }) => {
+  const leftPosts = boards.slice(0, 3);
+  const rightPosts = boards.slice(3, 5);
 
-const PopularPosts = () => (
-  <Wrapper>
-    <Container>
-      <Title>커뮤니티 인기 글</Title>
-      <ListRow>
-        <PostCol>
-          {posts.slice(0, 3).map((p, i) => (
-            <PostBox key={i}>
-              <PostTitle>{p.title}</PostTitle>
-              <PostContent>{p.content}</PostContent>
-              <StatsRow>
-                <FaRegEye></FaRegEye>
-                {p.views}
-                <FiMessageCircle></FiMessageCircle>
-                {p.comments}
-              </StatsRow>
-            </PostBox>
-          ))}
-        </PostCol>
-        <PostCol>
-          {posts.slice(2, 5).map((p, i) => (
-            <PostBox key={i}>
-              <PostTitle>{p.title}</PostTitle>
-              <PostContent>{p.content}</PostContent>
-              <StatsRow>
-                <FaRegEye></FaRegEye>
-                {p.views}
-                <FiMessageCircle></FiMessageCircle>
-                {p.comments}
-              </StatsRow>
-            </PostBox>
-          ))}
-          <MoreInfoBox>
-            <MoreText>더 많은 정보를 얻고싶으면?</MoreText>
-            <ViewAllBtn to="/community">전체보기 &gt;</ViewAllBtn>
-          </MoreInfoBox>
-        </PostCol>
-      </ListRow>
-    </Container>
-  </Wrapper>
-);
+  if (isLoading) {
+    return (
+      <Wrapper>
+        <Container>
+          <Title>커뮤니티 인기 글</Title>
+          <LoaderWrapper>
+            <BeatLoader color="#d1d5db" />
+          </LoaderWrapper>
+        </Container>
+      </Wrapper>
+    );
+  }
+
+  return (
+    <Wrapper>
+      <Container>
+        <Title>커뮤니티 인기 글</Title>
+        <ListRow>
+          <PostCol>
+            {leftPosts.map((b) => (
+              <PostBox key={b.board_no} to={`/communityDetailPage/${b.board_no}`}>
+                <PostTitle>{b.board_title}</PostTitle>
+                <PostContent>{b.board_content}</PostContent>
+                <StatsRow>
+                  <FaRegEye />
+                  {b.count}
+                  <FaThumbsUp />
+                  {b.heart}
+                </StatsRow>
+              </PostBox>
+            ))}
+          </PostCol>
+          <PostCol>
+            {rightPosts.map((b) => (
+              <PostBox key={b.board_no} to={`/communityDetailPage/${b.board_no}`}>
+                <PostTitle>{b.board_title}</PostTitle>
+                <PostContent>{b.board_content}</PostContent>
+                <StatsRow>
+                  <FaRegEye />
+                  {b.count}
+                  <FaThumbsUp />
+                  {b.heart}
+                </StatsRow>
+              </PostBox>
+            ))}
+            <MoreInfoBox>
+              <MoreText>더 많은 정보를 얻고싶으면?</MoreText>
+              <ViewAllBtn to="/community">전체보기 &gt;</ViewAllBtn>
+            </MoreInfoBox>
+          </PostCol>
+        </ListRow>
+      </Container>
+    </Wrapper>
+  );
+};
 
 export default PopularPosts;

@@ -1,8 +1,10 @@
 package com.fithealth.backend.controller;
 
+import com.fithealth.backend.dto.Board.Top5BoardDto;
 import com.fithealth.backend.dto.Review.ReviewCreateDto;
 import com.fithealth.backend.dto.Review.ReviewSelectDto;
 import com.fithealth.backend.dto.Review.SelectMyReviewDto;
+import com.fithealth.backend.dto.Review.Top6ReviewDto;
 import com.fithealth.backend.dto.member.LoginDto; // LoginDto 임포트
 import com.fithealth.backend.entity.Review;
 import com.fithealth.backend.service.ReviewService;
@@ -54,5 +56,10 @@ public class ReviewController {
         System.out.println("프론트에서 받은 리뷰 아이디 : " + id);
         reviewService.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/top6")
+    public ResponseEntity<List<Top6ReviewDto.Response>> getReviewTop6() {
+        return ResponseEntity.ok(reviewService.getReviewTop6());
     }
 }

@@ -3,8 +3,10 @@ package com.fithealth.backend.controller;
 import com.fithealth.backend.dto.Board.BoardCreateDto;
 import com.fithealth.backend.dto.Board.BoardGetDto;
 import com.fithealth.backend.dto.Board.BoardUpdateDto;
+import com.fithealth.backend.dto.Board.Top5BoardDto;
 import com.fithealth.backend.dto.PageResponse;
 import com.fithealth.backend.dto.Review.SelectMyReviewDto;
+import com.fithealth.backend.dto.Trainer.Top3TrainerDto;
 import com.fithealth.backend.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -98,5 +100,10 @@ public class BoardController {
         String parsedUserEmail = userEmail.replace("\"", ""); // JSON 문자열로 넘어올 경우 따옴표 제거
         boolean liked = boardService.toggleLike(boardNo, parsedUserEmail);
         return ResponseEntity.ok(liked); // 좋아요 상태 반환 (true: 좋아요, false: 좋아요 취소)
+    }
+
+    @GetMapping("/top5")
+    public ResponseEntity<List<Top5BoardDto.Response>> getBoardTop5() {
+        return ResponseEntity.ok(boardService.getBoardTop5());
     }
 }

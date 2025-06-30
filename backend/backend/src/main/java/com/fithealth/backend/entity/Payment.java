@@ -80,7 +80,9 @@ public class Payment {
 
     @Column(name = "APPLIED_AT", nullable = false, updatable = false)
     private LocalDateTime appliedAt;
-    
+
+    @Column(name = "USED_COUNT", nullable = false)
+    private Long usedCount = 0L;
 
     @PrePersist
     public void prePersist() {
@@ -92,6 +94,9 @@ public class Payment {
 
         if(this.useStatus == null) {
             this.useStatus = CommonEnums.UseStatus.Y;
+        }
+        if(this.usedCount == null) {
+            this.usedCount = 0L;
         }
     }
 

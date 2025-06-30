@@ -105,7 +105,6 @@ const NoDataMessage = styled.div`
 const MatchingList = () => {
   const navigate = useNavigate();
   const user = useUserStore((state) => state.user);
-  const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 
   const selectBarOptions = [
     { label: '전체', value: 'all' },
@@ -129,7 +128,7 @@ const MatchingList = () => {
   const fetchMatchingList = useCallback(async () => {
     const userEmail = user?.email;
 
-    if (!isAuthenticated || !userEmail) {
+    if (!userEmail) {
       toast.error('로그인이 필요하거나 사용자 이메일 정보를 찾을 수 없어 신청 내역을 불러올 수 없습니다.');
       navigate('/login');
       return;
@@ -146,7 +145,7 @@ const MatchingList = () => {
     } catch (err) {
       console.error('신청 내역을 불러오는 중 오류 발생:', err);
     }
-  }, [isAuthenticated, user?.email, navigate]);
+  }, [user?.email, navigate]);
 
   useEffect(() => {
     fetchMatchingList();
