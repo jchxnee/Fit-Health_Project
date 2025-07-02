@@ -69,7 +69,7 @@ const MyPage = () => {
           <ProfileInfo>
             <ProfileName>{user.name}님</ProfileName>
             <ProfileEmail>
-              <ProfileIcon src={emailIcon} alt="email" />
+              <ProfileIcon src={user.socialType === 'KAKAO' ? kakaotalkIcon : emailIcon} alt="email" />
               {user.email}
             </ProfileEmail>
           </ProfileInfo>

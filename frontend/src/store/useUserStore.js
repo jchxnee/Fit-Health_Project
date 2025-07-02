@@ -14,14 +14,9 @@ const useUserStore = create(
             email: userData.useremail,
             trainerNo: userData.trainerNo,
             name: userData.username,
-            birth: userData.birth,
-            phone: userData.phone,
-            address: userData.address,
-            gender: userData.gender,
-            height: userData.height,
-            goal: userData.goal,
             img: userData.profileimage,
             grade: userData.grade,
+            socialType: userData.socialType,
           },
           isAuthenticated: true,
         });
@@ -29,6 +24,7 @@ const useUserStore = create(
 
       //로그아웃
       logout: () => {
+        sessionStorage.removeItem('token'); // 토큰 삭제
         set({
           user: null,
           isAuthenticated: false,

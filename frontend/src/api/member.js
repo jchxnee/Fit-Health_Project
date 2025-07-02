@@ -63,11 +63,20 @@ export const memberService = {
     }
   },
 
+  getMemberBirth: async () => {
+    try {
+      const { data } = await api.get(API_ENDPOINTS.MEMBER.BIRTH);
+      return data;
+    } catch (error) {
+      console.error('회원 프로필 조회 실패:', error);
+      throw new Error('회원 정보를 불러오지 못했습니다.');
+    }
+  },
+
   //프로필 이미지 수정
-  updateProfileImage: async (profileImage, userEmail) => {
+  updateProfileImage: async (profileImage) => {
     try {
       const formData = new FormData();
-      formData.append('userEmail', userEmail);
       formData.append('profileImage', profileImage);
 
       const { data } = await api.put(API_ENDPOINTS.MEMBER.UPDATEPROFILEIMAGE, formData, {
@@ -88,12 +97,9 @@ export const memberService = {
   },
 
   //이름 수정
-  updateName: async (useremail, newUsername) => {
+  updateName: async (userName) => {
     try {
-      const { data } = await api.put(API_ENDPOINTS.MEMBER.UPDATENAME, {
-        user_email: useremail,
-        user_name: newUsername,
-      });
+      const { data } = await api.put(API_ENDPOINTS.MEMBER.UPDATENAME, { userName });
 
       return data;
     } catch (error) {
@@ -107,10 +113,9 @@ export const memberService = {
   },
 
   //생년월일 수정
-  updateBirth: async (useremail, newBirth) => {
+  updateBirth: async (newBirth) => {
     try {
       const { data } = await api.put(API_ENDPOINTS.MEMBER.UPDATEBIRTH, {
-        user_email: useremail,
         birth: newBirth,
       });
 
@@ -125,11 +130,20 @@ export const memberService = {
     }
   },
 
+  getMemberInfo: async () => {
+    try {
+      const { data } = await api.get(API_ENDPOINTS.MEMBER.INFO);
+      return data;
+    } catch (error) {
+      console.error('회원 프로필 조회 실패:', error);
+      throw new Error('회원 정보를 불러오지 못했습니다.');
+    }
+  },
+
   //내 정보 수정
-  updateInfo: async (useremail, data) => {
+  updateInfo: async (data) => {
     try {
       const { result } = await api.put(API_ENDPOINTS.MEMBER.BASE, {
-        user_email: useremail,
         phone: data.phone,
         address: data.address,
         gender: data.gender,
@@ -149,14 +163,9 @@ export const memberService = {
   },
 
   //비밀번호 변경
-  changePwd: async (useremail, userpwd) => {
+  changePwd: async (userPwd) => {
     try {
-      console.log(useremail);
-      console.log(userpwd);
-      const { data } = await api.put(API_ENDPOINTS.MEMBER.UPDATEPWD, {
-        user_email: useremail,
-        user_pwd: userpwd,
-      });
+      const { data } = await api.put(API_ENDPOINTS.MEMBER.UPDATEPWD, { userPwd });
 
       return data;
     } catch (error) {
@@ -170,13 +179,9 @@ export const memberService = {
   },
 
   //회원 탈퇴
-  deleteMember: async (useremail) => {
+  deleteMember: async () => {
     try {
-      const { data } = await api.put(API_ENDPOINTS.MEMBER.DELETE, null, {
-        params: {
-          userEmail: useremail,
-        },
-      });
+      const { data } = await api.put(API_ENDPOINTS.MEMBER.DELETE);
 
       return data;
     } catch (error) {

@@ -3,9 +3,20 @@ import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
 import { Link } from 'react-router-dom';
 import { useLoginForm } from '../../hooks/member/useLoginForm';
+const { VITE_KAKAO_URL, VITE_KAKAO_CLIENT_ID, VITE_KAKAO_REDIRECT_URL } = import.meta.env;
 
 function LoginPage() {
   const { register, handleSubmit, onsubmit, errors, isLoading } = useLoginForm();
+  const kakaoUrl = VITE_KAKAO_URL;
+  const kakaoClientId = VITE_KAKAO_CLIENT_ID;
+  const kakaoRedirectUrl = VITE_KAKAO_REDIRECT_URL;
+
+  const kakaoLogin = () => {
+    sessionStorage.setItem('kakaoAction', 'login');
+    const auth_uri = `${kakaoUrl}?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUrl}&response_type=code`;
+    window.location.href = auth_uri;
+  };
+
   return (
     <>
       <LoginContainer>
@@ -43,7 +54,7 @@ function LoginPage() {
             <span>SNS 계정으로 로그인</span>
           </SNSLoginDivider>
           <SNSLoginIcons>
-            <SNSIcon src="/public/img/kakaotalk.png" alt="Kakao Login" />
+            <SNSIcon src="/public/img/kakaotalk.png" alt="Kakao Login" onClick={kakaoLogin} />
             <SNSIcon src="/public/img/naver.png" alt="Naver Login" />
             <SNSIcon src="/public/img/google.png" alt="Google Login" />
           </SNSLoginIcons>

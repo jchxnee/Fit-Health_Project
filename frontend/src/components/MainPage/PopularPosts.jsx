@@ -113,6 +113,17 @@ const PopularPosts = ({ boards, isLoading }) => {
     );
   }
 
+  if (!boards || boards.length === 0) {
+    return (
+      <Wrapper>
+        <Container>
+          <Title>커뮤니티 인기 글</Title>
+          <div style={{ textAlign: 'center', fontSize: '1.1rem', color: '#999' }}>인기 게시물이 없습니다.</div>
+        </Container>
+      </Wrapper>
+    );
+  }
+
   return (
     <Wrapper>
       <Container>
