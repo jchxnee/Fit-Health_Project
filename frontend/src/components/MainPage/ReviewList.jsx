@@ -136,6 +136,17 @@ const ReviewList = ({ reviews, isLoading }) => {
     );
   }
 
+  if (!reviews || reviews.length === 0) {
+    return (
+      <Wrapper>
+        <Container>
+          <Title>리뷰</Title>
+          <div style={{ textAlign: 'center', fontSize: '1.1rem', color: '#999' }}>최근 리뷰가 없습니다.</div>
+        </Container>
+      </Wrapper>
+    );
+  }
+
   return (
     <Wrapper>
       <Container>

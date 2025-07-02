@@ -35,8 +35,14 @@ out/
 
 ### VS Code ###
 .vscode/
-# Spring Boot application configuration
-/src/main/resources/application.yml
+
+# =========================
+# ▶ Application Settings (보안상 제외)
+# =========================
+application.properties
+application.yml
+application-*.properties
+application-*.yml
 
 # H2 Database files
 db.mv.db

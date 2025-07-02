@@ -1,7 +1,12 @@
 package com.fithealth.backend.dto.member;
 
+import com.fithealth.backend.dto.member.LoginDto.Response;
+import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.enums.CommonEnums;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -9,17 +14,30 @@ import java.time.LocalDate;
 public class UpdateDto {
 
     @Getter
-    public static class RequestName {
-        private String user_email;
-        private String user_name;
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class Response {
+        private String phone;
+        private String address;
+        private CommonEnums.Gender gender;
+        private double height;
+        private String goal;
+
+        public static UpdateDto.Response toDto(Member member){
+            return UpdateDto.Response.builder()
+                    .phone(member.getPhone())
+                    .address(member.getAddress())
+                    .gender(member.getGender())
+                    .height(member.getHeight())
+                    .goal(member.getGoal())
+                    .build();
+        }
+
     }
 
-    @Getter
-    public static class RequestBirth {
-        private String user_email;
-        private LocalDate birth;
-    }
-
+    @Setter
     @Getter
     public static class RequestInfo {
         private String user_email;
@@ -28,11 +46,5 @@ public class UpdateDto {
         private CommonEnums.Gender gender;
         private double height;
         private String goal;
-    }
-
-    @Getter
-    public static class RequestPwd {
-        private String user_email;
-        private String user_pwd;
     }
 }

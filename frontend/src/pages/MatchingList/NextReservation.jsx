@@ -74,25 +74,19 @@ const NextReservation = () => {
   const [selectedTime, setSelectedTime] = useState(null);
 
   const [disabledDateTimes, setDisabledDateTimes] = useState([]);
-  const [trainerInfo, setTrainerInfo] = useState(null);
-  const [oneTimePrice, setOneTimePrice] = useState(0);
 
   useEffect(() => {
-    const fetchTrainerInfo = async () => {
+    const fetchDisableInfo = async () => {
       try {
-        const res = await api.get(`/api/trainer/${trainerNo}`);
         const { data: disabledList } = await api.get(`/api/reservation/disabledate/${trainerNo}`);
-        setTrainerInfo(res.data);
-        setOneTimePrice(res.data.oncePrice); // 실제 필드명에 맞게 수정
         setDisabledDateTimes(disabledList.map((d) => new Date(d)));
       } catch (error) {
-        setTrainerInfo(null);
-        setOneTimePrice(0);
+        setDisabledDateTimes(null);
       }
     };
 
     if (trainerNo) {
-      fetchTrainerInfo();
+      fetchDisableInfo();
     }
   }, [trainerNo]);
 

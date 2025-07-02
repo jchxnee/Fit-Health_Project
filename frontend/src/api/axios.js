@@ -1,3 +1,4 @@
+// api/axios.js
 import axios from 'axios';
 import { API_CONFIG } from './config';
 
@@ -7,15 +8,26 @@ const api = axios.create({
   headers: API_CONFIG.HEADERS,
 });
 
+// ✅ [1] 요청 시 Authorization 헤더에 토큰 자동 추가
+api.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem('token'); // 또는 localStorage
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`; // Bearer 스킴 사용
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// ✅ [2] 응답 오류 처리
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
-      //서버가 응답을 함
       const { status, data } = error.response;
       switch (status) {
         case 401:
-          //인증에러
           window.location.href = '/login';
           break;
         case 403:
@@ -31,7 +43,6 @@ api.interceptors.response.use(
           console.error('API 에러 :', data);
       }
     } else if (error.request) {
-      //요청은 했지만 응답을 받지 못함
       console.error('네트워크 에러 : ', error.request);
     } else {
       console.error('에러 :', error.message);

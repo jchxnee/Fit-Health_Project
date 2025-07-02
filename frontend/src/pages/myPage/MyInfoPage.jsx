@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
 import { Button, Item, List, Wrapper } from '../../styles/common/SelectGoal';
@@ -30,25 +30,58 @@ const schema = yup.object().shape({
 });
 
 const MyInfoPage = () => {
-  const { user, updateUser } = useUserStore();
+  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      phone: user.phone ?? '',
-      height: user.height ?? '',
-      gender: user.gender ?? '',
-      goal: user.goal ?? '',
-      address: user.address ?? '',
+      phone: '',
+      height: '',
+      gender: '',
+      goal: '',
+      address: '',
+      birth: '',
     },
   });
 
-  const { handleSubmit, setValue } = methods;
+  const { handleSubmit, setValue, reset } = methods;
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const data = await memberService.getMemberInfo();
+
+        if (data) {
+          setUser(data);
+
+          // 날짜 형식 변환
+          const formattedBirth = data.birth ? new Date(data.birth).toISOString().split('T')[0] : '';
+
+          // 폼 초기값 업데이트
+          reset({
+            phone: data.phone || '',
+            height: data.height || '',
+            gender: data.gender || '',
+            goal: data.goal || '',
+            address: data.address || '',
+            birth: formattedBirth,
+          });
+
+          setSelected(data.goal || '');
+          setSelectedGender(data.gender || '');
+        }
+      } catch (error) {
+        console.error('회원 정보 조회 실패', error);
+      }
+    };
+
+    fetchUser();
+  }, [reset]);
 
   // UI 전용 상태
-  const [selected, setSelected] = useState(user.goal || '');
-  const [selectedGender, setSelectedGender] = useState(user.gender || '');
+  const [selected, setSelected] = useState('');
+  const [selectedGender, setSelectedGender] = useState('');
 
   // 성별 선택 시 form에도 반영
   const handleGenderSelect = (value) => {
@@ -67,20 +100,9 @@ const MyInfoPage = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log('✅ onSubmit 실행', data);
     try {
       setIsLoading(true);
-
-      await memberService.updateInfo(user.email, data);
-
-      updateUser(data);
-      updateUser({
-        phone: data.phone,
-        address: data.address,
-        gender: data.gender,
-        height: data.height,
-        goal: data.goal,
-      });
+      await memberService.updateInfo(data);
       toast.success('내 정보가 성공적으로 수정되었습니다.');
     } catch (err) {
       if (err.response?.data?.message) {

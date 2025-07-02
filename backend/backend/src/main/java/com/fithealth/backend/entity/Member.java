@@ -1,6 +1,7 @@
 package com.fithealth.backend.entity;
 
 import com.fithealth.backend.enums.CommonEnums;
+import com.fithealth.backend.enums.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -92,6 +93,12 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Health> healths = new ArrayList<>();
 
+    @Column(name = "SOCIAL_TYPE")
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
+
+    @Column(name = "SOCIAL_ID")
+    private String socialId;
 
     @PrePersist
     public void prePersist() {
