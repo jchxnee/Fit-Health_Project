@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { CiCamera } from 'react-icons/ci';
 import { Link } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { memberService } from '../../api/member';
 import { BeatLoader } from 'react-spinners';
+const { VITE_KAKAO_URL, VITE_KAKAO_CLIENT_ID, VITE_KAKAO_REDIRECT_URL } = import.meta.env;
 
 // 이름 전용 yup 스키마
 const nameSchema = yup.object({
@@ -40,6 +41,40 @@ function AccountSettingsPage() {
   const [imageUrl, setImageUrl] = useState(user.img || basicProfile);
   const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [birth, setBirth] = useState(null);
+
+  const {
+    register,
+    getValues,
+    setValue,
+    setError,
+    clearErrors,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      username: user.name,
+      birth: '',
+    },
+  });
+
+  useEffect(() => {
+    const fetchBirth = async () => {
+      try {
+        const data = await memberService.getMemberBirth();
+        console.log(data);
+
+        if (data) {
+          setValue('birth', data); // ✅ 여기서 form에 주입
+          setBirth(data); // 상태도 유지 (선택 사항)
+        }
+      } catch (error) {
+        console.error('회원 정보 조회 실패', error);
+      }
+    };
+
+    fetchBirth();
+  }, [setValue]);
 
   const handleImageClick = () => {
     fileInputRef.current.click();
@@ -56,7 +91,7 @@ function AccountSettingsPage() {
     try {
       setIsLoading(true);
 
-      const response = await await memberService.updateProfileImage(file, user.email);
+      const response = await await memberService.updateProfileImage(file);
       console.log('응답 확인:', response); // { imageUrl: '/images/profile/...' }
 
       if (response?.imageUrl) {
@@ -74,25 +109,12 @@ function AccountSettingsPage() {
     }
   };
 
-  const {
-    register,
-    getValues,
-    setError,
-    clearErrors,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      username: user.name,
-      birth: user.birth,
-    },
-  });
-
   const handleNameEdit = async () => {
     try {
       setIsLoading(true);
       await nameSchema.validate({ username: getValues('username') }, { context: { original: user.name } });
 
-      await memberService.updateName(user.email, getValues('username'));
+      await memberService.updateName(getValues('username'));
 
       toast.success('이름 변경 완료!');
       updateUser({ name: getValues('username') });
@@ -115,10 +137,10 @@ function AccountSettingsPage() {
     try {
       setIsLoading(true);
       // 기존 생일과 비교해서 변경 없으면 에러 뜨게 하려면 context 전달
-      await birthSchema.validate({ birth: getValues('birth') }, { context: { original: user.birth } });
+      await birthSchema.validate({ birth: getValues('birth') }, { context: { original: birth } });
 
       // 예: 서버에 생일 변경 요청 (memberService.updateBirth 등)
-      await memberService.updateBirth(user.email, getValues('birth'));
+      await memberService.updateBirth(getValues('birth'));
 
       toast.success('생년월일 변경 완료!');
       updateUser({ birth: getValues('birth') });
@@ -134,6 +156,32 @@ function AccountSettingsPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDeleteClick = (e) => {
+    e.preventDefault();
+
+    if (user.socialType !== null && user.socialType !== undefined) {
+      const confirmed = window.confirm(
+        '소셜 로그인 회원은 카카오 인증을 다시 받아야 합니다. 카카오 로그인 페이지로 이동하시겠습니까?'
+      );
+      if (confirmed) {
+        kakaoDelete();
+      }
+    } else {
+      // socialType이 null이면 일반 회원 탈퇴 페이지로 이동
+      window.location.href = '/deleteMemberPage';
+    }
+  };
+
+  const kakaoUrl = VITE_KAKAO_URL;
+  const kakaoClientId = VITE_KAKAO_CLIENT_ID;
+  const kakaoRedirectUrl = VITE_KAKAO_REDIRECT_URL;
+
+  const kakaoDelete = () => {
+    sessionStorage.setItem('kakaoAction', 'delete');
+    const auth_uri = `${kakaoUrl}?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUrl}&response_type=code`;
+    window.location.href = auth_uri;
   };
 
   return (
@@ -188,8 +236,19 @@ function AccountSettingsPage() {
 
           <ButtonGroup>
             <SettingsButton to="/myInfoPage">내 정보 관리</SettingsButton>
-            <SettingsButton to="/changePwdPage">비밀번호 변경</SettingsButton>
-            <SettingsButton to="/deleteMemberPage">회원 탈퇴</SettingsButton>
+            <SettingsButton
+              to="/changePwdPage"
+              disabled={user.socialType !== null && user.socialType !== undefined}
+              style={{
+                pointerEvents: user.socialType !== null && user.socialType !== undefined ? 'none' : 'auto',
+                opacity: user.socialType !== null && user.socialType !== undefined ? 0.8 : 1,
+              }}
+            >
+              비밀번호 변경
+            </SettingsButton>
+            <SettingsButton to="/deleteMemberPage" onClick={handleDeleteClick}>
+              회원 탈퇴
+            </SettingsButton>
           </ButtonGroup>
         </SettingsForm>
       </SettingsContainer>

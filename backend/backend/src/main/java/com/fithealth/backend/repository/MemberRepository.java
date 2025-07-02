@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface MemberRepository {
     void save(Member member);
     Optional<Member> findOne(String userEmail);
+    Optional<Member> findBySocialId(String socialId);
     Optional<Member> findByTrainerNo(Long trainerNo);
     Optional<Member> findByUserEmail(String userEmail);
     void updateGradeAndTrainer(String userEmail, CommonEnums.Grade grade, Long trainerNo);

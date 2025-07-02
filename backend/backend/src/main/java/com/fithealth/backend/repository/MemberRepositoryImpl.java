@@ -32,6 +32,19 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
     }
 
     @Override
+    public Optional<Member> findBySocialId(String socialId) {
+        String sql = "SELECT m FROM Member m WHERE m.socialId = :socialId";
+        try {
+            Member member = em.createQuery(sql, Member.class)
+                    .setParameter("socialId", socialId)
+                    .getSingleResult();
+            return Optional.of(member);
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public void updateGradeAndTrainer(String userEmail, CommonEnums.Grade grade, Long trainerNo) {
         em.createQuery("UPDATE Member m SET m.grade = :grade, m.trainer.trainerNo = :trainerNo WHERE m.userEmail = :userEmail")
                 .setParameter("grade", grade)

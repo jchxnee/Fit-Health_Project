@@ -45,7 +45,7 @@ const DeleteMemberPage = () => {
         return;
       }
 
-      await memberService.deleteMember(user.email);
+      await memberService.deleteMember();
 
       logout();
       toast.success('회원 탈퇴가 완료되었습니다. 이용해주셔서 감사합니다.');
