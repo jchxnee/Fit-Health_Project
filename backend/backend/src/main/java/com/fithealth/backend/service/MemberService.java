@@ -18,10 +18,10 @@ public interface MemberService {
     String updateProfileImage(String userEmail, MultipartFile file) throws IOException;
     Boolean updateName(String userEmail, String userName);
     Boolean updateBirth(String userEmail, LocalDate birth);
-    UpdateDto.Response findInfo(String userEmail);
+    LoginDto.Response findInfo(String userEmail);
     Boolean updateInfo(UpdateDto.RequestInfo updateDto);
     Boolean updatePwd(String userEmail, String userPwd);
     Boolean deleteMember(String userEmail);
-    Member getMemberBySocialId(String socialId);
+    Member getMemberBySocialIdAndSocialType(String socialId, SocialType socialType);
     Member createOauth(String socialId, String email, String name, SocialType socialType);
 }

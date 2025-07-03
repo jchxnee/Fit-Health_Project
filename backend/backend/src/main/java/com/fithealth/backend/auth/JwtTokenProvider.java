@@ -26,13 +26,9 @@ public class JwtTokenProvider {
         this.SECRET_KEY = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String createToken(String userEmail, Long trainerNo, String userName, String profileImage, String grade, String socialType) {
+    public String createToken(String userEmail, String role) {
         Claims claims = Jwts.claims().setSubject(userEmail);
-        claims.put("userName", userName);
-        claims.put("trainerNo", trainerNo); // null 가능
-        claims.put("profileImage", profileImage);
-        claims.put("grade", grade); // role 대체로 사용 가능
-        claims.put("socialType", socialType);
+        claims.put("role", role); // null 가능
 
         Date now = new Date();
         Date exprire = new Date(now.getTime() + (expiration * 1000L * 60));

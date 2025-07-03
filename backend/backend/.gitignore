@@ -43,6 +43,8 @@ application.properties
 application.yml
 application-*.properties
 application-*.yml
+echo "backend/backend/src/main/resources/application.yml"
+
 
 # H2 Database files
 db.mv.db

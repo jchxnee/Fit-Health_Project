@@ -1,6 +1,7 @@
 package com.fithealth.backend.entity;
 
 import com.fithealth.backend.enums.CommonEnums;
+import com.fithealth.backend.enums.Role;
 import com.fithealth.backend.enums.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -99,6 +100,10 @@ public class Member {
 
     @Column(name = "SOCIAL_ID")
     private String socialId;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Role role = Role.USER;
 
     @PrePersist
     public void prePersist() {
