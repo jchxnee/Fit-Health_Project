@@ -3,10 +3,10 @@ package com.fithealth.backend.service;
 import com.fithealth.backend.dto.member.LoginDto;
 import com.fithealth.backend.dto.member.SignupDto;
 import com.fithealth.backend.dto.member.UpdateDto;
-import com.fithealth.backend.entity.BoardFile;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.enums.CommonEnums;
 import com.fithealth.backend.enums.CommonEnums.Grade;
+import com.fithealth.backend.enums.Role;
 import com.fithealth.backend.enums.SocialType;
 import com.fithealth.backend.repository.MemberRepository;
 import java.time.LocalDate;
@@ -108,11 +108,11 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public UpdateDto.Response findInfo(String userEmail) {
+    public LoginDto.Response findInfo(String userEmail) {
         Member member = memberRepository.findOne(userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("이메일이 존재하지 않습니다."));
 
-        return UpdateDto.Response.toDto(member);
+        return LoginDto.Response.toDto(member);
     }
 
     @Override
@@ -146,8 +146,8 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public Member getMemberBySocialId(String socialId) {
-        return memberRepository.findBySocialId(socialId).orElse(null);
+    public Member getMemberBySocialIdAndSocialType(String socialId, SocialType socialType) {
+        return memberRepository.findBySocialIdAndSocialType(socialId, socialType).orElse(null);
     }
 
     @Override
@@ -159,6 +159,7 @@ public class MemberServiceImpl implements MemberService{
                 .socialId(socialId)
                 .socialType(socialType)
                 .grade(Grade.U)
+                .role(Role.USER)
                 .build();
 
         memberRepository.save(member);

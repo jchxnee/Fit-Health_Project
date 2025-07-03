@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
 import { Link } from 'react-router-dom';
 import { useLoginForm } from '../../hooks/member/useLoginForm';
+import { toast } from 'react-toastify';
 const { VITE_KAKAO_URL, VITE_KAKAO_CLIENT_ID, VITE_KAKAO_REDIRECT_URL } = import.meta.env;
 
 function LoginPage() {
@@ -12,9 +13,16 @@ function LoginPage() {
   const kakaoRedirectUrl = VITE_KAKAO_REDIRECT_URL;
 
   const kakaoLogin = () => {
-    sessionStorage.setItem('kakaoAction', 'login');
-    const auth_uri = `${kakaoUrl}?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUrl}&response_type=code`;
-    window.location.href = auth_uri;
+    // sessionStorage.setItem('kakaoAction', 'login');
+    // const auth_uri = `${kakaoUrl}?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUrl}&response_type=code`;
+    // window.location.href = auth_uri;
+    window.location.href = 'http://localhost:7961/oauth2/authorization/kakao';
+  };
+
+  // 로그인 버튼 클릭 시
+  const googleLogin = () => {
+    // /oauth2/authorization/{provider}
+    window.location.href = 'http://localhost:7961/oauth2/authorization/google';
   };
 
   return (
@@ -56,7 +64,7 @@ function LoginPage() {
           <SNSLoginIcons>
             <SNSIcon src="/public/img/kakaotalk.png" alt="Kakao Login" onClick={kakaoLogin} />
             <SNSIcon src="/public/img/naver.png" alt="Naver Login" />
-            <SNSIcon src="/public/img/google.png" alt="Google Login" />
+            <SNSIcon src="/public/img/google.png" alt="Google Login" onClick={googleLogin} />
           </SNSLoginIcons>
         </LoginFormBox>
       </LoginContainer>
