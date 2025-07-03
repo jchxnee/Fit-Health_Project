@@ -51,7 +51,6 @@ import NoticeDetailPage from './pages/noticePage/NoticeDetailPage';
 import CoachModify from './pages/coach/CoachModify.jsx';
 import ScrollToTop from './components/ScrollToTop';
 import KakaoRedirect from './pages/KakaoRedirect';
-import KakaoDeleteRedirect from './pages/KakaoRedirect/KakaoDeleteRedirect';
 
 function AppContent() {
   const location = useLocation();
