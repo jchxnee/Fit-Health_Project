@@ -122,7 +122,7 @@ const PaymentPage = () => {
 
       // 결제 데이터 준비 (실제 결제에 필요한 정보)
       const data = {
-        pg: 'html5_inicis', // PG사 (예: 이니시스)
+        pg: 'html5_inicis',
         pay_method: 'card', // 결제수단
         merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
         name: paymentData.product_name, // 상품명

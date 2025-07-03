@@ -41,40 +41,6 @@ function AccountSettingsPage() {
   const [imageUrl, setImageUrl] = useState(user.img || basicProfile);
   const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [birth, setBirth] = useState(null);
-
-  const {
-    register,
-    getValues,
-    setValue,
-    setError,
-    clearErrors,
-    reset,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      username: user.name,
-      birth: '',
-    },
-  });
-
-  useEffect(() => {
-    const fetchBirth = async () => {
-      try {
-        const data = await memberService.getMemberBirth();
-        console.log(data);
-
-        if (data) {
-          setValue('birth', data); // ✅ 여기서 form에 주입
-          setBirth(data); // 상태도 유지 (선택 사항)
-        }
-      } catch (error) {
-        console.error('회원 정보 조회 실패', error);
-      }
-    };
-
-    fetchBirth();
-  }, [setValue]);
 
   const handleImageClick = () => {
     fileInputRef.current.click();
@@ -91,7 +57,7 @@ function AccountSettingsPage() {
     try {
       setIsLoading(true);
 
-      const response = await await memberService.updateProfileImage(file);
+      const response = await await memberService.updateProfileImage(file, user.email);
       console.log('응답 확인:', response); // { imageUrl: '/images/profile/...' }
 
       if (response?.imageUrl) {
@@ -108,6 +74,19 @@ function AccountSettingsPage() {
       setIsLoading(false);
     }
   };
+
+  const {
+    register,
+    getValues,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      username: user.name,
+      birth: user.birth,
+    },
+  });
 
   const handleNameEdit = async () => {
     try {
@@ -137,7 +116,7 @@ function AccountSettingsPage() {
     try {
       setIsLoading(true);
       // 기존 생일과 비교해서 변경 없으면 에러 뜨게 하려면 context 전달
-      await birthSchema.validate({ birth: getValues('birth') }, { context: { original: birth } });
+      await birthSchema.validate({ birth: getValues('birth') }, { context: { original: user.birth } });
 
       // 예: 서버에 생일 변경 요청 (memberService.updateBirth 등)
       await memberService.updateBirth(getValues('birth'));
@@ -166,7 +145,7 @@ function AccountSettingsPage() {
         '소셜 로그인 회원은 카카오 인증을 다시 받아야 합니다. 카카오 로그인 페이지로 이동하시겠습니까?'
       );
       if (confirmed) {
-        kakaoDelete();
+        SocialDelete();
       }
     } else {
       // socialType이 null이면 일반 회원 탈퇴 페이지로 이동
@@ -174,14 +153,16 @@ function AccountSettingsPage() {
     }
   };
 
-  const kakaoUrl = VITE_KAKAO_URL;
-  const kakaoClientId = VITE_KAKAO_CLIENT_ID;
-  const kakaoRedirectUrl = VITE_KAKAO_REDIRECT_URL;
+  const SocialDelete = () => {
+    sessionStorage.setItem('action', 'delete');
 
-  const kakaoDelete = () => {
-    sessionStorage.setItem('kakaoAction', 'delete');
-    const auth_uri = `${kakaoUrl}?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUrl}&response_type=code`;
-    window.location.href = auth_uri;
+    if (user.socialType === 'GOOGLE') {
+      window.location.href = 'http://localhost:7961/oauth2/authorization/google';
+    } else if (user.socialType === 'KAKAO') {
+      window.location.href = 'http://localhost:7961/oauth2/authorization/kakao';
+    } else {
+      alert('소셜 로그인 정보가 없습니다.');
+    }
   };
 
   return (
