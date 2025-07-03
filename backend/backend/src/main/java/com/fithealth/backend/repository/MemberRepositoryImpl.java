@@ -2,6 +2,7 @@ package com.fithealth.backend.repository;
 
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.enums.CommonEnums;
+import com.fithealth.backend.enums.SocialType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException; // NoResultException은 JPQL getSingleResult()에서 사용
 import jakarta.persistence.TypedQuery; // TypedQuery 임포트 추가
@@ -32,11 +33,12 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
     }
 
     @Override
-    public Optional<Member> findBySocialId(String socialId) {
-        String sql = "SELECT m FROM Member m WHERE m.socialId = :socialId";
+    public Optional<Member> findBySocialIdAndSocialType(String socialId, SocialType socialType) {
+        String sql = "SELECT m FROM Member m WHERE m.socialId = :socialId AND m.socialType = :socialType";
         try {
             Member member = em.createQuery(sql, Member.class)
                     .setParameter("socialId", socialId)
+                    .setParameter("socialType", socialType)
                     .getSingleResult();
             return Optional.of(member);
         } catch (NoResultException e) {

@@ -2,6 +2,7 @@ package com.fithealth.backend.dto.member;
 
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.enums.CommonEnums;
+import com.fithealth.backend.enums.SocialType;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -47,6 +48,7 @@ public class LoginDto {
         private String goal;
         private String profile_image;
         private CommonEnums.Grade grade;
+        private SocialType social_type;
 
         public static Response toDto(Member member){
             return Response.builder()
@@ -63,6 +65,7 @@ public class LoginDto {
                     .goal(member.getGoal())
                     .profile_image(member.getProfileImage())
                     .grade(member.getGrade())
+                    .social_type(member.getSocialType())
                     .build();
         }
 

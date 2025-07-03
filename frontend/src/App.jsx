@@ -51,7 +51,7 @@ import NoticeDetailPage from './pages/noticePage/NoticeDetailPage';
 import CoachModify from './pages/coach/CoachModify.jsx';
 import ScrollToTop from './components/ScrollToTop';
 import KakaoRedirect from './pages/KakaoRedirect';
-import KakaoDeleteRedirect from './pages/KakaoRedirect/KakaoDeleteRedirect';
+import TokenInitializer from './components/TokenInitializer';
 
 function AppContent() {
   const location = useLocation();
@@ -61,6 +61,7 @@ function AppContent() {
 
   return (
     <>
+      <TokenInitializer />
       {!isHeaderHidden && <Header user={user} />}
       <ScrollToTop />
       <Routes>
