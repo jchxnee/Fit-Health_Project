@@ -11,7 +11,7 @@ spring:
       on-profile: dev
 
   datasource:
-    url: jdbc:mysql://localhost:3306/fit_healthDB?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/fit_healthDB?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: fit
     password: 7961
