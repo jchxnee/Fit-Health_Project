@@ -47,21 +47,6 @@ export const useLoginForm = () => {
       // 1) 토큰 세션 저장
       sessionStorage.setItem('token', token);
 
-      // 2) 토큰 디코딩해서 사용자 정보 추출
-      const decoded = jwtDecode(token);
-      // decoded 예시: { sub: 'email@example.com', userName: '홍길동', trainerNo: 1, profileImage: 'url', grade: 'C', ... }
-
-      // 3) 상태 관리 함수 호출 (useUserStore 등)
-      login({
-        useremail: decoded.sub,
-        trainerNo: decoded.trainerNo,
-        username: decoded.userName,
-        // birth, phone, address, gender, height, goal 는 토큰에 없으면 생략
-        profileimage: decoded.profileImage,
-        grade: decoded.grade,
-        socialType: decoded.socialType,
-      });
-
       toast.success('로그인 성공!');
       navigate('/'); // 홈으로 이동
     } catch (error) {

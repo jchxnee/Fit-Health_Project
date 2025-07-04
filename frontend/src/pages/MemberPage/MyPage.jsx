@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import kakaotalkIcon from '/public/img/kakaotalk.png';
+import googleIcon from '/public/img/google.png';
 import { FaBell } from 'react-icons/fa';
 import { LuClipboardList } from 'react-icons/lu';
 import { AiOutlineTool } from 'react-icons/ai';
-import { ResponsiveLine } from '@nivo/line';
 import { MdOutlineHealthAndSafety } from 'react-icons/md';
 import ButtonStyle from '../../styles/common/Button';
 import { Link } from 'react-router-dom';
@@ -69,7 +69,12 @@ const MyPage = () => {
           <ProfileInfo>
             <ProfileName>{user.name}님</ProfileName>
             <ProfileEmail>
-              <ProfileIcon src={user.socialType === 'KAKAO' ? kakaotalkIcon : emailIcon} alt="email" />
+              <ProfileIcon
+                src={
+                  user.socialType === 'KAKAO' ? kakaotalkIcon : user.socialType === 'GOOGLE' ? googleIcon : emailIcon
+                }
+                alt="social"
+              />
               {user.email}
             </ProfileEmail>
           </ProfileInfo>

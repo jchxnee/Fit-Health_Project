@@ -1,12 +1,17 @@
 package com.fithealth.backend.config;
 
+import com.fithealth.backend.auth.JwtTokenFilter;
+import com.fithealth.backend.service.GoogleOauth2LoginSuccess;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer; // 이 임포트가 필요할 수 있습니다.
 
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -14,7 +19,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final JwtTokenFilter jwtTokenFilter;
+    private final GoogleOauth2LoginSuccess googleOauth2LoginSuccess;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -24,18 +32,21 @@ public class SecurityConfig {
     // Security 필터 체인 설정
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                // CSRF 비활성화 (보통 REST API에서 토큰 기반 인증 시 사용)
-                .csrf(AbstractHttpConfigurer::disable) // 또는 .csrf(csrf -> csrf.disable())
-
-                // 모든 요청에 대해 인증 없이 허용
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-
-                // ★★★ 이 부분을 추가해야 합니다! 이 부분이 없으면 CORS 설정이 활성화되지 않습니다. ★★★
-                // CORS 설정을 활성화하고, 위에서 정의한 corsConfigurationSource 빈을 사용하도록 지시합니다.
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())); // 이 줄을 추가하세요.
-
-        return http.build();
+        return http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable) //CSRF 보안기능 비활성 -> 세션을 통한 공격(REST에서는 필요없음)
+                .httpBasic(AbstractHttpConfigurer::disable) //HTTP Basic인증 비활성(아이디와 비밀번호를 HTTP요청 헤더에 담아서 인증하는 방식)
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/**"
+                        ).permitAll()
+                        .anyRequest().authenticated() // 위의 요청경로를 제외한 나머지 경로는 인증
+                )
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                //OAuth2 로그인 성공시 실행될 핸들러를 설정
+                .oauth2Login(o -> o.successHandler(googleOauth2LoginSuccess))
+                .build();
     }
 
     // 전역 CORS 설정 빈 등록 (Spring Security가 자동으로 사용)

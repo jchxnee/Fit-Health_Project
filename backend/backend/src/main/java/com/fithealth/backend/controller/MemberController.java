@@ -44,12 +44,7 @@ public class MemberController {
     public ResponseEntity<Map<String, Object>> loginMember(@RequestBody LoginDto.Request requestDto) {
         Member member = memberService.loginMember(requestDto);
 
-        Long trainerNo = null;
-        if (member.getTrainer() != null) {
-            trainerNo = member.getTrainer().getTrainerNo();
-        }
-
-        String jwtToken = jwtTokenProvider.createToken(member.getUserEmail(), trainerNo, member.getUserName(), member.getProfileImage(), member.getGrade().toString(), member.getSocialType().toString());
+        String jwtToken = jwtTokenProvider.createToken(member.getUserEmail(), member.getRole().toString());
         Map<String, Object> loginInfo = new HashMap<>();
         loginInfo.put("token", jwtToken);
         return ResponseEntity.ok(loginInfo);
@@ -97,7 +92,7 @@ public class MemberController {
 
     //내정보 찾기 API
     @GetMapping("/info")
-    public ResponseEntity<UpdateDto.Response> getMemberInfo() {
+    public ResponseEntity<LoginDto.Response> getMemberInfo() {
         String userEmail = jwtTokenProvider.getUserEmailFromToken();
         return ResponseEntity.ok(memberService.findInfo(userEmail));
     }
@@ -131,7 +126,7 @@ public class MemberController {
         AccessTokenDto accessTokenDto = kakaoService.getAccessToken(redirectDto.getCode());
         KakaoProfileDto kakaoProfileDto = kakaoService.getKakaoProfile(accessTokenDto.getAccess_token());
 
-        Member originMember = memberService.getMemberBySocialId(kakaoProfileDto.getId());
+        Member originMember = memberService.getMemberBySocialIdAndSocialType(kakaoProfileDto.getId(), SocialType.KAKAO);
         if (originMember == null) {//가입된 기록이 없음 회원가입 해야 함
             originMember = memberService.createOauth(kakaoProfileDto.getId(),
                     kakaoProfileDto.getKakao_account().getEmail(),
@@ -139,12 +134,8 @@ public class MemberController {
                     SocialType.KAKAO);
         }
 
-        Long trainerNo = null;
-        if (originMember.getTrainer() != null) {
-            trainerNo = originMember.getTrainer().getTrainerNo();
-        }
 
-        String jwtToken = jwtTokenProvider.createToken(originMember.getUserEmail(), trainerNo, originMember.getUserName(), originMember.getProfileImage(), originMember.getGrade().toString(), originMember.getSocialType().toString());
+        String jwtToken = jwtTokenProvider.createToken(originMember.getUserEmail(), originMember.getRole().toString());
         Map<String, Object> loginInfo = new HashMap<>();
         loginInfo.put("token", jwtToken);
         return new ResponseEntity<>(loginInfo, HttpStatus.OK);
