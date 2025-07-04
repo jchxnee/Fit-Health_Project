@@ -2,6 +2,7 @@ package com.fithealth.backend.repository;
 
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.enums.CommonEnums;
+import com.fithealth.backend.enums.SocialType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException; // NoResultException은 JPQL getSingleResult()에서 사용
 import jakarta.persistence.TypedQuery; // TypedQuery 임포트 추가
@@ -32,6 +33,20 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
     }
 
     @Override
+    public Optional<Member> findBySocialIdAndSocialType(String socialId, SocialType socialType) {
+        String sql = "SELECT m FROM Member m WHERE m.socialId = :socialId AND m.socialType = :socialType";
+        try {
+            Member member = em.createQuery(sql, Member.class)
+                    .setParameter("socialId", socialId)
+                    .setParameter("socialType", socialType)
+                    .getSingleResult();
+            return Optional.of(member);
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public void updateGradeAndTrainer(String userEmail, CommonEnums.Grade grade, Long trainerNo) {
         em.createQuery("UPDATE Member m SET m.grade = :grade, m.trainer.trainerNo = :trainerNo WHERE m.userEmail = :userEmail")
                 .setParameter("grade", grade)
@@ -46,8 +61,9 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
         // GRADE가 'C' (코치)인 멤버들을 조회합니다.
         // Member와 Trainer를 LEFT JOIN FETCH 하여 N+1 문제 방지
         TypedQuery<Member> query = em.createQuery(
-                "SELECT m FROM Member m LEFT JOIN FETCH m.trainer t WHERE m.grade = :grade", Member.class);
+                "SELECT m FROM Member m LEFT JOIN FETCH m.trainer t WHERE m.grade = :grade AND m.status = :status", Member.class);
         query.setParameter("grade", CommonEnums.Grade.C);
+        query.setParameter("status", CommonEnums.Status.Y);
         return query.getResultList();
     }
 

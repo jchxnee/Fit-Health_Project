@@ -191,38 +191,50 @@ const TimeSlotsContainer = styled.div`
 `;
 
 const TimeSlotButton = styled.button`
-  background-color: ${(props) => (props.isSelected ? theme.colors.primary : theme.colors.gray[100])};
-  color: ${(props) => (props.isSelected ? theme.colors.white : theme.colors.black)};
-  border: 1px solid ${(props) => (props.isSelected ? theme.colors.primary : theme.colors.gray[300])};
+  background-color: ${(props) =>
+    props.isSelected
+      ? theme.colors.primary
+      : props.disabled
+        ? theme.colors.gray[200] // ❗️불가능한 시간은 흐린 배경
+        : theme.colors.gray[100]};
+  color: ${(props) =>
+    props.isSelected
+      ? theme.colors.white
+      : props.disabled
+        ? theme.colors.gray[500] // ❗️불가능한 시간은 흐린 텍스트
+        : theme.colors.black};
+  border: 1px solid
+    ${(props) =>
+      props.isSelected ? theme.colors.primary : props.disabled ? theme.colors.gray[300] : theme.colors.gray[300]};
   border-radius: 8px;
   padding: 12px 10px;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
   font-size: 0.95em;
   font-weight: ${(props) => (props.isSelected ? 'bold' : 'normal')};
   transition: all 0.2s ease-in-out;
   outline: none;
+
   &:hover {
-    background-color: ${(props) => !props.isSelected && theme.colors.gray[200]};
-    transform: ${(props) => !props.isSelected && 'translateY(-2px)'};
+    background-color: ${(props) => !props.disabled && !props.isSelected && theme.colors.gray[200]};
+    transform: ${(props) => !props.disabled && !props.isSelected && 'translateY(-2px)'};
   }
 `;
 
-const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeChange, minDate }) => {
-  // currentDisplayDate를 selectedDate prop을 기반으로 초기화
-  // selectedDate가 유효한 날짜 문자열이라면 그 날짜로 Date 객체 생성
-  // 유효하지 않다면 (예: null) 현재 날짜로 초기화
-  const [currentDisplayDate, setCurrentDisplayDate] = useState(() => {
-    return selectedDate ? new Date(selectedDate) : new Date();
-  });
+const ReservationCalendar = ({
+  selectedDate,
+  onDateChange,
+  selectedTime,
+  onTimeChange,
+  minDate,
+  disabledDateTimes = [], // 예약 불가능한 날짜+시간 Date 객체 배열
+}) => {
+  const [currentDisplayDate, setCurrentDisplayDate] = useState(() =>
+    selectedDate ? new Date(selectedDate) : new Date()
+  );
 
   useEffect(() => {
-    // selectedDate prop이 변경될 때, 캘린더 표시 월을 해당 날짜로 업데이트
-    // 이펙트 내부에서 new Date(selectedDate)를 사용하여 새 Date 객체를 생성하고,
-    // currentDisplayDate가 현재 prop의 날짜와 다른 경우에만 업데이트하여 불필요한 렌더링 방지.
-    // 주의: currentDisplayDate를 의존성 배열에서 제거해야 무한 루프를 막을 수 있습니다.
     if (selectedDate) {
       const newDateFromProp = new Date(selectedDate);
-      // 현재 표시 중인 월/년도와 prop으로 받은 날짜의 월/년도가 다를 때만 업데이트
       if (
         newDateFromProp.getFullYear() !== currentDisplayDate.getFullYear() ||
         newDateFromProp.getMonth() !== currentDisplayDate.getMonth()
@@ -230,8 +242,6 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
         setCurrentDisplayDate(newDateFromProp);
       }
     } else {
-      // selectedDate가 null/undefined가 되면 현재 월로 돌아오도록 처리
-      // 이 부분은 필요에 따라 제거하거나 다른 로직으로 변경할 수 있습니다.
       const today = new Date();
       if (
         today.getFullYear() !== currentDisplayDate.getFullYear() ||
@@ -240,25 +250,22 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
         setCurrentDisplayDate(today);
       }
     }
-  }, [selectedDate]); // **currentDisplayDate를 의존성 배열에서 제거했습니다!**
+  }, [selectedDate]);
 
   const getCalendarDays = (year, month) => {
     const days = [];
-    const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0:일, 1:월, ..., 6:토
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
     const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
 
-    // 이전 달의 플레이스홀더 날짜
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push({ day: '', isPlaceholder: true });
     }
 
-    // 현재 달의 날짜
     for (let i = 1; i <= lastDayOfMonth; i++) {
       const date = new Date(year, month, i);
       days.push({ day: i, isPlaceholder: false, date: date });
     }
 
-    // 다음 달의 플레이스홀더 날짜 (총 6주, 42칸을 채우기 위함)
     const totalCells = days.length;
     const remainingCells = 42 - totalCells;
     for (let i = 1; i <= remainingCells; i++) {
@@ -269,8 +276,7 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
   };
 
   const year = currentDisplayDate.getFullYear();
-  const month = currentDisplayDate.getMonth(); // getMonth()는 0부터 시작
-
+  const month = currentDisplayDate.getMonth();
   const calendarDays = getCalendarDays(year, month);
 
   const goToPreviousMonth = () => {
@@ -290,12 +296,22 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
   };
 
   const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-
   const timeSlots = ['09:00', '10:30', '12:00', '13:30', '15:00', '16:30', '18:00', '19:30'];
+
+  const stripDate = (date) => {
+    // YYYY-MM-DD 로컬 기준으로 안전하게 출력
+    return `${date.getFullYear()}-${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+  };
+  const stripTime = (date) => {
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  };
 
   return (
     <>
       <TimeReservationText>P.T 시간(핏코치의 이동시간 포함 1시간 30분 단위로 예약 가능)</TimeReservationText>
+
       <DatePickerContainer>
         <StyledDateInput type="date" value={selectedDate} onChange={onDateChange} min={minDate} />
         <StyledTimeInput type="time" value={selectedTime || ''} onChange={onTimeChange} />
@@ -308,12 +324,16 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
               <FaChevronLeft />
             </NavButton>
             <MonthYearText>
-              {currentDisplayDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' })}
+              {currentDisplayDate.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+              })}
             </MonthYearText>
             <NavButton onClick={goToNextMonth}>
               <FaChevronRight />
             </NavButton>
           </CalendarHeader>
+
           <DayNames>
             {dayNames.map((day, index) => (
               <DayHeader key={day} isWeekend={index === 0 || index === 6}>
@@ -321,18 +341,24 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
               </DayHeader>
             ))}
           </DayNames>
+
           <CalendarGrid>
             {calendarDays.map((dayInfo, index) => {
-              const formattedDayInfoDate = dayInfo.date
-                ? `${dayInfo.date.getFullYear()}-${(dayInfo.date.getMonth() + 1).toString().padStart(2, '0')}-${dayInfo.date.getDate().toString().padStart(2, '0')}`
-                : null;
+              const date = dayInfo.date;
+              const dateStr = date ? stripDate(date) : null;
 
-              const isSelected = !dayInfo.isPlaceholder && formattedDayInfoDate === selectedDate;
-              const isWeekend = dayInfo.date && (dayInfo.date.getDay() === 0 || dayInfo.date.getDay() === 6);
+              const isSelected = !dayInfo.isPlaceholder && dateStr === selectedDate;
+              const isWeekend = date && (date.getDay() === 0 || date.getDay() === 6);
 
-              // ✅ 날짜 비교 시 시간 제거
-              const stripTime = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
-              const isBeforeMinDate = minDate && dayInfo.date && stripTime(dayInfo.date) < stripTime(new Date(minDate));
+              const isBeforeMinDate = minDate && date && new Date(stripDate(date)) < new Date(minDate);
+
+              const isDateFullyDisabled = (() => {
+                if (!date) return false;
+                const disabledTimes = disabledDateTimes.filter((dt) => stripDate(dt) === stripDate(date));
+                return disabledTimes.length === timeSlots.length;
+              })();
+
+              const isDisabled = dayInfo.isPlaceholder || isBeforeMinDate || isDateFullyDisabled;
 
               return (
                 <CalendarDay
@@ -341,16 +367,16 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
                   isSelected={isSelected}
                   isWeekend={isWeekend}
                   onClick={
-                    dayInfo.isPlaceholder || isBeforeMinDate
+                    isDisabled
                       ? null
                       : () => {
-                          const year = dayInfo.date.getFullYear();
-                          const month = (dayInfo.date.getMonth() + 1).toString().padStart(2, '0');
-                          const day = dayInfo.date.getDate().toString().padStart(2, '0');
+                          const year = date.getFullYear();
+                          const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                          const day = date.getDate().toString().padStart(2, '0');
                           onDateChange({ target: { value: `${year}-${month}-${day}` } });
                         }
                   }
-                  disabled={dayInfo.isPlaceholder || isBeforeMinDate}
+                  disabled={isDisabled}
                 >
                   {dayInfo.day}
                 </CalendarDay>
@@ -360,15 +386,22 @@ const ReservationCalendar = ({ selectedDate, onDateChange, selectedTime, onTimeC
         </CalendarContainerWrapper>
 
         <TimeSlotsContainer>
-          {timeSlots.map((time) => (
-            <TimeSlotButton
-              key={time}
-              isSelected={time === selectedTime}
-              onClick={() => onTimeChange({ target: { value: time } })}
-            >
-              {time}
-            </TimeSlotButton>
-          ))}
+          {timeSlots.map((time) => {
+            const isDisabledTime = disabledDateTimes.some(
+              (dt) => stripDate(dt) === selectedDate && stripTime(dt) === time
+            );
+
+            return (
+              <TimeSlotButton
+                key={time}
+                isSelected={time === selectedTime}
+                disabled={isDisabledTime}
+                onClick={() => onTimeChange({ target: { value: time } })}
+              >
+                {time}
+              </TimeSlotButton>
+            );
+          })}
         </TimeSlotsContainer>
       </HorizontalContainer>
     </>

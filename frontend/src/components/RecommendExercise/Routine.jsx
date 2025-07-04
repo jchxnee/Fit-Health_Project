@@ -42,14 +42,14 @@ const TrainerCard = styled.div`
   align-items: center;
   border-radius: ${({ theme }) => theme.borderRadius['2xl']};
   justify-content: center;
-    gap: ${({ theme }) => theme.spacing[3]};
+  gap: ${({ theme }) => theme.spacing[3]};
 `;
 const ProfileImg = styled.div`
   width: ${({ theme }) => theme.spacing[40]};
   height: ${({ theme }) => theme.spacing[40]};
   background: ${({ theme }) => theme.colors.gray[300]};
   border-radius: ${({ theme }) => `${theme.borderRadius['2xl']}`};
-  background-image: ${({ img }) => img ? `url(${img})` : 'none'};
+  background-image: ${({ img }) => (img ? `url(${img})` : 'none')};
   background-size: cover;
   background-position: center;
 `;
@@ -59,27 +59,30 @@ const Name = styled.div`
 `;
 
 const defaultTrainers = [
-    { name: '다이어트' },
-    { name: '근육량 증진', trainer: 'https://d2u3dcdbebyaiu.cloudfront.net/uploads/atch_img/516/1b86bf91cd093359045a07c31fc7f9d9_res.jpeg' },
-    { name: '홈트' },
+  { name: '다이어트', trainer: '' },
+  {
+    name: '근육량 증진',
+    trainer: 'https://d2u3dcdbebyaiu.cloudfront.net/uploads/atch_img/516/1b86bf91cd093359045a07c31fc7f9d9_res.jpeg',
+  },
+  { name: '홈트', trainer: '' },
 ];
 
 const Routine = ({ trainers = defaultTrainers, title = '추천 트레이너' }) => (
-    <Wrapper>
-        <Container>
-            <TitleRow>
-                <Title>{title}</Title>
-            </TitleRow>
-            <List>
-                {trainers.map((t) => (
-                    <TrainerCard key={t.name}>
-                        <ProfileImg img={t.trainer}/>
-                        <Name>{t.name} 루틴</Name>
-                    </TrainerCard>
-                ))}
-            </List>
-        </Container>
-    </Wrapper>
+  <Wrapper>
+    <Container>
+      <TitleRow>
+        <Title>{title}</Title>
+      </TitleRow>
+      <List>
+        {trainers.map((t) => (
+          <TrainerCard key={t.name}>
+            <ProfileImg img={t.trainer} />
+            <Name>{t.name} 루틴</Name>
+          </TrainerCard>
+        ))}
+      </List>
+    </Container>
+  </Wrapper>
 );
 
 export default Routine;

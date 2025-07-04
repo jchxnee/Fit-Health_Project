@@ -79,6 +79,7 @@ const CoachMatching = () => {
   const { user } = useUserStore(); // 두 번째 코드에서 추가된 부분
   const { id } = useParams(); // 두 번째 코드에서 추가된 부분
   const [trainer, setTrainer] = useState(null); // 두 번째 코드에서 추가된 부분
+  const [disabledDateTimes, setDisabledDateTimes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [courseQuantity, setCourseQuantity] = useState(3); // 두 번째 코드의 초기값 3 사용
   const [finalPrice, setFinalPrice] = useState(0); // 두 번째 코드에서 추가된 부분
@@ -105,8 +106,13 @@ const CoachMatching = () => {
     const fetchCoachData = async () => {
       try {
         const { data } = await api.get(`/api/trainer/request/${id}`);
+        const { data: disabledList } = await api.get(`/api/reservation/disabledate/${id}`);
+
         console.log('API 응답:', data);
+        console.log('불가능한 날짜:', disabledList);
+
         setTrainer(data);
+        setDisabledDateTimes(disabledList.map((d) => new Date(d)));
       } catch (error) {
         console.error('트레이너 정보 가져오기 실패:', error);
         toast.error('트레이너 정보를 가져오는데 실패했습니다.');
@@ -211,6 +217,7 @@ const CoachMatching = () => {
             selectedTime={selectedTime}
             onTimeChange={handleTimeChange}
             minDate={minDate}
+            disabledDateTimes={disabledDateTimes}
           />
         </ContentContainer>
         {/* 신청하기 버튼: handleRequest 함수 호출 및 disabled 조건 유지 */}

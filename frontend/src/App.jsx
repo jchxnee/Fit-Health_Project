@@ -14,10 +14,8 @@ import MainPage from './pages/MainPage.jsx';
 import RecommendExercise from './pages/RecommendExercise.jsx';
 import CoachDetail from './pages/coach/CoachDetail';
 import CoachRegister from './pages/coach/CoachRegister';
-import RegionSelect from './components/RegionSelect.jsx';
 import CoachCalendar from './components/CoachDetails/CoachCalendar.jsx';
 import NextReservation from './pages/MatchingList/NextReservation.jsx';
-import HistoryModal from './components/modal/HistoryModal.jsx';
 import CoachList from './pages/coach/CoachList';
 import MatchingList from './pages/MatchingList/MatchingList';
 import ProductList from './pages/Products/ProductList';
@@ -48,9 +46,12 @@ import ChangePwdPage from './pages/myPage/ChangePwdPage';
 import RecruitmentInfoPage from './pages/InformationPage/RecruitmentInfoPage';
 import useUserStore from './store/useUserStore';
 import RefundPage from './pages/PayPage/RefundPage';
-import CoachModify from './pages/coach/CoachModify.jsx';
 import NoticePostCreationPage from './pages/noticePage/NoticePostCreationPage';
 import NoticeDetailPage from './pages/noticePage/NoticeDetailPage';
+import CoachModify from './pages/coach/CoachModify.jsx';
+import ScrollToTop from './components/ScrollToTop';
+import KakaoRedirect from './pages/KakaoRedirect';
+import TokenInitializer from './components/TokenInitializer';
 
 function AppContent() {
   const location = useLocation();
@@ -60,7 +61,9 @@ function AppContent() {
 
   return (
     <>
+      <TokenInitializer />
       {!isHeaderHidden && <Header user={user} />}
+      <ScrollToTop />
       <Routes>
         {/* 공통 */}
         <Route path="/" element={<MainPage />} />
@@ -84,7 +87,7 @@ function AppContent() {
         <Route path="/coachList" element={<CoachList />} />
         <Route path="/coachRegister" element={<CoachRegister />} />
         <Route path="/coach/:id" element={<CoachDetail />} />
-        <Route path="/coachModify" element={<CoachModify />} />
+        <Route path="/coachModify/:trainerNo" element={<CoachModify />} />
         <Route path="/coachMatching/:id" element={<CoachMatching />} />
         <Route path="/nextReservation" element={<NextReservation />} />
         <Route path="/coachReview/:trainerNo" element={<CoachReview />} />
@@ -110,6 +113,9 @@ function AppContent() {
 
         {/* 고객 */}
         <Route path="/matchingList" element={<MatchingList />} />
+
+        {/* 카카오 로그인 */}
+        <Route path="/oauth/kakao/redirect" element={<KakaoRedirect />} />
       </Routes>
       {!isHeaderHidden && <Footer user={null} />}
     </>
@@ -123,7 +129,7 @@ function App() {
       <Router>
         <AppContent />
       </Router>
-      <ToastContainer />
+      <ToastContainer autoClose={3000} hideProgressBar={true} pauseOnFocusLoss={false} pauseOnHover={false} />
     </ThemeProvider>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { CiCamera } from 'react-icons/ci';
 import { Link } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { memberService } from '../../api/member';
 import { BeatLoader } from 'react-spinners';
+const { VITE_KAKAO_URL, VITE_KAKAO_CLIENT_ID, VITE_KAKAO_REDIRECT_URL } = import.meta.env;
 
 // 이름 전용 yup 스키마
 const nameSchema = yup.object({
@@ -92,7 +93,7 @@ function AccountSettingsPage() {
       setIsLoading(true);
       await nameSchema.validate({ username: getValues('username') }, { context: { original: user.name } });
 
-      await memberService.updateName(user.email, getValues('username'));
+      await memberService.updateName(getValues('username'));
 
       toast.success('이름 변경 완료!');
       updateUser({ name: getValues('username') });
@@ -118,7 +119,7 @@ function AccountSettingsPage() {
       await birthSchema.validate({ birth: getValues('birth') }, { context: { original: user.birth } });
 
       // 예: 서버에 생일 변경 요청 (memberService.updateBirth 등)
-      await memberService.updateBirth(user.email, getValues('birth'));
+      await memberService.updateBirth(getValues('birth'));
 
       toast.success('생년월일 변경 완료!');
       updateUser({ birth: getValues('birth') });
@@ -133,6 +134,34 @@ function AccountSettingsPage() {
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (e) => {
+    e.preventDefault();
+
+    if (user.socialType !== null && user.socialType !== undefined) {
+      const confirmed = window.confirm(
+        '소셜 로그인 회원은 카카오 인증을 다시 받아야 합니다. 카카오 로그인 페이지로 이동하시겠습니까?'
+      );
+      if (confirmed) {
+        SocialDelete();
+      }
+    } else {
+      // socialType이 null이면 일반 회원 탈퇴 페이지로 이동
+      window.location.href = '/deleteMemberPage';
+    }
+  };
+
+  const SocialDelete = () => {
+    sessionStorage.setItem('action', 'delete');
+
+    if (user.socialType === 'GOOGLE') {
+      window.location.href = 'http://localhost:7961/oauth2/authorization/google';
+    } else if (user.socialType === 'KAKAO') {
+      window.location.href = 'http://localhost:7961/oauth2/authorization/kakao';
+    } else {
+      alert('소셜 로그인 정보가 없습니다.');
     }
   };
 
@@ -188,8 +217,19 @@ function AccountSettingsPage() {
 
           <ButtonGroup>
             <SettingsButton to="/myInfoPage">내 정보 관리</SettingsButton>
-            <SettingsButton to="/changePwdPage">비밀번호 변경</SettingsButton>
-            <SettingsButton to="/deleteMemberPage">회원 탈퇴</SettingsButton>
+            <SettingsButton
+              to="/changePwdPage"
+              disabled={user.socialType !== null && user.socialType !== undefined}
+              style={{
+                pointerEvents: user.socialType !== null && user.socialType !== undefined ? 'none' : 'auto',
+                opacity: user.socialType !== null && user.socialType !== undefined ? 0.8 : 1,
+              }}
+            >
+              비밀번호 변경
+            </SettingsButton>
+            <SettingsButton to="/deleteMemberPage" onClick={handleDeleteClick}>
+              회원 탈퇴
+            </SettingsButton>
           </ButtonGroup>
         </SettingsForm>
       </SettingsContainer>

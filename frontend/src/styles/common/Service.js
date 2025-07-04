@@ -6,7 +6,6 @@ export const ContentWrapper = styled.main`
   align-items: center;
   width: 100%;
   min-height: 100vh;
-  padding: ${({ theme }) => theme.spacing[10]} 0;
 `;
 
 export const RecommendedExerciseWrapper = styled.div`

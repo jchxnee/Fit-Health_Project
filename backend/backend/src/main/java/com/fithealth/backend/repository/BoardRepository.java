@@ -2,6 +2,7 @@ package com.fithealth.backend.repository;
 
 import com.fithealth.backend.entity.Board;
 import com.fithealth.backend.enums.CommonEnums;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -43,4 +44,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Modifying
     @Query("UPDATE Board b SET b.status = 'N' WHERE b.boardNo = :boardNo")
     void updateStatusToInactive(@Param("boardNo") Long boardNo);
+
+    //조회순으로 높은 게시글 5개
+    List<Board> findTop5ByStatusOrderByCountDesc(CommonEnums.Status status);
 }

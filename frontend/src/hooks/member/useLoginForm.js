@@ -6,6 +6,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useState } from 'react';
 import { memberService } from '../../api/member';
 import useUserStore from '../../store/useUserStore';
+import { jwtDecode } from 'jwt-decode';
 
 // 로그인 유효성 검사 스키마 정의
 const loginSchema = yup.object().shape({
@@ -34,33 +35,21 @@ export const useLoginForm = () => {
     try {
       setIsLoading(true); // 로딩 시작
 
-      // 로그인 API 호출
-      const user = await memberService.login(data);
-      // 로그인 실패 시 알림 표시
-      if (!user) {
+      // 로그인 API 호출 (token 포함된 응답 가정)
+      const response = await memberService.login(data);
+      const token = response.token;
+
+      if (!token) {
         toast.error('이메일 또는 비밀번호가 일치하지 않습니다.');
         return;
       }
 
-      // 로그인 성공 시 사용자 정보 상태 저장
-      login({
-        useremail: user.user_email,
-        trainerNo: user.trainer_no,
-        username: user.user_name,
-        birth: user.birth,
-        phone: user.phone,
-        address: user.address,
-        gender: user.gender,
-        height: user.height,
-        goal: user.goal,
-        profileimage: user.profile_image,
-        grade: user.grade,
-      });
+      // 1) 토큰 세션 저장
+      sessionStorage.setItem('token', token);
 
       toast.success('로그인 성공!');
       navigate('/'); // 홈으로 이동
     } catch (error) {
-      // 네트워크 또는 기타 오류 처리
       toast.error('로그인 중 오류가 발생했습니다.');
       console.error('로그인 에러 : ', error);
     } finally {

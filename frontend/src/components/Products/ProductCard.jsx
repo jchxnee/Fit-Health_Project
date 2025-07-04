@@ -1,13 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 import theme from '../../styles/theme';
+import { toast } from 'react-toastify';
 
 const ProductCard = ({ product }) => {
   const handleProductClick = () => {
     if (product.externalUrl) {
       window.open(product.externalUrl, '_blank');
     } else {
-      alert('연결된 상품 페이지가 없습니다.');
+      toast.error('연결된 상품 페이지가 없습니다.');
     }
   };
 

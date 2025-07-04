@@ -5,6 +5,7 @@ import { FaInstagram } from 'react-icons/fa';
 import theme from '../../styles/theme'; // theme 파일 경로 확인
 import { RiKakaoTalkFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
+import basicProfile from '../../../public/img/basicProfile.jpg';
 
 const ProfileCard = styled.div`
   display: flex;
@@ -187,7 +188,7 @@ const TrainerProfile = ({ trainer, user }) => {
     <ProfileCard>
       <ProfileImageWrapper>
         {trainer.imageUrl ? (
-          <ProfileImage src={trainer.imageUrl} alt={`${trainer.name} 트레이너`} />
+          <ProfileImage src={user.img ? user.img : basicProfile} alt="프로필 이미지" />
         ) : (
           <FaRegEnvelope size="4em" color={theme.colors.gray[300]} />
         )}

@@ -22,6 +22,7 @@ const useUserStore = create(
             goal: userData.goal,
             img: userData.profileimage,
             grade: userData.grade,
+            socialType: userData.socialType,
           },
           isAuthenticated: true,
         });
@@ -29,6 +30,7 @@ const useUserStore = create(
 
       //로그아웃
       logout: () => {
+        sessionStorage.removeItem('token'); // 토큰 삭제
         set({
           user: null,
           isAuthenticated: false,

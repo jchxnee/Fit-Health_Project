@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
 import { Button, Item, List, Wrapper } from '../../styles/common/SelectGoal';
@@ -71,9 +71,8 @@ const MyInfoPage = () => {
     try {
       setIsLoading(true);
 
-      await memberService.updateInfo(user.email, data);
+      await memberService.updateInfo(data);
 
-      updateUser(data);
       updateUser({
         phone: data.phone,
         address: data.address,

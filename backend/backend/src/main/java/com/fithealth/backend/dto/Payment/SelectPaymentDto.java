@@ -27,6 +27,7 @@ public class SelectPaymentDto {
         private String userName;
         private String trainerEmail;
         private String trainerName;
+        private Long trainerNo;
         private String transactionId;
         private String paymentMethod;
         private String status;
@@ -159,6 +160,7 @@ public class SelectPaymentDto {
                     .userName(userName)
                     .trainerEmail(trainerEmail)
                     .trainerName(trainerName)
+                    .trainerNo(payment.getResponseMember().getTrainer().getTrainerNo())
                     .transactionId(payment.getTransactionId())
                     .paymentMethod(payment.getPaymentMethod())
                     .status(displayStatus)

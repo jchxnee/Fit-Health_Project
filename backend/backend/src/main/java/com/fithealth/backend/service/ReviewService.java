@@ -3,6 +3,7 @@ package com.fithealth.backend.service;
 import com.fithealth.backend.dto.Review.ReviewCreateDto;
 import com.fithealth.backend.dto.Review.ReviewSelectDto;
 import com.fithealth.backend.dto.Review.SelectMyReviewDto;
+import com.fithealth.backend.dto.Review.Top6ReviewDto;
 import com.fithealth.backend.entity.Review;
 
 import java.util.List;
@@ -14,5 +15,5 @@ public interface ReviewService {
     List<SelectMyReviewDto.Select>selectByUserEmail(String userEmail);
     Boolean findOne(Long paymentId);
     void delete(Long reviewId);
-
+    List<Top6ReviewDto.Response> getReviewTop6();
 }
