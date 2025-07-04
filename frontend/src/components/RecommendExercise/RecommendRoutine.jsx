@@ -132,7 +132,7 @@ function RecommendRoutine({
           {recommendList.map((item, idx) => (
             <TableRow key={idx}>
               <TableCell className="image-cell">
-                <ExerciseImage src={`/Eximg/${item.exerciseName}.png`} alt={item.exerciseName} />
+                <ExerciseImage src={`/Eximg/Health/${item.exerciseName}.png`} alt={item.exerciseName} />
                 <ExerciseName>{item.exerciseName}</ExerciseName>
               </TableCell>
               <TableCell>{item.exerciseTarget}</TableCell>
