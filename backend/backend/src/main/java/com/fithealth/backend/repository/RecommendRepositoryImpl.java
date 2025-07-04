@@ -27,7 +27,7 @@ public class RecommendRepositoryImpl implements RecommendRepository {
     private String openAiApiKey;
 
     private List<String> getExerciseImageNames() {
-        File eximgDir = new File("../frontend/public/Eximg");
+        File eximgDir = new File("../frontend/public/Eximg/Health");
         File[] files = eximgDir.listFiles((dir, name) -> name.endsWith(".png"));
         List<String> names = new ArrayList<>();
         if (files != null) {
@@ -91,18 +91,39 @@ public class RecommendRepositoryImpl implements RecommendRepository {
         List<RecommendExerciseDto> result = new ArrayList<>();
         Pattern rowPattern = Pattern.compile("\\|([^|]+)\\|([^|]+)\\|([^|]+)\\|([^|]+)\\|([^|]+)\\|([^|]+)\\|");
         Matcher matcher = rowPattern.matcher(content);
-        boolean headerSkipped = false;
+        int rowIndex = 0;
         while (matcher.find()) {
-            if (!headerSkipped) { headerSkipped = true; continue; } // 첫 번째(헤더) row skip
+            rowIndex++;
+            if (rowIndex <= 2) continue; // 헤더 + 구분선 스킵
+
+            String name = matcher.group(1).trim();
+            String target = matcher.group(2).trim();
+            if (name.isEmpty() || target.isEmpty()) continue;
+
             RecommendExerciseDto dto = new RecommendExerciseDto();
-            dto.setExerciseName(matcher.group(1).trim());
-            dto.setExerciseTarget(matcher.group(2).trim());
+            dto.setExerciseName(name);
+            dto.setExerciseTarget(target);
             dto.setExerciseItem(matcher.group(3).trim());
-            try { dto.setExerciseWeight(Long.parseLong(matcher.group(4).replaceAll("[^0-9]", "").trim())); } catch (Exception e) { dto.setExerciseWeight(0L); }
-            try { dto.setExerciseCount(Long.parseLong(matcher.group(5).replaceAll("[^0-9]", "").trim())); } catch (Exception e) { dto.setExerciseCount(0L); }
-            try { dto.setExerciseSet(Long.parseLong(matcher.group(6).replaceAll("[^0-9]", "").trim())); } catch (Exception e) { dto.setExerciseSet(0L); }
+
+            try {
+                dto.setExerciseWeight(Long.parseLong(matcher.group(4).replaceAll("[^0-9]", "").trim()));
+            } catch (Exception e) {
+                dto.setExerciseWeight(0L);
+            }
+            try {
+                dto.setExerciseCount(Long.parseLong(matcher.group(5).replaceAll("[^0-9]", "").trim()));
+            } catch (Exception e) {
+                dto.setExerciseCount(0L);
+            }
+            try {
+                dto.setExerciseSet(Long.parseLong(matcher.group(6).replaceAll("[^0-9]", "").trim()));
+            } catch (Exception e) {
+                dto.setExerciseSet(0L);
+            }
+
             result.add(dto);
         }
+
         return result;
     }
-} 
+}

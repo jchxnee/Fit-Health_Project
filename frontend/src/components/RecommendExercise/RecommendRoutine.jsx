@@ -22,14 +22,7 @@ const Title = styled.h1`
   padding-bottom: ${theme.spacing[2]};
 `;
 
-const CategoryContainer = styled.div`
-  display: flex;
-  justify-content: space-around;
-  width: 100%;
-  margin-bottom: ${theme.spacing[8]};
-`;
-
-const Category = styled.span`
+const Category = styled.button`
   color: ${theme.colors.black};
   font-size: ${theme.fontSizes.lg};
   font-weight: ${theme.fontWeights.semibold};
@@ -119,15 +112,15 @@ function RecommendRoutine({
 
   return (
     <PageContainer>
-      <Title>근육량 증진 루틴</Title>
-      <CategoryContainer>
-        <Category>가슴, 등</Category>
-        <Category>허리, 어깨</Category>
-        <Category>하체, 팔</Category>
-      </CategoryContainer>
+      <Title>
+        <button onClick={handleRecommend} disabled={loading || !bmi}>
+        {loading ? '추천 중...' : '루틴 추천받기'}
+        </button>
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+      </Title>
+
 
       <Table>
-        <thead>
           <TableRow>
             <TableHeader>운동</TableHeader>
             <TableHeader>부위</TableHeader>
@@ -136,8 +129,6 @@ function RecommendRoutine({
             <TableHeader>횟수</TableHeader>
             <TableHeader>세트</TableHeader>
           </TableRow>
-        </thead>
-        <tbody>
           {recommendList.map((item, idx) => (
             <TableRow key={idx}>
               <TableCell className="image-cell">
@@ -151,13 +142,7 @@ function RecommendRoutine({
               <TableCell>{item.exerciseSet}</TableCell>
             </TableRow>
           ))}
-        </tbody>
       </Table>
-
-      <button onClick={handleRecommend} disabled={loading || !bmi}>
-        {loading ? '추천 중...' : '추천받기'}
-      </button>
-      {error && <div style={{ color: 'red' }}>{error}</div>}
     </PageContainer>
   );
 }
