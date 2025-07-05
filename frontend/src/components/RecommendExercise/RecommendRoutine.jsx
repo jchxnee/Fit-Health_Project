@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import theme from "../../styles/theme.js";
 import { getRecommendExercise } from '../../api/recommend';
@@ -46,12 +46,6 @@ const TableHeader = styled.th`
   font-weight: ${theme.fontWeights.semibold};
   padding: ${theme.spacing[3]};
   text-align: center;
-  &:first-child {
-    border-top-left-radius: ${theme.borderRadius.md};
-  }
-  &:last-child {
-    border-top-right-radius: ${theme.borderRadius.md};
-  }
 `;
 
 const TableRow = styled.tr`
@@ -76,7 +70,7 @@ const TableCell = styled.td`
 `;
 
 const ExerciseImage = styled.img`
-  width: ${({ theme }) => theme.spacing[20]};
+  width: 80px;
   height: auto;
   border-radius: ${theme.borderRadius.sm};
   object-fit: contain;
@@ -88,20 +82,27 @@ const ExerciseName = styled.div`
   color: ${theme.colors.black};
 `;
 
+const categoryMap = {
+  '헬스': 'Health',
+  '요가': 'Yoga',
+  // 필요시 추가
+};
+
 function RecommendRoutine({
-  bmi,
-  recommendList,
-  setRecommendList,
-  loading,
-  setLoading,
-  error,
-  setError,
-}) {
+                            bmi,
+                            recommendList,
+                            setRecommendList,
+                            loading,
+                            setLoading,
+                            error,
+                            setError,
+                            selectedCategory,
+                          }) {
   const handleRecommend = async () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await getRecommendExercise(bmi);
+      const result = await getRecommendExercise(bmi, selectedCategory);
       setRecommendList(result);
     } catch (e) {
       setError('추천에 실패했습니다.');
@@ -110,15 +111,17 @@ function RecommendRoutine({
     }
   };
 
+  // 한글 카테고리명을 영문 폴더명으로 매핑
+  const folderName = categoryMap[selectedCategory] || selectedCategory;
+
   return (
     <PageContainer>
       <Title>
         <button onClick={handleRecommend} disabled={loading || !bmi}>
-        {loading ? '추천 중...' : '루틴 추천받기'}
+          {loading ? '추천 중...' : '루틴 추천받기'}
         </button>
         {error && <div style={{ color: 'red' }}>{error}</div>}
       </Title>
-
 
       <Table>
           <TableRow>
@@ -129,17 +132,21 @@ function RecommendRoutine({
             <TableHeader>횟수</TableHeader>
             <TableHeader>세트</TableHeader>
           </TableRow>
-          {recommendList.map((item, idx) => (
-            <TableRow key={idx}>
+        {recommendList.map((item, idx) => (
+          <TableRow key={idx}>
               <TableCell className="image-cell">
-                <ExerciseImage src={`/Eximg/Health/${item.exerciseName}.png`} alt={item.exerciseName} />
-                <ExerciseName>{item.exerciseName}</ExerciseName>
+              <ExerciseImage
+                src={`/Eximg/${folderName}/${item.exerciseName}.png`}
+                alt={item.exerciseName}
+                onError={(e) => (e.target.style.display = 'none')}
+              />
+              <ExerciseName>{item.exerciseName}</ExerciseName>
               </TableCell>
-              <TableCell>{item.exerciseTarget}</TableCell>
-              <TableCell>{item.exerciseItem}</TableCell>
-              <TableCell>{item.exerciseWeight}</TableCell>
-              <TableCell>{item.exerciseCount}</TableCell>
-              <TableCell>{item.exerciseSet}</TableCell>
+            <TableCell>{item.exerciseTarget}</TableCell>
+            <TableCell>{item.exerciseItem}</TableCell>
+            <TableCell>{item.exerciseWeight}</TableCell>
+            <TableCell>{item.exerciseCount}</TableCell>
+            <TableCell>{item.exerciseSet}</TableCell>
             </TableRow>
           ))}
       </Table>

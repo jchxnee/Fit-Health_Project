@@ -51,8 +51,6 @@ function RecommendExercise() {
     (category) => category !== '도수' && category !== '재활' && category !== '전체'
   );
 
-
-
   return (
     <>
       <HeaderContainer>
@@ -63,9 +61,7 @@ function RecommendExercise() {
           <CategoryMenu
             categories={visibleCategories}
             selectedCategory={selectedCategory}
-            onSelectCategory={(category) => {
-              setSelectedCategory(category);
-            }}
+            onSelectCategory={(category) => setSelectedCategory(category)}
           />
         </CategoryMenuWrapper>
         <ContentWrapper>
@@ -78,6 +74,7 @@ function RecommendExercise() {
             setLoading={setLoading}
             error={error}
             setError={setError}
+            selectedCategory={selectedCategory}
           />
         </ContentWrapper>
       </MainRow>
