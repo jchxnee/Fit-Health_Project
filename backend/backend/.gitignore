@@ -39,11 +39,11 @@ out/
 # =========================
 # ▶ Application Settings (보안상 제외)
 # =========================
-#application.properties
-#application.yml
-#application-*.properties
-#application-*.yml
-#echo "backend/backend/src/main/resources/application.yml"
+application.properties
+application.yml
+application-*.properties
+application-*.yml
+echo "backend/backend/src/main/resources/application.yml"
 
 
 # H2 Database files

@@ -27,6 +27,7 @@ public class MemberServiceImpl implements MemberService{
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+
     private final String UPLOAD_PATH = "C:\\testImage";
 
     @Override
@@ -57,6 +58,13 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public Boolean findMember(String userEmail) {
         return memberRepository.findOneStatusY(userEmail, CommonEnums.Status.Y).isPresent();
+    }
+
+    @Override
+    public String findId(String name, String phone) {
+        Member member = memberRepository.findByNameAndPhone(name, phone)
+                .orElseThrow(() -> new IllegalArgumentException("이메일이 존재하지 않습니다."));
+        return member.getUserEmail();
     }
 
     @Override
@@ -165,5 +173,4 @@ public class MemberServiceImpl implements MemberService{
         memberRepository.save(member);
         return member;
     }
-
 }

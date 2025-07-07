@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface MemberRepository {
     void save(Member member);
     Optional<Member> findOne(String userEmail);
+    Optional<Member> findByNameAndPhone(String name, String phone);
     Optional<Member> findBySocialIdAndSocialType(String socialId, SocialType socialType);
     Optional<Member> findByTrainerNo(Long trainerNo);
     Optional<Member> findByUserEmail(String userEmail);

@@ -17,6 +17,8 @@ export const API_ENDPOINTS = {
     BASE: '/api/members',
     LOGIN: '/api/members/login',
     FIND: '/api/members/email',
+    FINDID: '/api/members/id',
+    FINDPWD: '/api/members/pwd',
     BIRTH: 'api/members/birth',
     INFO: 'api/members/info',
     UPDATEPROFILEIMAGE: '/api/members/profileImage',

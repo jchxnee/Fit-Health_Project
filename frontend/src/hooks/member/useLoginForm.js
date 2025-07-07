@@ -47,6 +47,23 @@ export const useLoginForm = () => {
       // 1) 토큰 세션 저장
       sessionStorage.setItem('token', token);
 
+      const memberInfo = await memberService.getMemberInfo();
+
+      login({
+        useremail: memberInfo.user_email,
+        trainerNo: memberInfo.trainer_no,
+        username: memberInfo.user_name,
+        birth: memberInfo.birth,
+        phone: memberInfo.phone,
+        address: memberInfo.address,
+        gender: memberInfo.gender,
+        height: memberInfo.height,
+        goal: memberInfo.goal,
+        profileimage: memberInfo.profile_image,
+        grade: memberInfo.grade,
+        socialType: memberInfo.social_type,
+      });
+
       toast.success('로그인 성공!');
       navigate('/'); // 홈으로 이동
     } catch (error) {

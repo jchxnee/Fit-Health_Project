@@ -52,6 +52,8 @@ import CoachModify from './pages/coach/CoachModify.jsx';
 import ScrollToTop from './components/ScrollToTop';
 import KakaoRedirect from './pages/KakaoRedirect';
 import TokenInitializer from './components/TokenInitializer';
+import FindIdPage from './pages/MemberPage/FindIdPage';
+import FindPwdPage from './pages/MemberPage/FindPwdPage';
 
 function AppContent() {
   const location = useLocation();
@@ -69,6 +71,8 @@ function AppContent() {
         <Route path="/" element={<MainPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/findId" element={<FindIdPage />} />
+        <Route path="/findPwd" element={<FindPwdPage />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/accountSettingPage" element={<AccountSettingsPage />} />
         <Route path="/myInfoPage" element={<MyInfoPage />} />

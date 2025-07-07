@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import logoSrc from '../../assets/header_icon.png';
 import ButtonStyle from '../../styles/common/Button';
 import { toast } from 'react-toastify';
 import { useSignUpForm } from '../../hooks/member/useSignUpForm';
 import { memberService } from '../../api/member';
+import api from '../../api/axios';
 
 function SignUpPage() {
   const {
@@ -29,6 +30,33 @@ function SignUpPage() {
 
   const [isEmailVerified, setIsEmailVerified] = useState(false); // 이메일 인증 성공 여부
   const [emailAuthMessage, setEmailAuthMessage] = useState(''); // 이메일 인증 관련 메시지
+
+  const [timer, setTimer] = useState(180); // 3분 = 180초
+  const [isTimerActive, setIsTimerActive] = useState(false);
+  const timerIdRef = useRef(null);
+
+  // 타이머 useEffect
+  useEffect(() => {
+    if (!isTimerActive) {
+      if (timerIdRef.current) {
+        clearInterval(timerIdRef.current);
+        timerIdRef.current = null;
+      }
+      return;
+    }
+
+    if (timer === 0) {
+      setIsTimerActive(false);
+      setEmailAuthMessage('인증 시간이 만료되었습니다. 새로고침 후 다시 시도해주세요.');
+      return;
+    }
+
+    timerIdRef.current = setInterval(() => {
+      setTimer((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timerIdRef.current);
+  }, [isTimerActive, timer]);
 
   const onSubmitHandler = (data) => {
     if (!agreeService || !agreePrivacy) {
@@ -80,27 +108,53 @@ function SignUpPage() {
       setEmailAuthMessage('');
       setShowAuthCodeInput(true);
 
-      // 인증번호 발송 API 호출 (여기서 실제 서버 요청 필요)
-      console.log(`인증번호 발송 요청: ${email}`);
+      const dto = {
+        to: email,
+        subject: 'FIT:HEALTH 이메일 인증',
+        title: '이메일 인증 요청',
+        body: '아래 인증번호를 입력해주세요.',
+      };
+
+      const formData = new FormData();
+      formData.append('mail', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
+
+      await api.post('/mail/send', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
       toast.success('인증번호가 이메일로 발송되었습니다. 확인해주세요.');
       setEmailAuthMessage('인증번호가 발송되었습니다. 이메일을 확인해주세요.');
+      setIsTimerActive(true);
+      setTimer(180);
     } catch (error) {
       console.error('이메일 확인 중 오류:', error);
       setEmailAuthMessage('이메일 확인 중 문제가 발생했습니다.');
+      setIsTimerActive(false);
+      setTimer(0);
     }
   };
 
-  const handleVerifyAuthCode = () => {
+  const handleVerifyAuthCode = async () => {
+    const email = watch('useremail');
+    const code = authCode;
     console.log('입력된 인증번호:', authCode);
-    if (authCode === '123456') {
-      // 예시: 실제로는 서버에서 확인
-      setIsEmailVerified(true); // 인증 성공 상태로 변경
-      setEmailAuthMessage('이메일 인증이 성공하였습니다.'); // 성공 메시지 설정
-      // 이메일 필드를 읽기 전용으로 만들거나 비활성화
-      // 이메일 인증이 성공했으므로, 이메일 주소 변경을 막을 수 있음
-    } else {
-      setIsEmailVerified(false); // 인증 실패 상태 (혹시 성공했다가 실패할 경우 대비)
-      setEmailAuthMessage('인증번호가 올바르지 않습니다.'); // 실패 메시지 설정
+    try {
+      const result = await api.get('/mail/check', {
+        params: { email, code },
+      });
+
+      if (result.data === true) {
+        setIsEmailVerified(true);
+        setEmailAuthMessage('이메일 인증이 성공하였습니다.');
+      } else {
+        setIsEmailVerified(false);
+        setEmailAuthMessage('인증번호가 올바르지 않습니다.');
+      }
+    } catch (error) {
+      console.error('이메일 인증 확인 중 오류:', error);
+      setEmailAuthMessage('이메일 확인 중 문제가 발생했습니다.');
     }
   };
 
@@ -137,12 +191,20 @@ function SignUpPage() {
         {/* --- 새로 추가된 인증 번호 입력 영역 --- */}
         {showAuthCodeInput && (
           <AuthCodeInputGroup>
-            <AuthCodeInput
-              type="text"
-              placeholder="인증번호 6자리 입력"
-              value={authCode}
-              onChange={(e) => setAuthCode(e.target.value)}
-            />
+            <AuthCodeInputWrapper>
+              <AuthCodeInput
+                type="text"
+                placeholder="인증번호 6자리 입력"
+                value={authCode}
+                onChange={(e) => setAuthCode(e.target.value)}
+                disabled={!isTimerActive}
+              />
+              <TimerText>
+                {isTimerActive
+                  ? `${String(Math.floor(timer / 60)).padStart(2, '0')}:${String(timer % 60).padStart(2, '0')}`
+                  : '시간 만료'}
+              </TimerText>
+            </AuthCodeInputWrapper>
             <VerifyAuthCodeButton type="button" onClick={handleVerifyAuthCode} disabled={isEmailVerified}>
               확인
             </VerifyAuthCodeButton>
@@ -450,6 +512,21 @@ const AuthCodeInputGroup = styled(InputGroup)`
 const AuthCodeInput = styled(EmailAuthInput)``;
 
 const VerifyAuthCodeButton = styled(EmailAuthButton)``;
+
+const AuthCodeInputWrapper = styled.div`
+  position: relative;
+`;
+
+const TimerText = styled.span`
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85em;
+  color: red;
+  user-select: none;
+  pointer-events: none;
+`;
 
 const ErrorMessage = styled.p`
   color: red;
