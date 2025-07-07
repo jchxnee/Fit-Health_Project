@@ -3,6 +3,7 @@ package com.fithealth.backend.controller;
 import com.fithealth.backend.dto.Notification.NotificationResponseDto;
 import com.fithealth.backend.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus; // HttpStatus import 추가
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Collections; // Collections import 추가
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,6 +30,17 @@ public class NotificationController {
      */
     @GetMapping("/unread/count")
     public ResponseEntity<Map<String, Long>> getUnreadNotificationCount(@AuthenticationPrincipal UserDetails userDetails) {
+        System.out.println(userDetails);
+
+        // userDetails가 null인 경우 예외 처리
+        if (userDetails == null) {
+            System.out.println("UserDetails is null. User not authenticated.");
+            // 401 Unauthorized 상태 코드와 함께 오류 메시지 반환
+            // 클라이언트에게 인증이 필요함을 알림
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("message", 0L)); // count를 0으로 설정하거나, 다른 오류 메시지를 보낼 수 있습니다.
+        }
+
         String userEmail = userDetails.getUsername(); // UserDetails에서 사용자 이메일 추출
         // 변경된 서비스 메서드 이름 사용: notReadNotification
         Long unreadCount = notificationService.notReadNotification(userEmail);
@@ -45,6 +58,13 @@ public class NotificationController {
      */
     @GetMapping
     public ResponseEntity<List<NotificationResponseDto>> getAllNotifications(@AuthenticationPrincipal UserDetails userDetails) {
+        // userDetails가 null인 경우 예외 처리
+        if (userDetails == null) {
+            System.out.println("UserDetails is null. User not authenticated for getting all notifications.");
+            // 401 Unauthorized 상태 코드와 함께 빈 리스트 반환
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());
+        }
+
         String userEmail = userDetails.getUsername();
         // 변경된 서비스 메서드 이름 사용: getNotification
         List<NotificationResponseDto> notifications = notificationService.getNotification(userEmail)

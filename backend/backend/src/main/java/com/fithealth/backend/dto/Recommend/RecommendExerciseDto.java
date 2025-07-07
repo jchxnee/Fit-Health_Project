@@ -10,4 +10,4 @@ public class RecommendExerciseDto {
     private Long exerciseWeight;
     private Long exerciseCount;
     private Long exerciseSet;
-} 
+}

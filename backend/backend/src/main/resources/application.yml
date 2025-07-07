@@ -48,6 +48,11 @@ oauth:
     redirect-uri: http://localhost:5173/oauth/kakao/redirect
     redirect-delete-uri: http://localhost:5173/oauth/kakao/redirect/delete
 
+imp:
+  code: imp31851453
+  key: 7012420038076445
+  secret_key: p8ZbNx0kihWaBFVhgVNQRLtpQ1M9zyuNstMUo4WNvw0VHo9umI7Rkw89KRaJD7ABHEpTrb9CIxechCit
+
 ---
 spring:
   config:
