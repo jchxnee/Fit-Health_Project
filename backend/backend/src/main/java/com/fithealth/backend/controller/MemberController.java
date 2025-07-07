@@ -56,6 +56,12 @@ public class MemberController {
         return ResponseEntity.ok(memberService.findMember(userEmail));
     }
 
+    //아이디(이메일) 찾기 API
+    @GetMapping("/id")
+    public ResponseEntity<String> findMemberId(@RequestParam String name, @RequestParam String phone) {
+        return ResponseEntity.ok(memberService.findId(name,phone));
+    }
+
     //생년월일 찾기 API
     @GetMapping("/birth")
     public ResponseEntity<LocalDate> getMemberBirth() {
