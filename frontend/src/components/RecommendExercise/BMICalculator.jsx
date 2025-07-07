@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import useUserStore from '../../store/useUserStore';
 
@@ -43,19 +43,23 @@ const Result = styled.div`
   margin-top: ${({ theme }) => theme.spacing[2]};
 `;
 
-const BMICalculator = () => {
+function BMICalculator({ bmi, setBmi }) {
   const { user } = useUserStore();
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
   const name = user.name;
-  let bmi = '';
+  let calcBmi = '';
   if (height && weight) {
     const h = parseFloat(height) / 100;
     const w = parseFloat(weight);
     if (h > 0 && w > 0) {
-      bmi = (w / (h * h)).toFixed(1);
+      calcBmi = (w / (h * h)).toFixed(1);
     }
   }
+  useEffect(() => {
+    setBmi(calcBmi);
+  }, [calcBmi, setBmi]);
+
   return (
     <BMICalcWrapper>
       <Title>BMI 계산기</Title>
@@ -65,9 +69,9 @@ const BMICalculator = () => {
         <span>몸무게</span>
         <Input type="number" placeholder="kg" value={weight} onChange={(e) => setWeight(e.target.value)} />
       </InputRow>
-      <Result>{height && weight ? `${name}님의 BMI지수는 ${bmi} 입니다.` : '키와 몸무게를 입력하세요.'}</Result>
+      <Result>{height && weight ? `${name}님의 BMI지수는 ${calcBmi} 입니다.` : '키와 몸무게를 입력하세요.'}</Result>
     </BMICalcWrapper>
   );
-};
+}
 
 export default BMICalculator;
