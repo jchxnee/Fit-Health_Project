@@ -48,7 +48,7 @@ public class PaymentServiceImpl implements  PaymentService {
         Member userMember = memberRepository.findByUserEmail(createDto.getUser_email())
                 .orElseThrow(() -> new EntityNotFoundException("결제하는 회원을 찾을 수 없습니다: " + createDto.getUser_email()));
 
-        // 2. 트레이너 (이 트레이너에게 알림을 보낼 것임)
+        // 2. 트레이너 (이 트레이너에게 알림을 보낼거임)
         Member trainerMember = memberRepository.findByUserEmail(createDto.getTrainer_email())
                 .orElseThrow(() -> new EntityNotFoundException("트레이너 회원을 찾을 수 없습니다: " + createDto.getTrainer_email()));
 
@@ -58,13 +58,6 @@ public class PaymentServiceImpl implements  PaymentService {
 
         paymentRepository.save(payment);
 
-
-        // 알림 종류: 1. 유저가 트레이너에게 신청했을 때(해당 트레이너가 로그인 시 알림)
-        String message = String.format("%s님이 PT 코스를 신청했습니다. 승인해주세요.", userMember.getUserName()); // userMember.getName() 가정
-        String notificationType = "PT_APPLICATION_RECEIVED"; // 알림 종류를 나타내는 코드
-        Long relatedId = payment.getPaymentId(); // 관련 ID (결제 ID)
-
-        notificationService.createNotification(trainerMember, message, notificationType, relatedId);
 
 
         return payment.getPaymentId();
@@ -80,10 +73,6 @@ public class PaymentServiceImpl implements  PaymentService {
 
     @Override
     public Long goPayment(ReservationCreateDto.Create createDto) {
-        // 이 메서드는 '결제 정보'가 있고 '결제 완료' 버튼을 누르는 것처럼 보입니다.
-        // 만약 여기서 실질적인 결제가 일어나고 트레이너에게 승인 요청이 가는 시점이라면
-        // 여기서도 알림을 보낼 수 있지만, insertPayment에서 처리하는 것이 더 적절합니다.
-        // 현재 로직을 보면 goPayment는 예약 확정/생성 시점으로 보입니다.
         Payment payment = paymentRepository.findOne(createDto.getPayment_id())
                 .orElseThrow(() -> new IllegalArgumentException("결제 정보가 없습니다."));
 
@@ -93,6 +82,17 @@ public class PaymentServiceImpl implements  PaymentService {
         reservation.changePayment(payment);
 
         reservationRepository.save(reservation);
+
+        Member userMember = payment.getMember(); // 결제한 유저
+        Member trainerMember = payment.getResponseMember(); // 결제 대상 트레이너
+
+        String messageForTrainer = String.format("%s 회원님께서 PT 결제를 완료했습니다. PT 신청을 확인하고 승인해주세요.", userMember.getUserName());
+        String notificationTypeForTrainer = "PT_PAYMENT_COMPLETED"; // 알림 종류를 나타내는 코드
+        Long relatedIdForTrainer = reservation.getReservationNo(); // 관련 ID (예약 ID가 더 적절)
+
+        notificationService.createNotification(trainerMember, messageForTrainer, notificationTypeForTrainer, relatedIdForTrainer);
+
+
         return reservation.getReservationNo();
     }
 

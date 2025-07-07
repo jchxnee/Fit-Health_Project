@@ -30,7 +30,7 @@ const formatTimeAgo = (dateTimeString) => {
   return `${years}년 전`;
 };
 
-// NotificationList 컴포넌트 수정
+// NotificationList 컴포넌트
 function NotificationList({ notifications, onNotificationClick }) {
   if (!notifications || notifications.length === 0) {
     return (
@@ -58,7 +58,7 @@ function NotificationList({ notifications, onNotificationClick }) {
   );
 }
 
-// UserMenu 컴포넌트 (변경 없음)
+// UserMenu 컴포넌트
 function UserMenu({ onMenuItemClick }) {
   const logout = useUserStore((state) => state.logout);
   const updateUser = useUserStore((state) => state.updateUser);
@@ -238,6 +238,13 @@ function Header({ user }) {
           break;
         case 'NEW_COMMENT_ON_POST':
           navigate(`/communityDetailPage/${notification.relatedId}`);
+          break;
+        // 추가된 알림 타입 핸들링 (goPayment와 goRefund에서 추가된 알림)
+        case 'PT_PAYMENT_COMPLETED': // 유저가 결제 완료 시 트레이너에게 가는 알림
+          navigate(`/coachmatchingList`); // 트레이너의 코칭 내역으로 이동
+          break;
+        case 'PT_REFUND_REQUEST': // 유저가 환불 요청 시 트레이너에게 가는 알림
+          navigate(`/coachmatchingList`); // 트레이너의 코칭 내역으로 이동 또는 환불 관리 페이지
           break;
         default:
           navigate('/mypage');
@@ -517,6 +524,9 @@ const NotificationContainer = styled.div`
   box-shadow: ${({ theme }) => theme.shadows.sm};
   overflow: hidden;
   text-align: start;
+
+  max-height: 260px;
+  overflow-y: auto;
 `;
 
 const NotificationTitle = styled.div`
@@ -524,6 +534,11 @@ const NotificationTitle = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.primary};
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray['200']};
+  /* 스크롤 시 타이틀이 상단에 고정되도록 */
+  position: sticky;
+  top: 0;
+  background-color: ${({ theme }) => theme.colors.white};
+  z-index: 1; /* 알림 항목 위에 표시 */
 `;
 
 const NotificationItem = styled.div`

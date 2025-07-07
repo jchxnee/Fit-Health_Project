@@ -1,11 +1,11 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
 
 const Section = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
-    padding: 0 12px;
+  padding: 0 12px;
 `;
 const Label = styled.div`
   font-weight: 600;
@@ -16,7 +16,7 @@ const Label = styled.div`
 const Notice = styled.div`
   color: #ff4d4f;
   font-size: 14px;
-  margin-bottom:30px;
+  margin-bottom: 30px;
   align-self: flex-start;
 `;
 const TableHeaderRow = styled.div`
@@ -30,7 +30,7 @@ const TableHeader = styled.div`
   border-radius: 12px;
   font-weight: 600;
   font-size: 16px;
-  color: #3D4149;
+  color: #3d4149;
   padding: 10px 0;
   width: 120px;
   text-align: center;
@@ -52,9 +52,30 @@ const PriceInput = styled.input`
   background: transparent;
   outline: none;
   text-align: center;
+
+  /* 숫자 input의 스핀 버튼(화살표) 제거 */
+  -moz-appearance: textfield;
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &::placeholder {
+    text-align: center;
+  }
 `;
 
-function PriceDiscountSection({ price, setPrice, discount3, setDiscount3, discount5, setDiscount5, discount10, setDiscount10 }) {
+function PriceDiscountSection({
+  price,
+  setPrice,
+  discount3,
+  setDiscount3,
+  discount5,
+  setDiscount5,
+  discount10,
+  setDiscount10,
+}) {
   return (
     <Section>
       <Label>희망금액 및 할인율</Label>
@@ -66,13 +87,28 @@ function PriceDiscountSection({ price, setPrice, discount3, setDiscount3, discou
         <TableHeader>10회 이상</TableHeader>
       </TableHeaderRow>
       <TableRow>
-        <PriceInput type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
-        <PriceInput type="number" value={discount3} onChange={(e) => setDiscount3(e.target.value)} />
-        <PriceInput type="number" value={discount5} onChange={(e) => setDiscount5(e.target.value)} />
-        <PriceInput type="number" value={discount10} onChange={(e) => setDiscount10(e.target.value)} />
+        <PriceInput type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="ex) 50000" />
+        <PriceInput
+          type="number"
+          value={discount3}
+          onChange={(e) => setDiscount3(e.target.value)}
+          placeholder="ex) 3(%)"
+        />
+        <PriceInput
+          type="number"
+          value={discount5}
+          onChange={(e) => setDiscount5(e.target.value)}
+          placeholder="ex) 5(%)"
+        />
+        <PriceInput
+          type="number"
+          value={discount10}
+          onChange={(e) => setDiscount10(e.target.value)}
+          placeholder="ex) 10(%)"
+        />
       </TableRow>
     </Section>
   );
 }
 
-export default PriceDiscountSection; 
+export default PriceDiscountSection;
