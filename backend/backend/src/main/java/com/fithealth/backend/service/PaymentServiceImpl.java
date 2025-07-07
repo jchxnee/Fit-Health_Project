@@ -81,17 +81,23 @@ public class PaymentServiceImpl implements  PaymentService {
         Reservation reservation = createDto.toEntity();
         reservation.changePayment(payment);
 
-        reservationRepository.save(reservation);
+        boolean a = reservationRepository.save(reservation);
 
         Member userMember = payment.getMember(); // 결제한 유저
         Member trainerMember = payment.getResponseMember(); // 결제 대상 트레이너
 
-        String messageForTrainer = String.format("%s 회원님께서 PT 결제를 완료했습니다. PT 신청을 확인하고 승인해주세요.", userMember.getUserName());
-        String notificationTypeForTrainer = "PT_PAYMENT_COMPLETED"; // 알림 종류를 나타내는 코드
-        Long relatedIdForTrainer = reservation.getReservationNo(); // 관련 ID (예약 ID가 더 적절)
+        if(a) {
+            String messageForTrainer = String.format("%s 회원님께서 PT 결제를 완료했습니다. PT 신청을 확인하고 승인해주세요.",
+                    userMember.getUserName());
+            String notificationTypeForTrainer = "PT_PAYMENT_COMPLETED"; // 알림 종류를 나타내는 코드
+            Long relatedIdForTrainer = reservation.getReservationNo(); // 관련 ID (예약 ID가 더 적절)
 
-        notificationService.createNotification(trainerMember, messageForTrainer, notificationTypeForTrainer, relatedIdForTrainer);
+            notificationService.createNotification(trainerMember, messageForTrainer, notificationTypeForTrainer,
+                    relatedIdForTrainer);
 
+        } else{
+            throw new RuntimeException("알림 생성 실패");
+        }
 
         return reservation.getReservationNo();
     }
