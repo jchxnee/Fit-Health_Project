@@ -3,9 +3,9 @@ package com.fithealth.backend.dto.Review; // 실제 패키지 경로에 맞게 �
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Builder; // @Builder 추가 (선택 사항이지만 DTO 생성 시 유용)
+import lombok.Builder;
 
-import java.time.LocalDate; // 또는 LocalDateTime, 리뷰 생성 날짜 타입에 맞게
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ReviewSelectDto {

@@ -1,35 +1,64 @@
-import React, { useState, useEffect, useRef } from 'react'; // useRef와 useEffect import 추가
-import styled from 'styled-components'; // css import
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import styled from 'styled-components';
 import headerIcon from '../assets/header_icon.png';
 import { FaBell, FaChevronDown, FaChevronUp, FaSyncAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import useUserStore from '../store/useUserStore';
 import basicProfile from '../../public/img/basicProfile.jpg';
 import { toast } from 'react-toastify';
+import api from '../api/axios';
 
-// NotificationList 컴포넌트 (제공된 코드)
-function NotificationList() {
-  const notifications = [
-    { message: '김현아 코치님께서 코칭 승인하셨습니다. 결제를 진행해주세요.', time: '2분 전' },
-    { message: '전진영 코치님의 수업 결제가 완료되었습니다.', time: '2시간 전' },
-    { message: '이주찬 코치님의 수업이 하루 남았습니다.', time: '3일 전' },
-    { message: '황인태 코치님의 수업이 종료되었습니다. 리뷰를 남겨주세요.', time: '1달 전' },
-  ];
+// 시간 포맷팅 유틸리티 함수
+const formatTimeAgo = (dateTimeString) => {
+  if (!dateTimeString) return '';
+  const date = new Date(dateTimeString);
+  const now = new Date();
+  const seconds = Math.floor((now - date) / 1000);
+
+  if (seconds < 60) return `${seconds}초 전`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}분 전`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}시간 전`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}일 전`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 4) return `${weeks}주 전`;
+  const months = Math.floor(days / 30.44); // 평균 한 달
+  if (months < 12) return `${months}달 전`;
+  const years = Math.floor(months / 12);
+  return `${years}년 전`;
+};
+
+// NotificationList 컴포넌트 수정
+function NotificationList({ notifications, onNotificationClick }) {
+  if (!notifications || notifications.length === 0) {
+    return (
+      <NotificationContainer>
+        <NotificationTitle>알림</NotificationTitle>
+        <NoNotificationItem>새로운 알림이 없습니다.</NoNotificationItem>
+      </NotificationContainer>
+    );
+  }
 
   return (
     <NotificationContainer>
       <NotificationTitle>알림</NotificationTitle>
-      {notifications.map((notification, index) => (
-        <NotificationItem key={index}>
+      {notifications.map((notification) => (
+        <NotificationItem
+          key={notification.notificationNo}
+          $isRead={notification.isRead === 'Y'} // 읽음 상태에 따라 스타일 적용
+          onClick={() => onNotificationClick(notification)} // 클릭 시 핸들러 호출
+        >
           <NotificationMessage>{notification.message}</NotificationMessage>
-          <NotificationTime>{notification.time}</NotificationTime>
+          <NotificationTime>{formatTimeAgo(notification.createdDate)}</NotificationTime>
         </NotificationItem>
       ))}
     </NotificationContainer>
   );
 }
 
-// UserMenu 컴포넌트 (제공된 코드)
+// UserMenu 컴포넌트 (변경 없음)
 function UserMenu({ onMenuItemClick }) {
   const logout = useUserStore((state) => state.logout);
   const updateUser = useUserStore((state) => state.updateUser);
@@ -42,7 +71,6 @@ function UserMenu({ onMenuItemClick }) {
     navigate('/'); // 메인 페이지로 이동
   };
 
-  // 신청 내역으로 이동하면서 이메일을 쿼리 파라미터로 넘기는 함수
   const handleToggleGrade = async () => {
     if (!user) return;
 
@@ -79,8 +107,6 @@ function UserMenu({ onMenuItemClick }) {
       {menuItems.map((item) =>
         item.to ? (
           <NavItem key={item.name} to={item.to} onClick={onMenuItemClick}>
-            {' '}
-            {/* onClick 추가 */}
             <UserMenuItem>
               {item.name}
               {item.icon && item.icon}
@@ -94,8 +120,6 @@ function UserMenu({ onMenuItemClick }) {
               onMenuItemClick();
             }}
           >
-            {' '}
-            {/* onClick 추가 */}
             {item.name}
             {item.icon && item.icon}
           </UserMenuItem>
@@ -106,50 +130,153 @@ function UserMenu({ onMenuItemClick }) {
 }
 
 function Header({ user }) {
+  const navigate = useNavigate();
+
   const [showNotification, setShowNotification] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+  const [notifications, setNotifications] = useState([]);
 
-  // 알림 모달과 유저 메뉴 모달을 참조할 ref 생성
   const notificationRef = useRef(null);
   const userMenuRef = useRef(null);
-  const bellIconRef = useRef(null); // 알림 아이콘 ref
-  const profileWrapperRef = useRef(null); // 프로필 래퍼 ref
+  const bellIconRef = useRef(null);
+  const profileWrapperRef = useRef(null);
 
-  // 더미 알림 상태
-  const hasNotifications = true;
+  const fetchUnreadNotificationCount = useCallback(async () => {
+    if (!user || !user.email) {
+      // user.userEmail이 있는지 확인
+      setUnreadNotificationCount(0);
+      return;
+    }
+    try {
+      const response = await api.get('/api/notifications/unread/count');
+      setUnreadNotificationCount(response.data.count);
+    } catch (error) {
+      console.error('읽지 않은 알림 개수를 가져오는 데 실패했습니다:', error);
+    }
+  }, [user]);
 
-  const handleNotificationClick = () => {
+  const fetchAllNotifications = useCallback(async () => {
+    console.log('fetchAllNotifications 호출됨!'); // 이 로그가 찍히는지 확인
+    if (!user || !user.email) {
+      console.log('User 또는 user.userEmail 없음, 알림 가져오기 중단.');
+      setNotifications([]);
+      return;
+    }
+    try {
+      console.log('API 호출 시작: /api/notifications'); // 이 로그가 찍히는지 확인
+      const response = await api.get('/api/notifications');
+      console.log('API 응답 데이터:', response.data); // 응답 데이터 확인
+      setNotifications(response.data);
+    } catch (error) {
+      console.error('알림 목록을 가져오는 데 실패했습니다:', error);
+      toast.error('알림 목록을 가져오는 데 실패했습니다.');
+    }
+  }, [user]);
+
+  useEffect(() => {
+    let intervalId;
+    if (user && user.email) {
+      // user.userEmail이 유효한 경우에만 알림 관련 로직 실행
+      fetchUnreadNotificationCount();
+      intervalId = setInterval(fetchUnreadNotificationCount, 30000); // 30초마다 폴링
+    } else {
+      setUnreadNotificationCount(0);
+      setNotifications([]);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [user, fetchUnreadNotificationCount]);
+
+  const handleNotificationClick = async () => {
+    console.log('종 아이콘 클릭!');
     setShowNotification((prev) => !prev);
-    setShowUserMenu(false); // 다른 모달 닫기
+    setShowUserMenu(false);
+
+    if (!showNotification) {
+      // 알림 모달이 열릴 때만 목록을 다시 가져옴
+      await fetchAllNotifications();
+    }
+  };
+
+  const onNotificationItemClick = async (notification) => {
+    try {
+      if (notification.isRead === 'N') {
+        await api.post(`/api/notifications/${notification.notificationNo}/read`);
+        fetchUnreadNotificationCount(); // 읽음 처리 후 개수 갱신
+        // 알림 목록도 갱신하여 UI에 반영
+        setNotifications((prev) =>
+          prev.map((notif) =>
+            notif.notificationNo === notification.notificationNo ? { ...notif, isRead: 'Y' } : notif
+          )
+        );
+      }
+
+      setShowNotification(false);
+
+      switch (notification.notificationType) {
+        case 'PT_APPLICATION_RECEIVED':
+          navigate(`/coachmatchingList`);
+          break;
+        case 'PT_APPLICATION_APPROVED':
+          navigate('/matchingList');
+          break;
+        case 'PT_APPLICATION_REJECTED':
+          navigate('/matchingList');
+          break;
+        case 'PT_COURSE_COMPLETED':
+          navigate(`/review/write/${notification.relatedId}`); // relatedId = paymentId
+          break;
+        case 'REVIEW_SUBMITTED':
+          // relatedId가 Review ID인 경우 해당 리뷰 상세 페이지로,
+          // 트레이너의 모든 리뷰를 보려면 /review/trainer/${trainerNo}
+          // 여기서는 일단 리뷰 ID로 가정하고 상세페이지가 있다면 그렇게 이동.
+          // 만약 특정 리뷰를 보는 페이지가 없다면 트레이너 리뷰 목록으로 이동
+          navigate(`/review/${notification.relatedId}`); // relatedId = reviewNo
+          break;
+        case 'NEW_CHAT_MESSAGE':
+          navigate(`/chat/${notification.relatedId}`); // relatedId = chatRoomId
+          break;
+        case 'NEW_COMMENT_ON_POST':
+          navigate(`/community/detail/${notification.relatedId}`); // relatedId = boardNo (게시글 상세)
+          break;
+        default:
+          navigate('/mypage');
+          break;
+      }
+    } catch (error) {
+      console.error('알림 처리 중 오류 발생:', error);
+      toast.error('알림 처리 중 오류가 발생했습니다.');
+    }
   };
 
   const handleUserMenuClick = () => {
     setShowUserMenu((prev) => !prev);
-    setShowNotification(false); // 다른 모달 닫기
+    setShowNotification(false);
   };
 
-  // UserMenu 내의 아이템을 클릭했을 때 호출될 함수
   const handleUserMenuItemClick = () => {
-    setShowUserMenu(false); // UserMenu 닫기
+    setShowUserMenu(false);
   };
 
-  // 외부 클릭 감지 로직
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // 알림 모달 외부 클릭 감지
       if (
         notificationRef.current &&
         !notificationRef.current.contains(event.target) &&
-        bellIconRef.current && // 벨 아이콘이 클릭된 것이 아니라면
+        bellIconRef.current &&
         !bellIconRef.current.contains(event.target)
       ) {
         setShowNotification(false);
       }
-      // 유저 메뉴 모달 외부 클릭 감지
       if (
         userMenuRef.current &&
         !userMenuRef.current.contains(event.target) &&
-        profileWrapperRef.current && // 프로필 래퍼가 클릭된 것이 아니라면
+        profileWrapperRef.current &&
         !profileWrapperRef.current.contains(event.target)
       ) {
         setShowUserMenu(false);
@@ -160,7 +287,7 @@ function Header({ user }) {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []); // 빈 배열을 넣어 컴포넌트 마운트 시 한 번만 실행되도록 함
+  }, []);
 
   return (
     <HeaderComponent>
@@ -181,15 +308,11 @@ function Header({ user }) {
           <HeaderRight as="div">
             <HeaderNavRight>
               <NotificationWrapper onClick={handleNotificationClick} ref={bellIconRef}>
-                {' '}
-                {/* ref 추가 */}
                 <FaBell />
-                {hasNotifications && <RedDot />}
+                {unreadNotificationCount > 0 && <RedDot>{unreadNotificationCount}</RedDot>}
               </NotificationWrapper>
               <NavItem to="/chat">채팅</NavItem>
               <ProfileWrapper onClick={handleUserMenuClick} ref={profileWrapperRef}>
-                {' '}
-                {/* ref 추가 */}
                 <ProfileImg src={user.img ? user.img : basicProfile} alt="profileIcon" />
                 <span>{user.name}님</span>
                 {showUserMenu ? <FaChevronUp size="14px" /> : <FaChevronDown size="14px" />}
@@ -197,16 +320,12 @@ function Header({ user }) {
             </HeaderNavRight>
             {showNotification && (
               <NotificationListContainer ref={notificationRef}>
-                {' '}
-                {/* ref 추가 */}
-                <NotificationList />
+                <NotificationList notifications={notifications} onNotificationClick={onNotificationItemClick} />
               </NotificationListContainer>
             )}
             {showUserMenu && (
               <UserMenuContainerWrapper ref={userMenuRef}>
-                {' '}
-                {/* ref 추가 */}
-                <UserMenu onMenuItemClick={handleUserMenuItemClick} /> {/* prop 전달 */}
+                <UserMenu onMenuItemClick={handleUserMenuItemClick} />
               </UserMenuContainerWrapper>
             )}
           </HeaderRight>
@@ -217,6 +336,7 @@ function Header({ user }) {
     </HeaderComponent>
   );
 }
+
 const HeaderComponent = styled.header`
   width: 100%;
   height: 60px;
@@ -227,7 +347,7 @@ const HeaderComponent = styled.header`
   z-index: ${({ theme }) => theme.zIndices.sticky};
   position: sticky;
   top: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 헤더 그림자 추가 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
   a,
   button {
@@ -236,11 +356,11 @@ const HeaderComponent = styled.header`
 `;
 
 const HeaderContent = styled.div`
-  width: ${({ theme }) => theme.width.lg}; /* 1008px */
+  width: ${({ theme }) => theme.width.lg};
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: relative; /* 자식 모달의 위치 기준 */
+  position: relative;
 `;
 
 const HeaderLeft = styled.div`
@@ -282,7 +402,7 @@ const HeaderRight = styled(Link)`
   cursor: pointer;
   display: flex;
   align-items: center;
-  position: relative; /* 알림 및 유저 메뉴 모달의 위치 기준 */
+  position: relative;
 `;
 
 const HeaderNavRight = styled.nav`
@@ -307,8 +427,8 @@ const NotificationWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: ${({ theme }) => theme.fontSizes.xl}; /* 아이콘 크기 조정 */
-  color: ${({ theme }) => theme.colors.gray[700]}; /* 아이콘 색상 조정 */
+  font-size: ${({ theme }) => theme.fontSizes.xl};
+  color: ${({ theme }) => theme.colors.gray[700]};
 
   &:hover {
     color: ${({ theme }) => theme.colors.primary};
@@ -317,13 +437,19 @@ const NotificationWrapper = styled.div`
 
 const RedDot = styled.div`
   position: absolute;
-  top: 0px; /* 알림 아이콘 위치에 맞게 조정 */
-  right: -2px; /* 알림 아이콘 위치에 맞게 조정 */
-  width: 8px;
-  height: 8px;
-  background-color: #ff4d4f; /* 빨간색 */
+  top: -5px;
+  right: -10px;
+  min-width: 18px;
+  height: 18px;
+  background-color: #ff4d4f;
   border-radius: 50%;
-  border: 1px solid ${({ theme }) => theme.colors.white}; /* 흰색 테두리 */
+  border: 1px solid ${({ theme }) => theme.colors.white};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
 `;
 
 const ProfileWrapper = styled.div`
@@ -333,7 +459,6 @@ const ProfileWrapper = styled.div`
   cursor: pointer;
 
   & > svg {
-    /* Chevron 아이콘 스타일 */
     margin-left: ${({ theme }) => theme.spacing[1]};
     color: ${({ theme }) => theme.colors.gray[500]};
     font-size: ${({ theme }) => theme.fontSizes.sm};
@@ -347,13 +472,11 @@ const ProfileImg = styled.img`
   object-fit: cover;
 `;
 
-// 알림 목록 모달 스타일
 const NotificationListContainer = styled.div`
   position: absolute;
-  top: 50px; /* 헤더 높이 + 여백 */
-  right: -10px; /* 알림 아이콘에 맞춰서 조정 */
+  top: 50px;
+  right: -10px;
   z-index: ${({ theme }) => theme.zIndices.dropdown};
-  /* 애니메이션 추가 */
   opacity: 0;
   transform: translateY(-10px);
   animation: fadeInDown 0.3s forwards;
@@ -370,13 +493,11 @@ const NotificationListContainer = styled.div`
   }
 `;
 
-// 사용자 메뉴 모달 스타일
 const UserMenuContainerWrapper = styled.div`
   position: absolute;
-  top: 50px; /* 헤더 높이 + 여백 */
-  right: 0; /* 사용자 이름에 맞춰서 조정 */
+  top: 50px;
+  right: 0;
   z-index: ${({ theme }) => theme.zIndices.dropdown};
-  /* 애니메이션 추가 */
   opacity: 0;
   transform: translateY(-10px);
   animation: fadeInDown 0.3s forwards;
@@ -393,7 +514,6 @@ const UserMenuContainerWrapper = styled.div`
   }
 `;
 
-// 제공된 NotificationList의 스타일 컴포넌트 이름 변경 (이름 충돌 방지)
 const NotificationContainer = styled.div`
   width: 292px;
   border: 1px solid ${({ theme }) => theme.colors.gray['200']};
@@ -412,15 +532,26 @@ const NotificationTitle = styled.div`
 `;
 
 const NotificationItem = styled.div`
-  padding: ${({ theme }) => theme.spacing['2']};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['200']};
+  padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['4']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['100']};
+  cursor: pointer;
+  background-color: ${(props) => (props.$isRead ? props.theme.colors.white : props.theme.colors.gray[50])};
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.gray[100]};
+  }
+
   &:last-child {
     border-bottom: none;
   }
-  cursor: pointer;
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.gray[50]};
-  }
+`;
+
+const NoNotificationItem = styled.div`
+  padding: ${({ theme }) => theme.spacing['4']};
+  text-align: center;
+  color: ${({ theme }) => theme.colors.gray[500]};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
 `;
 
 const NotificationMessage = styled.p`
@@ -434,7 +565,6 @@ const NotificationTime = styled.span`
   color: ${({ theme }) => theme.colors.gray[500]};
 `;
 
-// 제공된 UserMenu의 스타일 컴포넌트 이름 변경 (이름 충돌 방지)
 const StyledFaSyncAlt = styled(FaSyncAlt)`
   font-size: 14px;
   margin-left: 8px;
@@ -466,13 +596,13 @@ const UserMenuItem = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.base};
   color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
-  padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]}; /* padding 조정 */
-  width: 100%; /* 너비 100%로 설정하여 hover 영역 넓히기 */
-  box-sizing: border-box; /* padding이 너비에 포함되도록 */
-  transition: background-color 0.2s ease-in-out; /* hover 트랜지션 추가 */
+  padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]};
+  width: 100%;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease-in-out;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.gray[50]}; /* hover 시 배경색 변경 */
+    background-color: ${({ theme }) => theme.colors.gray[50]};
     color: ${({ theme }) => theme.colors.primary};
   }
 `;

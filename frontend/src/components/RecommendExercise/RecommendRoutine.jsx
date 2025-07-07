@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import theme from "../../styles/theme.js";
+import { getRecommendExercise } from '../../api/recommend';
 
 const PageContainer = styled.div`
   display: flex;
@@ -21,14 +22,7 @@ const Title = styled.h1`
   padding-bottom: ${theme.spacing[2]};
 `;
 
-const CategoryContainer = styled.div`
-  display: flex;
-  justify-content: space-around;
-  width: 100%;
-  margin-bottom: ${theme.spacing[8]};
-`;
-
-const Category = styled.span`
+const Category = styled.button`
   color: ${theme.colors.black};
   font-size: ${theme.fontSizes.lg};
   font-weight: ${theme.fontWeights.semibold};
@@ -52,12 +46,6 @@ const TableHeader = styled.th`
   font-weight: ${theme.fontWeights.semibold};
   padding: ${theme.spacing[3]};
   text-align: center;
-  &:first-child {
-    border-top-left-radius: ${theme.borderRadius.md};
-  }
-  &:last-child {
-    border-top-right-radius: ${theme.borderRadius.md};
-  }
 `;
 
 const TableRow = styled.tr`
@@ -82,7 +70,7 @@ const TableCell = styled.td`
 `;
 
 const ExerciseImage = styled.img`
-  width: ${({ theme }) => theme.spacing[20]};
+  width: 80px;
   height: auto;
   border-radius: ${theme.borderRadius.sm};
   object-fit: contain;
@@ -94,75 +82,48 @@ const ExerciseName = styled.div`
   color: ${theme.colors.black};
 `;
 
-const Routine = () => {
-  const workoutData = [
-    {
-      image: '/public/img/DBPress.png',
-      name: '덤벨 프레스',
-      part: '윗가슴, 삼두',
-      equipment: '덤벨,벤치',
-      weight: '5-15kg',
-      reps: '6회',
-      sets: '4세트',
-    },
-    {
-      image: '/public/img/inclineDP.png',
-      name: '인클라인 덤벨 프레스',
-      part: '밑가슴, 삼두',
-      equipment: '벤치,덤벨',
-      weight: '5-10kg',
-      reps: '6-12회',
-      sets: '4세트',
-    },
-    {
-      image: '/public/img/DBFly.png',
-      name: '덤벨 플라이',
-      part: '윗가슴, 삼두',
-      equipment: '벤치,덤벨',
-      weight: '2.5kg',
-      reps: '12-18회',
-      sets: '4세트',
-    },
-    {
-      image: '/public/img/DBRow.png',
-      name: '덤벨 로우',
-      part: '광배근,승모근',
-      equipment: '바벨',
-      weight: '5-10kg',
-      reps: '6-12회',
-      sets: '4세트',
-    },
-    {
-      image: '/public/img/PushUp.png',
-      name: '푸쉬업',
-      part: '가슴전체, 삼두',
-      equipment: 'X',
-      weight: '체중',
-      reps: '20회',
-      sets: '3세트',
-    },
-    {
-      image: '/public/img/PullUp.png',
-      name: '풀업',
-      part: '광배근, 이두',
-      equipment: '풀업바,벤딩',
-      weight: '체중',
-      reps: '5-10회',
-      sets: '3세트',
-    },
-  ];
+const categoryMap = {
+  '헬스': 'Health',
+  '요가': 'Yoga',
+  // 필요시 추가
+};
+
+function RecommendRoutine({
+                            bmi,
+                            recommendList,
+                            setRecommendList,
+                            loading,
+                            setLoading,
+                            error,
+                            setError,
+                            selectedCategory,
+                          }) {
+  const handleRecommend = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await getRecommendExercise(bmi, selectedCategory);
+      setRecommendList(result);
+    } catch (e) {
+      setError('추천에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 한글 카테고리명을 영문 폴더명으로 매핑
+  const folderName = categoryMap[selectedCategory] || selectedCategory;
 
   return (
     <PageContainer>
-      <Title>근육량 증진 루틴</Title>
-      <CategoryContainer>
-        <Category>가슴, 등</Category>
-        <Category>허리, 어깨</Category>
-        <Category>하체, 팔</Category>
-      </CategoryContainer>
+      <Title>
+        <button onClick={handleRecommend} disabled={loading || !bmi}>
+          {loading ? '추천 중...' : '루틴 추천받기'}
+        </button>
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+      </Title>
 
       <Table>
-        <thead>
           <TableRow>
             <TableHeader>운동</TableHeader>
             <TableHeader>부위</TableHeader>
@@ -171,25 +132,26 @@ const Routine = () => {
             <TableHeader>횟수</TableHeader>
             <TableHeader>세트</TableHeader>
           </TableRow>
-        </thead>
-        <tbody>
-          {workoutData.map((exercise, index) => (
-            <TableRow key={index}>
+        {recommendList.map((item, idx) => (
+          <TableRow key={idx}>
               <TableCell className="image-cell">
-                <ExerciseImage src={exercise.image} alt={exercise.name} />
-                <ExerciseName>{exercise.name}</ExerciseName>
+              <ExerciseImage
+                src={`/Eximg/${folderName}/${item.exerciseName}.png`}
+                alt={item.exerciseName}
+                onError={(e) => (e.target.style.display = 'none')}
+              />
+              <ExerciseName>{item.exerciseName}</ExerciseName>
               </TableCell>
-              <TableCell>{exercise.part}</TableCell>
-              <TableCell>{exercise.equipment}</TableCell>
-              <TableCell>{exercise.weight}</TableCell>
-              <TableCell>{exercise.reps}</TableCell>
-              <TableCell>{exercise.sets}</TableCell>
+            <TableCell>{item.exerciseTarget}</TableCell>
+            <TableCell>{item.exerciseItem}</TableCell>
+            <TableCell>{item.exerciseWeight}</TableCell>
+            <TableCell>{item.exerciseCount}</TableCell>
+            <TableCell>{item.exerciseSet}</TableCell>
             </TableRow>
           ))}
-        </tbody>
       </Table>
     </PageContainer>
   );
-};
+}
 
-export default Routine;
+export default RecommendRoutine;

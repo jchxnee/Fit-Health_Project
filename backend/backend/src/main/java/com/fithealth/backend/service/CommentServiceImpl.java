@@ -26,20 +26,39 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
 
     @Override
     public Long createComment(CommentCreateDto.Create commentCreateDto) {
-        Member member = memberRepository.findOne(commentCreateDto.getUser_email())
+        Member commentWriter = memberRepository.findOne(commentCreateDto.getUser_email())
                 .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));
 
         Board board = boardRepository.findById(commentCreateDto.getBoard_no())
                 .orElseThrow(() -> new EntityNotFoundException("게시물을 찾을 수 없습니다."));
 
         Comment comment = commentCreateDto.toEntity();
-        comment.changeMember(member);
+        comment.changeMember(commentWriter);
         comment.changeBoard(board);
 
         Comment savedComment = commentRepository.save(comment);
+        // 게시글 작성자
+        Member boardWriter = board.getMember();
+
+        if (boardWriter != null && commentWriter != null) {
+            // 게시글 작성자와 댓글 작성자가 동일하지 않을 경우에만 알림 보내기 (옵션)
+            // 즉, 자신이 쓴 글에 자신이 댓글을 달았을 때는 알림을 보내지 않음
+            if (!boardWriter.getUserEmail().equals(commentWriter.getUserEmail())) {
+                String message = String.format("%s님이 회원님의 게시글에 새로운 댓글을 남겼습니다.",
+                        commentWriter.getUserName() != null ? commentWriter.getUserName() : commentWriter.getUserEmail());
+                String notificationType = "NEW_COMMENT_ON_POST";
+                Long relatedId = board.getBoardNo();
+
+                notificationService.createNotification(boardWriter, message, notificationType, relatedId);
+            }
+        } else {
+            System.err.println("알림을 보낼 게시글 작성자나 댓글 작성자 정보가 없자나 뭐함?");
+        }
+
         return savedComment.getCommentNo();
     }
 
