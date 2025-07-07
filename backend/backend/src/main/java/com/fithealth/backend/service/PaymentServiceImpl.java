@@ -40,20 +40,26 @@ public class PaymentServiceImpl implements  PaymentService {
     private final ReservationRepository reservationRepository;
     private final RefundRepository refundRepository;
     private final SalaryRepository salaryRepository;
+    private final NotificationService notificationService;
 
     @Override
     public Long insertPayment(CreatePaymentDto.Create createDto) {
-        Member member = memberRepository.findOne(createDto.getUser_email())
-                .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));
+        // 1. 결제하는 유저 (알림을 보낼 대상은 아님)
+        Member userMember = memberRepository.findByUserEmail(createDto.getUser_email())
+                .orElseThrow(() -> new EntityNotFoundException("결제하는 회원을 찾을 수 없습니다: " + createDto.getUser_email()));
 
-        Member responseMember = memberRepository.findOne(createDto.getTrainer_email())
-                .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));
+        // 2. 트레이너 (이 트레이너에게 알림을 보낼거임)
+        Member trainerMember = memberRepository.findByUserEmail(createDto.getTrainer_email())
+                .orElseThrow(() -> new EntityNotFoundException("트레이너 회원을 찾을 수 없습니다: " + createDto.getTrainer_email()));
 
         Payment payment = createDto.toEntity();
-        payment.changeMember(member);
-        payment.changeResponseMember(responseMember);
+        payment.changeMember(userMember); // 결제한 유저
+        payment.changeResponseMember(trainerMember); // 결제 대상 트레이너
 
         paymentRepository.save(payment);
+
+
+
         return payment.getPaymentId();
     }
 
@@ -70,12 +76,23 @@ public class PaymentServiceImpl implements  PaymentService {
         Payment payment = paymentRepository.findOne(createDto.getPayment_id())
                 .orElseThrow(() -> new IllegalArgumentException("결제 정보가 없습니다."));
 
-        payment.changeStatus(CommonEnums.Status.Y);
+        payment.changeStatus(CommonEnums.Status.Y); // 결제 상태를 'Y' (완료)로 변경
 
         Reservation reservation = createDto.toEntity();
         reservation.changePayment(payment);
 
         reservationRepository.save(reservation);
+
+        Member userMember = payment.getMember(); // 결제한 유저
+        Member trainerMember = payment.getResponseMember(); // 결제 대상 트레이너
+
+        String messageForTrainer = String.format("%s 회원님께서 PT 결제를 완료했습니다. PT 신청을 확인하고 승인해주세요.", userMember.getUserName());
+        String notificationTypeForTrainer = "PT_PAYMENT_COMPLETED"; // 알림 종류를 나타내는 코드
+        Long relatedIdForTrainer = reservation.getReservationNo(); // 관련 ID (예약 ID가 더 적절)
+
+        notificationService.createNotification(trainerMember, messageForTrainer, notificationTypeForTrainer, relatedIdForTrainer);
+
+
         return reservation.getReservationNo();
     }
 
@@ -144,15 +161,50 @@ public class PaymentServiceImpl implements  PaymentService {
             Payment payment = reservation.getPayment();
             if (payment.getUsedCount() == null) payment.setUsedCount(0L);
             payment.setUsedCount(payment.getUsedCount() + 1);
+
+            // (트레이너가 유저의 신청을 승인했을 때) ---
+            // 알림 종류: 2. 트레이너가 유저의 신청을 승인했을 때(해당 유저가 로그인 시 알림)
+            Member userMember = reservation.getPayment().getMember(); // 예약에 연결된 결제의 유저
+            Member trainerMember = reservation.getPayment().getResponseMember(); // 예약에 연결된 결제의 트레이너
+
+            String message = String.format("%s 코치님께서 PT 신청을 승인하셨습니다. 결제를 진행해주세요.", trainerMember.getUserName()); // trainerMember.getName() 가정
+            String notificationType = "PT_APPLICATION_APPROVED"; // 알림 종류를 나타내는 코드
+            Long relatedId = reservation.getPayment().getPaymentId(); // 관련 ID (결제 ID 또는 예약 ID)
+
+            notificationService.createNotification(userMember, message, notificationType, relatedId);
+
+            // (3. 트레이너와의 PT코스가 끝났을 때) ---
+            // 현재 회차 사용량(usedCount)이 총 회차(totalCount)와 같아지는지 확인
+            if (payment.getUsedCount() != null && payment.getTotalCount() != null &&
+                    payment.getUsedCount().equals(payment.getTotalCount())) {
+
+                String completedMessage = String.format("%s 코치님과의 PT 코스가 모두 종료되었습니다. 코치님과의 수업은 어떠셨나요? 리뷰를 작성해주세요!",
+                        trainerMember.getUserName() != null ? trainerMember.getUserName() : trainerMember.getUserEmail());
+                String completedNotificationType = "PT_COURSE_COMPLETED";
+                Long completedRelatedId = payment.getPaymentId();
+
+                notificationService.createNotification(userMember, completedMessage, completedNotificationType, completedRelatedId);
+            }
+
         }
 
-       if (CommonEnums.Status.N.equals(newStatus)){
+        else if (CommonEnums.Status.N.equals(newStatus)){
             reservation.setRejectComment(dto.getRejectReason());
-        } else{
-           reservation.setRejectComment(null);
-       }
+            // (트레이너가 유저의 신청을 거절했을 때) ---
+            // 알림 종류: (추가) 트레이너가 유저의 신청을 거절했을 때(해당 유저가 로그인 시 알림)
+            Member userMember = reservation.getPayment().getMember(); // 예약에 연결된 결제의 유저
+            Member trainerMember = reservation.getPayment().getResponseMember(); // 예약에 연결된 결제의 트레이너
 
-       reservationRepository.save(reservation);
+            String message = String.format("%s 코치님께서 PT 신청을 거절하셨습니다. 사유: %s", trainerMember.getUserName(), dto.getRejectReason()); // trainerMember.getName() 가정
+            String notificationType = "PT_APPLICATION_REJECTED"; // 알림 종류를 나타내는 코드
+            Long relatedId = reservation.getPayment().getPaymentId(); // 관련 ID (결제 ID 또는 예약 ID)
+
+            notificationService.createNotification(userMember, message, notificationType, relatedId);
+        } else {
+            reservation.setRejectComment(null);
+        }
+
+        reservationRepository.save(reservation);
 
     }
 

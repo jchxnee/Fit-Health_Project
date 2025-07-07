@@ -11,7 +11,7 @@ spring:
       on-profile: dev
 
   datasource:
-    url: jdbc:mysql://localhost:3306/fit_healthDB?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/fit_healthDB?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: fit
     password: 7961
@@ -47,6 +47,11 @@ oauth:
     client-id: da3b2a4c2ffd133e7d6f97b803e58ede #카카오 REST API key
     redirect-uri: http://localhost:5173/oauth/kakao/redirect
     redirect-delete-uri: http://localhost:5173/oauth/kakao/redirect/delete
+
+imp:
+  code: imp31851453
+  key: 7012420038076445
+  secret_key: p8ZbNx0kihWaBFVhgVNQRLtpQ1M9zyuNstMUo4WNvw0VHo9umI7Rkw89KRaJD7ABHEpTrb9CIxechCit
 
 ---
 spring:

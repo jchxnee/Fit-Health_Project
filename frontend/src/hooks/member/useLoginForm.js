@@ -6,7 +6,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useState } from 'react';
 import { memberService } from '../../api/member';
 import useUserStore from '../../store/useUserStore';
-import { jwtDecode } from 'jwt-decode';
 
 // 로그인 유효성 검사 스키마 정의
 const loginSchema = yup.object().shape({

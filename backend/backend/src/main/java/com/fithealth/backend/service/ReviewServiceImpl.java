@@ -37,6 +37,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
     private final TrainerRepository trainerRepository;
     private final String UPLOAD_PATH = "C:\\Wallpaper";
     @Override
@@ -95,6 +96,22 @@ public class ReviewServiceImpl implements ReviewService {
         Review savedReview = reviewRepository.save(review);
 
         payment.setReview(savedReview);
+
+        Member trainerMember = payment.getResponseMember();
+        Member userMember = payment.getMember();
+
+        if (trainerMember != null && userMember != null) {
+            String message = String.format("%s님이 코치님에 대한 리뷰를 작성했습니다. 확인해보세요!",
+                    userMember.getUserName() != null ? userMember.getUserName() : userMember.getUserEmail());
+            String notificationType = "REVIEW_SUBMITTED";
+            Long relatedId = savedReview.getReviewNo();
+
+            notificationService.createNotification(trainerMember, message, notificationType, relatedId);
+        } else {
+            System.err.println("알림에 대해 저장할 유저나 트레이너 멤버가 없습니다.");
+        }
+
+
         return savedReview;
     }
 
