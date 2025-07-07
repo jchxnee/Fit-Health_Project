@@ -181,7 +181,7 @@ public class PaymentServiceImpl implements  PaymentService {
                 String completedMessage = String.format("%s 코치님과의 PT 코스가 모두 종료되었습니다. 코치님과의 수업은 어떠셨나요? 리뷰를 작성해주세요!",
                         trainerMember.getUserName() != null ? trainerMember.getUserName() : trainerMember.getUserEmail());
                 String completedNotificationType = "PT_COURSE_COMPLETED";
-                Long completedRelatedId = payment.getPaymentId(); // PT 코스의 관련 ID는 PaymentId가 적절
+                Long completedRelatedId = payment.getPaymentId();
 
                 notificationService.createNotification(userMember, completedMessage, completedNotificationType, completedRelatedId);
             }

@@ -157,16 +157,16 @@ function Header({ user }) {
   }, [user]);
 
   const fetchAllNotifications = useCallback(async () => {
-    console.log('fetchAllNotifications 호출됨!'); // 이 로그가 찍히는지 확인
+    console.log('fetchAllNotifications 호출됨!');
     if (!user || !user.email) {
       console.log('User 또는 user.userEmail 없음, 알림 가져오기 중단.');
       setNotifications([]);
       return;
     }
     try {
-      console.log('API 호출 시작: /api/notifications'); // 이 로그가 찍히는지 확인
+      console.log('API 호출 시작: /api/notifications');
       const response = await api.get('/api/notifications');
-      console.log('API 응답 데이터:', response.data); // 응답 데이터 확인
+      console.log('API 응답 데이터:', response.data);
       setNotifications(response.data);
     } catch (error) {
       console.error('알림 목록을 가져오는 데 실패했습니다:', error);
@@ -208,7 +208,6 @@ function Header({ user }) {
       if (notification.isRead === 'N') {
         await api.post(`/api/notifications/${notification.notificationNo}/read`);
         fetchUnreadNotificationCount(); // 읽음 처리 후 개수 갱신
-        // 알림 목록도 갱신하여 UI에 반영
         setNotifications((prev) =>
           prev.map((notif) =>
             notif.notificationNo === notification.notificationNo ? { ...notif, isRead: 'Y' } : notif
@@ -229,20 +228,16 @@ function Header({ user }) {
           navigate('/matchingList');
           break;
         case 'PT_COURSE_COMPLETED':
-          navigate(`/review/write/${notification.relatedId}`); // relatedId = paymentId
+          navigate('/reviewCreationPage', { state: { paymentId: notification.relatedId } });
           break;
         case 'REVIEW_SUBMITTED':
-          // relatedId가 Review ID인 경우 해당 리뷰 상세 페이지로,
-          // 트레이너의 모든 리뷰를 보려면 /review/trainer/${trainerNo}
-          // 여기서는 일단 리뷰 ID로 가정하고 상세페이지가 있다면 그렇게 이동.
-          // 만약 특정 리뷰를 보는 페이지가 없다면 트레이너 리뷰 목록으로 이동
-          navigate(`/review/${notification.relatedId}`); // relatedId = reviewNo
+          navigate(`/coachReview/${notification.relatedId}`);
           break;
         case 'NEW_CHAT_MESSAGE':
-          navigate(`/chat/${notification.relatedId}`); // relatedId = chatRoomId
+          navigate(`/chat`);
           break;
         case 'NEW_COMMENT_ON_POST':
-          navigate(`/community/detail/${notification.relatedId}`); // relatedId = boardNo (게시글 상세)
+          navigate(`/communityDetailPage/${notification.relatedId}`);
           break;
         default:
           navigate('/mypage');
