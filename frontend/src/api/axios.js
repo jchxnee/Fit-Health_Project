@@ -28,7 +28,9 @@ api.interceptors.response.use(
       const { status, data } = error.response;
       switch (status) {
         case 401:
-          window.location.href = '/login';
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
           break;
         case 403:
           console.error('접근권한이 없습니다.');
