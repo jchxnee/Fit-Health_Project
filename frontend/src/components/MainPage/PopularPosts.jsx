@@ -74,6 +74,7 @@ const MoreInfoBox = styled.div`
   gap: ${({ theme }) => theme.spacing[2]};
 `;
 const MoreText = styled.div`
+  font-family: 'SUITE', sans-serif;
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   font-size: ${({ theme }) => theme.fontSizes.xl};
   color: ${({ theme }) => theme.colors.primary};
@@ -81,6 +82,7 @@ const MoreText = styled.div`
 const ViewAllBtn = styled(Link)`
   background: none;
   border: none;
+  font-family: 'SUITE', sans-serif;
   font-size: ${({ theme }) => theme.fontSizes.base};
   color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;

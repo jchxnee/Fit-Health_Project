@@ -6,6 +6,7 @@
   overflow: hidden;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   box-sizing: border-box; /* 모든 요소에 box-sizing 적용 */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* 모든 요소에 box-sizing: border-box 적용 (안정성을 위해) */

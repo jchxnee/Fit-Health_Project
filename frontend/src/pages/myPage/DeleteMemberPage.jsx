@@ -94,6 +94,7 @@ const WithdrawContainer = styled.div`
   min-height: calc(100vh - 60px); /* 헤더 높이를 제외한 최소 높이 */
   box-sizing: border-box;
   width: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
 `;
 
 const WithdrawForm = styled.form`
