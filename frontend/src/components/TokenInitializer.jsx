@@ -67,7 +67,7 @@ const TokenInitializer = () => {
           grade: memberInfo.grade,
           socialType: memberInfo.social_type,
         });
-        console.log('로그인에 성공하였습니다!');
+        console.log('로그인에 성공!');
       } catch (error) {
         console.error('유저 정보 불러오기 실패:', error);
         sessionStorage.removeItem('token');
