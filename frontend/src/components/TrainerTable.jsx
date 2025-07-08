@@ -8,6 +8,7 @@ import theme from '../styles/theme';
 import SalaryModal from './modal/SalaryModal';
 import HealthChartModal from './modal/HealthChartModal';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onReject }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
@@ -19,6 +20,8 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
   const [salaryModalData, setSalaryModalData] = useState(null);
   const [healthModalOpen, setHealthModalOpen] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState(null);
+
+  const navigate = useNavigate();
 
   const sortedData = useMemo(() => {
     let sortableItems = [...data];
@@ -143,6 +146,8 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
       setHealthModalOpen(true);
     } else if (action === '정산내역') {
       setSalaryModalData(rowData); // 정산내역도 동일 모달 사용
+    } else if (action === '1대1채팅') {
+      navigate('/chat');
     }
 
     // 메뉴 닫힘 관련 상태 업데이트는 한 번만 수행
