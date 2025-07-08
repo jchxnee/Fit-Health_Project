@@ -230,6 +230,12 @@ function Header({ user }) {
         case 'PT_COURSE_COMPLETED':
           navigate('/reviewCreationPage', { state: { paymentId: notification.relatedId } });
           break;
+        case 'PHONE_NULL':
+          navigate('/myInfoPage');
+          break;
+        case 'REFUND_COMPLETED':
+          navigate('/coachmatchingList');
+          break;
         case 'REVIEW_SUBMITTED':
           navigate(`/coachReview/${notification.relatedId}`);
           break;

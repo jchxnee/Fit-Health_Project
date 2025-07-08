@@ -134,7 +134,12 @@ public class PaymentServiceImpl implements  PaymentService {
         Refund refund = createDto.toEntity();
         refund.changePayment(payment);
 
-        refundRepository.save(refund);
+        boolean a = refundRepository.save(refund);
+        if(a){
+            String message = String.format("%s 님이 환불을 진행하였습니다. 확인해주세요", payment.getMember().getUserName());
+            String notificationType = "REFUND_COMPLETED";
+            notificationService.createSocialNotification(payment.getResponseMember(), message, notificationType);
+        }
         return refund.getRefundId();
     }
 
