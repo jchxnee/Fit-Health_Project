@@ -107,59 +107,15 @@ const PaymentPage = () => {
 
     try {
       setIsLoading(true);
+      const response = await paymentService.goPayment(id, paymentData.first_reservation);
+      console.log('결제 처리 결과:', response);
 
-      if (window.IMP) {
-        // TODO: 백엔드 yml 파일의 imp.code와 동일하게 변경
-        window.IMP.init('imp31851453'); // 이 부분을 백엔드 yml 파일의 imp.code와 동일하게 맞춰주세요.
-      } else {
-        console.error('포트원 라이브러리가 로드되지 않았습니다.');
-        toast.error('결제 시스템을 준비하는 중 오류가 발생했습니다.');
-        setIsLoading(false);
-        return;
-      }
-
-      const { IMP } = window; // window 객체에서 IMP 객체 가져오기
-
-      // 결제 데이터 준비 (실제 결제에 필요한 정보)
-      const data = {
-        pg: 'html5_inicis',
-        pay_method: 'card', // 결제수단
-        merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
-        name: paymentData.product_name, // 상품명
-        amount: paymentData.product_price, // 결제 금액
-        buyer_email: user.email, // 구매자 이메일
-        buyer_name: paymentData.user_name, // 구매자 이름
-        buyer_tel: paymentData.user_phone, // 구매자 전화번호
-        // custom_data: { some_data: 'your_custom_data' }, // 필요한 경우 추가 데이터
-      };
-
-      // IMP.request_pay 호출
-      IMP.request_pay(data, async (rsp) => {
-        if (rsp.success) {
-          // 결제 성공 시
-          console.log('결제 성공:', rsp);
-
-          // 서버에 결제 검증 및 완료 요청
-          const response = await paymentService.goPayment(
-            id,
-            paymentData.first_reservation,
-            rsp.imp_uid,
-            rsp.merchant_uid
-          );
-          console.log('서버 결제 처리 결과:', response);
-
-          toast.success('결제가 완료되었습니다!');
-          navigate('/matchingList');
-        } else {
-          // 결제 실패 시
-          console.error('결제 실패:', rsp.error_msg);
-          toast.error(`결제 실패: ${rsp.error_msg}`);
-        }
-        setIsLoading(false); // 결제 프로세스 완료 (성공/실패 무관)
-      });
+      toast.success('결제가 완료되었습니다!');
+      navigate('/matchingList');
     } catch (error) {
       console.error('결제 에러:', error);
       toast.error('결제 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
       setIsLoading(false);
     }
   };
