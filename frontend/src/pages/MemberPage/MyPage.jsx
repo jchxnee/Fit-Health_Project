@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import kakaotalkIcon from '/public/img/kakaotalk.png';
 import googleIcon from '/public/img/google.png';
-import naverIcon from '/public/img/naver.png';
 import { FaBell } from 'react-icons/fa';
 import { LuClipboardList } from 'react-icons/lu';
 import { AiOutlineTool } from 'react-icons/ai';
@@ -72,16 +71,9 @@ const MyPage = () => {
             <ProfileEmail>
               <ProfileIcon
                 src={
-                  user.socialType === 'NAVER'
-                    ? naverIcon
-                    : user.socialType === 'KAKAO'
-                      ? kakaotalkIcon
-                      : user.socialType === 'GOOGLE'
-                        ? googleIcon
-                        : emailIcon
+                  user.socialType === 'KAKAO' ? kakaotalkIcon : user.socialType === 'GOOGLE' ? googleIcon : emailIcon
                 }
                 alt="social"
-                style={user.socialType === 'NAVER' ? { borderRadius: '50%' } : undefined}
               />
               {user.email}
             </ProfileEmail>

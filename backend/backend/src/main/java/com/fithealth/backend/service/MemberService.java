@@ -14,7 +14,6 @@ public interface MemberService {
     String createMember(SignupDto.Create createDto);
     Member loginMember(LoginDto.Request requestDto);
     Boolean findMember(String userEmail);
-    String findId(String name, String phone);
     LocalDate findBirth(String userEmail);
     String updateProfileImage(String userEmail, MultipartFile file) throws IOException;
     Boolean updateName(String userEmail, String userName);

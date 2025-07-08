@@ -1,7 +1,9 @@
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import ButtonStyle from '../../styles/common/Button';
 import { Link } from 'react-router-dom';
 import { useLoginForm } from '../../hooks/member/useLoginForm';
+import { toast } from 'react-toastify';
 const { VITE_KAKAO_URL, VITE_KAKAO_CLIENT_ID, VITE_KAKAO_REDIRECT_URL } = import.meta.env;
 
 function LoginPage() {
@@ -21,11 +23,6 @@ function LoginPage() {
   const googleLogin = () => {
     // /oauth2/authorization/{provider}
     window.location.href = 'http://localhost:7961/oauth2/authorization/google';
-  };
-
-  const naverLogin = () => {
-    // /oauth2/authorization/{provider}
-    window.location.href = 'http://localhost:7961/oauth2/authorization/naver';
   };
 
   return (
@@ -54,9 +51,9 @@ function LoginPage() {
           </LoginButton>
 
           <LoginLinksContainer>
-            <OptionLink to="/findId">아이디 찾기</OptionLink>
+            <OptionLink href="#">아이디 찾기</OptionLink>
             <LinkSeparator>|</LinkSeparator>
-            <OptionLink to="/findPwd">비밀번호 찾기</OptionLink>
+            <OptionLink href="#">비밀번호 찾기</OptionLink>
             <LinkSeparator>|</LinkSeparator>
             <OptionLink to="/signup">회원가입</OptionLink>
           </LoginLinksContainer>
@@ -66,7 +63,7 @@ function LoginPage() {
           </SNSLoginDivider>
           <SNSLoginIcons>
             <SNSIcon src="/public/img/kakaotalk.png" alt="Kakao Login" onClick={kakaoLogin} />
-            <SNSIcon src="/public/img/naver.png" alt="Naver Login" onClick={naverLogin} />
+            <SNSIcon src="/public/img/naver.png" alt="Naver Login" />
             <SNSIcon src="/public/img/google.png" alt="Google Login" onClick={googleLogin} />
           </SNSLoginIcons>
         </LoginFormBox>
