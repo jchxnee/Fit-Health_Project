@@ -18,8 +18,9 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     private EntityManager em;
 
     @Override
-    public void save(Reservation reservation) {
+    public boolean save(Reservation reservation) {
         em.persist(reservation);
+        return true;
     }
 
     @Override

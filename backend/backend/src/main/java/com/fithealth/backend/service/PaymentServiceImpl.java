@@ -15,6 +15,7 @@ import com.fithealth.backend.entity.Refund;
 import com.fithealth.backend.entity.Reservation;
 import com.fithealth.backend.entity.Salary;
 import com.fithealth.backend.enums.CommonEnums;
+import com.fithealth.backend.enums.CommonEnums.Status;
 import com.fithealth.backend.repository.MemberRepository;
 import com.fithealth.backend.repository.PaymentRepository;
 import com.fithealth.backend.repository.RefundRepository;
@@ -75,23 +76,39 @@ public class PaymentServiceImpl implements  PaymentService {
     public Long goPayment(ReservationCreateDto.Create createDto) {
         Payment payment = paymentRepository.findOne(createDto.getPayment_id())
                 .orElseThrow(() -> new IllegalArgumentException("결제 정보가 없습니다."));
+        List<Reservation> isExists = reservationRepository.findByPaymentId(payment.getPaymentId(), Status.Y);
+        boolean isFirstReservation = isExists.isEmpty();
 
         payment.changeStatus(CommonEnums.Status.Y); // 결제 상태를 'Y' (완료)로 변경
 
         Reservation reservation = createDto.toEntity();
         reservation.changePayment(payment);
 
-        reservationRepository.save(reservation);
+        boolean success = reservationRepository.save(reservation);
 
         Member userMember = payment.getMember(); // 결제한 유저
         Member trainerMember = payment.getResponseMember(); // 결제 대상 트레이너
 
-        String messageForTrainer = String.format("%s 회원님께서 PT 결제를 완료했습니다. PT 신청을 확인하고 승인해주세요.", userMember.getUserName());
-        String notificationTypeForTrainer = "PT_PAYMENT_COMPLETED"; // 알림 종류를 나타내는 코드
-        Long relatedIdForTrainer = reservation.getReservationNo(); // 관련 ID (예약 ID가 더 적절)
+        if(success) {
+            String message;
+            String notificationType;
+            if(isFirstReservation) {
+                message = String.format("%s 회원님께서 PT 결제를 완료했습니다. PT 신청을 확인하고 승인해주세요.",
+                        userMember.getUserName());
+                notificationType = "PT_PAYMENT_COMPLETED";
+            } else {
+                message = String.format("%s 회원님께서 다음 PT 회차 신청을 완료했습니다. 신청을 확인하고 승인해주세요.",
+                        userMember.getUserName());
+                notificationType = "NEXT_RESERVATION_COMPLETED";
+            }
 
-        notificationService.createNotification(trainerMember, messageForTrainer, notificationTypeForTrainer, relatedIdForTrainer);
+            Long relatedIdForTrainer = reservation.getReservationNo();
 
+            notificationService.createNotification(trainerMember, message, notificationType,
+                    relatedIdForTrainer);
+        } else{
+            throw new RuntimeException("알림 생성 실패");
+        }
 
         return reservation.getReservationNo();
     }
@@ -128,7 +145,12 @@ public class PaymentServiceImpl implements  PaymentService {
         Refund refund = createDto.toEntity();
         refund.changePayment(payment);
 
-        refundRepository.save(refund);
+        boolean a = refundRepository.save(refund);
+        if(a){
+            String message = String.format("%s 님이 환불을 진행하였습니다. 확인해주세요", payment.getMember().getUserName());
+            String notificationType = "REFUND_COMPLETED";
+            notificationService.createSocialNotification(payment.getResponseMember(), message, notificationType);
+        }
         return refund.getRefundId();
     }
 
@@ -167,7 +189,7 @@ public class PaymentServiceImpl implements  PaymentService {
             Member userMember = reservation.getPayment().getMember(); // 예약에 연결된 결제의 유저
             Member trainerMember = reservation.getPayment().getResponseMember(); // 예약에 연결된 결제의 트레이너
 
-            String message = String.format("%s 코치님께서 PT 신청을 승인하셨습니다. 결제를 진행해주세요.", trainerMember.getUserName()); // trainerMember.getName() 가정
+            String message = String.format("%s 코치님께서 PT 신청을 승인하셨습니다. 레슨이 진행됩니다.", trainerMember.getUserName()); // trainerMember.getName() 가정
             String notificationType = "PT_APPLICATION_APPROVED"; // 알림 종류를 나타내는 코드
             Long relatedId = reservation.getPayment().getPaymentId(); // 관련 ID (결제 ID 또는 예약 ID)
 

@@ -2,6 +2,7 @@ package com.fithealth.backend.service;
 
 import com.fithealth.backend.auth.JwtTokenProvider;
 import com.fithealth.backend.entity.Member;
+import com.fithealth.backend.entity.Notification;
 import com.fithealth.backend.enums.CommonEnums.Grade;
 import com.fithealth.backend.enums.Role;
 import com.fithealth.backend.enums.SocialType;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 public class GoogleOauth2LoginSuccess extends SimpleUrlAuthenticationSuccessHandler {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final NotificationService notificationService;
 
     //Oauth2 인증에 성공했을 때 호출
     @Override
@@ -96,12 +98,19 @@ public class GoogleOauth2LoginSuccess extends SimpleUrlAuthenticationSuccessHand
             memberRepository.save(member);
         }
 
+        if(member.getPhone() == null){
+            String message = String.format("%s 님의 전화번호가 등록되어있지 않습니다. 원활한 서비스 이용을 위해 번호를 등록해주세요.", member.getUserName());
+            String notificationType = "PHONE_NULL";
+            notificationService.createSocialNotification(member, message, notificationType);
+        }
+
         String jwtToken = jwtTokenProvider.createToken(member.getUserEmail(), member.getRole().toString());
 
         Cookie jwtCookie = new Cookie("token", jwtToken);
         jwtCookie.setPath("/"); //모든 경로에서 쿠키 사용가능
         response.addCookie(jwtCookie);
         response.sendRedirect("http://localhost:5173");
+
 
     }
 

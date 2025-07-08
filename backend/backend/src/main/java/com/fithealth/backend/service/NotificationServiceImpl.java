@@ -42,6 +42,23 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public Notification createSocialNotification(Member targetMember, String message, String notificationType) {
+        if (targetMember == null) {
+            System.err.println("알림 대상에 대한 정보가 없다~ : "  + message);
+            throw new IllegalArgumentException("알림을 받을 대상 회원이 유효하지 않습니다.");
+        }
+        Notification notification = Notification.builder()
+                .member(targetMember) // 알림을 받을 멤버
+                .message(message)
+                .notificationType(notificationType)
+                .isRead(CommonEnums.Status.N) // 기본값은 읽지 않음
+                .createdDate(LocalDateTime.now())
+                .build();
+
+        return notificationRepository.save(notification); // 저장된 알림 객체 반환
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Long notReadNotification(String userEmail) {
         Member member = memberRepository.findByUserEmail(userEmail)

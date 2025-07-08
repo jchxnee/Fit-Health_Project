@@ -42,7 +42,7 @@ public class Notification {
     @Column(name = "MESSAGE", nullable = false, length = 255)
     private String message;
 
-    @Column(name = "NOTIFICATION_TYPE", nullable = false, length = 50)
+    @Column(name = "NOTIFICATION_TYPE", nullable = false, length = 100)
     private String notificationType;
 
     @Column(name = "RELATED_ID")

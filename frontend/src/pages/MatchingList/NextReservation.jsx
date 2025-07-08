@@ -9,32 +9,32 @@ import api from '../../api/axios';
 import { toast } from 'react-toastify';
 
 const PageWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `;
 
 const SubmitButton = styled.button`
-  background-color: ${theme.colors.button};
-  color: ${theme.colors.white};
-  border: none;
-  border-radius: 10px;
-  padding: 18px 35px;
-  font-size: 1.2em;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 40px;
-  margin-bottom: 40px;
-  width: 80%;
-  max-width: 400px;
-  &:hover {
-    opacity: 90%;
-  }
-  &:disabled {
-    background-color: ${theme.colors.gray[400]};
-    cursor: not-allowed;
-  }
+    background-color: ${theme.colors.button};
+    color: ${theme.colors.white};
+    border: none;
+    border-radius: 10px;
+    padding: 18px 35px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    width: 80%;
+    max-width: 400px;
+    &:hover {
+        opacity: 90%;
+    }
+    &:disabled {
+        background-color: ${theme.colors.gray[400]};
+        cursor: not-allowed;
+    }
 `;
 
 const NextReservation = () => {

@@ -1,6 +1,7 @@
 package com.fithealth.backend.repository;
 
 import com.fithealth.backend.entity.Payment;
+import com.fithealth.backend.enums.CommonEnums;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
@@ -48,18 +49,23 @@ public class PaymentRepositoryImpl implements PaymentRepository {
                 "LEFT JOIN FETCH rm.trainer t " +
                 "LEFT JOIN FETCH p.reservations r " +
                 "LEFT JOIN FETCH p.review rv " +
-                "WHERE m.userEmail = :userEmail";
+                "WHERE m.userEmail = :userEmail " +
+                "AND p.paymentStatus = :statusY"; // ✨ 이 조건 추가
 
         return em.createQuery(jpql, Payment.class)
                 .setParameter("userEmail", userEmail)
+                .setParameter("statusY", CommonEnums.Status.Y) // ✨ 파라미터 추가
                 .getResultList();
     }
 
     @Override
     public List<Payment> findPaymentListTrainer(String userEmail) {
+        // ✨ 이 부분에 paymentStatus = :statusY 조건과 파라미터를 추가했습니다.
         return em.createQuery(
-                        "SELECT p FROM Payment p WHERE p.responseMember.userEmail = :trainerEmail", Payment.class)
+                        "SELECT p FROM Payment p WHERE p.responseMember.userEmail = :trainerEmail " +
+                                "AND p.paymentStatus = :statusY", Payment.class)
                 .setParameter("trainerEmail", userEmail)
+                .setParameter("statusY", CommonEnums.Status.Y) // ✨ 파라미터 추가
                 .getResultList();
     }
 

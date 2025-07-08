@@ -14,7 +14,8 @@ public class RefundRepositoryImpl implements  RefundRepository{
     private EntityManager em;
 
     @Override
-    public void save(Refund refund) {
+    public boolean save(Refund refund) {
         em.persist(refund);
+        return true;
     }
 }
