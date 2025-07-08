@@ -68,10 +68,24 @@ const MyInfoPage = () => {
 
   const onSubmit = async (data) => {
     console.log('✅ onSubmit 실행', data);
+
+    if (!data.phone || data.phone.trim() === '') {
+      toast.error('전화번호는 필수 항목입니다.');
+      return;
+    }
+
     try {
       setIsLoading(true);
 
-      await memberService.updateInfo(data);
+      const payload = {
+        phone: data.phone, // 필수값
+        address: data.address || null,
+        gender: data.gender || null,
+        height: data.height === '' ? null : data.height,
+        goal: data.goal || null,
+      };
+
+      await memberService.updateInfo(payload);
 
       updateUser({
         phone: data.phone,

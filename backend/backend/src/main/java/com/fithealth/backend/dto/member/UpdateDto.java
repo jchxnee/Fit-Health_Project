@@ -1,5 +1,6 @@
 package com.fithealth.backend.dto.member;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fithealth.backend.dto.member.LoginDto.Response;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.enums.CommonEnums;
@@ -18,6 +19,7 @@ public class UpdateDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Response {
         private String phone;
         private String address;
