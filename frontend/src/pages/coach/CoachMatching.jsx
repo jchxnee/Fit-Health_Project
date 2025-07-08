@@ -145,7 +145,10 @@ const CoachMatching = () => {
 
   // 신청하기 버튼 클릭 시 호출될 함수 (두 번째 코드의 로직에 기반하여 통합)
   const handleRequest = async () => {
-    console.log('handleRequest 시작됨');
+    if (!user?.phone) {
+      toast.warning('계정 전화번호를 입력 후 결제를 진행해주세요.');
+      return;
+    }
 
     if (!selectedDate || !selectedTime) {
       toast.warning('신청하실 날짜와 시간을 선택해주세요.'); // toast 사용

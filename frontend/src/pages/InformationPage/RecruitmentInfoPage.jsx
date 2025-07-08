@@ -150,7 +150,6 @@ const RecruitmentInfoPage = () => {
 export default RecruitmentInfoPage;
 
 const PageContainer = styled.div`
-  font-family: 'Noto Sans KR', sans-serif;
   color: ${({ theme }) => theme.colors.primary}; /* 기본 텍스트 색상 */
   line-height: 1.6;
   text-align: left;
