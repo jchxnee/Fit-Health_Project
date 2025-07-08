@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ReservationRepository {
-    void save(Reservation reservation);
+    boolean save(Reservation reservation);
     List<Reservation> findByPaymentId(Long paymentId, CommonEnums.Status status);
     Reservation findByReservationNo(Long reservationNo);
     List<LocalDateTime> findDisableDate(Long trainerNo);

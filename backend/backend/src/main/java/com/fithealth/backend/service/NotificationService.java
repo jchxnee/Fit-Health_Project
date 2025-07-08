@@ -8,6 +8,7 @@ public interface NotificationService {
     // 알림을 생성하고 저장하는 메서드
     Notification createNotification(Member targetMember, String message, String notificationType, Long relatedId);
 
+    Notification createSocialNotification(Member targetMember, String message, String notificationType);
     // 특정 유저의 읽지 않은 알림 개수를 조회하는 메서드 (헤더 알림 아이콘에 표시)
     Long notReadNotification(String userEmail);
 
