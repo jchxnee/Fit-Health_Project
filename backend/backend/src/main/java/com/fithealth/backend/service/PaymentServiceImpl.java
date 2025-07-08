@@ -97,7 +97,7 @@ public class PaymentServiceImpl implements  PaymentService {
                         userMember.getUserName());
                 notificationType = "PT_PAYMENT_COMPLETED";
             } else {
-                message = String.format("%s 회원님께서 다음 PT 회차 결제를 완료했습니다. PT 신청을 확인하고 승인해주세요.",
+                message = String.format("%s 회원님께서 다음 PT 회차 신청을 완료했습니다. 신청을 확인하고 승인해주세요.",
                         userMember.getUserName());
                 notificationType = "NEXT_RESERVATION_COMPLETED";
             }
@@ -189,7 +189,7 @@ public class PaymentServiceImpl implements  PaymentService {
             Member userMember = reservation.getPayment().getMember(); // 예약에 연결된 결제의 유저
             Member trainerMember = reservation.getPayment().getResponseMember(); // 예약에 연결된 결제의 트레이너
 
-            String message = String.format("%s 코치님께서 PT 신청을 승인하셨습니다. 결제를 진행해주세요.", trainerMember.getUserName()); // trainerMember.getName() 가정
+            String message = String.format("%s 코치님께서 PT 신청을 승인하셨습니다. 레슨이 진행됩니다.", trainerMember.getUserName()); // trainerMember.getName() 가정
             String notificationType = "PT_APPLICATION_APPROVED"; // 알림 종류를 나타내는 코드
             Long relatedId = reservation.getPayment().getPaymentId(); // 관련 ID (결제 ID 또는 예약 ID)
 
