@@ -252,6 +252,9 @@ function Header({ user }) {
         case 'PT_REFUND_REQUEST': // 유저가 환불 요청 시 트레이너에게 가는 알림
           navigate(`/coachmatchingList`); // 트레이너의 코칭 내역으로 이동 또는 환불 관리 페이지
           break;
+        case 'NEXT_RESERVATION_COMPLETED':
+          navigate('/coachmatchingList');
+          break;
         default:
           navigate('/mypage');
           break;
