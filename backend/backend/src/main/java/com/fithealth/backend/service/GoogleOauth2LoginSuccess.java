@@ -70,18 +70,6 @@ public class GoogleOauth2LoginSuccess extends SimpleUrlAuthenticationSuccessHand
                     name = "Kakao User";
                 }
             }
-        } else if (socialType == SocialType.NAVER) {
-            System.out.println("Naver OAuth2User attributes: " + oAuth2User.getAttributes());
-            Map<String, Object> responseData = oAuth2User.getAttribute("response");
-            if (responseData != null) {
-                socialId = (String) responseData.get("id");
-                email = (String) responseData.get("email");
-                name = (String) responseData.get("name");
-
-                if (name == null) {
-                    name = "Naver User";
-                }
-            }
         }
 
         Member member = memberRepository.findBySocialIdAndSocialType(socialId, socialType).orElse(null);

@@ -33,17 +33,6 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
     }
 
     @Override
-    public Optional<Member> findByNameAndPhone(String name, String phone) {
-        String jpql = "SELECT m FROM Member m WHERE m.userName = :name AND m.phone = :phone";
-        return em.createQuery(jpql, Member.class)
-                .setParameter("name", name)
-                .setParameter("phone", phone)
-                .getResultList()
-                .stream()
-                .findFirst();
-    }
-
-    @Override
     public Optional<Member> findBySocialIdAndSocialType(String socialId, SocialType socialType) {
         String sql = "SELECT m FROM Member m WHERE m.socialId = :socialId AND m.socialType = :socialType";
         try {
