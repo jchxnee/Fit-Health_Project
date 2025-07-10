@@ -8,6 +8,9 @@ import useUserStore from '../../store/useUserStore';
 import { API_ENDPOINTS } from '../../api/config';
 import api from '../../api/axios';
 import { toast } from 'react-toastify';
+import { getUploadUrl, uploadFileToS3 } from '../../api/file'; // S3 파일 업로드 관련 함수 import
+
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/'; // S3 CloudFront URL
 
 const ErrorMessage = styled.p`
   color: red;
@@ -16,26 +19,24 @@ const ErrorMessage = styled.p`
   margin-left: 12px;
 `;
 
-// isEditMode를 prop으로 받도록 변경합니다.
 function CommunityPostCreationPage({ isEditMode = false }) {
   const { user } = useUserStore();
   const navigate = useNavigate();
-  const { id: boardNoFromParams } = useParams(); // URL에서 게시글 번호를 가져옵니다.
+  const { id: boardNoFromParams } = useParams();
 
-  // 수정 모드일 때만 boardNo를 사용하고, 아니면 null로 설정합니다.
   const boardNo = isEditMode ? boardNoFromParams : null;
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('운동해요!');
-  const [files, setFiles] = useState([]); // 새로 업로드할 파일들
-  const [existingImageUrls, setExistingImageUrls] = useState([]); // 기존 이미지 URL
-  const [isSubmitting, setIsSubmitting] = useState(false); // 제출 상태
-  const [errors, setErrors] = useState({}); // 에러 상태
+  const [files, setFiles] = useState([]); // 새로 업로드할 파일들 (File 객체)
+  const [existingImageUrls, setExistingImageUrls] = useState([]); // 기존 이미지 정보 { file_no, url }
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const fileInputRef = useRef(null); // 파일 인풋 참조
+  const fileInputRef = useRef(null);
 
   const imageCount = files.length + existingImageUrls.length; // 전체 이미지 수 (신규 + 기존)
 
@@ -46,23 +47,25 @@ function CommunityPostCreationPage({ isEditMode = false }) {
     if (isEditMode && boardNo) {
       const fetchPostData = async () => {
         try {
+          // 사용자 이메일을 쿼리 파라미터로 추가 (필요에 따라)
           const response = await api.get(`${API_ENDPOINTS.BOARD.DETAIL}/${boardNo}?userEmail=${user.email}`);
           const postData = response.data;
           setTitle(postData.board_title);
           setContent(postData.board_content);
           setSelectedCategory(postData.board_category_name);
           setExistingImageUrls(
-            postData.files
+            postData.files // 백엔드에서 files 정보를 배열로 준다고 가정
               ? postData.files.map((file) => ({
                   file_no: file.file_no,
-                  url: `http://localhost:7961/uploads/${file.change_name}`,
+                  url: `${CLOUDFRONT_URL}${file.change_name}`, // S3 CloudFront URL 사용
+                  change_name: file.change_name, // 파일명도 저장하여 필요시 사용할 수 있도록
                 }))
               : []
           );
         } catch (error) {
           console.error('게시글 데이터를 불러오는 데 실패했습니다:', error);
           toast.error('게시글 데이터를 불러오는 데 실패했습니다.');
-          navigate('/community'); // 에러 발생 시 커뮤니티 목록으로 돌아갑니다.
+          navigate('/community');
         }
       };
       fetchPostData();
@@ -75,19 +78,19 @@ function CommunityPostCreationPage({ isEditMode = false }) {
       setExistingImageUrls([]);
       setErrors({});
     }
-  }, [isEditMode, boardNo, user.email, navigate]); // boardNo, user.email, navigate가 변경될 때 재실행
+  }, [isEditMode, boardNo, user.email, navigate]);
 
   // 폼 유효성 검사
   const isFormValid = title.trim() !== '' && content.trim() !== '';
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
-    setErrors((prev) => ({ ...prev, title: null })); // 입력 시 에러 제거
+    setErrors((prev) => ({ ...prev, title: null }));
   };
 
   const handleContentChange = (e) => {
     setContent(e.target.value);
-    setErrors((prev) => ({ ...prev, content: null })); // 입력 시 에러 제거
+    setErrors((prev) => ({ ...prev, content: null }));
   };
 
   const handleCategorySelect = (category) => {
@@ -106,11 +109,11 @@ function CommunityPostCreationPage({ isEditMode = false }) {
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     const totalCurrentImages = files.length + existingImageUrls.length;
-    const filesToAdd = selectedFiles.slice(0, 15 - totalCurrentImages); // 15개 제한에 맞춰 파일 추가
+    const filesToAdd = selectedFiles.slice(0, 15 - totalCurrentImages);
 
     if (filesToAdd.length < selectedFiles.length) {
       toast.error(
-        `최대 15개의 이미지만 업로드할 수 있습니다. 이미 ${totalCurrentImages}개의 이미지가 있으며, ${filesToAdd.length}개의 새로운 이미지만 추가됩니다.`
+        `최대 15개의 이미지만 업로드할 수 있습니다. 현재 ${totalCurrentImages}개의 이미지가 있으며, ${filesToAdd.length}개의 새로운 이미지만 추가됩니다.`
       );
     }
 
@@ -129,6 +132,8 @@ function CommunityPostCreationPage({ isEditMode = false }) {
   const handleSubmitClick = async (e) => {
     e.preventDefault();
 
+    console.log('현재 user 객체:', user); // user 객체 전체 확인
+    console.log('현재 user.email:', user.email); // user.email 값 확인
     const newErrors = {};
     if (title.trim() === '') {
       newErrors.title = '제목을 입력해주세요.';
@@ -151,53 +156,70 @@ function CommunityPostCreationPage({ isEditMode = false }) {
     setIsSubmitting(true);
 
     const formData = new FormData();
-
-    if (isEditMode && boardNo) {
-      formData.append('board_no', boardNo);
-    }
-
-    formData.append('user_email', user.email);
-    formData.append('board_category_name', selectedCategory);
-    formData.append('board_title', title);
-    formData.append('board_content', content);
-
-    // 수정 모드일 경우, 남아있는 기존 이미지의 file_no를 보냅니다.
-    if (isEditMode && existingImageUrls.length > 0) {
-      existingImageUrls.forEach((file) => {
-        formData.append('existing_file_numbers', file.file_no);
-      });
-    }
-
-    // 새로 추가된 파일들을 보냅니다.
-    files.forEach((file) => {
-      formData.append('files', file);
-    });
+    const uploadedFileNames = []; // S3에 업로드된 파일의 새 이름을 저장할 배열
 
     try {
+      // 1. 새로 추가된 파일들을 S3에 업로드
+      for (const file of files) {
+        try {
+          // 'community/' 폴더에 업로드되도록 path를 설정
+          const { presignedUrl, changeName } = await getUploadUrl(file.name, file.type, 'community/');
+          await uploadFileToS3(presignedUrl, file);
+          uploadedFileNames.push(changeName);
+        } catch (uploadError) {
+          console.error('S3 파일 업로드 실패:', uploadError);
+          toast.error('이미지 업로드 중 문제가 발생했습니다. 다시 시도해주세요.');
+          setIsSubmitting(false);
+          return; // 업로드 실패 시 함수 종료
+        }
+      }
+
+      // 2. formData에 게시글 데이터 및 파일 이름 추가
+      if (isEditMode && boardNo) {
+        formData.append('board_no', boardNo);
+      }
+
+      formData.append('user_email', user.email);
+      formData.append('board_category_name', selectedCategory);
+      formData.append('board_title', title);
+      formData.append('board_content', content);
+
+      // 수정 모드일 경우, 남아있는 기존 이미지의 file_no를 보냅니다.
+      // 백엔드 API가 기존 파일 중 삭제되지 않은 파일의 file_no를 배열로 받도록 가정합니다.
+      if (isEditMode && existingImageUrls.length > 0) {
+        existingImageUrls.forEach((file) => {
+          formData.append('existing_file_numbers', file.file_no);
+        });
+      }
+
+      // S3에 업로드된 새로운 파일 이름들을 FormData에 추가
+      // 백엔드 API가 'new_file_names'라는 파라미터 이름으로 파일명들을 받도록 가정합니다.
+      uploadedFileNames.forEach((name) => {
+        formData.append('new_file_names', name);
+      });
+
+      // 3. 백엔드 API 호출
       let response;
       if (isEditMode) {
-        // 수정 API 호출
         response = await api.put(`${API_ENDPOINTS.BOARD.UPDATE}/${boardNo}`, formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'multipart/form-data', // ⭐ 이 헤더를 명시적으로 추가
           },
         });
         toast.success('게시글이 성공적으로 수정되었습니다!');
       } else {
-        // 생성 API 호출
         response = await api.post(API_ENDPOINTS.BOARD.CREATE, formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'multipart/form-data', // ⭐ 이 헤더를 명시적으로 추가
           },
         });
         toast.success('게시글이 성공적으로 등록되었습니다!');
       }
-
       console.log('게시글 처리 성공:', response.data);
       navigate('/community');
     } catch (error) {
       console.error('게시글 처리 실패:', error.response ? error.response.data : error.message);
-      toast.error(`게시글 처리 실패: ${error.response ? error.response.data || error.message : error.message}`);
+      toast.error(`게시글 처리 실패: ${error.response ? error.response.data.message || error.message : error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -274,7 +296,7 @@ function CommunityPostCreationPage({ isEditMode = false }) {
             {files.map((file, index) => (
               <ImagePreviewContainer key={`new-${index}`}>
                 <img
-                  src={URL.createObjectURL(file)}
+                  src={URL.createObjectURL(file)} // 새 파일은 URL.createObjectURL로 미리보기
                   alt={`preview-${index}`}
                   style={{ width: '60px', height: '60px', objectFit: 'cover', margin: '2px', borderRadius: '6px' }}
                 />

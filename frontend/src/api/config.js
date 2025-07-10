@@ -57,6 +57,7 @@ export const API_ENDPOINTS = {
     UPDATE: '/api/board',
     DELETE: '/api/board/delete',
     MYPOSTS: '/api/board/myposts',
+    LIKE: '/api/board',
   },
   NOTICE: {
     LIST: '/api/notice/all',
