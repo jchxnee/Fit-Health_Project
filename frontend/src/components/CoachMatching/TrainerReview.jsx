@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FiMessageCircle } from 'react-icons/fi';
 import { FaRegEye, FaStar, FaRegStar, FaStarHalfAlt } from 'react-icons/fa';
 import { Link } from 'react-router-dom'; // Link 컴포넌트 임포트
+import basicProfile from '../../../public/img/basicProfile.jpg';
 
 const Wrapper = styled.section`
   width: 100%;
@@ -108,6 +109,7 @@ const MoreText = styled.button`
   color: ${({ theme }) => theme.colors.primary};
 `;
 
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
 const StarRating = ({ rating = 0 }) => {
   const stars = [];
 
@@ -141,7 +143,7 @@ const TrainerReview = (
             <PostBox key={p.reviewId}>
               <PostWriter>
                 <ProfileImg
-                  src={p.userProfileImage || 'https://via.placeholder.com/24x24?text=User'} // 기본 이미지 설정
+                  src={p.userProfileImage ? `${CLOUDFRONT_URL}${p.userProfileImage}?v=${Date.now()}` : basicProfile} // 기본 이미지 설정
                   alt={`${p.userName}의 프로필`}
                 />
                 {p.userName}

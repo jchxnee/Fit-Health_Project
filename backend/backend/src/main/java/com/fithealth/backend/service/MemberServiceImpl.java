@@ -10,6 +10,7 @@ import com.fithealth.backend.enums.Role;
 import com.fithealth.backend.enums.SocialType;
 import com.fithealth.backend.repository.MemberRepository;
 import java.time.LocalDate;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,12 +48,11 @@ public class MemberServiceImpl implements MemberService{
         Member member = memberRepository.findOneStatusY(requestDto.getUser_email(), CommonEnums.Status.Y)
                 .orElseThrow(() -> new IllegalArgumentException("이메일이 존재하지 않습니다."));
 
-        // 암호화된 비밀번호와 입력 비밀번호 비교
         if (!passwordEncoder.matches(requestDto.getUser_pwd(), member.getUserPwd())) {
-            return null;
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        return member;
+        return member; // 로그인 성공
     }
 
     @Override
@@ -158,4 +158,37 @@ public class MemberServiceImpl implements MemberService{
         memberRepository.save(member);
         return member;
     }
-}
+
+    @Override
+    public boolean existsUser(String userName, String userEmail) {
+        return memberRepository.findByNameAndEmail(userName, userEmail);
+    }
+
+    @Override
+    public boolean isSocialMember(String userEmail) {
+        SocialType socialType = memberRepository.isSocialMember(userEmail);
+        return socialType != null;
+    }
+
+    @Override
+    public void resetPassword(String userEmail, String newPassword) {
+
+        Optional<Member> existsUser = memberRepository.findByUserEmail(userEmail);
+
+        if (existsUser.isEmpty()) {
+            throw new IllegalArgumentException("사용자 정보를 찾을 수 없습니다.");
+        }
+        Member member = existsUser.get();
+
+        if (member.getSocialType() != null) {
+
+            throw new IllegalArgumentException("소셜 로그인 회원은 비밀번호를 재설정할 수 없습니다.");
+        }
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+
+        member.updatePwd(encodedPassword);
+
+    }
+    }
+

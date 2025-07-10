@@ -17,4 +17,6 @@ public interface MemberRepository {
     void updateGradeAndTrainer(String userEmail, CommonEnums.Grade grade, Long trainerNo);
     List<Member> findTrainer();
     Optional<Member> findOneStatusY(String userEmail, CommonEnums.Status status);
+    boolean findByNameAndEmail(String userName, String userEmail);
+    SocialType isSocialMember(String userEmail);
 }

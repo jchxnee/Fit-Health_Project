@@ -31,7 +31,7 @@ public class TrainerController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Long> registerTrainer(@ModelAttribute addTrainerDto.Create trainerDto) {
+    public ResponseEntity<Long> registerTrainer(@RequestBody addTrainerDto.Create trainerDto) {
         return ResponseEntity.ok(trainerService.registerTrainer(trainerDto));
     }
 

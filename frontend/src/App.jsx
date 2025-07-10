@@ -54,6 +54,7 @@ import KakaoRedirect from './pages/KakaoRedirect';
 import TokenInitializer from './components/TokenInitializer';
 import FindIdPage from './pages/MemberPage/FindIdPage';
 import FindPwdPage from './pages/MemberPage/FindPwdPage';
+import ResetPwdPage from './pages/MemberPage/ResetPwdPage';
 
 function AppContent() {
   const location = useLocation();
@@ -86,6 +87,7 @@ function AppContent() {
         <Route path="/privacyPolicy" element={<PrivacyPolicyPage />} />
         <Route path="/introduce" element={<CompanyIntroducionPage />} />
         <Route path="/recruitmentInfo" element={<RecruitmentInfoPage />} />
+        <Route path="/ResetPwdPage" element={<ResetPwdPage />} />
 
         {/* 코치 */}
         <Route path="/coachList" element={<CoachList />} />

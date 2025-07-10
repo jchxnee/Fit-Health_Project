@@ -112,6 +112,27 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
         }
     }
 
+    @Override
+    public boolean findByNameAndEmail(String userName, String userEmail) {
+        Long count = em.createQuery(
+                        "SELECT COUNT(m) FROM Member m WHERE m.userName = :userName AND m.userEmail = :userEmail", Long.class)
+                .setParameter("userName", userName)
+                .setParameter("userEmail", userEmail)
+                .getSingleResult();
+        return count > 0;
+    }
+
+    @Override
+    public SocialType isSocialMember(String userEmail) {
+        try {
+            return em.createQuery("SELECT m.socialType FROM Member m WHERE m.userEmail = :userEmail", SocialType.class)
+                    .setParameter("userEmail", userEmail)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null; // 해당 이메일의 회원이 없으면 null 반환
+        }
+    }
+
     // findByUserEmail은 기존 findOne과 동일한 기능을 합니다.
     // 만약 userEmail이 PK가 아니라 다른 고유한 필드라면 이 방법을 사용하는 것이 더 명확합니다.
     // 하지만 이미 findOne에서 PK로 사용 중이므로, 이 메서드는 중복이거나

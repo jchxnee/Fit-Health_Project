@@ -148,6 +148,10 @@ public class Member {
         this.userPwd = userPwd;
     }
 
+    public void updatePwd(String newPassword ){
+        this.userPwd = newPassword;
+    }
+
     public void changeStatus(CommonEnums.Status status){
         this.status = status;
     }

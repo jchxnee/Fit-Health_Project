@@ -131,7 +131,8 @@ const CoachDetail = () => {
     instagramId: trainerDetails.instaId,
     location: trainerDetails.wishArea,
     introduction: trainerDetails.introduce,
-    imageUrl: trainerDetails.profileImage || '../../../public/img/minju.png',
+    trainerPhoto: trainerDetails.trainerPhoto,
+    profileImg: trainerDetails.profileImage,
   };
 
   const trainerQuals = trainerDetails.careers.map((career) => ({ text: career }));
