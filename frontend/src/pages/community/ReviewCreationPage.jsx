@@ -269,6 +269,7 @@ function ReviewCreationPage() {
     coachName: trainerName || '알 수 없음',
     paymentId: paymentId,
   });
+  console.log(information.paymentId);
 
   const fileInputRef = useRef(null);
 
@@ -320,28 +321,30 @@ function ReviewCreationPage() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('paymentId', information.paymentId);
-    formData.append('reviewContent', content);
-    formData.append('rating', selectedRating);
-    formData.append('heart', 0);
-
-    if (file) {
-      formData.append('reviewImageFile', file);
-    }
-
-    console.log('전송할 리뷰 데이터 (FormData):', Object.fromEntries(formData.entries()));
-
     try {
-      const { presignedUrl, changeName } = await getUploadUrl(file.name, file.type, 'review/');
-      await uploadFileToS3(presignedUrl, file);
-      formData.append('originName', file.name);
-      formData.append('changeName', changeName);
-      const response = await api.post(API_ENDPOINTS.REVIEW.CREATE, formData);
-      console.log('리뷰 등록 성공:', response.data);
+      let originName = null;
+      let changeName = null;
+
+      if (file) {
+        const { presignedUrl, changeName: uploadedChangeName } = await getUploadUrl(file.name, file.type, 'review/');
+        await uploadFileToS3(presignedUrl, file);
+        originName = file.name;
+        changeName = uploadedChangeName;
+      }
+      const body = {
+        paymentId: information.paymentId,
+        reviewContent: content,
+        rating: selectedRating,
+        heart: 0,
+        originName, // null일 수 있음
+        changeName, // null일 수 있음
+      };
+
+      await api.post(API_ENDPOINTS.REVIEW.CREATE, body);
       toast.success('리뷰가 성공적으로 등록되었습니다!');
       navigate(`/coachReview/${trainerNo}`);
 
+      // 초기화
       setContent('');
       setFile(null);
       setSelectedRating(0);
@@ -350,6 +353,7 @@ function ReviewCreationPage() {
     } catch (error) {
       console.error('리뷰 등록 실패:', error.response ? error.response.data : error.message);
       toast.error(`리뷰 등록 실패: ${error.response?.data?.message || error.message}`);
+      navigate(`/matchingList`);
     }
   };
 

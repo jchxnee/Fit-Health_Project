@@ -87,6 +87,8 @@ const LoaderWrapper = styled.div`
   width: 100%;
 `;
 
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
+
 const PopularTrainer = ({ trainers, isLoading }) => (
   <Wrapper>
     <Container>
@@ -105,7 +107,10 @@ const PopularTrainer = ({ trainers, isLoading }) => (
           trainers.map((t) => (
             <Link key={t.trainer_no} to={`/coach/${t.trainer_no}`} style={{ textDecoration: 'none' }}>
               <TrainerCard>
-                <ProfileImg src={t.profile_image ? t.profile_image : basicProfile} alt={t.trainer_name} />
+                <ProfileImg
+                  src={t.profile_image ? `${CLOUDFRONT_URL}${t.profile_image}?v=${Date.now()}` : basicProfile}
+                  alt={t.trainer_name}
+                />
                 <Name>{t.trainer_name} 트레이너</Name>
               </TrainerCard>
             </Link>
