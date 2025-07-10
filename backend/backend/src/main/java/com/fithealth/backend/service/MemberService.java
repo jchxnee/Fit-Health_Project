@@ -16,7 +16,7 @@ public interface MemberService {
     Boolean findMember(String userEmail);
     String findId(String name, String phone);
     LocalDate findBirth(String userEmail);
-    String updateProfileImage(String userEmail, MultipartFile file) throws IOException;
+    Boolean updateProfileImage(String userEmail, String changeName);
     Boolean updateName(String userEmail, String userName);
     Boolean updateBirth(String userEmail, LocalDate birth);
     LoginDto.Response findInfo(String userEmail);

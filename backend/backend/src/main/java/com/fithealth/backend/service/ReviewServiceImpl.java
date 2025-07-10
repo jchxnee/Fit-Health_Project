@@ -51,46 +51,13 @@ public class ReviewServiceImpl implements ReviewService {
             throw new IllegalStateException("이미 이 결제에 대한 리뷰가 존재합니다.");
         }
 
-        String originName = null;
-        String changeName = null;
-        MultipartFile imageFile = reviewCreateDto.getReviewImageFile();
-
-
-        // 파일이 존재하고 비어있지 않으면 파일 저장 로직 실행
-        if (imageFile != null && !imageFile.isEmpty()) {
-            try {
-                originName = imageFile.getOriginalFilename();
-                String fileExtension = "";
-                int dotIndex = originName.lastIndexOf('.');
-                if (dotIndex > 0 && dotIndex < originName.length() - 1) {
-                    fileExtension = originName.substring(dotIndex); // .jpg, .png 등
-                }
-
-                changeName = UUID.randomUUID().toString() + fileExtension; // 유니크한 파일명 생성
-
-                // 파일 저장 경로 생성 (없으면 생성)
-                Path uploadPath = Paths.get(UPLOAD_PATH);
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
-                }
-
-                // 파일 저장
-                Path filePath = uploadPath.resolve(changeName);
-                Files.copy(imageFile.getInputStream(), filePath);
-
-            } catch (IOException e) {
-
-                throw new RuntimeException("리뷰 이미지 파일 저장 실패: " + e.getMessage(), e);
-            }
-        }
-
         Review review = Review.builder()
                 .payment(payment)
                 .reviewContent(reviewCreateDto.getReviewContent())
                 .rating(reviewCreateDto.getRating())
                 .heart(reviewCreateDto.getHeart())
-                .originName(originName)
-                .changeName(changeName)
+                .originName(reviewCreateDto.getOriginName())
+                .changeName(reviewCreateDto.getChangeName())
                 .build();
 
         Review savedReview = reviewRepository.save(review);

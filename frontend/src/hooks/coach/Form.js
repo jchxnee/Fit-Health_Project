@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import useUserStore from '../../store/useUserStore';
+import { getUploadUrl, uploadFileToS3 } from '../../api/file';
 
 export default function useCoachRegisterForm() {
   const { user } = useUserStore();
@@ -24,8 +25,20 @@ export default function useCoachRegisterForm() {
     setLoading(true);
     setError(null);
     try {
+      const imagePaths = [];
+
+      // 1. 이미지 업로드 (0~5개까지 가능)
+      for (const photo of photos) {
+        if (photo?.file) {
+          const { presignedUrl, changeName } = await getUploadUrl(photo.file.name, photo.file.type, 'trainer/');
+          await uploadFileToS3(presignedUrl, photo.file);
+          imagePaths.push(changeName); // 업로드 성공한 이미지 경로만 저장
+        }
+      }
+
+      // 2. FormData 구성
       const formData = new FormData();
-      formData.append('userEmail', userEmail); // 사용자 이메일 추가
+      formData.append('userEmail', userEmail);
       formData.append('majorName', majorName);
       formData.append('wishArea', wishArea);
       formData.append('kakaoId', kakaoId);
@@ -36,8 +49,14 @@ export default function useCoachRegisterForm() {
       formData.append('discount10', discount10);
       formData.append('introduce', intro);
       careers.forEach((career, idx) => formData.append(`careers[${idx}]`, career));
-      photos.forEach((photo) => formData.append('files', photo.file));
+      photos.forEach((photo, idx) => formData.append(`originName[${idx}]`, photo.file.name));
 
+      // 이미지 경로를 서버로 전송
+      imagePaths.forEach((path, idx) => {
+        formData.append(`changeName[${idx}]`, path);
+      });
+
+      // 3. 서버로 전송
       const data = await axios.post('http://localhost:7961/api/trainer/register', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });

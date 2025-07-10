@@ -23,7 +23,11 @@ const categories = [
 
 const schema = yup.object().shape({
   phone: yup.string().matches(/^\d{11}$/, '전화번호는 11자리 숫자로만 입력해주세요.'),
-  height: yup.number().typeError('숫자만 입력하세요.').min(0),
+  height: yup
+    .number()
+    .transform((value, originalValue) => (originalValue === '' ? null : value))
+    .nullable()
+    .min(0, '0 이상만 입력 가능합니다.'),
   gender: yup.string(),
   goal: yup.string(),
   address: yup.string(),
@@ -63,12 +67,11 @@ const MyInfoPage = () => {
   };
 
   const onInvalid = (errors) => {
+    console.log(errors);
     toast.error('입력 정보를 확인해주세요.');
   };
 
   const onSubmit = async (data) => {
-    console.log('✅ onSubmit 실행', data);
-
     if (!data.phone || data.phone.trim() === '') {
       toast.error('전화번호는 필수 항목입니다.');
       return;

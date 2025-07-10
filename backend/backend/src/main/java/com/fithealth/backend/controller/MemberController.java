@@ -71,12 +71,10 @@ public class MemberController {
 
     //사진 수정 API
     @PutMapping("/profileImage")
-    public ResponseEntity<?> updateProfileImage(
-            @RequestParam("profileImage") MultipartFile profileImage) throws IOException {
+    public ResponseEntity<Boolean> updateProfileImage(@RequestBody Map<String, String> payload) {
         String userEmail = jwtTokenProvider.getUserEmailFromToken();
-        Map<String, String> response = new HashMap<>();
-        response.put("imageUrl", "/testImage" + memberService.updateProfileImage(userEmail, profileImage));
-        return ResponseEntity.ok(response);
+        String changeName = payload.get("changeName"); // body에서 userName 추출
+        return ResponseEntity.ok(memberService.updateProfileImage(userEmail, changeName));
     }
 
     // 이름 수정 API

@@ -9,7 +9,9 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { memberService } from '../../api/member';
 import { BeatLoader } from 'react-spinners';
+import { getUploadUrl, uploadFileToS3 } from '../../api/file';
 const { VITE_KAKAO_URL, VITE_KAKAO_CLIENT_ID, VITE_KAKAO_REDIRECT_URL } = import.meta.env;
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
 
 // 이름 전용 yup 스키마
 const nameSchema = yup.object({
@@ -38,7 +40,7 @@ const birthSchema = yup.object({
 
 function AccountSettingsPage() {
   const { user, updateUser } = useUserStore();
-  const [imageUrl, setImageUrl] = useState(user.img || basicProfile);
+  const [imageUrl, setImageUrl] = useState(user.img ? `${CLOUDFRONT_URL}${user.img}?v=${Date.now()}` : basicProfile);
   const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,28 +49,32 @@ function AccountSettingsPage() {
   };
 
   const handleFileChange = async (e) => {
+    // e.target.files가 배열인지, 길이가 1 이상인지 확인
+    if (!e.target?.files || e.target.files.length === 0) {
+      console.warn('파일이 선택되지 않았습니다.');
+      return;
+    }
+
     const file = e.target.files[0];
     if (!file) return;
 
-    // 클라이언트에서 즉시 이미지 미리보기
+    // 이미지 미리보기
     const previewUrl = URL.createObjectURL(file);
     setImageUrl(previewUrl);
 
+    setIsLoading(true);
     try {
-      setIsLoading(true);
+      const { presignedUrl, changeName } = await getUploadUrl(file.name, file.type, 'profile/');
+      await uploadFileToS3(presignedUrl, file);
+      const response = await memberService.updateProfileImage(changeName);
+      console.log('응답 확인:', response);
 
-      const response = await await memberService.updateProfileImage(file, user.email);
-      console.log('응답 확인:', response); // { imageUrl: '/images/profile/...' }
-
-      if (response?.imageUrl) {
-        setImageUrl(response.data.imageUrl);
-        updateUser({ img: response.data.imageUrl });
-        toast.success('프로필 사진 변경 완료!');
-      }
+      toast.success('이미지 변경 완료!');
+      updateUser({ img: changeName });
+      setImageUrl(`${CLOUDFRONT_URL}${changeName}?v=${Date.now()}`);
     } catch (error) {
       toast.error('이미지 변경 중 문제가 발생했습니다.');
       console.error('이미지 업로드 실패', error);
-      // 실패 시 원래 이미지로 롤백 가능
       setImageUrl(user.img || basicProfile);
     } finally {
       setIsLoading(false);
@@ -142,7 +148,7 @@ function AccountSettingsPage() {
 
     if (user.socialType !== null && user.socialType !== undefined) {
       const confirmed = window.confirm(
-        '소셜 로그인 회원은 카카오 인증을 다시 받아야 합니다. 카카오 로그인 페이지로 이동하시겠습니까?'
+        '소셜 로그인 회원은 로그인 인증을 다시 받아야 합니다. 로그인 페이지로 이동하시겠습니까?'
       );
       if (confirmed) {
         SocialDelete();
@@ -160,6 +166,8 @@ function AccountSettingsPage() {
       window.location.href = 'http://localhost:7961/oauth2/authorization/google';
     } else if (user.socialType === 'KAKAO') {
       window.location.href = 'http://localhost:7961/oauth2/authorization/kakao';
+    } else if (user.socialType === 'NAVER') {
+      window.location.href = 'http://localhost:7961/oauth2/authorization/naver';
     } else {
       alert('소셜 로그인 정보가 없습니다.');
     }
@@ -179,7 +187,7 @@ function AccountSettingsPage() {
               onChange={handleFileChange}
               disabled={isLoading}
             />
-            <ProfileImage src={user.img ? user.img : basicProfile} alt="프로필 이미지" />
+            <ProfileImage src={imageUrl ? imageUrl : basicProfile} alt="프로필 이미지" />
             <CameraIcon>
               <StyledCameraIcon />
             </CameraIcon>

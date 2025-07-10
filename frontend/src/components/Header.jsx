@@ -8,6 +8,8 @@ import basicProfile from '../../public/img/basicProfile.jpg';
 import { toast } from 'react-toastify';
 import api from '../api/axios';
 
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
+
 // 시간 포맷팅 유틸리티 함수
 const formatTimeAgo = (dateTimeString) => {
   if (!dateTimeString) return '';
@@ -324,7 +326,10 @@ function Header({ user }) {
               </NotificationWrapper>
               <NavItem to="/chat">채팅</NavItem>
               <ProfileWrapper onClick={handleUserMenuClick} ref={profileWrapperRef}>
-                <ProfileImg src={user.img ? user.img : basicProfile} alt="profileIcon" />
+                <ProfileImg
+                  src={user.img ? `${CLOUDFRONT_URL}${user.img}?v=${Date.now()}` : basicProfile}
+                  alt="profileIcon"
+                />
                 <span>{user.name}님</span>
                 {showUserMenu ? <FaChevronUp size="14px" /> : <FaChevronDown size="14px" />}
               </ProfileWrapper>

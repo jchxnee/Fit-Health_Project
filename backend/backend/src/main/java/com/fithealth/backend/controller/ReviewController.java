@@ -24,7 +24,7 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping()
     public ResponseEntity<Review> create(@ModelAttribute ReviewCreateDto.Create reviewCreateDto) {
         return ResponseEntity.ok(reviewService.createReview(reviewCreateDto));
     }

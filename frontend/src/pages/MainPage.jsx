@@ -22,9 +22,19 @@ function MainPage() {
 
     Promise.all([api.get('/api/trainer/top3'), api.get('/api/board/top5'), api.get('/api/review/top6')])
       .then(([trainerRes, boardRes, reviewRes]) => {
-        setPopularTrainerList(trainerRes.data);
-        setPopularBoardList(boardRes.data);
-        setRecentReviewList(reviewRes.data);
+        const trainers = Array.isArray(trainerRes.data)
+          ? trainerRes.data
+          : trainerRes.data.result || trainerRes.data.trainers || [];
+        const boards = Array.isArray(boardRes.data)
+          ? boardRes.data
+          : boardRes.data.result || boardRes.data.boards || [];
+        const reviews = Array.isArray(reviewRes.data)
+          ? reviewRes.data
+          : reviewRes.data.result || reviewRes.data.reviews || [];
+
+        setPopularTrainerList(trainers);
+        setPopularBoardList(boards);
+        setRecentReviewList(reviews);
       })
       .catch((error) => {
         console.error('데이터 로드 중 에러:', error);

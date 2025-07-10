@@ -20,13 +20,16 @@ public class ReviewCreateDto {
         private String reviewContent;
         private Double rating;
         private Long heart;
-        private MultipartFile reviewImageFile;
+        private String originName;
+        private String changeName;
 
         public Review toEntity() {
             return Review.builder()
                     .reviewContent(this.reviewContent)
                     .rating(this.rating)
                     .heart(this.heart)
+                    .originName(this.originName)
+                    .changeName(this.changeName)
                     .build();
         }
     }

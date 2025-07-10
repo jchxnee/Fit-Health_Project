@@ -93,18 +93,10 @@ export const memberService = {
   },
 
   //프로필 이미지 수정
-  updateProfileImage: async (profileImage) => {
+  updateProfileImage: async (changeName) => {
     try {
-      const formData = new FormData();
-      formData.append('profileImage', profileImage);
+      const { data } = await api.put(API_ENDPOINTS.MEMBER.UPDATEPROFILEIMAGE, { changeName });
 
-      const { data } = await api.put(API_ENDPOINTS.MEMBER.UPDATEPROFILEIMAGE, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      // ✅ 문제의 핵심: 여기를 data만 return해야 함
       return data;
     } catch (error) {
       if (error.response) {

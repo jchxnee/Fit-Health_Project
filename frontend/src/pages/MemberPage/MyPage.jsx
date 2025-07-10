@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import kakaotalkIcon from '/public/img/kakaotalk.png';
@@ -17,14 +17,46 @@ import { useHealthForm } from '../../hooks/member/useHealthForm';
 import { healthService } from '../../api/health';
 import { toast } from 'react-toastify';
 import HealthChart from '../../components/HealthChart';
+import api from '../../api/axios';
 
 const MyPage = () => {
   const { user } = useUserStore();
 
   const [rawHealthData, setRawHealthData] = useState([]);
   const [isHealthInputModalOpen, setIsHealthInputModalOpen] = useState(false);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
 
-  // 🧾 건강 정보 입력 폼 Hook
+  // 읽지 않은 알림 개수 가져오기
+  const fetchUnreadNotificationCount = useCallback(async () => {
+    if (!user || !user.email) {
+      setUnreadNotificationCount(0);
+      return;
+    }
+    try {
+      const response = await api.get('/api/notifications/unread/count'); // 여기에 인증 포함된 axios 인스턴스를 쓰는 것이 좋음
+      setUnreadNotificationCount(response.data.count);
+    } catch (error) {
+      console.error('읽지 않은 알림 개수를 가져오는 데 실패했습니다:', error);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    let intervalId;
+    if (user && user.email) {
+      fetchUnreadNotificationCount();
+      intervalId = setInterval(fetchUnreadNotificationCount, 30000); // 30초마다 폴링
+    } else {
+      setUnreadNotificationCount(0);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [user, fetchUnreadNotificationCount]);
+
+  // 건강 정보 입력 폼 Hook
   const { register, handleSubmit, onSubmit, errors, isLoading, reset } = useHealthForm({
     useremail: user.email,
     onSuccess: async () => {
@@ -91,7 +123,9 @@ const MyPage = () => {
 
         <AlertBar>
           <StyledFaBell />
-          읽지 않은 알림이 3개 있습니다.
+          {unreadNotificationCount > 0
+            ? `읽지 않은 알림이 ${unreadNotificationCount}개 있습니다.`
+            : '현재 읽지 않은 알림이 없습니다.'}
         </AlertBar>
 
         {/* 건강 정보 섹션 추가 */}

@@ -31,11 +31,8 @@ public class TrainerController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Long> registerTrainer(
-            @ModelAttribute addTrainerDto.Create trainerDto,
-            @RequestParam(value = "files", required = false) List<MultipartFile> files
-    ) throws IOException {
-        return ResponseEntity.ok(trainerService.registerTrainer(trainerDto, files));
+    public ResponseEntity<Long> registerTrainer(@ModelAttribute addTrainerDto.Create trainerDto) {
+        return ResponseEntity.ok(trainerService.registerTrainer(trainerDto));
     }
 
     @GetMapping

@@ -71,10 +71,11 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Long registerTrainer(addTrainerDto.Create trainerDto, List<MultipartFile> files) throws IOException {
-        // 1. Trainer 생성 (member 없이 생성, 이후 member에 set)
+    public Long registerTrainer(addTrainerDto.Create trainerDto) {
+        // 1. Trainer 생성
         Trainer trainer = trainerDto.toEntity();
-        // Career 추가
+
+        // 2. Career 추가
         if (trainerDto.getCareers() != null) {
             for (String content : trainerDto.getCareers()) {
                 Career career = Career.builder()
@@ -84,27 +85,20 @@ public class TrainerServiceImpl implements TrainerService {
                 trainer.getCareers().add(career);
             }
         }
-        // 파일 저장 경로
-        String UPLOAD_PATH = "E:\\test";
-        if(files != null && !files.isEmpty()){
-            for (MultipartFile file : files) {
-                if (!file.isEmpty()) {
-                    String originName = file.getOriginalFilename();
-                    String changeName = UUID.randomUUID().toString() + "_" + originName;
-                    File uploadDir = new File(UPLOAD_PATH);
-                    if(!uploadDir.exists()){
-                        uploadDir.mkdirs();
-                    }
-                    file.transferTo(new File(UPLOAD_PATH + File.separator + changeName));
-                    TrainerFile trainerFile = TrainerFile.builder()
-                            .originName(originName)
-                            .changeName(changeName)
-                            .build();
-                    trainer.addTrainerFile(trainerFile);
-                }
+
+        // 3. 이미지 정보 저장 (이미 S3에 저장된 파일의 이름 정보만 사용)
+        if (trainerDto.getTrainerPhoto() != null) {
+            for (addTrainerDto.FileRequest fileRequest : trainerDto.getTrainerPhoto()) {
+                TrainerFile trainerFile = TrainerFile.builder()
+                        .originName(fileRequest.getOriginName())
+                        .changeName(fileRequest.getChangeName())
+                        .trainer(trainer)
+                        .build();
+                trainer.addTrainerFile(trainerFile);
             }
         }
-        // 2. Member 조회 및 연관관계 연결
+
+        // 4. Member 연관관계 연결
         if (trainerDto.getUserEmail() != null) {
             Member member = memberRepository.findOne(trainerDto.getUserEmail())
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));

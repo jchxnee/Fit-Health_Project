@@ -6,6 +6,7 @@ import api from '../../api/axios.js';
 import { API_ENDPOINTS } from '../../api/config.js';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'; // toast 메시지를 위한 임포트 추가
+import { getUploadUrl, uploadFileToS3 } from '../../api/file';
 
 // ===========================================
 // 스타일 컴포넌트 정의
@@ -332,11 +333,11 @@ function ReviewCreationPage() {
     console.log('전송할 리뷰 데이터 (FormData):', Object.fromEntries(formData.entries()));
 
     try {
-      const response = await api.post(API_ENDPOINTS.REVIEW.CREATE, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const { presignedUrl, changeName } = await getUploadUrl(file.name, file.type, 'review/');
+      await uploadFileToS3(presignedUrl, file);
+      formData.append('originName', file.name);
+      formData.append('changeName', changeName);
+      const response = await api.post(API_ENDPOINTS.REVIEW.CREATE, formData);
       console.log('리뷰 등록 성공:', response.data);
       toast.success('리뷰가 성공적으로 등록되었습니다!');
       navigate(`/coachReview/${trainerNo}`);

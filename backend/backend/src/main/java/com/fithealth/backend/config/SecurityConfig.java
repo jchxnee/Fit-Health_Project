@@ -39,7 +39,12 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/**"
+                                "/api/members/login",
+                                "/api/members",
+                                "/api/members/email",
+                                "/api/members/id",
+                                "/mail/send",
+                                "/mail/check"
                         ).permitAll()
                         .anyRequest().authenticated() // 위의 요청경로를 제외한 나머지 경로는 인증
                 )

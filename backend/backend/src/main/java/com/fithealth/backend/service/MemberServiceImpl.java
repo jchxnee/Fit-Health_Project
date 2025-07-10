@@ -75,26 +75,11 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public String updateProfileImage(String userEmail, MultipartFile file) throws IOException {
+    public Boolean updateProfileImage(String userEmail, String changeName) {
         Member member = memberRepository.findOne(userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("이메일이 존재하지 않습니다."));
-
-        if(file != null && !file.isEmpty()){
-            String originName = file.getOriginalFilename();
-            String changeName = UUID.randomUUID().toString() + "_" + originName;
-
-            File uploadDir = new File(UPLOAD_PATH);
-            if(!uploadDir.exists()){
-                uploadDir.mkdirs();
-            }
-
-            file.transferTo(new File(UPLOAD_PATH + File.separator + changeName));
-
-            member.changeProfileImage(changeName);
-            return changeName;
-        }
-
-        return null;
+        member.changeProfileImage(changeName);
+        return true;
     }
 
     @Override

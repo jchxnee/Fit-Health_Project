@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public interface TrainerService {
     String createTrainer(addTrainerDto.Request requestDto);
-    Long registerTrainer(addTrainerDto.Create trainerDto, List<MultipartFile> files) throws IOException;
+    Long registerTrainer(addTrainerDto.Create trainerDto);
     List<SelectTrainerDto.Response> getAllTrainers();
     TrainerDetailDto.Response getTrainer(Long trainerNo);
     void updateTrainer(UpdateTrainerDto.Request requestDto);
