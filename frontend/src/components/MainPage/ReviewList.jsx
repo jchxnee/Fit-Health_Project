@@ -114,6 +114,8 @@ const StarRating = ({ rating = 0 }) => {
   return <StarWrapper>{stars}</StarWrapper>;
 };
 
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
+
 const ReviewList = ({ reviews, isLoading }) => {
   const leftPosts = reviews.slice(0, 3);
   const rightPosts = reviews.slice(3, 6);
@@ -156,7 +158,10 @@ const ReviewList = ({ reviews, isLoading }) => {
             {leftPosts.map((r) => (
               <PostBox key={r.review_no} to={`/coachReview/${r.trainer_no}`}>
                 <PostWriter>
-                  <ProfileImg src={r.profile_image ? r.profile_image : basicProfile} alt={`${r.user_name}의 프로필`} />
+                  <ProfileImg
+                    src={r.profile_image ? `${CLOUDFRONT_URL}${r.profile_image}?v=${Date.now()}` : basicProfile}
+                    alt={`${r.user_name}의 프로필`}
+                  />
                   {r.user_name} ({r.trainer_name} 트레이너)
                 </PostWriter>
                 <PostRate>
@@ -171,7 +176,10 @@ const ReviewList = ({ reviews, isLoading }) => {
             {rightPosts.map((r) => (
               <PostBox key={r.review_no} to={`/coachReview/${r.trainer_no}`}>
                 <PostWriter>
-                  <ProfileImg src={r.profile_image ? r.profile_image : basicProfile} alt={`${r.user_name}의 프로필`} />
+                  <ProfileImg
+                    src={r.profile_image ? `${CLOUDFRONT_URL}${r.profile_image}?v=${Date.now()}` : basicProfile}
+                    alt={`${r.user_name}의 프로필`}
+                  />
                   {r.user_name} ({r.trainer_name} 트레이너)
                 </PostWriter>
                 <PostRate>
