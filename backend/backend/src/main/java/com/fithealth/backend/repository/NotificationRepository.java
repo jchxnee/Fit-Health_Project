@@ -13,7 +13,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Query("SELECT COUNT(n) FROM Notification n WHERE n.member.userEmail = :userEmail AND n.isRead = :status")
     Long countNotification(@Param("userEmail") String userEmail, @Param("status") CommonEnums.Status status);
 
-    @Query("SELECT n FROM Notification n WHERE n.member.userEmail = :userEmail ORDER BY n.createdDate DESC") // 최신순 정렬 추가
+    @Query("SELECT n FROM Notification n WHERE n.member.userEmail = :userEmail AND n.isRead = 'N' ORDER BY n.createdDate DESC") // 최신순 정렬 추가
     List<Notification> selectNotification(@Param("userEmail") String userEmail);
 
     // JpaRepository 기본 메서드 findById(), save() 등은 자동 제공

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect, useRef, useCallback } from 'react'; // useRef, useEffect, useCallback import 추가
+import styled from 'styled-components'; // css import
 import headerIcon from '../assets/header_icon.png';
 import { FaBell, FaChevronDown, FaChevronUp, FaSyncAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
@@ -32,7 +32,7 @@ const formatTimeAgo = (dateTimeString) => {
   return `${years}년 전`;
 };
 
-// NotificationList 컴포넌트
+// NotificationList 컴포넌트 (중복 제거 후 Header에서 props로 데이터 받도록 수정)
 function NotificationList({ notifications, onNotificationClick }) {
   if (!notifications || notifications.length === 0) {
     return (
@@ -49,11 +49,11 @@ function NotificationList({ notifications, onNotificationClick }) {
       {notifications.map((notification) => (
         <NotificationItem
           key={notification.notificationNo}
-          $isRead={notification.isRead === 'Y'} // 읽음 상태에 따라 스타일 적용
-          onClick={() => onNotificationClick(notification)} // 클릭 시 핸들러 호출
+          $isRead={notification.isRead === 'Y'} // 읽음 여부에 따라 스타일 적용
+          onClick={() => onNotificationClick(notification)}
         >
-          <NotificationMessage>{notification.message}</NotificationMessage>
-          <NotificationTime>{formatTimeAgo(notification.createdDate)}</NotificationTime>
+          <NotificationMessage>{notification.notificationContent}</NotificationMessage>
+          <NotificationTime>{formatTimeAgo(notification.notificationDate)}</NotificationTime>
         </NotificationItem>
       ))}
     </NotificationContainer>
@@ -73,6 +73,7 @@ function UserMenu({ onMenuItemClick }) {
     navigate('/'); // 메인 페이지로 이동
   };
 
+  // 신청 내역으로 이동하면서 이메일을 쿼리 파라미터로 넘기는 함수
   const handleToggleGrade = async () => {
     if (!user) return;
 
@@ -131,43 +132,47 @@ function UserMenu({ onMenuItemClick }) {
   );
 }
 
-function Header({ user }) {
+function Header() {
+  const { user } = useUserStore(); // user 정보를 useUserStore에서 가져옴
   const navigate = useNavigate();
 
   const [showNotification, setShowNotification] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState([]); // 알림 목록 상태
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0); // 읽지 않은 알림 개수 상태
 
+  // 알림 모달과 유저 메뉴 모달을 참조할 ref 생성
   const notificationRef = useRef(null);
   const userMenuRef = useRef(null);
-  const bellIconRef = useRef(null);
-  const profileWrapperRef = useRef(null);
+  const bellIconRef = useRef(null); // 알림 아이콘 ref
+  const profileWrapperRef = useRef(null); // 프로필 래퍼 ref
 
+  // 읽지 않은 알림 개수를 가져오는 함수
   const fetchUnreadNotificationCount = useCallback(async () => {
     if (!user || !user.email) {
-      // user.userEmail이 있는지 확인
       setUnreadNotificationCount(0);
       return;
     }
     try {
-      const response = await api.get('/api/notifications/unread/count');
-      setUnreadNotificationCount(response.data.count);
+      const response = await api.get(`/api/notifications/countUnread?userEmail=${user.email}`);
+      setUnreadNotificationCount(response.data);
     } catch (error) {
       console.error('읽지 않은 알림 개수를 가져오는 데 실패했습니다:', error);
+      setUnreadNotificationCount(0);
     }
   }, [user]);
 
+  // 모든 알림을 가져오는 함수
   const fetchAllNotifications = useCallback(async () => {
     console.log('fetchAllNotifications 호출됨!');
     if (!user || !user.email) {
-      console.log('User 또는 user.userEmail 없음, 알림 가져오기 중단.');
+      console.log('User 또는 user.email 없음, 알림 가져오기 중단.');
       setNotifications([]);
       return;
     }
     try {
       console.log('API 호출 시작: /api/notifications');
-      const response = await api.get('/api/notifications');
+      const response = await api.get(`/api/notifications?userEmail=${user.email}`);
       console.log('API 응답 데이터:', response.data);
       setNotifications(response.data);
     } catch (error) {
@@ -179,7 +184,6 @@ function Header({ user }) {
   useEffect(() => {
     let intervalId;
     if (user && user.email) {
-      // user.userEmail이 유효한 경우에만 알림 관련 로직 실행
       fetchUnreadNotificationCount();
       intervalId = setInterval(fetchUnreadNotificationCount, 30000); // 30초마다 폴링
     } else {
@@ -254,9 +258,6 @@ function Header({ user }) {
         case 'PT_REFUND_REQUEST': // 유저가 환불 요청 시 트레이너에게 가는 알림
           navigate(`/coachmatchingList`); // 트레이너의 코칭 내역으로 이동 또는 환불 관리 페이지
           break;
-        case 'NEXT_RESERVATION_COMPLETED':
-          navigate('/coachmatchingList');
-          break;
         default:
           navigate('/mypage');
           break;
@@ -269,27 +270,31 @@ function Header({ user }) {
 
   const handleUserMenuClick = () => {
     setShowUserMenu((prev) => !prev);
-    setShowNotification(false);
+    setShowNotification(false); // 다른 모달 닫기
   };
 
+  // UserMenu 내의 아이템을 클릭했을 때 호출될 함수
   const handleUserMenuItemClick = () => {
-    setShowUserMenu(false);
+    setShowUserMenu(false); // UserMenu 닫기
   };
 
+  // 외부 클릭 감지 로직
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // 알림 모달 외부 클릭 감지
       if (
         notificationRef.current &&
         !notificationRef.current.contains(event.target) &&
-        bellIconRef.current &&
+        bellIconRef.current && // 벨 아이콘이 클릭된 것이 아니라면
         !bellIconRef.current.contains(event.target)
       ) {
         setShowNotification(false);
       }
+      // 유저 메뉴 모달 외부 클릭 감지
       if (
         userMenuRef.current &&
         !userMenuRef.current.contains(event.target) &&
-        profileWrapperRef.current &&
+        profileWrapperRef.current && // 프로필 래퍼가 클릭된 것이 아니라면
         !profileWrapperRef.current.contains(event.target)
       ) {
         setShowUserMenu(false);
@@ -300,7 +305,7 @@ function Header({ user }) {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, []); // 빈 배열을 넣어 컴포넌트 마운트 시 한 번만 실행되도록 함
 
   return (
     <HeaderComponent>
@@ -322,7 +327,7 @@ function Header({ user }) {
             <HeaderNavRight>
               <NotificationWrapper onClick={handleNotificationClick} ref={bellIconRef}>
                 <FaBell />
-                {unreadNotificationCount > 0 && <RedDot>{unreadNotificationCount}</RedDot>}
+                {unreadNotificationCount > 0 && <RedDot />} {/* 읽지 않은 알림이 있을 때만 표시 */}
               </NotificationWrapper>
               <NavItem to="/chat">채팅</NavItem>
               <ProfileWrapper onClick={handleUserMenuClick} ref={profileWrapperRef}>
@@ -341,7 +346,7 @@ function Header({ user }) {
             )}
             {showUserMenu && (
               <UserMenuContainerWrapper ref={userMenuRef}>
-                <UserMenu onMenuItemClick={handleUserMenuItemClick} />
+                <UserMenu onMenuItemClick={handleUserMenuItemClick} /> {/* prop 전달 */}
               </UserMenuContainerWrapper>
             )}
           </HeaderRight>
@@ -352,7 +357,6 @@ function Header({ user }) {
     </HeaderComponent>
   );
 }
-
 const HeaderComponent = styled.header`
   width: 100%;
   height: 60px;
@@ -363,7 +367,7 @@ const HeaderComponent = styled.header`
   z-index: ${({ theme }) => theme.zIndices.sticky};
   position: sticky;
   top: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 헤더 그림자 추가 */
 
   a,
   button {
@@ -372,11 +376,11 @@ const HeaderComponent = styled.header`
 `;
 
 const HeaderContent = styled.div`
-  width: ${({ theme }) => theme.width.lg};
+  width: ${({ theme }) => theme.width.lg}; /* 1008px */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: relative;
+  position: relative; /* 자식 모달의 위치 기준 */
 `;
 
 const HeaderLeft = styled.div`
@@ -418,7 +422,7 @@ const HeaderRight = styled(Link)`
   cursor: pointer;
   display: flex;
   align-items: center;
-  position: relative;
+  position: relative; /* 알림 및 유저 메뉴 모달의 위치 기준 */
 `;
 
 const HeaderNavRight = styled.nav`
@@ -443,8 +447,8 @@ const NotificationWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: ${({ theme }) => theme.fontSizes.xl};
-  color: ${({ theme }) => theme.colors.gray[700]};
+  font-size: ${({ theme }) => theme.fontSizes.xl}; /* 아이콘 크기 조정 */
+  color: ${({ theme }) => theme.colors.gray[700]}; /* 아이콘 색상 조정 */
 
   &:hover {
     color: ${({ theme }) => theme.colors.primary};
@@ -453,19 +457,13 @@ const NotificationWrapper = styled.div`
 
 const RedDot = styled.div`
   position: absolute;
-  top: -5px;
-  right: -10px;
-  min-width: 18px;
-  height: 18px;
-  background-color: #ff4d4f;
+  top: 0px; /* 알림 아이콘 위치에 맞게 조정 */
+  right: -2px; /* 알림 아이콘 위치에 맞게 조정 */
+  width: 8px;
+  height: 8px;
+  background-color: #ff4d4f; /* 빨간색 */
   border-radius: 50%;
-  border: 1px solid ${({ theme }) => theme.colors.white};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 10px;
-  font-weight: bold;
+  border: 1px solid ${({ theme }) => theme.colors.white}; /* 흰색 테두리 */
 `;
 
 const ProfileWrapper = styled.div`
@@ -475,6 +473,7 @@ const ProfileWrapper = styled.div`
   cursor: pointer;
 
   & > svg {
+    /* Chevron 아이콘 스타일 */
     margin-left: ${({ theme }) => theme.spacing[1]};
     color: ${({ theme }) => theme.colors.gray[500]};
     font-size: ${({ theme }) => theme.fontSizes.sm};
@@ -488,11 +487,13 @@ const ProfileImg = styled.img`
   object-fit: cover;
 `;
 
+// 알림 목록 모달 스타일
 const NotificationListContainer = styled.div`
   position: absolute;
-  top: 50px;
-  right: -10px;
+  top: 50px; /* 헤더 높이 + 여백 */
+  right: -10px; /* 알림 아이콘에 맞춰서 조정 */
   z-index: ${({ theme }) => theme.zIndices.dropdown};
+  /* 애니메이션 추가 */
   opacity: 0;
   transform: translateY(-10px);
   animation: fadeInDown 0.3s forwards;
@@ -509,11 +510,13 @@ const NotificationListContainer = styled.div`
   }
 `;
 
+// 사용자 메뉴 모달 스타일
 const UserMenuContainerWrapper = styled.div`
   position: absolute;
-  top: 50px;
-  right: 0;
+  top: 50px; /* 헤더 높이 + 여백 */
+  right: 0; /* 사용자 이름에 맞춰서 조정 */
   z-index: ${({ theme }) => theme.zIndices.dropdown};
+  /* 애니메이션 추가 */
   opacity: 0;
   transform: translateY(-10px);
   animation: fadeInDown 0.3s forwards;
@@ -530,6 +533,7 @@ const UserMenuContainerWrapper = styled.div`
   }
 `;
 
+// 제공된 NotificationList의 스타일 컴포넌트 이름 변경 (이름 충돌 방지)
 const NotificationContainer = styled.div`
   width: 292px;
   border: 1px solid ${({ theme }) => theme.colors.gray['200']};
@@ -556,18 +560,15 @@ const NotificationTitle = styled.div`
 `;
 
 const NotificationItem = styled.div`
-  padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['4']};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['100']};
-  cursor: pointer;
-  background-color: ${(props) => (props.$isRead ? props.theme.colors.white : props.theme.colors.gray[50])};
-  transition: background-color 0.2s ease-in-out;
-
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.gray[100]};
-  }
-
+  padding: ${({ theme }) => theme.spacing['2']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray['200']};
+  background-color: ${(props) => (props.$isRead ? 'transparent' : '#f0f8ff')}; /* 읽지 않은 알림 배경색 */
   &:last-child {
     border-bottom: none;
+  }
+  cursor: pointer;
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.gray[50]};
   }
 `;
 
@@ -589,6 +590,7 @@ const NotificationTime = styled.span`
   color: ${({ theme }) => theme.colors.gray[500]};
 `;
 
+// 제공된 UserMenu의 스타일 컴포넌트 이름 변경 (이름 충돌 방지)
 const StyledFaSyncAlt = styled(FaSyncAlt)`
   font-size: 14px;
   margin-left: 8px;
@@ -620,13 +622,13 @@ const UserMenuItem = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.base};
   color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
-  padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]};
-  width: 100%;
-  box-sizing: border-box;
-  transition: background-color 0.2s ease-in-out;
+  padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]}; /* padding 조정 */
+  width: 100%; /* 너비 100%로 설정하여 hover 영역 넓히기 */
+  box-sizing: border-box; /* padding이 너비에 포함되도록 */
+  transition: background-color 0.2s ease-in-out; /* hover 트랜지션 추가 */
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.gray[50]};
+    background-color: ${({ theme }) => theme.colors.gray[50]}; /* hover 시 배경색 변경 */
     color: ${({ theme }) => theme.colors.primary};
   }
 `;
