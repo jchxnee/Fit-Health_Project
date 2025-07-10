@@ -307,7 +307,7 @@ function CommunityPostDetailPage() {
                           <AuthorDetailsSmall>
                             <AuthorName>{comment.user_name}</AuthorName>
                           </AuthorDetailsSmall>
-                          <CommentAuthorRegion></CommentAuthorRegion>
+                          <CommentAuthorRegion>{comment.address}</CommentAuthorRegion>
                         </AuthorDetails>
                       </CommentAuthorInfo>
                       {/* 현재 로그인한 사용자가 댓글 작성자인 경우에만 삭제 버튼 표시 */}
