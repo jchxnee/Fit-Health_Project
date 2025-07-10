@@ -20,6 +20,7 @@ function CommunityPage() {
   const [photoPosts, setPhotoPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
 
   // 백엔드에서 받은 전체 페이지 정보 (페이지네이션에 사용)
   const [totalPostsCount, setTotalPostsCount] = useState(0);
@@ -161,9 +162,7 @@ function CommunityPage() {
                   {photoPosts.map((post) => (
                     <StyledPostLink key={post.board_no} to={`/communityDetailPage/${post.board_no}`}>
                       <PhotoPostCard>
-                        {/* file_url은 백엔드에서 제공하는 실제 파일 경로여야 합니다. */}
-                        {/* 예시: http://localhost:8080/files/ {post.files[0]?.change_name} 과 같이 백엔드에서 파일 제공하는 API 경로를 구성해야 합니다. */}
-                        <PhotoPostImage src={'https://picsum.photos/200'} alt={post.board_title} />
+                        <PhotoPostImage src={`${CLOUDFRONT_URL}${post.files[0].change_name}`} alt={post.board_title} />
                         <PhotoPostContent>
                           <PhotoPostTitle>{post.board_title}</PhotoPostTitle>
                           <PhotoPostText>{post.board_content}</PhotoPostText>

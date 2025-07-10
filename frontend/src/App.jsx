@@ -101,7 +101,7 @@ function AppContent() {
 
         {/* 커뮤니티 */}
         <Route path="/community" element={<CommunityPage />} />
-        <Route path="/communityPostCreationPage" element={<CommunityPostCreationPage user={user} />} />
+        <Route path="/communityPostCreationPage" element={<CommunityPostCreationPage />} />
         <Route path="/community/:id/edit" element={<CommunityPostCreationPage isEditMode={true} />} />
         <Route path="/reviewCreationPage" element={<ReviewCreationPage />} />
         <Route path="/communityDetailPage/:id" element={<CommunityPostDetailPage />} />
