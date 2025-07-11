@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import api from '../../api/axios';
+import { getUploadUrl, uploadFileToS3 } from '../../api/file';
 
 const Section = styled.section`
   width: 100%;
@@ -69,34 +71,37 @@ const UploadLabel = styled.label`
   cursor: pointer;
 `;
 
-function PhotoSection({ photos, setPhotos }) {
-  const API_BASE = import.meta.env.VITE_API_URL;
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
 
+function PhotoSection({ photos, setPhotos }) {
   const handleAddPhoto = async (e) => {
     const files = Array.from(e.target.files);
     for (let file of files) {
-      const formData = new FormData();
-      formData.append('file', file);
-
       try {
-        const res = await axios.post(`${API_BASE}/api/trainer/uploadPhoto`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        // 1. presigned URL 요청
+        const { presignedUrl, changeName } = await getUploadUrl(file.name, file.type, 'trainer/');
+        if (!presignedUrl || !changeName) {
+          toast.error('S3 업로드 URL 요청 실패');
+          continue;
+        }
 
-        const uploaded = res.data; // { originName, changeName }
+        // 2. S3 직접 업로드
+        await uploadFileToS3(presignedUrl, file);
+        console.log(`[PhotoSection] S3 업로드 성공: ${file.name}`);
 
+        // 3. CloudFront 기반 preview 설정
         const newPhoto = {
           file,
-          preview: URL.createObjectURL(file),
-          uploadedFileName: uploaded.changeName,
-          originName: uploaded.originName,
-          changeName: uploaded.changeName,
+          preview: changeName, // changeName만 저장하고 렌더링에서 CloudFront 붙임
+          uploadedFileName: changeName,
+          originName: file.name,
+          changeName: changeName,
         };
 
         setPhotos((prev) => [...prev, newPhoto]);
       } catch (err) {
-        console.error('파일 업로드 실패:', err);
-        toast.error('파일 업로드에 실패했습니다.');
+        console.error('사진 업로드 실패:', err);
+        toast.error(`사진 업로드 실패`);
       }
     }
   };
@@ -113,7 +118,7 @@ function PhotoSection({ photos, setPhotos }) {
       <PhotoRow>
         {photos.map((photo, index) => (
           <PhotoBox key={index}>
-            <PreviewImage src={photo.preview} alt="preview" />
+            <PreviewImage src={`${CLOUDFRONT_URL}${photo.preview}?v=${Date.now()}`} alt="preview" />
             <RemoveButton onClick={() => handleRemovePhoto(index)}>X</RemoveButton>
           </PhotoBox>
         ))}

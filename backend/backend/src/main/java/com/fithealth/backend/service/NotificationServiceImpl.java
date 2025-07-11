@@ -79,6 +79,7 @@ public class NotificationServiceImpl implements NotificationService {
         Notification notification = notificationRepository.findById(notificationNo)
                 .orElseThrow(() -> new EntityNotFoundException("알림을 찾을 수 없습니다: " + notificationNo));
         notification.setIsRead(CommonEnums.Status.Y); // 읽음으로 변경
+        notificationRepository.save(notification);
 
     }
 }

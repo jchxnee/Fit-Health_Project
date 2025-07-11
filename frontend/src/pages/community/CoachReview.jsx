@@ -15,6 +15,7 @@ function CoachReview() {
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const [sortCriteria, setSortCriteria] = useState('highestRating'); // 초기 정렬 기준: 높은순
   const sortMenuRef = useRef(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const [reviews, setReviews] = useState([]); // 실제 리뷰 데이터를 저장할 상태
   const [loading, setLoading] = useState(true); // 로딩 상태
@@ -218,6 +219,8 @@ function CoachReview() {
                 <ReviewBodyImage
                   src={`${CLOUDFRONT_URL}${review.reviewBodyImage}?v=${Date.now()}`}
                   alt="Review body image"
+                  onClick={() => setSelectedImage(`${CLOUDFRONT_URL}${review.reviewBodyImage}?v=${Date.now()}`)}
+                  style={{ cursor: 'pointer' }} // 클릭 가능하게 포인터 추가
                 />
               )}
               <ReviewContent>{review.content}</ReviewContent>
@@ -230,7 +233,11 @@ function CoachReview() {
           ))}
         </MainContentWrapper>
       </PageContainer>
-      {/* <Footer /> */}
+      {selectedImage && (
+        <ModalOverlay onClick={() => setSelectedImage(null)}>
+          <ModalImage src={selectedImage} alt="확대 이미지" />
+        </ModalOverlay>
+      )}
     </>
   );
 }
@@ -388,7 +395,7 @@ const RatingText = styled.p`
 `;
 
 const ReviewBodyImage = styled.img`
-  width: 150px; /* 이미지 너비 조정 */
+  width: 200px; /* 이미지 너비 조정 */
   height: auto; /* 비율 유지 */
   border-radius: ${({ theme }) => theme.borderRadius.base};
   margin-bottom: ${({ theme }) => theme.spacing['4']};
@@ -431,4 +438,24 @@ const RecommendButton = styled.button`
   &:hover {
     opacity: 0.8;
   }
+`;
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+`;
+
+const ModalImage = styled.img`
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  box-shadow: ${({ theme }) => theme.shadows.lg};
 `;

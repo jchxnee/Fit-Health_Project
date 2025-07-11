@@ -27,6 +27,8 @@ const MainContainer = styled.section`
   }
 `;
 
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
+
 function CoachModify() {
   const { trainerNo } = useParams();
   const navigate = useNavigate();
@@ -77,7 +79,7 @@ function CoachModify() {
       setPhotos(
         (data.trainerPhoto || []).map((photo) => ({
           file: null,
-          preview: `/api/images/${photo.changeName}`,
+          preview: photo.changeName,
           uploadedFileName: photo.changeName,
           originName: photo.originName,
         }))
