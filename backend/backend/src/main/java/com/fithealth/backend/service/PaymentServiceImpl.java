@@ -93,11 +93,11 @@ public class PaymentServiceImpl implements  PaymentService {
             String message;
             String notificationType;
             if(isFirstReservation) {
-                message = String.format("%s 회원님께서 PT 결제를 완료했습니다. PT 신청을 확인하고 승인해주세요.",
+                message = String.format("%s 회원님께서 PT 결제를 완료했습니다. PT 신청을 확인하고 승인해주세요!",
                         userMember.getUserName());
                 notificationType = "PT_PAYMENT_COMPLETED";
             } else {
-                message = String.format("%s 회원님께서 다음 PT 회차 신청을 완료했습니다. 신청을 확인하고 승인해주세요.",
+                message = String.format("%s 회원님께서 다음 PT 회차 신청을 완료했습니다. 신청을 확인하고 승인해주세요!",
                         userMember.getUserName());
                 notificationType = "NEXT_RESERVATION_COMPLETED";
             }
