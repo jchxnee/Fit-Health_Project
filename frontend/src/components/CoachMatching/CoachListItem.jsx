@@ -90,10 +90,14 @@ const ReviewCount = styled.div`
   margin-top: ${theme.spacing[0.5]};
 `;
 
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
 const CoachListItem = ({ coach }) => {
   return (
     <CoachCard>
-      <ProfileImage src={coach.img ? coach.img : basicProfile} alt="프로필 이미지" />
+      <ProfileImage
+        src={coach.imageUrl ? `${CLOUDFRONT_URL}${coach.imageUrl}?v=${Date.now()}` : basicProfile}
+        alt="프로필 이미지"
+      />
       <CoachInfo>
         <NameAndSpecialization>
           <Name>{coach.name} 트레이너</Name>

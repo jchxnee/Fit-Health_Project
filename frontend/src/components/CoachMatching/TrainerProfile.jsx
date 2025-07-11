@@ -173,7 +173,10 @@ const BackDiv = styled.div`
   justify-content: end;
 `;
 
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
+
 const TrainerProfile = ({ trainer, user }) => {
+  console.log(trainer);
   const getInstagramProfileUrl = (instagramId) => {
     if (!instagramId) return '#';
     return `https://www.instagram.com/${instagramId}/`;
@@ -187,11 +190,10 @@ const TrainerProfile = ({ trainer, user }) => {
   return (
     <ProfileCard>
       <ProfileImageWrapper>
-        {trainer.imageUrl ? (
-          <ProfileImage src={user.img ? user.img : basicProfile} alt="프로필 이미지" />
-        ) : (
-          <FaRegEnvelope size="4em" color={theme.colors.gray[300]} />
-        )}
+        <ProfileImage
+          src={trainer.profileImg ? `${CLOUDFRONT_URL}${trainer.profileImg}?v=${Date.now()}` : basicProfile}
+          alt="프로필 이미지"
+        />
       </ProfileImageWrapper>
       <ProfileInfo>
         <NameRow>

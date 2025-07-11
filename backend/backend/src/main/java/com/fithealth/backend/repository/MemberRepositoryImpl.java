@@ -113,6 +113,27 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
     }
 
     @Override
+    public boolean findByNameAndEmail(String userName, String userEmail) {
+        Long count = em.createQuery(
+                        "SELECT COUNT(m) FROM Member m WHERE m.userName = :userName AND m.userEmail = :userEmail", Long.class)
+                .setParameter("userName", userName)
+                .setParameter("userEmail", userEmail)
+                .getSingleResult();
+        return count > 0;
+    }
+
+    @Override
+    public SocialType isSocialMember(String userEmail) {
+        try {
+            return em.createQuery("SELECT m.socialType FROM Member m WHERE m.userEmail = :userEmail", SocialType.class)
+                    .setParameter("userEmail", userEmail)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null; // 해당 이메일의 회원이 없으면 null 반환
+        }
+    }
+
+    @Override
     public List<Member> findAll() {
         return em.createQuery("SELECT m FROM Member m", Member.class)
                 .getResultList();

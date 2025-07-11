@@ -189,6 +189,25 @@ export const memberService = {
     }
   },
 
+  resetPassword: async (resetPwdData) => {
+    try {
+      const { data } = await api.post(API_ENDPOINTS.MEMBER.RESETPASSWORD, {
+        // API_ENDPOINTS.MEMBER.RESETPASSWORD 필요
+        userEmail: resetPwdData.userEmail,
+        newPassword: resetPwdData.newPassword,
+      });
+
+      return data;
+    } catch (error) {
+      if (error.response) {
+        // 백엔드에서 보낸 에러 메시지를 프론트로 전달
+        const message = error.response?.data || '비밀번호 재설정에 실패했습니다.'; // 백엔드가 String 반환 시 data 바로 사용
+        throw new Error(message);
+      }
+      throw new Error('서버 통신 불량');
+    }
+  },
+
   //회원 탈퇴
   deleteMember: async () => {
     try {

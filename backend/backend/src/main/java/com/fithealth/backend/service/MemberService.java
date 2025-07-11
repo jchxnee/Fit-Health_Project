@@ -2,6 +2,7 @@ package com.fithealth.backend.service;
 
 import com.fithealth.backend.dto.member.LoginDto;
 import com.fithealth.backend.dto.member.ResponseDto;
+import com.fithealth.backend.dto.member.ResetPwdDto;
 import com.fithealth.backend.dto.member.SignupDto;
 import com.fithealth.backend.dto.member.UpdateDto;
 import com.fithealth.backend.entity.Member;
@@ -26,4 +27,7 @@ public interface MemberService {
     Member getMemberBySocialIdAndSocialType(String socialId, SocialType socialType);
     Member createOauth(String socialId, String email, String name, SocialType socialType);
     List<ResponseDto> findAll();
+    boolean existsUser(String userName, String userEmail);
+    boolean isSocialMember(String userEmail);
+    void resetPassword(String userEmail, String newPassword);
 }

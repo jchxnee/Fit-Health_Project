@@ -6,6 +6,7 @@ import com.fithealth.backend.dto.OAuth.KakaoProfileDto;
 import com.fithealth.backend.dto.OAuth.RedirectDto;
 import com.fithealth.backend.dto.member.LoginDto;
 import com.fithealth.backend.dto.member.ResponseDto;
+import com.fithealth.backend.dto.member.ResetPwdDto;
 import com.fithealth.backend.dto.member.SignupDto;
 import com.fithealth.backend.dto.member.UpdateDto;
 import com.fithealth.backend.entity.Member;
@@ -152,5 +153,23 @@ public class MemberController {
         List<ResponseDto> dtos = memberService.findAll();
         return new ResponseEntity<>(dtos, HttpStatus.OK);
 
+    }
+
+    @GetMapping("/exists")
+    public ResponseEntity<Boolean> existsUser(@RequestParam String userName, @RequestParam String userEmail) {
+        boolean exists = memberService.existsUser(userName,userEmail);
+        return ResponseEntity.ok(exists);
+    }
+
+    @PostMapping("/resetPwd")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPwdDto requestDto) {
+        try {
+            memberService.resetPassword(requestDto.getUserEmail(), requestDto.getNewPassword());
+            return ResponseEntity.ok("비밀번호가 성공적으로 재설정되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("비밀번호 재설정 중 알 수 없는 오류가 발생했습니다.");
+        }
     }
 }

@@ -19,6 +19,8 @@ import { toast } from 'react-toastify';
 import HealthChart from '../../components/HealthChart';
 import api from '../../api/axios';
 
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
+
 const MyPage = () => {
   const { user } = useUserStore();
 
@@ -98,7 +100,10 @@ const MyPage = () => {
         <TitleBar title={'마이페이지'} />
 
         <ProfileSection>
-          <ProfileImage src={user.img ? user.img : basicProfile} alt="User Profile" />
+          <ProfileImage
+            src={user.img ? `${CLOUDFRONT_URL}${user.img}?v=${Date.now()}` : basicProfile}
+            alt="User Profile"
+          />
           <ProfileInfo>
             <ProfileName>{user.name}님</ProfileName>
             <ProfileEmail>

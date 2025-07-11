@@ -8,6 +8,8 @@ import { useParams } from 'react-router-dom';
 import api from '../../api/axios';
 import { API_ENDPOINTS } from '../../api/config';
 
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
+
 function CoachReview() {
   const { trainerNo } = useParams(); // URL에서 trainerEmail 가져오기
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
@@ -198,7 +200,12 @@ function CoachReview() {
           {sortedReviews.map((review) => (
             <ReviewItem key={review.id}>
               <ReviewHeader>
-                <ProfileImageSmall src={review.authorProfileImg || betaImg} alt={review.author} />
+                <ProfileImageSmall
+                  src={
+                    review.authorProfileImg ? `${CLOUDFRONT_URL}${review.authorProfileImg}?v=${Date.now()}` : betaImg
+                  }
+                  alt={review.author}
+                />
                 <AuthorInfoReview>
                   <AuthorNameReview>{review.author}</AuthorNameReview>
                   <TimeAgoReview>{review.timeAgo}</TimeAgoReview>
@@ -207,7 +214,12 @@ function CoachReview() {
                   {renderStars(review.rating)} <RatingText>{review.rating.toFixed(1)}</RatingText>
                 </Rating>
               </ReviewHeader>
-              {review.reviewBodyImage && <ReviewBodyImage src={review.reviewBodyImage} alt="Review body image" />}
+              {review.reviewBodyImage && (
+                <ReviewBodyImage
+                  src={`${CLOUDFRONT_URL}${review.reviewBodyImage}?v=${Date.now()}`}
+                  alt="Review body image"
+                />
+              )}
               <ReviewContent>{review.content}</ReviewContent>
               <ReviewActions>
                 <RecommendButton onClick={() => handleRecommendToggle(review.id)}>

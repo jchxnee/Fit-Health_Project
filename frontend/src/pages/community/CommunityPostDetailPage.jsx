@@ -1,80 +1,124 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styled from 'styled-components';
-import { FaThumbsUp, FaEllipsisV, FaShareAlt, FaTimes } from 'react-icons/fa'; // FaTimes 아이콘 추가
+import styled, { createGlobalStyle } from 'styled-components';
+import { FaThumbsUp, FaEllipsisV, FaShareAlt, FaTimes } from 'react-icons/fa';
 import { RiMessage2Fill } from 'react-icons/ri';
 import { FaPaperPlane } from 'react-icons/fa';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import api from '../../api/axios';
+import api from '../../api/axios'; // api 인스턴스 import 확인
 import { API_ENDPOINTS } from '../../api/config';
 import useUserStore from '../../store/useUserStore';
 import { toast } from 'react-toastify';
 
-function CommunityPostDetailPage() {
-  const { user } = useUserStore();
-  const { id } = useParams();
-  const boardNo = id;
-  const navigate = useNavigate();
+// Global 스타일을 정의하여 모달 배경을 어둡게 처리하고 스크롤을 막습니다.
+const GlobalModalStyle = createGlobalStyle`
+  body {
+    overflow: ${(props) => (props.modalOpen ? 'hidden' : 'auto')};
+  }
+`;
 
+function CommunityPostDetailPage() {
+  // CloudFront URL, 실제 사용하는 URL로 변경해주세요.
+  const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
+
+  const { user } = useUserStore(); // 사용자 정보 스토어
+  const { id } = useParams(); // URL 파라미터에서 게시글 번호(id) 가져오기
+  const boardNo = id;
+  const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 훅
+
+  // 게시글 관련 상태
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // 좋아요 관련 상태
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
-  const [commentInput, setCommentInput] = useState('');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef(null);
 
-  const currentUserEmail = user.email;
+  // 댓글 입력 관련 상태
+  const [commentInput, setCommentInput] = useState('');
+
+  // 게시글 메뉴(수정/삭제) 관련 상태
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null); // 더보기 메뉴 외부 클릭 감지를 위한 Ref
+
+  // 이미지 확대 보기 관련 상태
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
+
+  const currentUserEmail = user.email; // 현재 로그인한 사용자의 이메일 (좋아요, 댓글, 게시글 권한 확인용)
+
+  // 이미지 확대 모달 열기 핸들러
+  const openImageModal = (imageUrl) => {
+    setSelectedImageUrl(imageUrl);
+    setIsImageModalOpen(true);
+  };
+
+  // 이미지 확대 모달 닫기 핸들러
+  const closeImageModal = () => {
+    setSelectedImageUrl(null);
+    setIsImageModalOpen(false);
+  };
 
   // 게시글 데이터 및 댓글 목록 불러오기
   useEffect(() => {
     const fetchPostDetail = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        setLoading(true); // 로딩 시작
+        setError(null); // 에러 초기화
+
+        // 게시글 상세 정보와 좋아요 상태를 포함하여 가져옵니다.
         const response = await api.get(`${API_ENDPOINTS.BOARD.DETAIL}/${boardNo}?userEmail=${currentUserEmail}`);
         const fetchedPost = response.data;
 
         setPost(fetchedPost);
-        setLikesCount(fetchedPost.heart || 0);
-        setIsLiked(fetchedPost.is_liked_by_user);
+        setLikesCount(fetchedPost.heart || 0); // 좋아요 수 설정
+        setIsLiked(fetchedPost.is_liked_by_user); // 현재 사용자의 좋아요 여부 설정
 
+        // 게시글 조회수 증가 API 호출 (비동기)
         await api.put(`/api/board/${boardNo}/view`);
       } catch (err) {
         console.error('게시글 상세 정보를 불러오는 중 오류 발생:', err);
         setError('게시글 상세 정보를 불러오는데 실패했습니다.');
       } finally {
-        setLoading(false);
+        setLoading(false); // 로딩 종료
       }
     };
 
-    if (boardNo) {
+    // boardNo와 currentUserEmail이 유효할 때만 데이터를 불러옵니다.
+    if (boardNo && currentUserEmail) {
       fetchPostDetail();
     }
-  }, [boardNo, currentUserEmail]);
+  }, [boardNo, currentUserEmail]); // boardNo 또는 currentUserEmail이 변경될 때마다 실행
 
+  // 좋아요 토글 핸들러
   const handleLikeToggle = async () => {
     try {
-      const response = await axios.post(`http://localhost:7961/api/board/${boardNo}/like`, currentUserEmail, {
+      // 좋아요/좋아요 취소 API 호출 (POST 요청에 userEmail을 body로 보냅니다)
+      const response = await api.post(`${API_ENDPOINTS.BOARD.LIKE}/${boardNo}/like`, currentUserEmail, {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json', // 백엔드가 JSON을 기대하므로 명시
         },
       });
-      const newLikedStatus = response.data;
+      const newLikedStatus = response.data; // 백엔드에서 좋아요 상태(true/false)를 반환한다고 가정
 
-      setIsLiked(newLikedStatus);
-      setLikesCount((prevCount) => (newLikedStatus ? prevCount + 1 : prevCount - 1));
+      setIsLiked(newLikedStatus); // 좋아요 상태 업데이트
+      setLikesCount((prevCount) => (newLikedStatus ? prevCount + 1 : prevCount - 1)); // 좋아요 수 업데이트
+      toast.success(newLikedStatus ? '게시글에 좋아요를 눌렀습니다!' : '게시글 좋아요를 취소했습니다.');
     } catch (err) {
       console.error('좋아요 토글 중 오류 발생:', err);
-      toast.error('좋아요 처리에 실패했습니다.');
+      // 에러 메시지가 있다면 토스트 메시지로 표시
+      if (err.response && err.response.data && err.response.data.message) {
+        toast.error(`좋아요 처리에 실패했습니다: ${err.response.data.message}`);
+      } else {
+        toast.error('좋아요 처리에 실패했습니다.');
+      }
     }
   };
 
+  // 댓글 제출 핸들러
   const handleCommentSubmit = async (e) => {
-    e.preventDefault();
-    if (commentInput.trim() === '') return;
+    e.preventDefault(); // 폼 기본 제출 동작 방지
+    if (commentInput.trim() === '') return; // 입력값이 비어있으면 리턴
 
     try {
       const newCommentData = {
@@ -82,28 +126,33 @@ function CommunityPostDetailPage() {
         comment_content: commentInput,
         user_email: currentUserEmail,
       };
-      const response = await api.post(API_ENDPOINTS.COMMENT.CREATE, newCommentData);
+      // 댓글 생성 API 호출
+      await api.post(API_ENDPOINTS.COMMENT.CREATE, newCommentData);
 
-      console.log('댓글 등록 성공:', response.data);
-
+      // 댓글 등록 후 최신 댓글 목록을 반영하기 위해 게시글 정보 다시 불러오기
       const updatedPostResponse = await api.get(
         `${API_ENDPOINTS.BOARD.DETAIL}/${boardNo}?userEmail=${currentUserEmail}`
       );
-      setPost(updatedPostResponse.data);
-      setCommentInput('');
+      setPost(updatedPostResponse.data); // 게시글 상태 업데이트
+      setCommentInput(''); // 댓글 입력 필드 초기화
+      toast.success('댓글이 성공적으로 등록되었습니다.');
     } catch (err) {
       console.error('댓글 작성 중 오류 발생:', err);
       toast.error('댓글 작성에 실패했습니다.');
     }
   };
 
-  // 댓글 삭제 핸들러 추가
+  // 댓글 삭제 핸들러
   const handleDeleteComment = async (commentNo) => {
     if (!window.confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
-      return;
+      return; // 사용자가 취소하면 삭제 중단
     }
     try {
-      await api.delete(`${API_ENDPOINTS.COMMENT.DELETE}/${commentNo}`);
+      // 댓글 삭제 API 호출 (DELETE 요청에 user_email을 body로 보냄)
+      // 백엔드에서 DELETE 요청의 body를 제대로 파싱하도록 설정되어 있어야 합니다.
+      await api.delete(`${API_ENDPOINTS.COMMENT.DELETE}/${commentNo}`, {
+        data: { user_email: currentUserEmail },
+      });
       toast.success('댓글이 삭제되었습니다.');
       // 댓글 삭제 후 게시글 정보를 다시 불러와 댓글 목록 업데이트
       const updatedPostResponse = await api.get(
@@ -116,47 +165,58 @@ function CommunityPostDetailPage() {
     }
   };
 
+  // 게시글 삭제 핸들러
   const handleDeletePost = async () => {
     if (!window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
-      return;
+      return; // 사용자가 취소하면 삭제 중단
     }
     try {
-      await api.put(`${API_ENDPOINTS.BOARD.DELETE}/${boardNo}`);
+      // 게시글 삭제 API 호출 (PUT 요청에 user_email을 body로 보냄, 백엔드 로직에 따라 PUT 사용)
+      await api.put(`${API_ENDPOINTS.BOARD.DELETE}/${boardNo}`, { user_email: currentUserEmail });
       toast.success('게시글이 삭제되었습니다.');
-      navigate('/community'); // 삭제 후 목록 페이지로 이동
+      navigate('/community'); // 삭제 후 커뮤니티 목록 페이지로 이동
     } catch (err) {
       console.error('게시글 삭제 중 오류 발생:', err);
       toast.error('게시글 삭제에 실패했습니다.');
     }
   };
 
-  // 더보기 메뉴 외부 클릭 감지
+  // 더보기 메뉴 외부 클릭 감지 (메뉴 자동 닫힘 기능)
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // 메뉴Ref가 존재하고, 클릭된 요소가 메뉴Ref 내부에 포함되어 있지 않으면 메뉴 닫기
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setIsMenuOpen(false);
       }
     };
+    // 문서에 마우스다운 이벤트 리스너 추가
     document.addEventListener('mousedown', handleClickOutside);
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
+  // 로딩 중일 때 표시
   if (loading) {
     return <PageContainer>로딩 중...</PageContainer>;
   }
 
+  // 에러 발생 시 표시
   if (error) {
     return <PageContainer>오류: {error}</PageContainer>;
   }
 
+  // 게시글이 없을 경우 (예: 404 Not Found)
   if (!post) {
     return <PageContainer>게시글을 찾을 수 없습니다.</PageContainer>;
   }
 
   return (
     <>
+      {/* 이미지 모달이 열려 있을 때 body 스크롤을 막는 Global 스타일 적용 */}
+      <GlobalModalStyle modalOpen={isImageModalOpen} />
+
       <PageContainer>
         <MainContentWrapper>
           <PostHeader>
@@ -165,7 +225,8 @@ function CommunityPostDetailPage() {
             <PostAuthorRegion>{post.address}</PostAuthorRegion>
             <PostInfo>
               <AuthorInfo>
-                <ProfileImage src={post.profile_image} alt={post.user_name} />
+                {/* 게시글 작성자 프로필 이미지 */}
+                <ProfileImage src={`${CLOUDFRONT_URL}${post.profile_image}`} alt={post.user_name} />
                 <AuthorDetailsStyled>
                   <AuthorName>{post.user_name}</AuthorName>
                   <PostMeta>
@@ -179,6 +240,7 @@ function CommunityPostDetailPage() {
                 <ShareButton>
                   <FaShareAlt color="#757575" />
                 </ShareButton>
+                {/* 현재 로그인한 사용자가 게시글 작성자인 경우에만 수정/삭제 메뉴 표시 */}
                 {currentUserEmail === post.user_email && (
                   <>
                     <EllipsisButton onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -203,8 +265,9 @@ function CommunityPostDetailPage() {
                 post.files.map((file, index) => (
                   <ImageItem
                     key={file.file_no}
-                    src={`http://localhost:7961/uploads/${file.change_name}`}
+                    src={`${CLOUDFRONT_URL}${file.change_name}`}
                     alt={`게시글 이미지 ${index + 1}`}
+                    onClick={() => openImageModal(`${CLOUDFRONT_URL}${file.change_name}`)} // 이미지 클릭 시 모달 열기
                   />
                 ))}
             </ImageGallery>
@@ -237,17 +300,17 @@ function CommunityPostDetailPage() {
                 post.comments.map((comment) => (
                   <CommentItem key={comment.comment_no}>
                     <CommentHeader>
-                      {' '}
-                      {/* CommentHeader 추가 */}
                       <CommentAuthorInfo>
-                        <ProfileImage src={comment.profile_image} alt={comment.user_name} />
+                        {/* 댓글 작성자 프로필 이미지 */}
+                        <ProfileImage src={`${CLOUDFRONT_URL}${comment.profile_image}`} alt={comment.user_name} />
                         <AuthorDetails>
                           <AuthorDetailsSmall>
                             <AuthorName>{comment.user_name}</AuthorName>
                           </AuthorDetailsSmall>
-                          <CommentAuthorRegion></CommentAuthorRegion>
+                          <CommentAuthorRegion>{comment.address}</CommentAuthorRegion>
                         </AuthorDetails>
                       </CommentAuthorInfo>
+                      {/* 현재 로그인한 사용자가 댓글 작성자인 경우에만 삭제 버튼 표시 */}
                       {currentUserEmail === comment.user_email && (
                         <DeleteCommentButton onClick={() => handleDeleteComment(comment.comment_no)}>
                           <FaTimes size="14" color="#a0a0a0" />
@@ -262,13 +325,31 @@ function CommunityPostDetailPage() {
           </CommentSection>
         </MainContentWrapper>
       </PageContainer>
+
+      {/* 이미지 확대 보기 모달 (isImageModalOpen 상태에 따라 조건부 렌더링) */}
+      {isImageModalOpen && (
+        <ImageModalOverlay onClick={closeImageModal}>
+          {' '}
+          {/* 오버레이 클릭 시 모달 닫기 */}
+          <ImageModal onClick={(e) => e.stopPropagation()}>
+            {' '}
+            {/* 모달 내부 클릭 시 닫히지 않도록 이벤트 전파 방지 */}
+            <CloseButton onClick={closeImageModal}>
+              {' '}
+              {/* 닫기 버튼 */}
+              <FaTimes size={20} color="white" />
+            </CloseButton>
+            <ModalImage src={selectedImageUrl} alt="확대된 이미지" />
+          </ImageModal>
+        </ImageModalOverlay>
+      )}
     </>
   );
 }
 
 export default CommunityPostDetailPage;
 
-// --- 스타일 컴포넌트 (변경 있음) ---
+// --- 스타일 컴포넌트 ---
 const PageContainer = styled.div`
   width: 100%;
   display: flex;
@@ -432,20 +513,26 @@ const ImageGallery = styled.div`
   gap: ${({ theme }) => theme.spacing['3']};
   padding-bottom: ${({ theme }) => theme.spacing['2']};
   margin-bottom: ${({ theme }) => theme.spacing['4']};
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
 
   &::-webkit-scrollbar {
-    display: none;
+    display: none; /* Chrome, Safari, Opera */
   }
 `;
 
 const ImageItem = styled.img`
   width: 200px;
   height: 200px;
-  object-fit: cover;
+  object-fit: cover; /* 이미지가 잘리더라도 영역에 꽉 채움 */
   border-radius: ${({ theme }) => theme.borderRadius.ten};
-  flex-shrink: 0;
+  flex-shrink: 0; /* flex 컨테이너 내에서 축소되지 않도록 함 */
+  cursor: pointer; /* 클릭 가능한 요소임을 나타냄 */
+  transition: transform 0.2s ease-in-out; /* 확대/축소 시 부드러운 전환 효과 */
+
+  &:hover {
+    transform: scale(1.02); /* 마우스 오버 시 살짝 확대 */
+  }
 `;
 
 const InteractionStats = styled.div`
@@ -547,7 +634,6 @@ const CommentItem = styled.div`
   }
 `;
 
-// 댓글 헤더 (작성자 정보와 삭제 버튼을 함께 묶기 위해 추가)
 const CommentHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -616,5 +702,60 @@ const DeleteCommentButton = styled.button`
 
   &:hover {
     color: ${({ theme }) => theme.colors.gray['700']};
+  }
+`;
+
+// --- 이미지 확대 모달 관련 스타일 ---
+const ImageModalOverlay = styled.div`
+  position: fixed; /* 뷰포트에 고정 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85); /* 어두운 배경 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* 다른 요소들 위에 표시 */
+  backdrop-filter: blur(5px); /* 배경 블러 효과 (선택 사항) */
+`;
+
+const ImageModal = styled.div`
+  position: relative;
+  background-color: black;
+  border-radius: ${({ theme }) => theme.borderRadius.base};
+  max-width: 90%;
+  max-height: 85%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ModalImage = styled.img`
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  margin: 0;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+  z-index: 1001; /* 모달 이미지 위에 표시 */
+  padding: 5px; /* 클릭 영역 확보 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    opacity: 0.7;
   }
 `;

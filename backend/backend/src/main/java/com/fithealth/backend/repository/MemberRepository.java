@@ -19,4 +19,6 @@ public interface MemberRepository {
     Optional<Member> findOneStatusY(String userEmail, CommonEnums.Status status);
 
     List<Member> findAll();
+    boolean findByNameAndEmail(String userName, String userEmail);
+    SocialType isSocialMember(String userEmail);
 }

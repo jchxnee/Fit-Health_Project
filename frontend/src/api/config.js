@@ -26,6 +26,7 @@ export const API_ENDPOINTS = {
     UPDATEBIRTH: '/api/members/birth',
     UPDATEPWD: '/api/members/pwd',
     DELETE: '/api/members/delete',
+    RESETPASSWORD: '/api/members/resetPwd',
   },
   HEALTH: {
     BASE: '/api/healths',
@@ -56,6 +57,7 @@ export const API_ENDPOINTS = {
     UPDATE: '/api/board',
     DELETE: '/api/board/delete',
     MYPOSTS: '/api/board/myposts',
+    LIKE: '/api/board',
   },
   NOTICE: {
     LIST: '/api/notice/all',

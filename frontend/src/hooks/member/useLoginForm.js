@@ -6,6 +6,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useState } from 'react';
 import { memberService } from '../../api/member';
 import useUserStore from '../../store/useUserStore';
+import axios from 'axios';
 
 // 로그인 유효성 검사 스키마 정의
 const loginSchema = yup.object().shape({
@@ -32,9 +33,7 @@ export const useLoginForm = () => {
   // 실제 로그인 요청 처리 함수
   const onsubmit = async (data) => {
     try {
-      setIsLoading(true); // 로딩 시작
-
-      // 로그인 API 호출 (token 포함된 응답 가정)
+      setIsLoading(true);
       const response = await memberService.login(data);
       const token = response.token;
 
@@ -43,10 +42,11 @@ export const useLoginForm = () => {
         return;
       }
 
-      // 1) 토큰 세션 저장
       sessionStorage.setItem('token', token);
+      // ⭐ 추가: Axios 기본 헤더에 토큰 설정
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-      const memberInfo = await memberService.getMemberInfo();
+      const memberInfo = await memberService.getMemberInfo(); // 이제 이 요청은 토큰을 포함하여 전송됩니다.
 
       login({
         useremail: memberInfo.user_email,
@@ -64,15 +64,16 @@ export const useLoginForm = () => {
       });
 
       toast.success('로그인 성공!');
-      navigate('/'); // 홈으로 이동
+      navigate('/');
     } catch (error) {
-      toast.error('로그인 중 오류가 발생했습니다.');
+      toast.error('이메일 또는 비밀번호가 일치하지 않습니다.');
       console.error('로그인 에러 : ', error);
+      delete axios.defaults.headers.common['Authorization'];
+      sessionStorage.removeItem('token');
     } finally {
-      setIsLoading(false); // 로딩 종료
+      setIsLoading(false);
     }
   };
-
   // 컴포넌트에서 사용할 값들 반환
   return {
     register, // 인풋 연결용

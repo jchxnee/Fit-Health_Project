@@ -8,13 +8,14 @@ import com.fithealth.backend.dto.Board.Top5BoardDto;
 import com.fithealth.backend.dto.PageResponse;
 import com.fithealth.backend.entity.Board;
 import com.fithealth.backend.entity.BoardFile;
-import com.fithealth.backend.entity.BoardLike; // ⭐ BoardLike 임포트 ⭐
+import com.fithealth.backend.entity.BoardLike;
 import com.fithealth.backend.entity.Member;
 import com.fithealth.backend.enums.CommonEnums;
-import com.fithealth.backend.repository.BoardLikeRepository; // ⭐ BoardLikeRepository 임포트 ⭐
+import com.fithealth.backend.repository.BoardLikeRepository;
 import com.fithealth.backend.repository.BoardRepository;
 import com.fithealth.backend.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,14 +23,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
+import java.io.File; // 로컬 파일 시스템 삭제/경로 관련은 일단 유지
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Optional; // ⭐ Optional 임포트 ⭐
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -40,33 +41,35 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
-    private final BoardLikeRepository boardLikeRepository; // ⭐ BoardLikeRepository 주입 ⭐
-    private final String UPLOAD_PATH = "C:\\Users\\User\\Pictures\\photo";
+    private final BoardLikeRepository boardLikeRepository;
 
     @Override
-    public Long createBoard(BoardCreateDto.Create boardCreateDto, List<MultipartFile> files) throws IOException {
-        Member member = memberRepository.findOne(boardCreateDto.getUser_email())
-                .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));
+    @Transactional
+    public Long createBoard(BoardCreateDto.Create boardCreateDto) {
+        String userEmail = boardCreateDto.getUser_email();
+
+        // userEmail 유효성 검사 (프론트에서 유효한 이메일을 보냈다고 했으므로, DTO 바인딩 문제이거나 극히 드문 경우)
+        if (userEmail == null || userEmail.trim().isEmpty()) {
+            throw new IllegalArgumentException("사용자 이메일이 필요합니다.");
+        }
+
+        Member member = memberRepository.findOne(userEmail)
+                .orElseThrow(() -> new EntityNotFoundException("해당 이메일의 회원을 찾을 수 없습니다: " + userEmail));
 
         Board board = boardCreateDto.toEntity();
         board.changeMember(member);
 
-        if(files != null && !files.isEmpty()){
-            for (MultipartFile file : files) {
-                if (!file.isEmpty()) {
-                    String originName = file.getOriginalFilename();
-                    String changeName = UUID.randomUUID().toString() + "_" + originName;
-
-                    File uploadDir = new File(UPLOAD_PATH);
-                    if(!uploadDir.exists()){
-                        uploadDir.mkdirs();
-                    }
-
-                    file.transferTo(new File(UPLOAD_PATH + File.separator + changeName));
-
+        // ⭐ 변경된 파일 처리 로직: MultipartFile 대신 S3에 업로드된 파일명 리스트를 처리
+        List<String> newFileNames = boardCreateDto.getNew_file_names();
+        if (newFileNames != null && !newFileNames.isEmpty()) {
+            for (String s3FileName : newFileNames) { // s3FileName은 "community/abc-123.jpg"와 같은 S3 경로
+                if (s3FileName != null && !s3FileName.trim().isEmpty()) {
+                    // BoardFile 엔티티 생성 및 게시글과 연결
+                    // S3에 업로드된 파일의 경우, originName은 알 수 없으므로 changeName과 동일하게 처리하거나
+                    // 프론트에서 originName도 함께 전달받아야 합니다.
                     BoardFile boardFile = BoardFile.builder()
-                            .originName(originName)
-                            .changeName(changeName)
+                            .originName(s3FileName.substring(s3FileName.lastIndexOf('/') + 1)) // 파일명만 추출
+                            .changeName(s3FileName) // S3 전체 경로를 changeName으로 저장
                             .build();
                     board.addBoardFile(boardFile);
                 }
@@ -88,17 +91,15 @@ public class BoardServiceImpl implements BoardService {
             boardPage = boardRepository.findByBoardCategoryNameAndStatus(category, CommonEnums.Status.Y, pageable);
         }
 
-        // 목록 조회 시에는 좋아요 여부를 알 수 없으므로, false로 설정하거나 필요에 따라 별도 처리
         Page<BoardGetDto.Response> dtoPage = boardPage.map(board -> BoardGetDto.Response.toDto(board, false));
         return new PageResponse<>(dtoPage);
     }
 
     @Override
-    public BoardGetDto.Response getBoardDetail(Long boardNo, String userEmail) { // ⭐ userEmail 파라미터 추가 ⭐
+    public BoardGetDto.Response getBoardDetail(Long boardNo, String userEmail) {
         Board board = boardRepository.findById(boardNo)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
 
-        // ⭐ 현재 사용자가 이 게시물에 좋아요를 눌렀는지 확인 ⭐
         boolean isLikedByUser = false;
         if (userEmail != null && !userEmail.isEmpty()) {
             Member member = memberRepository.findOne(userEmail).orElse(null);
@@ -106,19 +107,19 @@ public class BoardServiceImpl implements BoardService {
                 isLikedByUser = boardLikeRepository.findByBoardAndMember(board, member).isPresent();
             }
         }
-        return BoardGetDto.Response.toDto(board, isLikedByUser); // ⭐ isLikedByUser 전달 ⭐
+        return BoardGetDto.Response.toDto(board, isLikedByUser);
     }
 
     @Override
-    public void incrementBoardCount(Long boardNo) { // ⭐ 조회수 증가 메서드 구현 ⭐
+    public void incrementBoardCount(Long boardNo) {
         Board board = boardRepository.findById(boardNo)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
         board.setCount(board.getCount() + 1);
-        boardRepository.save(board); // 변경된 count 저장
+        boardRepository.save(board);
     }
 
     @Override
-    public boolean toggleLike(Long boardNo, String userEmail) { // ⭐ 좋아요 토글 메서드 구현 ⭐
+    public boolean toggleLike(Long boardNo, String userEmail) {
         Board board = boardRepository.findById(boardNo)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
         Member member = memberRepository.findOne(userEmail)
@@ -127,13 +128,11 @@ public class BoardServiceImpl implements BoardService {
         Optional<BoardLike> existingLike = boardLikeRepository.findByBoardAndMember(board, member);
 
         if (existingLike.isPresent()) {
-            // 이미 좋아요를 눌렀다면 좋아요 취소
             boardLikeRepository.delete(existingLike.get());
             board.setHeart(board.getHeart() - 1);
             boardRepository.save(board);
-            return false; // 좋아요 취소됨
+            return false;
         } else {
-            // 좋아요를 누르지 않았다면 좋아요 추가
             BoardLike boardLike = BoardLike.builder()
                     .board(board)
                     .member(member)
@@ -141,17 +140,16 @@ public class BoardServiceImpl implements BoardService {
             boardLikeRepository.save(boardLike);
             board.setHeart(board.getHeart() + 1);
             boardRepository.save(board);
-            return true; // 좋아요 추가됨
+            return true;
         }
     }
 
     @Override
-    public Long updateBoard(BoardUpdateDto.Update boardUpdateDto, List<MultipartFile> newFiles) throws IOException {
-        // 1. 기존 게시글 조회 (ID로 찾음)
+    @Transactional
+    public Long updateBoard(BoardUpdateDto.Update boardUpdateDto) {
         Board existingBoard = boardRepository.findById(boardUpdateDto.getBoard_no())
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다: " + boardUpdateDto.getBoard_no()));
 
-        // 2. 권한 확인: 요청한 사용자의 이메일과 게시글 작성자의 이메일 비교
         if (existingBoard.getMember() == null || !existingBoard.getMember().getUserEmail().equals(boardUpdateDto.getUser_email())) {
             throw new IllegalArgumentException("게시글을 수정할 권한이 없습니다.");
         }
@@ -164,56 +162,49 @@ public class BoardServiceImpl implements BoardService {
 
         List<Long> existingFileNumbersToKeep = boardUpdateDto.getExisting_file_numbers();
 
+        // 1. 기존 파일 삭제 처리 (S3에서는 삭제하지 않고 DB에서만 연결 끊기)
         if (existingBoard.getBoardPhoto() != null && !existingBoard.getBoardPhoto().isEmpty()) {
-            // 삭제할 파일들을 필터링합니다. (유지할 목록에 없는 파일들)
-            List<BoardFile> filesToRemove = existingBoard.getBoardPhoto().stream()
-                    .filter(file -> existingFileNumbersToKeep == null || !existingFileNumbersToKeep.contains(file.getBoardFileNo()))
-                    .collect(Collectors.toList());
+            List<BoardFile> filesToDeleteFromDb = new ArrayList<>();
+            List<BoardFile> filesToKeepInDb = new ArrayList<>();
 
-            for (BoardFile file : filesToRemove) {
-                // 실제 파일 시스템에서 파일 삭제
-                Path filePath = Paths.get(UPLOAD_PATH, file.getChangeName());
-                try {
-                    Files.deleteIfExists(filePath);
-                } catch (IOException e) {
-                    System.err.println("파일 삭제 실패: " + filePath + " - " + e.getMessage());
-                    // 파일 삭제 실패는 로깅하고 계속 진행합니다.
+            for (BoardFile existingFile : existingBoard.getBoardPhoto()) {
+                if (existingFileNumbersToKeep == null || !existingFileNumbersToKeep.contains(existingFile.getBoardFileNo())) {
+                    // 유지할 파일 목록에 없으면 DB에서 삭제할 대상
+                    filesToDeleteFromDb.add(existingFile);
+                    // ⭐ 여기에 S3 삭제 로직이 있었으나, 제거하지 않으므로 호출 안 함
+                    System.out.println("DEBUG: S3에서는 파일 제거하지 않고, DB에서만 연결 끊기: " + existingFile.getChangeName());
+                } else {
+                    // 유지할 파일 목록에 있으면 유지 대상
+                    filesToKeepInDb.add(existingFile);
                 }
-                // 게시글 엔티티의 파일 컬렉션에서 제거합니다.
-                // Board 엔티티의 @OneToMany(..., orphanRemoval = true) 설정 덕분에
-                // 여기서 remove()를 호출하면 해당 BoardFile 엔티티는 DB에서도 자동으로 삭제됩니다.
-                existingBoard.getBoardPhoto().remove(file);
             }
+            // boardPhoto 컬렉션을 유지할 파일들로만 갱신
+            // @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true) 설정되어 있다면
+            // filesToDeleteFromDb에 있는 BoardFile 엔티티들이 컬렉션에서 제거되면서 DB에서도 자동으로 삭제됩니다.
+            existingBoard.getBoardPhoto().removeAll(filesToDeleteFromDb);
+            // 또는 existingBoard.setBoardPhoto(filesToKeepInDb); 와 같이 아예 새 리스트로 교체해도 됩니다.
+            // (둘 다 orphanRemoval = true 설정 시 동일하게 작동)
         }
 
-        // 4-2. 새로운 파일 업로드 및 연결
-        // newFiles는 Controller에서 @RequestParam으로 받은 MultipartFile 리스트입니다.
-        if (newFiles != null && !newFiles.isEmpty()) {
-            // 파일 업로드 디렉토리가 없으면 생성
-            Path uploadDirPath = Paths.get(UPLOAD_PATH);
-            if (!Files.exists(uploadDirPath)) {
-                Files.createDirectories(uploadDirPath);
-            }
 
-            for (MultipartFile file : newFiles) {
-                if (!file.isEmpty()) {
-                    String originName = file.getOriginalFilename();
-                    String changeName = UUID.randomUUID().toString() + "_" + originName;
-
-                    // 실제 파일을 서버에 저장
-                    Files.copy(file.getInputStream(), uploadDirPath.resolve(changeName), StandardCopyOption.REPLACE_EXISTING);
-
-                    // BoardFile 엔티티 생성 및 기존 게시글과 연결
-                    BoardFile boardFile = BoardFile.builder()
+        // 2. 새로운 파일 추가 처리 (프론트에서 넘어온 S3 경로를 사용)
+        List<String> newS3FileNames = boardUpdateDto.getNew_file_names();
+        if (newS3FileNames != null && !newS3FileNames.isEmpty()) {
+            for (String s3FileName : newS3FileNames) {
+                if (s3FileName != null && !s3FileName.trim().isEmpty()) {
+                    String originName = s3FileName.substring(s3FileName.lastIndexOf('/') + 1);
+                    BoardFile newBoardFile = BoardFile.builder()
                             .originName(originName)
-                            .changeName(changeName)
-                            .board(existingBoard) // 중요한 부분: 새로 추가된 파일이 어떤 게시글에 속하는지 명시
+                            .changeName(s3FileName)
+                            .board(existingBoard)
                             .build();
-                    existingBoard.addBoardFile(boardFile); // 게시글 엔티티의 파일 컬렉션에 추가 (양방향 관계 관리)
+                    existingBoard.addBoardFile(newBoardFile);
                 }
             }
         }
-        return existingBoard.getBoardNo(); // 변경된 엔티티의 ID 반환
+
+        Board savedBoard = boardRepository.save(existingBoard);
+        return savedBoard.getBoardNo();
     }
 
     @Override
@@ -234,19 +225,15 @@ public class BoardServiceImpl implements BoardService {
         boolean hasCategory = category != null && !"전체".equals(category) && !category.isEmpty() && !"all".equals(category);
 
         if (hasSearch && hasCategory) {
-            // 검색어와 카테고리 모두 있는 경우
             boardPage = boardRepository.findByMemberUserEmailAndStatusAndCategoryAndSearch(
                     currentUserEmail, CommonEnums.Status.Y, category, search.trim(), pageable);
         } else if (hasSearch) {
-            // 검색어만 있는 경우
             boardPage = boardRepository.findByMemberUserEmailAndStatusAndSearch(
                     currentUserEmail, CommonEnums.Status.Y, search.trim(), pageable);
         } else if (hasCategory) {
-            // 카테고리만 있는 경우
             boardPage = boardRepository.findByMemberUserEmailAndBoardCategoryNameAndStatus(
                     currentUserEmail, category, CommonEnums.Status.Y, pageable);
         } else {
-            // 둘 다 없는 경우 (전체 조회)
             boardPage = boardRepository.findByMemberUserEmailAndStatus(
                     currentUserEmail, CommonEnums.Status.Y, pageable);
         }
@@ -264,5 +251,4 @@ public class BoardServiceImpl implements BoardService {
         return boardRepository.findTop5ByStatusOrderByCountDesc(CommonEnums.Status.Y).stream()
                 .map(Top5BoardDto.Response::fromEntity).collect(Collectors.toList());
     }
-
 }
