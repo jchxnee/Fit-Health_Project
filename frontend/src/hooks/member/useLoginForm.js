@@ -66,7 +66,7 @@ export const useLoginForm = () => {
       toast.success('로그인 성공!');
       navigate('/');
     } catch (error) {
-      toast.error('로그인 중 오류가 발생했습니다.');
+      toast.error('이메일 또는 비밀번호가 일치하지 않습니다.');
       console.error('로그인 에러 : ', error);
       delete axios.defaults.headers.common['Authorization'];
       sessionStorage.removeItem('token');
