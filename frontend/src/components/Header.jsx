@@ -7,6 +7,7 @@ import useUserStore from '../store/useUserStore';
 import basicProfile from '../../public/img/basicProfile.jpg';
 import { toast } from 'react-toastify';
 import api from '../api/axios';
+import { API_ENDPOINTS } from '../api/config';
 
 const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
 
@@ -49,11 +50,13 @@ function NotificationList({ notifications, onNotificationClick }) {
       {notifications.map((notification) => (
         <NotificationItem
           key={notification.notificationNo}
-          $isRead={notification.isRead === 'Y'} // 읽음 여부에 따라 스타일 적용
+          $isRead={notification.isRead === 'Y'}
           onClick={() => onNotificationClick(notification)}
         >
-          <NotificationMessage>{notification.notificationContent}</NotificationMessage>
-          <NotificationTime>{formatTimeAgo(notification.notificationDate)}</NotificationTime>
+          {' '}
+          {/* 여기서 사용 */}
+          <NotificationMessage>{notification.message}</NotificationMessage>
+          <NotificationTime>{formatTimeAgo(notification.createdDate)}</NotificationTime>
         </NotificationItem>
       ))}
     </NotificationContainer>
@@ -154,8 +157,8 @@ function Header() {
       return;
     }
     try {
-      const response = await api.get(`/api/notifications/countUnread?userEmail=${user.email}`);
-      setUnreadNotificationCount(response.data);
+      const response = await api.get(`${API_ENDPOINTS.NOTIFICATION.UNREAD}?userEmail=${user.email}`);
+      setUnreadNotificationCount(response.data.count);
     } catch (error) {
       console.error('읽지 않은 알림 개수를 가져오는 데 실패했습니다:', error);
       setUnreadNotificationCount(0);
@@ -327,7 +330,8 @@ function Header() {
             <HeaderNavRight>
               <NotificationWrapper onClick={handleNotificationClick} ref={bellIconRef}>
                 <FaBell />
-                {unreadNotificationCount > 0 && <RedDot />} {/* 읽지 않은 알림이 있을 때만 표시 */}
+                {unreadNotificationCount > 0 && <RedDot>{unreadNotificationCount}</RedDot>}{' '}
+                {/* 읽지 않은 알림이 있을 때만 표시 */}
               </NotificationWrapper>
               <NavItem to="/chat">채팅</NavItem>
               <ProfileWrapper onClick={handleUserMenuClick} ref={profileWrapperRef}>
@@ -364,7 +368,7 @@ const HeaderComponent = styled.header`
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: ${({ theme }) => theme.zIndices.sticky};
+  z-index: ${({ theme }) => theme.zIndices.dropdown};
   position: sticky;
   top: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 헤더 그림자 추가 */
@@ -447,8 +451,8 @@ const NotificationWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: ${({ theme }) => theme.fontSizes.xl}; /* 아이콘 크기 조정 */
-  color: ${({ theme }) => theme.colors.gray[700]}; /* 아이콘 색상 조정 */
+  font-size: ${({ theme }) => theme.fontSizes.xl};
+  color: ${({ theme }) => theme.colors.gray[700]};
 
   &:hover {
     color: ${({ theme }) => theme.colors.primary};
@@ -457,13 +461,16 @@ const NotificationWrapper = styled.div`
 
 const RedDot = styled.div`
   position: absolute;
-  top: 0px; /* 알림 아이콘 위치에 맞게 조정 */
-  right: -2px; /* 알림 아이콘 위치에 맞게 조정 */
-  width: 8px;
-  height: 8px;
-  background-color: #ff4d4f; /* 빨간색 */
+  top: -7px;
+  right: -6px;
+  width: 16px;
+  height: 16px;
+  background-color: #ff4d4f;
   border-radius: 50%;
-  border: 1px solid ${({ theme }) => theme.colors.white}; /* 흰색 테두리 */
+  border: 1px solid ${({ theme }) => theme.colors.white};
+  font-size: ${({ theme }) => theme.fontSizes.xs};
+  color: ${({ theme }) => theme.colors.white};
+  text-align: center;
 `;
 
 const ProfileWrapper = styled.div`
@@ -490,10 +497,9 @@ const ProfileImg = styled.img`
 // 알림 목록 모달 스타일
 const NotificationListContainer = styled.div`
   position: absolute;
-  top: 50px; /* 헤더 높이 + 여백 */
-  right: -10px; /* 알림 아이콘에 맞춰서 조정 */
-  z-index: ${({ theme }) => theme.zIndices.dropdown};
-  /* 애니메이션 추가 */
+  top: 40px;
+  right: -130px;
+  z-index: ${({ theme }) => theme.zIndices.sticky};
   opacity: 0;
   transform: translateY(-10px);
   animation: fadeInDown 0.3s forwards;
@@ -535,16 +541,16 @@ const UserMenuContainerWrapper = styled.div`
 
 // 제공된 NotificationList의 스타일 컴포넌트 이름 변경 (이름 충돌 방지)
 const NotificationContainer = styled.div`
-  width: 292px;
+  width: 338px;
   border: 1px solid ${({ theme }) => theme.colors.gray['200']};
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   box-shadow: ${({ theme }) => theme.shadows.sm};
-  overflow: hidden;
   text-align: start;
-
   max-height: 260px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 `;
 
 const NotificationTitle = styled.div`
@@ -560,9 +566,10 @@ const NotificationTitle = styled.div`
 `;
 
 const NotificationItem = styled.div`
-  padding: ${({ theme }) => theme.spacing['2']};
+  padding: ${({ theme }) => theme.spacing['3']};
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray['200']};
-  background-color: ${(props) => (props.$isRead ? 'transparent' : '#f0f8ff')}; /* 읽지 않은 알림 배경색 */
+  background-color: ${({ theme }) => theme.colors.white};
+  min-height: ${({ theme }) => theme.spacing['18']};
   &:last-child {
     border-bottom: none;
   }
@@ -570,6 +577,10 @@ const NotificationItem = styled.div`
   &:hover {
     background-color: ${({ theme }) => theme.colors.gray[50]};
   }
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 `;
 
 const NoNotificationItem = styled.div`
@@ -579,18 +590,26 @@ const NoNotificationItem = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.sm};
 `;
 
-const NotificationMessage = styled.p`
+const NotificationMessage = styled.div`
+  flex-grow: 1;
+  flex-basis: 0;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.primary};
-  margin-bottom: ${({ theme }) => theme.spacing[0.5]};
+  margin-bottom: 3px;
+  word-break: break-word;
+  line-height: 1.3;
 `;
 
 const NotificationTime = styled.span`
+  flex-shrink: 0;
+  margin-left: ${({ theme }) => theme.spacing['2']};
   font-size: ${({ theme }) => theme.fontSizes.xs};
   color: ${({ theme }) => theme.colors.gray[500]};
+  white-space: nowrap;
+  text-align: right;
+  margin-top: ${({ theme }) => theme.spacing['8']};
 `;
 
-// 제공된 UserMenu의 스타일 컴포넌트 이름 변경 (이름 충돌 방지)
 const StyledFaSyncAlt = styled(FaSyncAlt)`
   font-size: 14px;
   margin-left: 8px;

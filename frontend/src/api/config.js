@@ -75,4 +75,7 @@ export const API_ENDPOINTS = {
   COACH: {
     LIST: '/api/trainer',
   },
+  NOTIFICATION: {
+    UNREAD: '/api/notifications/unread/count',
+  },
 };
