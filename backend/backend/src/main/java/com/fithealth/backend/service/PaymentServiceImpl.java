@@ -73,21 +73,31 @@ public class PaymentServiceImpl implements  PaymentService {
     }
 
     @Override
+    @Transactional // 트랜잭션 관리를 위해 추가 (필수)
     public Long goPayment(ReservationCreateDto.Create createDto) {
+        // 1. payment_id로 Payment 엔티티 조회
         Payment payment = paymentRepository.findOne(createDto.getPayment_id())
-                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 없습니다."));
-        List<Reservation> isExists = reservationRepository.findByPaymentId(payment.getPaymentId(), Status.Y);
+                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 없습니다. payment_id: " + createDto.getPayment_id()));
+
+        // 2. 해당 payment_id로 이미 완료된 예약이 있는지 확인 (선택 사항, 비즈니스 로직에 따라)
+        List<Reservation> isExists = reservationRepository.findByPaymentId(payment.getPaymentId(), CommonEnums.Status.Y);
         boolean isFirstReservation = isExists.isEmpty();
 
+        // 3. Payment 엔티티의 상태 변경 및 트랜잭션 정보 업데이트
         payment.changeStatus(CommonEnums.Status.Y); // 결제 상태를 'Y' (완료)로 변경
+        payment.putTransactionIdAndPaymentMethod(createDto.getTransaction_id(), createDto.getPayment_method());
 
-        Reservation reservation = createDto.toEntity();
-        reservation.changePayment(payment);
 
-        boolean success = reservationRepository.save(reservation);
+        // 4. Reservation 엔티티 생성 및 Payment 연결
+        Reservation reservation = createDto.toEntity(); // selectDate만 설정된 Reservation 객체 반환
+        reservation.changePayment(payment); // Reservation에 Payment 객체 연결
 
-        Member userMember = payment.getMember(); // 결제한 유저
-        Member trainerMember = payment.getResponseMember(); // 결제 대상 트레이너
+        // 5. Reservation 저장
+        boolean success = reservationRepository.save(reservation); // 이 save 메서드가 boolean을 반환한다면
+
+        // 6. 알림 관련 로직 (기존과 동일)
+        Member userMember = payment.getMember();
+        Member trainerMember = payment.getResponseMember();
 
         if(success) {
             String message;
@@ -106,8 +116,9 @@ public class PaymentServiceImpl implements  PaymentService {
 
             notificationService.createNotification(trainerMember, message, notificationType,
                     relatedIdForTrainer);
-        } else{
-            throw new RuntimeException("알림 생성 실패");
+        } else {
+            // save(reservation)이 false를 반환하는 경우, 실패로 간주
+            throw new RuntimeException("예약 저장 실패: 알림을 생성할 수 없습니다.");
         }
 
         return reservation.getReservationNo();
