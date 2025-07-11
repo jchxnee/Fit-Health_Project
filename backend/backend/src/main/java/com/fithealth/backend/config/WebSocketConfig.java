@@ -19,6 +19,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
         // registry.addHandler(핸들러객체, 요청경로)
         // /connect url로 websocket연결 요청이 들어오면, 핸들러 클래스가 처리
         registry.addHandler(simpleWebSocketHandler, "/connect")
-                .setAllowedOrigins("http://localhost:5173");
+                .setAllowedOrigins("http://localhost:7961");
     }
 }

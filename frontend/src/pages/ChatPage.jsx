@@ -9,7 +9,7 @@ import {
   readChatRoom,
 } from '../api/chatApi.js'; // 실제 API 경로에 맞게 수정 필요
 
-const WS_BASE_URL = 'ws://localhost:8080/connect'; // 실제 서버 주소에 맞게 수정
+const WS_BASE_URL = 'ws://localhost:7961/connect'; // 백엔드 서버 포트로 수정
 
 const ChatPage = () => {
   const [chatRooms, setChatRooms] = useState([]); // 채팅방 목록
@@ -73,9 +73,21 @@ const ChatPage = () => {
       wsRef.current.close();
     }
     const token = getToken();
-    if (!token) return;
-    const ws = new window.WebSocket(`${WS_BASE_URL}?roomId=${roomId}&token=${token}`);
+    if (!token) {
+      console.error('토큰이 없습니다.');
+      return;
+    }
+    console.log('roomId:', roomId, 'token:', token);
+    const wsUrl = `${WS_BASE_URL}?roomId=${roomId}&token=${token}`;
+    console.log('WebSocket 연결 시도:', wsUrl);
+    const ws = new window.WebSocket(wsUrl);
     wsRef.current = ws;
+    ws.onopen = () => {
+      console.log('WebSocket 연결 성공');
+    };
+    ws.onerror = (e) => {
+      console.error('WebSocket 에러:', e);
+    };
     ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
@@ -91,7 +103,9 @@ const ChatPage = () => {
         ]);
       } catch (e) {}
     };
-    ws.onclose = () => {};
+    ws.onclose = (e) => {
+      console.log('WebSocket 연결 종료', e);
+    };
   };
 
   // 메시지 전송
@@ -107,9 +121,9 @@ const ChatPage = () => {
       ...prev,
       {
         id: `m${Date.now()}`,
-        text: messageInput,
-        time: new Date().toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true }),
-        isSent: true,
+      text: messageInput,
+      time: new Date().toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true }),
+      isSent: true,
         read: false,
       },
     ]);
@@ -238,6 +252,8 @@ const ChatPage = () => {
 };
 
 export default ChatPage;
+// ... 이하 스타일 컴포넌트는 기존 그대로 유지 ...
+
 
 // 메인 채팅 컨테이너
 const ChatPageContainer = styled.div`

@@ -9,6 +9,7 @@ import SalaryModal from './modal/SalaryModal';
 import HealthChartModal from './modal/HealthChartModal';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { startPrivateChat } from '../api/chatApi';
 
 const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onReject }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
@@ -124,14 +125,23 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
     [openMenuId]
   );
 
-  const handleMenuItemClick = (e, action, rowData) => {
-    e.stopPropagation(); // 메뉴 아이템 클릭 시 메뉴가 바로 닫히도록
+  const handleMenuItemClick = async (e, action, rowData) => {
+    e.stopPropagation();
 
-    // setOpenMenuId(null); // 중복 호출 제거, 아래에서 한 번만 호출
-    // setMenuPosition({ top: 0, left: 0 }); // 중복 호출 제거
-    // currentMenuButtonRef.current = null; // 중복 호출 제거
-
-    if (action === '승인') {
+    if (action === '1:1 채팅') {
+      try {
+        const otherMemberEmail = rowData.userEmail;
+        if (!otherMemberEmail) {
+          alert('상대방 이메일 정보가 없습니다.');
+          return;
+        }
+        const roomId = await startPrivateChat(otherMemberEmail);
+        navigate(`/chatpage/${roomId}`); // 실제 채팅 페이지 경로에 맞게 수정
+      } catch (error) {
+        console.error('개인 채팅 시작 실패:', error);
+        alert('채팅 시작에 실패했습니다.');
+      }
+    } else if (action === '승인') {
       if (onApprove) {
         onApprove(rowData);
       }
@@ -146,11 +156,8 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
       setHealthModalOpen(true);
     } else if (action === '정산내역') {
       setSalaryModalData(rowData); // 정산내역도 동일 모달 사용
-    } else if (action === '1대1채팅') {
-      navigate('/chat');
     }
 
-    // 메뉴 닫힘 관련 상태 업데이트는 한 번만 수행
     setOpenMenuId(null);
     setMenuPosition({ top: 0, left: 0 });
     currentMenuButtonRef.current = null;
