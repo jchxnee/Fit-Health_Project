@@ -49,6 +49,8 @@ dependencies {
 	//고성능 대용량 파일 업로드/다운로드를 위한 고급 추상화 계층
 	implementation 'software.amazon.awssdk:s3-transfer-manager:2.20.26'
 
+	//WebSocket 기능을 위한 라이브러리
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 tasks.named('test') {
