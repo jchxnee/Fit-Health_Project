@@ -26,7 +26,7 @@ function SubmitSection({ onSubmit }) {
   return (
     <Row>
       <SubmitButton type="submit" onClick={onSubmit}>
-        등록하기
+        수정하기
       </SubmitButton>
     </Row>
   );
