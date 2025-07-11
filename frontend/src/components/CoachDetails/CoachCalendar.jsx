@@ -87,15 +87,19 @@ function CoachCalendar() {
     const events = [];
     matchingList.forEach((match) => {
       if (match.history && match.history.length > 0) {
-        match.history.forEach((session) => {
+        const totalSessions = match.history.length;
+
+        match.history.forEach((session, index) => {
           if (!session.selectDate) return;
 
           const datePart = session.selectDate.split(' ')[0];
           const [year, month, day] = datePart.split('-').map(Number);
           const eventDate = new Date(year, month - 1, day);
 
+          const currentSessionNumber = index + 1;
+
           events.push({
-            title: `${match.userName} - ${match.sessions}회차`,
+            title: `${match.trainerName} - ${currentSessionNumber}/${totalSessions}회차`,
             start: eventDate,
             end: moment(eventDate).endOf('day').toDate(),
             type: 'session',
@@ -120,7 +124,10 @@ function CoachCalendar() {
       padding: '2px 5px',
       display: 'flex',
       alignItems: 'center',
+      justifyContent: 'center',
       gap: '5px',
+      width: '100%',
+      height: '100%',
     };
 
     switch (event.status) {
@@ -153,11 +160,6 @@ function CoachCalendar() {
   const Event = ({ event }) => {
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        {event.initial && (
-          <span className="event-initial" style={{ fontWeight: 'bold' }}>
-            {event.initial}
-          </span>
-        )}
         <span className="event-title">{event.title}</span>
       </div>
     );
