@@ -1,3 +1,4 @@
+// com.fithealth.backend.dto.Reservation.ReservationCreateDto.java
 package com.fithealth.backend.dto.Reservation;
 
 import com.fithealth.backend.entity.Reservation;
@@ -15,6 +16,8 @@ public class ReservationCreateDto {
     @NoArgsConstructor
     public static class Create{
         private Long payment_id;
+        private String transaction_id; // 프론트에서 받은 merchant_uid
+        private String payment_method; // 프론트에서 받은 pay_method
         private LocalDateTime select_date;
 
         public Reservation toEntity(){

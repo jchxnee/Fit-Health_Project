@@ -42,17 +42,16 @@ export const paymentService = {
   },
 
   //결제 진행
-  goPayment: async (paymentId, firstReservation) => {
-    console.log(paymentId);
-    console.log(firstReservation);
+  goPayment: async (createDto) => {
+    // <-- 단일 객체 인자로 변경!
+    console.log('프론트에서 백엔드로 보낼 요청 본문:', createDto); // 디버깅을 위해 추가
     try {
-      const { data } = await api.put(API_ENDPOINTS.PAYMENT.PAYMENT, {
-        payment_id: paymentId,
-        select_date: firstReservation,
-      });
+      // api.put의 두 번째 인자로 createDto 객체 전체를 직접 전달합니다.
+      const { data } = await api.put(API_ENDPOINTS.PAYMENT.PAYMENT, createDto); // <-- 여기가 핵심 수정!
 
       return data;
     } catch (error) {
+      console.error('API 에러 :', error.response ? error.response.data : error.message); // 에러 로그 강화
       const message = error.response?.data?.message || '결제 하는데 실패했습니다.';
       throw new Error(message);
     }
