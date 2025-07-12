@@ -249,7 +249,7 @@ function Header() {
           navigate(`/coachReview/${notification.relatedId}`);
           break;
         case 'NEW_CHAT_MESSAGE':
-          navigate(`/chat`);
+          navigate(`/chatpage`);
           break;
         case 'NEW_COMMENT_ON_POST':
           navigate(`/communityDetailPage/${notification.relatedId}`);
@@ -333,7 +333,7 @@ function Header() {
                 {unreadNotificationCount > 0 && <RedDot>{unreadNotificationCount}</RedDot>}{' '}
                 {/* 읽지 않은 알림이 있을 때만 표시 */}
               </NotificationWrapper>
-              <NavItem to="/chat">채팅</NavItem>
+              <NavItem to="/chatpage">채팅</NavItem>
               <ProfileWrapper onClick={handleUserMenuClick} ref={profileWrapperRef}>
                 <ProfileImg
                   src={user.img ? `${CLOUDFRONT_URL}${user.img}?v=${Date.now()}` : basicProfile}

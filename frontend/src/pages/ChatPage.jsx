@@ -22,7 +22,7 @@ const ChatPage = () => {
   const [userEmail, setUserEmail] = useState('');
 
   // access token 가져오기 (localStorage 기준)
-  const getToken = () => localStorage.getItem('accessToken');
+  const getToken = () => sessionStorage.getItem('token');
 
   // 내 정보(이메일) 가져오기 (토큰 decode 또는 별도 API 필요)
   useEffect(() => {

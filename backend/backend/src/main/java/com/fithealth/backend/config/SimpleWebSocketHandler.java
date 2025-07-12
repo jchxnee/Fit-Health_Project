@@ -53,14 +53,17 @@ public class SimpleWebSocketHandler extends TextWebSocketHandler {
             System.out.println("WebSocket JWT 인증 성공");
         } catch (Exception e) {
             System.out.println("WebSocket JWT 인증 실패: " + e.getMessage());
+            e.printStackTrace();
             session.close();
             return;
+
         }
 
         session.getAttributes().put("roomId", roomId);
         roomSessions.computeIfAbsent(roomId, k -> ConcurrentHashMap.newKeySet()).add(session);
         System.out.println("Connected : " + session.getId() + " to room " + roomId);
     }
+
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
