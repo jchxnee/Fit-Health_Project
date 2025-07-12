@@ -45,6 +45,7 @@ public class ResponsePaymentDto {
         private Long payment_id;
         private String user_name;
         private String trainer_name;
+        private Long trainer_no;
         private String user_phone;
         private CommonEnums.Status payment_status;
         private Long product_price;
@@ -63,6 +64,7 @@ public class ResponsePaymentDto {
                     .trainer_name(payment.getResponseMember().getUserName())
                     .user_phone(payment.getMember().getPhone())
                     .payment_status(payment.getPaymentStatus())
+                    .trainer_no(payment.getResponseMember().getTrainer().getTrainerNo())
                     .product_price(payment.getProductPrice())
                     .product_name(payment.getProductName())
                     .total_count(payment.getTotalCount())
