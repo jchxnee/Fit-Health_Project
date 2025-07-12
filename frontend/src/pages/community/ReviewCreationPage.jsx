@@ -1,16 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import TitleBar from '../../components/TitleBar';
 import { FaCamera, FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import api from '../../api/axios.js';
 import { API_ENDPOINTS } from '../../api/config.js';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify'; // toast 메시지를 위한 임포트 추가
+import { toast } from 'react-toastify';
 import { getUploadUrl, uploadFileToS3 } from '../../api/file';
-
-// ===========================================
-// 스타일 컴포넌트 정의
-// ===========================================
 
 const PageContainer = styled.div`
   width: 100%;
@@ -256,31 +252,25 @@ const RemoveImageButton = styled.button`
 
 function ReviewCreationPage() {
   const location = useLocation();
-  const { paymentId, trainerName, trainerNo } = location.state || {};
+  const { paymentId: initialPaymentId } = location.state || {};
+
   const navigate = useNavigate();
 
   const [content, setContent] = useState('');
-  const [file, setFile] = useState(null); // 단일 파일 저장을 위한 상태
+  const [file, setFile] = useState(null);
 
-  // imageCount를 파일이 존재하는지에 따라 0 또는 1로 설정
   const imageCount = file ? 1 : 0;
 
   const [information, setInformation] = useState({
-    coachName: trainerName || '알 수 없음',
-    paymentId: paymentId,
+    coachName: '알 수 없음',
+    paymentId: initialPaymentId,
   });
-  console.log(information.paymentId);
+  console.log('Current paymentId in information state:', information.paymentId);
+
+  // 트레이너 번호를 useRef로 관리 (백엔드 DTO에 trainer_no 추가 후 이 값을 사용할 예정)
+  const trainerNoRef = useRef(null);
 
   const fileInputRef = useRef(null);
-
-  useEffect(() => {
-    if (paymentId && trainerName) {
-      setInformation({ coachName: trainerName, paymentId: paymentId });
-    } else {
-      console.warn('ReviewCreationPage: paymentId or trainerName not found in location state.');
-    }
-  }, [paymentId, trainerName]);
-
   const contentTextareaRef = useRef(null);
   const [isContentFocused, setIsContentFocused] = useState(false);
 
@@ -288,6 +278,7 @@ function ReviewCreationPage() {
   const [hoverRating, setHoverRating] = useState(0);
   const starRatingRef = useRef(null);
 
+  // isFormValid는 trainerNo의 유무와 상관없이 리뷰 등록 자체의 유효성을 검사합니다.
   const isFormValid = content.trim() !== '' && selectedRating > 0 && information.paymentId != null;
 
   const handleContentChange = (e) => {
@@ -314,10 +305,68 @@ function ReviewCreationPage() {
     setFile(null);
   };
 
+  const fetchTrainerInfo = useCallback(async () => {
+    if (!initialPaymentId) {
+      console.warn('알림으로부터 결제 정보를 넘기지 못함.');
+      toast.error('결제 정보가 없어 트레이너 정보를 불러올 수 없습니다.');
+      navigate('/matchingList');
+      return;
+    }
+
+    try {
+      const response = await api.get(API_ENDPOINTS.PAYMENT.BASE, {
+        params: {
+          paymentId: initialPaymentId,
+        },
+      });
+      const paymentDetail = response.data;
+
+      if (paymentDetail && paymentDetail.trainer_name && paymentDetail.trainer_no) {
+        setInformation((prev) => ({
+          ...prev,
+          coachName: paymentDetail.trainer_name,
+        }));
+        trainerNoRef.current = paymentDetail.trainer_no;
+      } else {
+        console.warn('트레이너 정보를 잘못불러옴 또는 trainer_no가 누락됨:', paymentDetail);
+        toast.error('트레이너 정보를 불러오거나 트레이너 번호를 확인할 수 없습니다.');
+        setInformation((prev) => ({
+          ...prev,
+          coachName: '알 수 없음',
+        }));
+        trainerNoRef.current = null;
+      }
+    } catch (error) {
+      console.error('트레이너 정보 조회 실패:', error.response ? error.response.data : error.message);
+      toast.error(`트레이너 정보 불러오기 실패: ${error.response?.data?.message || '알 수 없는 오류'}`);
+      setInformation((prev) => ({
+        ...prev,
+        coachName: '알 수 없음',
+      }));
+      trainerNoRef.current = null;
+    }
+  }, [initialPaymentId, navigate]);
+
+  useEffect(() => {
+    if (initialPaymentId) {
+      fetchTrainerInfo();
+    }
+  }, [initialPaymentId, fetchTrainerInfo]);
+
   const handleSubmit = async () => {
+    // 폼 유효성 검사 (내용, 별점, 결제ID)
     if (!isFormValid) {
-      console.log('폼이 유효하지 않습니다. 내용, 별점, Payment ID를 모두 확인해주세요.');
-      toast.error('리뷰 내용을 입력하고 별점을 선택해주세요.');
+      let errorMessage = '';
+      if (content.trim() === '') errorMessage = '리뷰 내용을 입력해주세요.';
+      else if (selectedRating === 0) errorMessage = '별점을 선택해주세요.';
+      else if (information.paymentId == null) errorMessage = '결제 정보가 없습니다.';
+      toast.error(errorMessage);
+      return;
+    }
+
+    // 리뷰 등록 후 페이지 이동을 위한 trainerNo 유효성 검사
+    if (trainerNoRef.current == null) {
+      toast.error('트레이너 정보를 불러오지 못하여 리뷰 등록 후 페이지를 이동할 수 없습니다.');
       return;
     }
 
@@ -336,15 +385,16 @@ function ReviewCreationPage() {
         reviewContent: content,
         rating: selectedRating,
         heart: 0,
-        originName, // null일 수 있음
-        changeName, // null일 수 있음
+        originName,
+        changeName,
       };
 
       await api.post(API_ENDPOINTS.REVIEW.CREATE, body);
       toast.success('리뷰가 성공적으로 등록되었습니다!');
-      navigate(`/coachReview/${trainerNo}`);
 
-      // 초기화
+      // trainer번호 사용해서 트레이너 리뷰 페이지로 이동
+      navigate(`/coachReview/${trainerNoRef.current}`);
+
       setContent('');
       setFile(null);
       setSelectedRating(0);
@@ -353,7 +403,6 @@ function ReviewCreationPage() {
     } catch (error) {
       console.error('리뷰 등록 실패:', error.response ? error.response.data : error.message);
       toast.error(`리뷰 등록 실패: ${error.response?.data?.message || error.message}`);
-      navigate(`/matchingList`);
     }
   };
 
@@ -431,7 +480,14 @@ function ReviewCreationPage() {
     if (selectedRating === 0) {
       return '별점을 선택해주세요';
     }
-    return '';
+    if (information.paymentId == null) {
+      return '결제 정보가 없습니다.';
+    }
+    // trainerNo가 없으면 리뷰 등록 후 이동이 불가능하므로, 이때도 툴팁 메시지 제공
+    if (trainerNoRef.current == null) {
+      return '트레이너 정보를 불러오는 중입니다...';
+    }
+    return ''; // 모든 조건 충족 시 빈 문자열 반환 (툴팁 미표시)
   };
 
   return (
@@ -440,6 +496,7 @@ function ReviewCreationPage() {
         <TitleBar title="리뷰 등록" />
         <ContentWrapper>
           <TopSection>
+            {/* information.coachName을 사용하여 트레이너 이름 표시 */}
             <CategorySelect>{information.coachName} 트레이너</CategorySelect>
             <StarRatingContainer
               ref={starRatingRef}
@@ -450,10 +507,16 @@ function ReviewCreationPage() {
               {renderStars(hoverRating || selectedRating)}
             </StarRatingContainer>
             <SubmitButtonWrapper>
-              <SubmitTextButton onClick={handleSubmit} disabled={!isFormValid} $isValid={isFormValid}>
+              {/* isFormValid와 trainerNoRef.current가 모두 유효할 때만 버튼 활성화 */}
+              <SubmitTextButton
+                onClick={handleSubmit}
+                disabled={!isFormValid || trainerNoRef.current == null}
+                $isValid={isFormValid && trainerNoRef.current != null}
+              >
                 등록
               </SubmitTextButton>
-              {!isFormValid && <Tooltip>{getTooltipMessage()}</Tooltip>}
+              {/* 폼이 유효하지 않거나 trainerNo가 없을 때 툴팁 표시 */}
+              {(!isFormValid || trainerNoRef.current == null) && <Tooltip>{getTooltipMessage()}</Tooltip>}
             </SubmitButtonWrapper>
           </TopSection>
 
@@ -468,8 +531,8 @@ function ReviewCreationPage() {
               accept="image/*"
               style={{ display: 'none' }}
             />
-            <ImageCount>{imageCount}/1</ImageCount> {/* 1개 제한으로 변경 */}
-            {file /* 파일이 있을 때만 미리보기 표시 */ && (
+            <ImageCount>{imageCount}/1</ImageCount>
+            {file && (
               <ImagePreviewContainer>
                 <img
                   src={URL.createObjectURL(file)}
