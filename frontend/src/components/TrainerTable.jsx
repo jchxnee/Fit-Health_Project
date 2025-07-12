@@ -29,6 +29,21 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
       sortableItems.sort((a, b) => {
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
+
+        // ⭐ 날짜/시간 필드 정렬을 위한 특수 처리 추가 ⭐
+        if (sortConfig.key === 'startDate' || sortConfig.key === 'paymentAt' || sortConfig.key === 'reservationAt') {
+          const dateA = aValue ? new Date(aValue) : null;
+          const dateB = bValue ? new Date(bValue) : null;
+
+          if (dateA && dateB) {
+            return (dateA.getTime() - dateB.getTime()) * (sortConfig.direction === 'ascending' ? 1 : -1);
+          }
+          // null 값 처리: null은 항상 마지막으로 정렬
+          if (dateA === null) return 1;
+          if (dateB === null) return -1;
+          return 0; // 둘 다 null인 경우
+        }
+
         const isNumeric = (str) => !isNaN(str) && !isNaN(parseFloat(str));
 
         if (isNumeric(aValue) && isNumeric(bValue)) {
@@ -114,7 +129,6 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
 
         setMenuPosition({
           top: buttonRect.top - tableContainerRect.top,
-          // 'left' 값이 두 번 할당되어 마지막 값이 적용되던 부분을 한 번으로 통합
           left: buttonRect.left - tableContainerRect.left + buttonRect.width + 10,
         });
         setOpenMenuId(rowId);
@@ -125,11 +139,7 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
   );
 
   const handleMenuItemClick = (e, action, rowData) => {
-    e.stopPropagation(); // 메뉴 아이템 클릭 시 메뉴가 바로 닫히도록
-
-    // setOpenMenuId(null); // 중복 호출 제거, 아래에서 한 번만 호출
-    // setMenuPosition({ top: 0, left: 0 }); // 중복 호출 제거
-    // currentMenuButtonRef.current = null; // 중복 호출 제거
+    e.stopPropagation();
 
     if (action === '승인') {
       if (onApprove) {
@@ -140,17 +150,16 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
         onReject(rowData);
       }
     } else if (action === '정산신청') {
-      setSalaryModalData(rowData); // 정산 모달 열기
+      setSalaryModalData(rowData);
     } else if (action === '고객 건강정보') {
-      setSelectedEmail(rowData.userEmail); // usermail이 아닌 userEmail 사용하도록 명시적으로 수정 (가정)
+      setSelectedEmail(rowData.userEmail);
       setHealthModalOpen(true);
     } else if (action === '정산내역') {
-      setSalaryModalData(rowData); // 정산내역도 동일 모달 사용
+      setSalaryModalData(rowData);
     } else if (action === '1대1채팅') {
       navigate('/chat');
     }
 
-    // 메뉴 닫힘 관련 상태 업데이트는 한 번만 수행
     setOpenMenuId(null);
     setMenuPosition({ top: 0, left: 0 });
     currentMenuButtonRef.current = null;
@@ -177,9 +186,25 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
         <tbody>
           {sortedData.map((row, rowIndex) => (
             <tr key={row.id || rowIndex} onClick={() => handleRowClickInternal(row)}>
-              {' '}
               {columns.map((col) => (
-                <td key={col.key}>{col.key === 'status' ? <StatusBadge status={row[col.key]} /> : row[col.key]}</td>
+                <td key={col.key}>
+                  {col.key === 'status' ? (
+                    <StatusBadge status={row[col.key]} />
+                  ) : // ⭐ 날짜/시간 컬럼에 대한 포맷팅 로직 추가 ⭐
+                  (col.key === 'startDate' || col.key === 'paymentAt' || col.key === 'reservationAt') &&
+                    row[col.key] ? (
+                    new Date(row[col.key]).toLocaleString('ko-KR', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false, // 24시간 형식
+                    })
+                  ) : (
+                    row[col.key]
+                  )}
+                </td>
               ))}
               <TdMenuCell>
                 <ThreeDotsMenu onClick={(e) => handleThreeDotsMenuClick(e, row.id ?? rowIndex)}>
@@ -196,20 +221,18 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
           const rowData = sortedData.find((d, i) => (d.id ?? i) === openMenuId);
           if (!rowData) return null;
 
-          // ⭐ 변경된 부분: 조건 변수를 명확히 정의하고, 중첩된 PopupMenuItem을 분리 ⭐
           const isPending = rowData.status?.trim() === '승인 대기중';
           const isCompleted = rowData.status?.trim() === '완료됨';
           const isInProgress = rowData.status?.trim() === '진행중';
 
           return (
             <PopupMenu ref={menuRef} $top={menuPosition.top} $left={menuPosition.left}>
-              <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '1:1 채팅', rowData)}>1:1 채팅</PopupMenuItem>
+              <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '1대1채팅', rowData)}>1:1 채팅</PopupMenuItem>
 
               {/* '진행중' 상태일 때만 '고객 건강정보' 메뉴 보이기 */}
               {isInProgress && (
                 <PopupMenuItem
                   onClick={(e) => {
-                    // 이벤트 객체 'e'를 전달하여 전파를 막을 수 있도록 함
                     handleMenuItemClick(e, '고객 건강정보', rowData);
                   }}
                 >
@@ -221,8 +244,7 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
               {isCompleted && (
                 <PopupMenuItem
                   onClick={(e) => {
-                    // 이벤트 객체 'e'를 전달하여 전파를 막을 수 있도록 함
-                    handleMenuItemClick(e, '정산신청', rowData); // 액션 이름을 '정산신청'으로 통일
+                    handleMenuItemClick(e, '정산신청', rowData);
                   }}
                 >
                   {rowData.hasSalary ? '정산내역' : '정산신청'}
@@ -277,9 +299,9 @@ const StyledTable = styled.table`
   th,
   td {
     padding: ${theme.spacing['3']} ${theme.spacing['4']};
-    text-align: left;
     border-bottom: 1px solid ${theme.colors.gray['200']};
     white-space: nowrap;
+    vertical-align: middle; /* ⭐ 수직 중앙 정렬 추가 ⭐ */
   }
 
   th {
@@ -294,11 +316,12 @@ const StyledTable = styled.table`
   td {
     color: ${theme.colors.gray['700']};
     font-size: ${theme.fontSizes.sm};
+    text-align: center; /* ⭐ 왼쪽 정렬로 변경 ⭐ */
   }
 
   th:last-child,
   td:last-child {
-    text-align: center;
+    text-align: center; /* 마지막 컬럼은 가운데 정렬 유지 */
   }
 
   tr {
@@ -314,6 +337,7 @@ const ThContent = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing['1']};
+  justify-content: center; /* th 내용도 왼쪽 정렬하고 싶다면 이 부분을 left로 변경 */
 `;
 
 const SortIconWrapper = styled.div`
@@ -345,7 +369,7 @@ const ThreeDotsMenu = styled.button`
 const TdMenuCell = styled.td`
   position: relative;
   width: 50px;
-  text-align: center !important;
+  text-align: center !important; /* 이 셀은 여전히 가운데 정렬 */
 `;
 
 const PopupMenu = styled.div`
