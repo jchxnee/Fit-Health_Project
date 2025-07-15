@@ -343,7 +343,7 @@ function Header() {
           </NavItem>
           <HeaderNavLeft>
             <NavItem to="/coachList">핏코치 매칭</NavItem>
-            <NavItem to="/exercise">추천 운동</NavItem>
+            <NavItem to="/exercise">AI 맞춤건강</NavItem>
             <NavItem to="/community">커뮤니티</NavItem>
             <NavItem to="/notice">공지사항</NavItem>
             <NavItem to="/productList">건강 상품</NavItem>

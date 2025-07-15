@@ -28,6 +28,7 @@ const InputRow = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing[6]};
   align-items: center;
+  margin-bottom: 20px;
 `;
 const Input = styled.input`
   width: 120px;
