@@ -48,6 +48,9 @@ export const useLoginForm = () => {
 
       const memberInfo = await memberService.getMemberInfo(); // 이제 이 요청은 토큰을 포함하여 전송됩니다.
 
+      // 로그인 성공 시 이메일도 세션에 저장
+      sessionStorage.setItem('userEmail', memberInfo.user_email);
+
       login({
         useremail: memberInfo.user_email,
         trainerNo: memberInfo.trainer_no,

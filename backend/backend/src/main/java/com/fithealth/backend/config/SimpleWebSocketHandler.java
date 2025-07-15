@@ -30,6 +30,7 @@ public class SimpleWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        System.out.println("[WebSocket] afterConnectionEstablished 진입");
         String query = session.getUri().getQuery();
         Long roomId = null;
         String token = null;
@@ -45,40 +46,49 @@ public class SimpleWebSocketHandler extends TextWebSocketHandler {
         }
 
         if (roomId == null || token == null) {
+            System.out.println("[WebSocket] roomId 또는 token 누락, 연결 종료");
             session.close();
             return;
         }
         try {
             jwtTokenProvider.parseClaims(token);
-            System.out.println("WebSocket JWT 인증 성공");
+            String email = jwtTokenProvider.parseClaims(token).getSubject();
+            session.getAttributes().put("userEmail", email);
+            System.out.println("[WebSocket] JWT 인증 성공, userEmail=" + email);
         } catch (Exception e) {
-            System.out.println("WebSocket JWT 인증 실패: " + e.getMessage());
+            System.out.println("[WebSocket] JWT 인증 실패: " + e.getMessage());
             e.printStackTrace();
             session.close();
             return;
-
         }
 
         session.getAttributes().put("roomId", roomId);
         roomSessions.computeIfAbsent(roomId, k -> ConcurrentHashMap.newKeySet()).add(session);
-        System.out.println("Connected : " + session.getId() + " to room " + roomId);
+        System.out.println("[WebSocket] 연결 성공: sessionId=" + session.getId() + ", roomId=" + roomId);
     }
 
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        System.out.println("[WebSocket] handleTextMessage 진입");
         String payload = message.getPayload();
-        System.out.println("received message : " + payload);
+        System.out.println("[WebSocket] 수신 메시지: " + payload);
         ChatMessageDto chatMessageDto = objectMapper.readValue(payload, ChatMessageDto.class);
+
+        // senderEmail을 session에서 꺼내서 dto에 set
+        String email = (String) session.getAttributes().get("userEmail");
+        chatMessageDto.setSenderEmail(email);
 
         chatService.saveMessage(chatMessageDto);
 
         Long roomId = chatMessageDto.getRoomId();
         Set<WebSocketSession> targetSessions = roomSessions.get(roomId);
         if (targetSessions != null) {
+            // senderEmail이 반드시 포함된 JSON으로 변환
+            String sendPayload = objectMapper.writeValueAsString(chatMessageDto);
             for (WebSocketSession s : targetSessions) {
                 if (s.isOpen()) {
-                    s.sendMessage(new TextMessage(payload));
+                    s.sendMessage(new TextMessage(sendPayload));
                 }
             }
         }
@@ -86,6 +96,7 @@ public class SimpleWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        System.out.println("[WebSocket] afterConnectionClosed 진입");
         Long roomId = (Long) session.getAttributes().get("roomId");
         if (roomId != null) {
             Set<WebSocketSession> sessions = roomSessions.get(roomId);
@@ -96,6 +107,13 @@ public class SimpleWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         }
-        System.out.println("disconnected!!");
+        System.out.println("[WebSocket] 연결 종료: sessionId=" + session.getId() + ", 상태=" + status);
+    }
+
+    @Override
+    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+        System.out.println("[WebSocket] handleTransportError 진입");
+        System.out.println("[WebSocket] 에러: " + exception.getMessage());
+        exception.printStackTrace();
     }
 }
