@@ -45,6 +45,7 @@ const StyledTable = styled.table`
     font-size: ${theme.fontSizes.sm};
     text-align: center;
     padding-right: calc(${theme.spacing['4']} + 10px);
+    vertical-align: middle;
   }
 
   th:last-child,
@@ -154,6 +155,20 @@ const UserTable = ({ data, columns, onRowClick }) => {
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
 
+        // 날짜/시간 필드 정렬을 위한 특수 처리 (ISO 8601 문자열 또는 Date 객체를 비교)
+        if (sortConfig.key === 'startDate' || sortConfig.key === 'paymentAt' || sortConfig.key === 'reservationAt') {
+          const dateA = aValue ? new Date(aValue) : null;
+          const dateB = bValue ? new Date(bValue) : null;
+
+          if (dateA && dateB) {
+            return (dateA.getTime() - dateB.getTime()) * (sortConfig.direction === 'ascending' ? 1 : -1);
+          }
+          // null 값 처리: null은 항상 마지막으로 정렬
+          if (dateA === null) return 1;
+          if (dateB === null) return -1;
+          return 0; // 둘 다 null인 경우
+        }
+
         const isNumeric = (str) => !isNaN(str) && !isNaN(parseFloat(str));
 
         if (isNumeric(aValue) && isNumeric(bValue)) {
@@ -197,7 +212,7 @@ const UserTable = ({ data, columns, onRowClick }) => {
       if (sortConfig.direction === 'ascending') {
         direction = 'descending';
       } else if (sortConfig.direction === 'descending') {
-        direction = 'none';
+        direction = 'none'; // 세 번째 클릭 시 정렬 해제
       }
     }
     setSortConfig({ key, direction });
@@ -227,7 +242,6 @@ const UserTable = ({ data, columns, onRowClick }) => {
   // 'status: Y'인 항목 중 가장 최근 예약 날짜와, 전체 history 중 가장 최근 예약의 상태 및 거절 사유 존재 여부를 동시에 반환
   const getLatestReservationInfo = useCallback((history) => {
     if (!history || history.length === 0) {
-      // ⭐ 추가: rejectCommentExists 필드도 반환 ⭐
       return { latestApprovedDate: null, latestOverallStatus: null, latestRejectCommentExists: false };
     }
 
@@ -238,13 +252,11 @@ const UserTable = ({ data, columns, onRowClick }) => {
     });
 
     const latestStatus = sortedHistory[0].status; // 제일 최근 예약내역의 승인상태
-    // ⭐ 추가: 제일 최근 예약내역의 거절 사유 존재 여부 ⭐
     const latestRejectCommentExists = !!sortedHistory[0].rejectComment;
 
     const approvedHistory = sortedHistory.filter((item) => item.status === 'Y');
-    const latestApprovedDate = approvedHistory.length > 0 ? new Date(approvedHistory[0].selectDate) : null; // 제일 최근 예약내역의 날짜
+    const latestApprovedDate = approvedHistory.length > 0 ? new Date(approvedHistory[0].selectDate) : null;
 
-    // ⭐ 반환 값에 latestRejectCommentExists 추가 ⭐
     return { latestApprovedDate, latestStatus, latestRejectCommentExists };
   }, []);
 
@@ -266,10 +278,12 @@ const UserTable = ({ data, columns, onRowClick }) => {
           return;
         }
 
-        setMenuPosition({
-          top: buttonRect.top - tableContainerRect.top,
-          left: tableContainerRect.width + 10,
-        });
+        // 팝업 메뉴가 테이블 내에 위치하도록 상대 좌표 계산
+        const top = buttonRect.top - tableContainerRect.top;
+        // 팝업 메뉴를 버튼 오른쪽에 배치 (원하는 위치에 따라 조정 가능)
+        const left = buttonRect.right - tableContainerRect.left + 10; // 버튼 오른쪽 10px 떨어진 곳
+
+        setMenuPosition({ top, left });
         setOpenMenuId(rowPaymentId);
         currentMenuButtonRef.current = e.currentTarget;
       }
@@ -307,13 +321,11 @@ const UserTable = ({ data, columns, onRowClick }) => {
         toast.warn('완료된 수업에 대해서만 후기를 남길 수 있습니다.');
       }
     } else if (action === '다음 회차예약') {
-      // ⭐ 변경: latestRejectCommentExists를 사용하도록 조건 수정 ⭐
       const { latestOverallStatus, latestRejectCommentExists } = getLatestReservationInfo(rowData.history);
 
-      // 코치 승인 대기 중이고 거절 사유가 없을 때만 경고 메시지 표시
       if (latestOverallStatus === 'N' && !latestRejectCommentExists) {
         toast.warn('코치 승인 대기 중인 예약이 있어 다음 회차 예약을 할 수 없습니다.');
-        return; // 예약 진행을 막음
+        return;
       }
 
       const sessionsParts = rowData.sessions.split(/\s*\/\s*/);
@@ -331,14 +343,11 @@ const UserTable = ({ data, columns, onRowClick }) => {
     }
   };
 
-  // PopupMenu가 열려있을 때만 해당 rowData와 날짜 조건을 계산
   const selectedRowData = useMemo(() => {
     if (openMenuId === null) return null;
     return sortedData.find((d) => d.paymentId === openMenuId);
   }, [openMenuId, sortedData]);
 
-  // 가장 최근 예약 정보를 가져옴
-  // ⭐ 변경: latestRejectCommentExists도 함께 가져옴 ⭐
   const { latestApprovedDate, latestStatus, latestRejectCommentExists } = useMemo(() => {
     return selectedRowData ? getLatestReservationInfo(selectedRowData.history) : {};
   }, [selectedRowData, getLatestReservationInfo]);
@@ -346,15 +355,11 @@ const UserTable = ({ data, columns, onRowClick }) => {
   const now = new Date();
   const TWENTY_FOUR_HOURS_IN_MS = 24 * 60 * 60 * 1000;
 
-  // 코치 승인된 가장 최근 예약일로부터 24시간이 '경과하지 않았는지'
   const isWithin24HoursOfLatestApprovedBooking = latestApprovedDate
     ? now.getTime() - latestApprovedDate.getTime() < TWENTY_FOUR_HOURS_IN_MS
     : false;
 
-  // 메뉴가 보여야 하는 조건:
-  // 1. 코치 승인된 가장 최근 예약일로부터 24시간이 경과했거나,
-  // 2. (코치 승인 대기 중이 아니거나) OR (코치 승인 대기 중이지만 거절 사유가 있을 때)
-  const nextActionMenu = latestStatus == 'Y' || (latestStatus == 'N' && latestRejectCommentExists);
+  const nextActionMenu = latestStatus === 'Y' || (latestStatus === 'N' && latestRejectCommentExists);
 
   return (
     <StyledTableContainer ref={tableContainerRef}>
@@ -378,7 +383,24 @@ const UserTable = ({ data, columns, onRowClick }) => {
           {sortedData.map((row) => (
             <tr key={row.paymentId} onClick={() => handleRowClick(row)}>
               {columns.map((col) => (
-                <td key={col.key}>{col.key === 'status' ? <StatusBadge status={row[col.key]} /> : row[col.key]}</td>
+                <td key={col.key}>
+                  {col.key === 'status' ? (
+                    <StatusBadge status={row[col.key]} />
+                  ) : // ⭐ 'startDate' 또는 다른 날짜/시간 컬럼에 대해 포맷 적용 ⭐
+                  (col.key === 'startDate' || col.key === 'paymentAt' || col.key === 'reservationAt') &&
+                    row[col.key] ? (
+                    new Date(row[col.key]).toLocaleString('ko-KR', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false, // 24시간 형식
+                    })
+                  ) : (
+                    row[col.key]
+                  )}
+                </td>
               ))}
               <TdMenuCell>
                 <ThreeDotsMenu onClick={(e) => handleThreeDotsMenuClick(e, row.paymentId)}>
@@ -392,25 +414,16 @@ const UserTable = ({ data, columns, onRowClick }) => {
       {openMenuId !== null && selectedRowData && (
         <PopupMenu ref={menuRef} $top={menuPosition.top} $left={menuPosition.left}>
           <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '1:1 채팅', selectedRowData)}>1:1 채팅</PopupMenuItem>
-          {/* 후기 남기기 버튼: 완료된 수업이고 아직 후기가 없는 경우에만 보임 */}
           {selectedRowData.hasReview === false && selectedRowData.status === '완료됨' && (
             <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '후기 남기기', selectedRowData)}>
               후기 남기기
             </PopupMenuItem>
           )}
-          {/* 다음 회차 예약 버튼:
-                1. '진행중' 상태
-                2. 'shouldShowActionMenus' (통합 조건)가 true일 때
-          */}
           {selectedRowData.status === '진행중' && nextActionMenu && (
             <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '다음 회차예약', selectedRowData)}>
               다음 회차예약
             </PopupMenuItem>
           )}
-          {/* 결제 취소 버튼:
-                1. 'refund'가 true
-                2. 'shouldShowActionMenus' (통합 조건)가 true일 때
-          */}
           {selectedRowData.refund && !isWithin24HoursOfLatestApprovedBooking && (
             <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '결제취소', selectedRowData)} $isDelete>
               결제취소
