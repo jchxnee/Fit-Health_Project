@@ -7,13 +7,27 @@ import {
   getMyChatRooms,
   getChatHistory,
   readChatRoom,
-} from '../api/chatApi.js'; // 실제 API 경로에 맞게 수정 필요
+} from '../api/chatApi.js';
+// import basicProfile from 'E:\Fit-Health_Project\frontend\public\img\basicProfile.jpg'; // import 구문 제거
 
 const WS_BASE_URL = 'ws://localhost:7961/connect'; // 백엔드 서버 포트로 수정
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
+
+// 시간 포맷 함수 추가
+const formatTime = (isoString) => {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  const hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const ampm = hours < 12 ? '오전' : '오후';
+  const displayHour = hours % 12 === 0 ? 12 : hours % 12;
+  return `${ampm} ${displayHour}:${minutes}`;
+};
 
 const ChatPage = () => {
   const [chatRooms, setChatRooms] = useState([]); // 채팅방 목록
-  const [messages, setMessages] = useState([]); // 메시지 목록
+  const [messages, setMessages] = useState([]);
+  const [unreadCounts, setUnreadCounts] = useState({});
   const [activeChatId, setActiveChatId] = useState(null); // 현재 활성화된 채팅방
   const [messageInput, setMessageInput] = useState('');
   const [activeTab, setActiveTab] = useState('ongoing'); // 'ongoing', 'completed'
@@ -47,27 +61,23 @@ const ChatPage = () => {
   // 채팅방 변경 시 메시지 불러오기 및 읽음 처리
   useEffect(() => {
     if (!activeChatId) return;
-    getChatHistory(activeChatId)
-      .then((data) => {
-        setMessages(
-          data.map((msg, idx) => ({
-            id: `m${idx}_${msg.senderEmail}`,
-            text: msg.message,
-            time: '', // 시간 포맷 필요시 추가
-            isSent:
-              (msg.senderEmail || '').trim().toLowerCase() ===
-              (userEmail || '').trim().toLowerCase(),
-            read: true, // 읽음 여부는 별도 처리 필요
-          }))
-        );
-        // 읽음 처리
-        readChatRoom(activeChatId);
-      })
-      .catch(() => setMessages([]));
-    // WebSocket 연결
-    connectWebSocket(activeChatId);
-    // eslint-disable-next-line
+    getChatHistory(activeChatId).then((data) => {
+      const formatted = data.map((msg, idx) => ({
+        id: `m${idx}_${msg.senderEmail}`,
+        text: msg.message,
+        time: formatTime(msg.createdTime), // 시간 포맷 적용
+        isSent: (msg.senderEmail || '').toLowerCase() === (userEmail || '').toLowerCase(),
+        read: msg.read || false
+      }));
+      setMessages(formatted);
+
+      // 읽지 않은 메시지 수 0으로 초기화
+      setUnreadCounts((prev) => ({ ...prev, [activeChatId]: 0 }));
+
+      connectWebSocket(activeChatId);
+    });
   }, [activeChatId, userEmail]);
+
 
 
   const scrollToBottom = () => {
@@ -114,21 +124,29 @@ const ChatPage = () => {
     ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
-        console.log('서버에서 받은 senderEmail:', msg.senderEmail, '내 userEmail:', userEmail);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `m${Date.now()}`,
-            text: msg.message,
-            time: '',
-            isSent:
-              (msg.senderEmail || '').trim().toLowerCase() ===
-              (userEmail || '').trim().toLowerCase(),
-            read: true,
-          },
-        ]);
-      } catch (e) {}
+        const isMe = (msg.senderEmail || '').trim().toLowerCase() === (userEmail || '').trim().toLowerCase();
+        const isActiveRoom = String(msg.roomId) === String(activeChatId);
+        const newMsg = {
+          id: `m${Date.now()}`,
+          text: msg.message,
+          time: formatTime(msg.createdTime || new Date()), // createdTime 없으면 현재 시각 사용
+          isSent: isMe,
+          read: isMe // 본인이 보낸 건 바로 읽음
+        };
+        setMessages((prev) => [...prev, newMsg]);
+
+        // 읽지 않은 메시지 수 증가: 현재 활성화된 채팅방이 아닐 때만
+        if (!isMe && !isActiveRoom) {
+          setUnreadCounts((prev) => {
+            const prevCount = prev[msg.roomId] || 0;
+            return { ...prev, [msg.roomId]: prevCount + 1 };
+          });
+        }
+      } catch (e) {
+        console.error('메시지 파싱 오류', e);
+      }
     };
+
     ws.onclose = (e) => {
       console.log('WebSocket 연결 종료', e);
     };
@@ -157,16 +175,23 @@ const ChatPage = () => {
   const activeChatRoom = chatRooms.find((chat) => String(chat.roomId) === String(activeChatId));
 
   // 메시지 스크롤이 가장 아래로 내려갈 때 메시지를 읽음 처리
-  const handleScrollToBottom = (e) => {
+  const handleScrollToBottom = async (e) => {
     const { scrollHeight, scrollTop, clientHeight } = e.target;
     if (scrollHeight - scrollTop - clientHeight < 20) {
       setMessages((prevMessages) =>
-        prevMessages.map((message) =>
-          message.isSent === false && message.read === false ? { ...message, read: true } : message
-        )
+        prevMessages.map((m) => (!m.read && !m.isSent ? { ...m, read: true } : m))
       );
+
+      setUnreadCounts((prev) => ({ ...prev, [activeChatId]: 0 }));
+
+      try {
+        await readChatRoom(activeChatId);
+      } catch (e) {
+        console.error('읽음 처리 실패', e);
+      }
     }
   };
+
 
   // 채팅방 변경 시 WebSocket 재연결
   useEffect(() => {
@@ -174,6 +199,8 @@ const ChatPage = () => {
       if (wsRef.current) wsRef.current.close();
     };
   }, [activeChatId]);
+
+
 
   return (
     <>
@@ -192,20 +219,29 @@ const ChatPage = () => {
               </ChatTab>
             </ChatTabContainer>
             <ChatListScrollContainer>
-              {filteredChatRooms.map((room) => (
-                <ChatListItem
-                  key={room.roomId}
-                  $isActive={String(room.roomId) === String(activeChatId)}
-                  onClick={() => setActiveChatId(String(room.roomId))}
-                >
-                  <ChatAvatar>{room.roomName ? room.roomName.charAt(0) : '?'}</ChatAvatar>
-                  <ChatInfo>
-                    <ChatName>{room.roomName}</ChatName>
-                    <LastMessage>{room.lastMessage || ''}</LastMessage>
-                  </ChatInfo>
-                  <LastMessageTime>{room.time || ''}</LastMessageTime>
-                </ChatListItem>
-              ))}
+              {filteredChatRooms.map((room) => {
+                const unread = unreadCounts[room.roomId] || 0;
+                return (
+                  <ChatListItem
+                    key={room.roomId}
+                    $isActive={String(room.roomId) === String(activeChatId)}
+                    onClick={() => setActiveChatId(String(room.roomId))}
+                  >
+                    <ChatAvatar>
+                      <img
+                        src={room.profileImage ? CLOUDFRONT_URL + room.profileImage : '/img/basicProfile.jpg'}
+                        alt="프로필"
+                      />
+                    </ChatAvatar>
+                    <ChatInfo>
+                      <ChatName>{room.roomName}</ChatName>
+                      <LastMessage>{room.lastMessage || ''}</LastMessage>
+                    </ChatInfo>
+                    {unread > 0 && <UnreadBadge>{unread}</UnreadBadge>}
+                  </ChatListItem>
+                );
+              })}
+
             </ChatListScrollContainer>
           </ChatListSection>
 
@@ -377,6 +413,7 @@ const ChatName = styled.div`
     color: ${({ theme }) => theme.colors.primary};
     white-space: nowrap;
     overflow: hidden;
+    margin-top: 10px;
     text-overflow: ellipsis;
     text-align: left;
 `;
@@ -547,4 +584,14 @@ const InputIcons = styled.div`
             margin-right: 0;
         }
     }
+`;
+
+const UnreadBadge = styled.div`
+  background-color: ${({ theme }) => theme.colors.danger || '#f44336'};
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 2px 8px;
+  margin-left: auto;
 `;

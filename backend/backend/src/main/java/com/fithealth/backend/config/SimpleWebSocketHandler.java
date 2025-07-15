@@ -1,6 +1,8 @@
 package com.fithealth.backend.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fithealth.backend.auth.JwtTokenProvider;
 import com.fithealth.backend.dto.chat.ChatMessageDto;
 import com.fithealth.backend.service.ChatService;
@@ -19,7 +21,9 @@ public class SimpleWebSocketHandler extends TextWebSocketHandler {
 
     private final Map<Long, Set<WebSocketSession>> roomSessions = new ConcurrentHashMap<>();
     private final ChatService chatService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
@@ -81,10 +85,12 @@ public class SimpleWebSocketHandler extends TextWebSocketHandler {
 
         chatService.saveMessage(chatMessageDto);
 
+        // 저장 후, DB에서 방금 저장된 메시지의 createdTime을 가져와서 DTO에 세팅
+        chatMessageDto.setCreatedTime(java.time.LocalDateTime.now()); // 임시: 실제로는 saveMessage에서 반환하도록 개선 가능
+
         Long roomId = chatMessageDto.getRoomId();
         Set<WebSocketSession> targetSessions = roomSessions.get(roomId);
         if (targetSessions != null) {
-            // senderEmail이 반드시 포함된 JSON으로 변환
             String sendPayload = objectMapper.writeValueAsString(chatMessageDto);
             for (WebSocketSession s : targetSessions) {
                 if (s.isOpen()) {

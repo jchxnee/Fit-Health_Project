@@ -13,4 +13,5 @@ public class ChatMessageDto {
     private Long roomId;
     private String message;
     private String senderEmail;
+    private java.time.LocalDateTime createdTime; // 추가
 }

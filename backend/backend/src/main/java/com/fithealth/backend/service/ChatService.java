@@ -100,10 +100,13 @@ public class ChatService {
                 .collect(Collectors.toList());
 
         return rooms.stream().map(r -> {
-            long unRead = readStatusRepository.countByChatRoomAndMemberAndIsReadFalse(r, me);
+            boolean isMeMember1 = me.getUserEmail().equals(r.getMember1().getUserEmail());
+            String opponentName = isMeMember1 ? r.getMember2().getUserName() : r.getMember1().getUserName();
+            String opponentProfile = isMeMember1 ? r.getMember2().getProfileImage() : r.getMember1().getProfileImage();
             return ChatRoomResponse.builder()
                     .roomId(r.getId())
-                    .roomName(r.getName())
+                    .roomName(opponentName) // 상대방 이름만!
+                    .profileImage(opponentProfile) // 상대방 프로필
                     .build();
         }).collect(Collectors.toList());
     }
