@@ -1,3 +1,4 @@
+// src/pages/RecommendExercise.jsx
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
@@ -7,75 +8,109 @@ import BMICalculator from '../components/RecommendExercise/BMICalculator.jsx';
 import RecommendRoutine from '../components/RecommendExercise/RecommendRoutine.jsx';
 
 const HeaderContainer = styled.div`
-    width: 100%;
-    display: flex;
-    justify-content: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 `;
 
 const MainRow = styled.div`
-    display: flex;
-    flex-direction: row;
-    max-width: 1008px;
-    margin: 0 auto;
-    gap: 44px;
+  display: flex;
+  flex-direction: row;
+  max-width: 1008px;
+  margin: 0 auto;
+  gap: 44px;
 `;
 
 const CategoryMenuWrapper = styled.div`
-    width: 200px;
-    min-width: 180px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    padding: 34px 10px;
+  width: 200px;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 34px 10px;
 `;
 
 const ContentWrapper = styled.div`
-    width: 654px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 59px;
+  width: 654px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 59px;
 `;
 
 function RecommendExercise() {
   const location = useLocation();
-  const initialCategory = location.state?.category || '헬스';
+
+  const initialMainCategory = location.state?.mainCategory || 'AI 추천 운동';
+
+  const initialSubCategory = location.state?.subCategory || '헬스';
 
   const [bmi, setBmi] = useState('');
   const [recommendList, setRecommendList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const allCategories = ['전체', '헬스', '요가', '도수', '재활'];
-  const visibleCategories = allCategories.filter(
-    (category) => category !== '도수' && category !== '재활' && category !== '전체'
-  );
+
+  const [selectedMainCategory, setSelectedMainCategory] = useState(initialMainCategory);
+
+  const [selectedExerciseSubCategory, setSelectedExerciseSubCategory] = useState(initialSubCategory);
+
+  const mainCategories = ['AI 추천 운동', 'AI 추천 식단'];
+
+  const handleMainCategorySelect = (category) => {
+    setSelectedMainCategory(category);
+
+    setRecommendList([]);
+    setError(null);
+
+    if (category === 'AI 추천 운동') {
+      setSelectedExerciseSubCategory('헬스');
+    } else {
+      setSelectedExerciseSubCategory('');
+    }
+  };
+
+  const handleSubCategorySelect = (category) => {
+    setSelectedExerciseSubCategory(category);
+    setRecommendList([]);
+    setError(null);
+  };
 
   return (
     <>
       <HeaderContainer>
-        <TitleBar title="운동 추천" />
+        <TitleBar title={selectedMainCategory} />
       </HeaderContainer>
       <MainRow>
         <CategoryMenuWrapper>
           <CategoryMenu
-            categories={visibleCategories}
-            selectedCategory={selectedCategory}
-            onSelectCategory={(category) => setSelectedCategory(category)}
+            categories={mainCategories}
+            selectedCategory={selectedMainCategory}
+            onSelectCategory={handleMainCategorySelect}
           />
         </CategoryMenuWrapper>
         <ContentWrapper>
           <BMICalculator bmi={bmi} setBmi={setBmi} />
-          <RecommendRoutine
-            bmi={bmi}
-            recommendList={recommendList}
-            setRecommendList={setRecommendList}
-            loading={loading}
-            setLoading={setLoading}
-            error={error}
-            setError={setError}
-            selectedCategory={selectedCategory}
-          />
+
+          {selectedMainCategory === 'AI 추천 운동' && (
+            <RecommendRoutine
+              bmi={bmi}
+              recommendList={recommendList}
+              setRecommendList={setRecommendList}
+              loading={loading}
+              setLoading={setLoading}
+              error={error}
+              setError={setError}
+              selectedCategory={selectedExerciseSubCategory}
+              onSelectSubCategory={handleSubCategorySelect}
+            />
+          )}
+
+          {selectedMainCategory === 'AI 추천 식단' && (
+            <div>
+              <h2>AI 추천 식단 페이지</h2>
+              <p>여기에 식단 추천 관련 내용을 추가할 예정입니다.</p>
+            </div>
+          )}
         </ContentWrapper>
       </MainRow>
     </>

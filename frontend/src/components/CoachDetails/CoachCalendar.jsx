@@ -99,7 +99,7 @@ function CoachCalendar() {
           const currentSessionNumber = index + 1;
 
           events.push({
-            title: `${match.trainerName} - ${currentSessionNumber}/${totalSessions}회차`,
+            title: `${match.userName} - ${currentSessionNumber}/${totalSessions}회차`,
             start: eventDate,
             end: moment(eventDate).endOf('day').toDate(),
             type: 'session',
@@ -121,10 +121,10 @@ function CoachCalendar() {
       borderRadius: '4px',
       border: '1px solid transparent',
       fontSize: '12px',
-      padding: '2px 5px',
+      padding: '5px 15px',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center',
+
       gap: '5px',
       width: '100%',
       height: '100%',

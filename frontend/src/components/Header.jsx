@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'; // useRef, useEffect, useCallback import 추가
-import styled from 'styled-components'; // css import
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import styled from 'styled-components';
 import headerIcon from '../assets/header_icon.png';
 import { FaBell, FaChevronDown, FaChevronUp, FaSyncAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
@@ -34,31 +34,30 @@ const formatTimeAgo = (dateTimeString) => {
 };
 
 // NotificationList 컴포넌트 (중복 제거 후 Header에서 props로 데이터 받도록 수정)
-function NotificationList({ notifications, onNotificationClick }) {
-  if (!notifications || notifications.length === 0) {
-    return (
-      <NotificationContainer>
-        <NotificationTitle>알림</NotificationTitle>
-        <NoNotificationItem>새로운 알림이 없습니다.</NoNotificationItem>
-      </NotificationContainer>
-    );
-  }
-
+// onClearAllNotifications prop 추가
+function NotificationList({ notifications, onNotificationClick, onClearAllNotifications }) {
   return (
     <NotificationContainer>
-      <NotificationTitle>알림</NotificationTitle>
-      {notifications.map((notification) => (
-        <NotificationItem
-          key={notification.notificationNo}
-          $isRead={notification.isRead === 'Y'}
-          onClick={() => onNotificationClick(notification)}
-        >
-          {' '}
-          {/* 여기서 사용 */}
-          <NotificationMessage>{notification.message}</NotificationMessage>
-          <NotificationTime>{formatTimeAgo(notification.createdDate)}</NotificationTime>
-        </NotificationItem>
-      ))}
+      <NotificationTitle>
+        알림
+        {/* 알림이 있든 없든 항상 '모두 지우기' 버튼을 표시하려면 여기에 렌더링 */}
+        <AllClearButton onClick={onClearAllNotifications}>모두 지우기</AllClearButton>
+      </NotificationTitle>
+      {notifications && notifications.length > 0 ? (
+        notifications.map((notification) => (
+          <NotificationItem
+            key={notification.notificationNo}
+            $isRead={notification.isRead === 'Y'}
+            onClick={() => onNotificationClick(notification)}
+          >
+            <NotificationMessage>{notification.message}</NotificationMessage>
+            <NotificationTime>{formatTimeAgo(notification.createdDate)}</NotificationTime>
+          </NotificationItem>
+        ))
+      ) : (
+        // 알림이 없을 때만 이 메시지를 표시
+        <NoNotificationItem>새로운 알림이 없습니다.</NoNotificationItem>
+      )}
     </NotificationContainer>
   );
 }
@@ -136,21 +135,19 @@ function UserMenu({ onMenuItemClick }) {
 }
 
 function Header() {
-  const { user } = useUserStore(); // user 정보를 useUserStore에서 가져옴
+  const { user } = useUserStore();
   const navigate = useNavigate();
 
   const [showNotification, setShowNotification] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [notifications, setNotifications] = useState([]); // 알림 목록 상태
-  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0); // 읽지 않은 알림 개수 상태
+  const [notifications, setNotifications] = useState([]);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
 
-  // 알림 모달과 유저 메뉴 모달을 참조할 ref 생성
   const notificationRef = useRef(null);
   const userMenuRef = useRef(null);
-  const bellIconRef = useRef(null); // 알림 아이콘 ref
-  const profileWrapperRef = useRef(null); // 프로필 래퍼 ref
+  const bellIconRef = useRef(null);
+  const profileWrapperRef = useRef(null);
 
-  // 읽지 않은 알림 개수를 가져오는 함수
   const fetchUnreadNotificationCount = useCallback(async () => {
     if (!user || !user.email) {
       setUnreadNotificationCount(0);
@@ -165,7 +162,6 @@ function Header() {
     }
   }, [user]);
 
-  // 모든 알림을 가져오는 함수
   const fetchAllNotifications = useCallback(async () => {
     console.log('fetchAllNotifications 호출됨!');
     if (!user || !user.email) {
@@ -188,7 +184,7 @@ function Header() {
     let intervalId;
     if (user && user.email) {
       fetchUnreadNotificationCount();
-      intervalId = setInterval(fetchUnreadNotificationCount, 30000); // 30초마다 폴링
+      intervalId = setInterval(fetchUnreadNotificationCount, 30000);
     } else {
       setUnreadNotificationCount(0);
       setNotifications([]);
@@ -207,7 +203,6 @@ function Header() {
     setShowUserMenu(false);
 
     if (!showNotification) {
-      // 알림 모달이 열릴 때만 목록을 다시 가져옴
       await fetchAllNotifications();
     }
   };
@@ -216,7 +211,7 @@ function Header() {
     try {
       if (notification.isRead === 'N') {
         await api.post(`/api/notifications/${notification.notificationNo}/read`);
-        fetchUnreadNotificationCount(); // 읽음 처리 후 개수 갱신
+        fetchUnreadNotificationCount();
         setNotifications((prev) =>
           prev.map((notif) =>
             notif.notificationNo === notification.notificationNo ? { ...notif, isRead: 'Y' } : notif
@@ -254,12 +249,14 @@ function Header() {
         case 'NEW_COMMENT_ON_POST':
           navigate(`/communityDetailPage/${notification.relatedId}`);
           break;
-        // 추가된 알림 타입 핸들링 (goPayment와 goRefund에서 추가된 알림)
-        case 'PT_PAYMENT_COMPLETED': // 유저가 결제 완료 시 트레이너에게 가는 알림
-          navigate(`/coachmatchingList`); // 트레이너의 코칭 내역으로 이동
+        case 'PT_PAYMENT_COMPLETED':
+          navigate(`/coachmatchingList`);
           break;
-        case 'PT_REFUND_REQUEST': // 유저가 환불 요청 시 트레이너에게 가는 알림
-          navigate(`/coachmatchingList`); // 트레이너의 코칭 내역으로 이동 또는 환불 관리 페이지
+        case 'PT_REFUND_REQUEST':
+          navigate(`/coachmatchingList`);
+          break;
+        case 'NEXT_RESERVATION_COMPLETED':
+          navigate('/coachmatchingList');
           break;
         default:
           navigate('/mypage');
@@ -271,33 +268,60 @@ function Header() {
     }
   };
 
+  // 모든 알림을 읽음 처리하는 함수 (수정된 부분)
+  const handleClearAllNotifications = useCallback(async () => {
+    if (!user || !user.email) {
+      toast.error('사용자 정보가 없어 알림을 읽음 처리할 수 없습니다.');
+      return;
+    }
+    try {
+      // 현재 notifications 상태에서 읽지 않은 알림만 필터링합니다.
+      const unreadNotifs = notifications.filter((notif) => notif.isRead === 'N');
+
+      // 각 읽지 않은 알림에 대해 개별 읽음 처리 API를 호출합니다.
+      // Promise.all을 사용하여 모든 요청이 완료될 때까지 기다립니다.
+      const markAsReadPromises = unreadNotifs.map((notif) =>
+        api.post(`/api/notifications/${notif.notificationNo}/read`)
+      );
+
+      await Promise.all(markAsReadPromises);
+
+      // 모든 요청이 성공하면 프론트엔드 상태를 업데이트합니다.
+      setNotifications(
+        (prev) => prev.map((notif) => ({ ...notif, isRead: 'Y' })) // 모든 알림을 읽음으로 표시
+      );
+      setUnreadNotificationCount(0); // 읽지 않은 알림 개수를 0으로 설정
+      toast.success('모든 알림을 읽음 처리했습니다.');
+      setShowNotification(false); // 알림창 닫기
+    } catch (error) {
+      console.error('모든 알림을 읽음 처리하는 데 실패했습니다:', error);
+      toast.error('모든 알림을 읽음 처리하는 데 실패했습니다.');
+    }
+  }, [user, notifications]); // notifications 상태를 의존성 배열에 추가
+
   const handleUserMenuClick = () => {
     setShowUserMenu((prev) => !prev);
-    setShowNotification(false); // 다른 모달 닫기
+    setShowNotification(false);
   };
 
-  // UserMenu 내의 아이템을 클릭했을 때 호출될 함수
   const handleUserMenuItemClick = () => {
-    setShowUserMenu(false); // UserMenu 닫기
+    setShowUserMenu(false);
   };
 
-  // 외부 클릭 감지 로직
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // 알림 모달 외부 클릭 감지
       if (
         notificationRef.current &&
         !notificationRef.current.contains(event.target) &&
-        bellIconRef.current && // 벨 아이콘이 클릭된 것이 아니라면
+        bellIconRef.current &&
         !bellIconRef.current.contains(event.target)
       ) {
         setShowNotification(false);
       }
-      // 유저 메뉴 모달 외부 클릭 감지
       if (
         userMenuRef.current &&
         !userMenuRef.current.contains(event.target) &&
-        profileWrapperRef.current && // 프로필 래퍼가 클릭된 것이 아니라면
+        profileWrapperRef.current &&
         !profileWrapperRef.current.contains(event.target)
       ) {
         setShowUserMenu(false);
@@ -308,7 +332,7 @@ function Header() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []); // 빈 배열을 넣어 컴포넌트 마운트 시 한 번만 실행되도록 함
+  }, []);
 
   return (
     <HeaderComponent>
@@ -319,7 +343,7 @@ function Header() {
           </NavItem>
           <HeaderNavLeft>
             <NavItem to="/coachList">핏코치 매칭</NavItem>
-            <NavItem to="/exercise">추천 운동</NavItem>
+            <NavItem to="/exercise">AI 맞춤건강</NavItem>
             <NavItem to="/community">커뮤니티</NavItem>
             <NavItem to="/notice">공지사항</NavItem>
             <NavItem to="/productList">건강 상품</NavItem>
@@ -330,8 +354,7 @@ function Header() {
             <HeaderNavRight>
               <NotificationWrapper onClick={handleNotificationClick} ref={bellIconRef}>
                 <FaBell />
-                {unreadNotificationCount > 0 && <RedDot>{unreadNotificationCount}</RedDot>}{' '}
-                {/* 읽지 않은 알림이 있을 때만 표시 */}
+                {unreadNotificationCount > 0 && <RedDot>{unreadNotificationCount}</RedDot>}
               </NotificationWrapper>
               <NavItem to="/chat">채팅</NavItem>
               <ProfileWrapper onClick={handleUserMenuClick} ref={profileWrapperRef}>
@@ -345,12 +368,16 @@ function Header() {
             </HeaderNavRight>
             {showNotification && (
               <NotificationListContainer ref={notificationRef}>
-                <NotificationList notifications={notifications} onNotificationClick={onNotificationItemClick} />
+                <NotificationList
+                  notifications={notifications}
+                  onNotificationClick={onNotificationItemClick}
+                  onClearAllNotifications={handleClearAllNotifications} // 새로 추가된 prop
+                />
               </NotificationListContainer>
             )}
             {showUserMenu && (
               <UserMenuContainerWrapper ref={userMenuRef}>
-                <UserMenu onMenuItemClick={handleUserMenuItemClick} /> {/* prop 전달 */}
+                <UserMenu onMenuItemClick={handleUserMenuItemClick} />
               </UserMenuContainerWrapper>
             )}
           </HeaderRight>
@@ -361,6 +388,7 @@ function Header() {
     </HeaderComponent>
   );
 }
+
 const HeaderComponent = styled.header`
   width: 100%;
   height: 60px;
@@ -371,7 +399,7 @@ const HeaderComponent = styled.header`
   z-index: ${({ theme }) => theme.zIndices.dropdown};
   position: sticky;
   top: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 헤더 그림자 추가 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
   a,
   button {
@@ -380,11 +408,11 @@ const HeaderComponent = styled.header`
 `;
 
 const HeaderContent = styled.div`
-  width: ${({ theme }) => theme.width.lg}; /* 1008px */
+  width: ${({ theme }) => theme.width.lg};
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: relative; /* 자식 모달의 위치 기준 */
+  position: relative;
 `;
 
 const HeaderLeft = styled.div`
@@ -426,7 +454,7 @@ const HeaderRight = styled(Link)`
   cursor: pointer;
   display: flex;
   align-items: center;
-  position: relative; /* 알림 및 유저 메뉴 모달의 위치 기준 */
+  position: relative;
 `;
 
 const HeaderNavRight = styled.nav`
@@ -480,7 +508,6 @@ const ProfileWrapper = styled.div`
   cursor: pointer;
 
   & > svg {
-    /* Chevron 아이콘 스타일 */
     margin-left: ${({ theme }) => theme.spacing[1]};
     color: ${({ theme }) => theme.colors.gray[500]};
     font-size: ${({ theme }) => theme.fontSizes.sm};
@@ -494,7 +521,6 @@ const ProfileImg = styled.img`
   object-fit: cover;
 `;
 
-// 알림 목록 모달 스타일
 const NotificationListContainer = styled.div`
   position: absolute;
   top: 40px;
@@ -516,13 +542,11 @@ const NotificationListContainer = styled.div`
   }
 `;
 
-// 사용자 메뉴 모달 스타일
 const UserMenuContainerWrapper = styled.div`
   position: absolute;
-  top: 50px; /* 헤더 높이 + 여백 */
-  right: 0; /* 사용자 이름에 맞춰서 조정 */
+  top: 50px;
+  right: 0;
   z-index: ${({ theme }) => theme.zIndices.dropdown};
-  /* 애니메이션 추가 */
   opacity: 0;
   transform: translateY(-10px);
   animation: fadeInDown 0.3s forwards;
@@ -539,7 +563,6 @@ const UserMenuContainerWrapper = styled.div`
   }
 `;
 
-// 제공된 NotificationList의 스타일 컴포넌트 이름 변경 (이름 충돌 방지)
 const NotificationContainer = styled.div`
   width: 338px;
   border: 1px solid ${({ theme }) => theme.colors.gray['200']};
@@ -553,16 +576,33 @@ const NotificationContainer = styled.div`
   flex-direction: column;
 `;
 
+// AllClearButton 스타일 추가 및 수정
+const AllClearButton = styled.button`
+  background: none;
+  border: none;
+  color: ${({ theme }) => theme.colors.gray[500]};
+  font-size: ${({ theme }) => theme.fontSizes.xs};
+  cursor: pointer;
+  padding: 0;
+  &:hover {
+    text-decoration: none;
+    color: ${({ theme }) => theme.colors.primary};
+    scale: 1.1;
+  }
+`;
+
 const NotificationTitle = styled.div`
   padding: ${({ theme }) => theme.spacing['3']} ${({ theme }) => theme.spacing['4']};
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.primary};
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray['200']};
-  /* 스크롤 시 타이틀이 상단에 고정되도록 */
   position: sticky;
   top: 0;
   background-color: ${({ theme }) => theme.colors.white};
-  z-index: 1; /* 알림 항목 위에 표시 */
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const NotificationItem = styled.div`
@@ -641,13 +681,13 @@ const UserMenuItem = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.base};
   color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
-  padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]}; /* padding 조정 */
-  width: 100%; /* 너비 100%로 설정하여 hover 영역 넓히기 */
-  box-sizing: border-box; /* padding이 너비에 포함되도록 */
-  transition: background-color 0.2s ease-in-out; /* hover 트랜지션 추가 */
+  padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]};
+  width: 100%;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease-in-out;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.gray[50]}; /* hover 시 배경색 변경 */
+    background-color: ${({ theme }) => theme.colors.gray[50]};
     color: ${({ theme }) => theme.colors.primary};
   }
 `;

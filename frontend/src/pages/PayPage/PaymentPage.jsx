@@ -121,9 +121,9 @@ const PaymentPage = () => {
       // 결제 데이터 준비 (실제 결제에 필요한 정보)
       const data = {
         pg: 'html5_inicis', // PG사 (예: 이니시스)
-        pay_method: 'card', // 결제수단
-        merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
-        name: paymentData.product_name, // 상품명
+        payment_method: 'tosspay', // 결제수단
+        transaction_id: `mid_${new Date().getTime()}`, // 주문번호
+        name: paymentData.trainer_name + '코치 ' + paymentData.product_name + paymentData.total_count + '회권', // 상품명
         amount: paymentData.product_price, // 결제 금액
         buyer_email: user.email, // 구매자 이메일
         buyer_name: paymentData.user_name, // 구매자 이름
@@ -135,15 +135,17 @@ const PaymentPage = () => {
       IMP.request_pay(data, async (rsp) => {
         if (rsp.success) {
           // 결제 성공 시
-          console.log('결제 성공:', rsp);
+          console.log('결제 성공:', rsp); // 서버에 결제 검증 및 완료 요청
+          // 백엔드 ReservationCreateDto.Create DTO 형태에 맞게 객체로 묶어서 보냅니다.
 
-          // 서버에 결제 검증 및 완료 요청
-          const response = await paymentService.goPayment(
-            id,
-            paymentData.first_reservation,
-            rsp.imp_uid,
-            rsp.merchant_uid
-          );
+          const requestBody = {
+            payment_id: Number(id), // URL 파라미터에서 가져온 payment ID
+            select_date: paymentData.first_reservation, // 결제 정보에서 가져온 첫 예약일 (LocalDateTime 형식)
+            transaction_id: rsp.merchant_uid, // 포트원에서 받은 주문번호 (merchant_uid)
+            payment_method: data.payment_method, // 포트원에 보냈던 결제 수단 (card)
+          };
+
+          const response = await paymentService.goPayment(requestBody); // DTO 객체로 전달
           console.log('서버 결제 처리 결과:', response);
 
           toast.success('결제가 완료되었습니다!');
