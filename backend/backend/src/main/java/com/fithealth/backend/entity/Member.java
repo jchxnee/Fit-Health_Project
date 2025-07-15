@@ -24,7 +24,7 @@ import java.util.List;
 @DynamicUpdate
 public class Member {
     @Id
-    @Column(name = "USER_EMAIL", length = 254)
+    @Column(name = "USER_EMAIL", length = 100)
     private String userEmail;
 
     @Column(name = "USER_PWD", length = 100, nullable = false)
@@ -44,7 +44,7 @@ public class Member {
     @Column(length = 11)
     private String phone;
 
-    @Column(name = "ADDRESS",length = 100)
+    @Column(name = "ADDRESS",length = 255)
     private String address;
 
     @Enumerated(EnumType.STRING)
