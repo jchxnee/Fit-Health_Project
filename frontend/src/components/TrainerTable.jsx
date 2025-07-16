@@ -144,16 +144,27 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
 
     if (action === '1:1 채팅') {
       try {
-        const otherMemberEmail = rowData.userEmail;
+        const myEmail = sessionStorage.getItem('userEmail');
+        let otherMemberEmail = null;
+        if (myEmail === rowData.userEmail) {
+          // 내가 회원 → 상대방은 트레이너
+          otherMemberEmail = rowData.trainerEmail;
+        } else {
+          // 내가 트레이너 → 상대방은 회원
+          otherMemberEmail = rowData.userEmail;
+        }
         if (!otherMemberEmail) {
           alert('상대방 이메일 정보가 없습니다.');
           return;
         }
+        if (otherMemberEmail === myEmail) {
+          alert('자기 자신과는 채팅할 수 없습니다.');
+          return;
+        }
         const roomId = await startPrivateChat(otherMemberEmail);
-        navigate(`/chatpage/${roomId}`); // 실제 채팅 페이지 경로에 맞게 수정
+        navigate(`/chatpage/${roomId}`);
       } catch (error) {
-        console.error('개인 채팅 시작 실패:', error);
-        alert('채팅 시작에 실패했습니다.');
+        alert('채팅방 생성에 실패했습니다.');
       }
     } else if (action === '승인') {
       if (onApprove) {

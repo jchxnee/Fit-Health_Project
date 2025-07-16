@@ -119,10 +119,12 @@ public class ChatService {
             boolean isMeMember1 = me.getUserEmail().equals(r.getMember1().getUserEmail());
             String opponentName = isMeMember1 ? r.getMember2().getUserName() : r.getMember1().getUserName();
             String opponentProfile = isMeMember1 ? r.getMember2().getProfileImage() : r.getMember1().getProfileImage();
+            String opponentEmail = isMeMember1 ? r.getMember2().getUserEmail() : r.getMember1().getUserEmail();
             return ChatRoomResponse.builder()
                     .roomId(r.getId())
                     .roomName(opponentName) // 상대방 이름만!
                     .profileImage(opponentProfile) // 상대방 프로필
+                    .opponentEmail(opponentEmail)
                     .build();
         }).collect(Collectors.toList());
     }
