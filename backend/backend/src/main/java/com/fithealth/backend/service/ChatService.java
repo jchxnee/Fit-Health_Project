@@ -27,8 +27,7 @@ public class ChatService {
 
     public Long getOrCreateRoom(String otherUserEmail) {
         Member member = getCurrentMember();
-        System.out.println("내 이메일: " + member.getUserEmail());
-        System.out.println("상대방 이메일: " + otherUserEmail);
+
         if (member.getUserEmail().equals(otherUserEmail)) {
             throw new IllegalArgumentException("자기 자신과는 채팅방을 만들 수 없습니다.");
         }

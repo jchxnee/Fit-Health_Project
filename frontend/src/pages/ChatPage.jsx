@@ -65,10 +65,15 @@ const ChatPage = () => {
   useEffect(() => {
     if (!activeChatId) return;
     getChatHistory(activeChatId).then((data) => {
+      // 읽음 여부 콘솔 출력
+      console.log('채팅 히스토리 read 값:', data.map(msg => ({
+        message: msg.message,
+        sender: msg.senderEmail,
+        read: msg.read
+      })));
       const messages = data.map((msg, idx) => {
         const isSent = normalizeEmail(msg.senderEmail) === normalizeEmail(userEmail);
         // 디버깅용 콘솔 로그 추가
-        console.log('[채팅 히스토리] userEmail(내):', userEmail, 'msg.senderEmail:', msg.senderEmail, 'isSent:', isSent);
         return {
           id: `m${idx}_${msg.senderEmail}`,
           text: msg.message,
@@ -134,7 +139,6 @@ const ChatPage = () => {
         const msg = JSON.parse(event.data);
         const isMe = normalizeEmail(msg.senderEmail) === normalizeEmail(userEmail);
         // 디버깅용 콘솔 로그 추가
-        console.log('[WebSocket] userEmail(내):', userEmail, 'msg.senderEmail:', msg.senderEmail, 'isSent:', isMe);
         const isActiveRoom = String(msg.roomId) === String(activeChatId);
         const newMsg = {
           id: `m${Date.now()}`,
