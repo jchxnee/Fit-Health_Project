@@ -1,7 +1,8 @@
+// src/components/RecommendDiet/RecommendDiet.jsx
 import React from 'react';
 import styled from 'styled-components';
 import theme from '../../styles/theme';
-import SubCategoryMenu from './SubCategoryMenu';
+import SubCategoryMenu from './SubCategoryMenu'; // 목적 선택용 재사용
 
 const PageContainer = styled.div`
   display: flex;
@@ -79,15 +80,6 @@ const TableCell = styled.td`
   color: ${theme.colors.black};
 `;
 
-const renderDietItems = (items) => {
-  if (!items || items.length === 0) return '없음';
-  return items.map((item, i) => (
-    <span key={i}>
-      {item.name} ({item.kcal}kcal){i < items.length - 1 && ', '}
-    </span>
-  ));
-};
-
 const RecommendDiet = ({
   goalCategory,
   setGoalCategory,
@@ -109,8 +101,8 @@ const RecommendDiet = ({
     setLoading(true);
     setError(null);
     try {
-      // const result = await getRecommendDiet(goalCategory);
-      // setDietPlan(result);
+      //const result = await getRecommendDiet(goalCategory);
+      //setDietPlan(result); // 예: { breakfast: [...], lunch: [...], dinner: [...] }
     } catch (e) {
       setError('식단 추천에 실패했습니다.');
     } finally {
@@ -144,15 +136,15 @@ const RecommendDiet = ({
             <>
               <TableRow>
                 <TableCell>아침</TableCell>
-                <TableCell>{renderDietItems(dietPlan.breakfast)}</TableCell>
+                <TableCell>{dietPlan.breakfast?.join(', ') || '없음'}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>점심</TableCell>
-                <TableCell>{renderDietItems(dietPlan.lunch)}</TableCell>
+                <TableCell>{dietPlan.lunch?.join(', ') || '없음'}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>저녁</TableCell>
-                <TableCell>{renderDietItems(dietPlan.dinner)}</TableCell>
+                <TableCell>{dietPlan.dinner?.join(', ') || '없음'}</TableCell>
               </TableRow>
             </>
           ) : (

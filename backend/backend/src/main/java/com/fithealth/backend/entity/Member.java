@@ -24,7 +24,7 @@ import java.util.List;
 @DynamicUpdate
 public class Member {
     @Id
-    @Column(name = "USER_EMAIL", length = 100)
+    @Column(name = "USER_EMAIL", length = 254)
     private String userEmail;
 
     @Column(name = "USER_PWD", length = 100, nullable = false)
