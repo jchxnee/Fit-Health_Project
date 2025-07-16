@@ -8,6 +8,7 @@ import theme from '../styles/theme'; // theme 파일 경로가 올바른지 확�
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import RefundModal from './modal/RefundModal';
+import { startPrivateChat } from '../api/chatApi'; // 추가
 
 const StyledTableContainer = styled.div`
   width: 100%;
@@ -291,7 +292,7 @@ const UserTable = ({ data, columns, onRowClick }) => {
     [openMenuId]
   );
 
-  const handleMenuItemClick = (e, action, rowData) => {
+  const handleMenuItemClick = async (e, action, rowData) => { // async 추가
     e.stopPropagation();
     setOpenMenuId(null);
     setMenuPosition({ top: 0, left: 0 });
@@ -305,7 +306,29 @@ const UserTable = ({ data, columns, onRowClick }) => {
     if (action === '결제취소') {
       navigate(`/refundPage/${rowData.paymentId}`);
     } else if (action === '1:1 채팅') {
-      navigate('/chat');
+      try {
+        const myEmail = sessionStorage.getItem('userEmail');
+        let otherMemberEmail = null;
+        if (myEmail === rowData.userEmail) {
+          // 내가 회원 → 상대방은 트레이너
+          otherMemberEmail = rowData.trainerEmail;
+        } else {
+          // 내가 트레이너 → 상대방은 회원
+          otherMemberEmail = rowData.userEmail;
+        }
+        if (!otherMemberEmail) {
+          alert('상대방 이메일 정보가 없습니다.');
+          return;
+        }
+        if (otherMemberEmail === myEmail) {
+          alert('자기 자신과는 채팅할 수 없습니다.');
+          return;
+        }
+        const roomId = await startPrivateChat(otherMemberEmail);
+        navigate(`/chatpage/${roomId}`);
+      } catch (error) {
+        alert('채팅방 생성에 실패했습니다.');
+      }
     } else if (action === '후기 남기기') {
       if (rowData.status === '완료됨' && !rowData.hasReview) {
         navigate('/reviewCreationPage', {

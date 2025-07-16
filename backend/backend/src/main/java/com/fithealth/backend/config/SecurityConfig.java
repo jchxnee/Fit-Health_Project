@@ -54,7 +54,9 @@ public class SecurityConfig {
                                 "/oauth2/*",
                                 "/api/trainer",
                                 "/api/board/all",
-                                "/api/notice/all"
+                                "/api/notice/all",
+                                "/api/members/resetPwd",
+                                "/connect"
                         ).permitAll()
                         .anyRequest().authenticated() // 위의 요청경로를 제외한 나머지 경로는 인증
                 )

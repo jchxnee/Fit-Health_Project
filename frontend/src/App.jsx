@@ -68,7 +68,7 @@ function AppContent() {
   return (
     <>
       <TokenInitializer />
-      {!isHeaderHidden && <Header user={user} />}
+      {!isHeaderHidden && <Header />}
       <ScrollToTop />
       <Routes>
         {/* 공개 라우트 */}
@@ -82,6 +82,7 @@ function AppContent() {
         <Route path="/community" element={<CommunityPage />} />
         <Route path="/notice" element={<NoticePage />} />
         <Route path="/productList" element={<ProductList />} />
+        <Route path="/chatpage/:roomId" element={<ChatPage />} />
         <Route path="/termOfServicePage" element={<TermOfServicePage />} />
         <Route path="/operatingPolicy" element={<OperatingPolicyPage />} />
         <Route path="/privacyPolicy" element={<PrivacyPolicyPage />} />
@@ -130,7 +131,7 @@ function AppContent() {
           <Route path="/matchingList" element={<MatchingList />} />
         </Route>
       </Routes>
-      {!isHeaderHidden && <Footer user={null} />}
+      {!isHeaderHidden && <Footer />}
     </>
   );
 }

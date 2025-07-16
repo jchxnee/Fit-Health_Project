@@ -5,6 +5,7 @@ import com.fithealth.backend.dto.OAuth.AccessTokenDto;
 import com.fithealth.backend.dto.OAuth.KakaoProfileDto;
 import com.fithealth.backend.dto.OAuth.RedirectDto;
 import com.fithealth.backend.dto.member.LoginDto;
+import com.fithealth.backend.dto.member.ResponseDto;
 import com.fithealth.backend.dto.member.ResetPwdDto;
 import com.fithealth.backend.dto.member.SignupDto;
 import com.fithealth.backend.dto.member.UpdateDto;
@@ -144,6 +145,14 @@ public class MemberController {
         Map<String, Object> loginInfo = new HashMap<>();
         loginInfo.put("token", jwtToken);
         return new ResponseEntity<>(loginInfo, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/list")
+    public ResponseEntity<?> getMemberList() {
+        List<ResponseDto> dtos = memberService.findAll();
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
+
     }
 
     @GetMapping("/exists")

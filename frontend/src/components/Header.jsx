@@ -8,6 +8,7 @@ import basicProfile from '../../public/img/basicProfile.jpg';
 import { toast } from 'react-toastify';
 import api from '../api/axios';
 import { API_ENDPOINTS } from '../api/config';
+import media from '../utils/media'; // media 헬퍼 함수 임포트
 
 const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
 
@@ -68,7 +69,7 @@ function UserMenu({ onMenuItemClick }) {
   const updateUser = useUserStore((state) => state.updateUser);
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
-  console.log(user.trainerNo);
+
   const handleLogout = () => {
     logout(); // 상태 초기화
     toast.success('로그아웃되었습니다.');
@@ -163,16 +164,12 @@ function Header() {
   }, [user]);
 
   const fetchAllNotifications = useCallback(async () => {
-    console.log('fetchAllNotifications 호출됨!');
     if (!user || !user.email) {
-      console.log('User 또는 user.email 없음, 알림 가져오기 중단.');
       setNotifications([]);
       return;
     }
     try {
-      console.log('API 호출 시작: /api/notifications');
       const response = await api.get(`/api/notifications?userEmail=${user.email}`);
-      console.log('API 응답 데이터:', response.data);
       setNotifications(response.data);
     } catch (error) {
       console.error('알림 목록을 가져오는 데 실패했습니다:', error);
@@ -198,7 +195,6 @@ function Header() {
   }, [user, fetchUnreadNotificationCount]);
 
   const handleNotificationClick = async () => {
-    console.log('종 아이콘 클릭!');
     setShowNotification((prev) => !prev);
     setShowUserMenu(false);
 
@@ -244,7 +240,7 @@ function Header() {
           navigate(`/coachReview/${notification.relatedId}`);
           break;
         case 'NEW_CHAT_MESSAGE':
-          navigate(`/chat`);
+          navigate(`/chatpage`);
           break;
         case 'NEW_COMMENT_ON_POST':
           navigate(`/communityDetailPage/${notification.relatedId}`);
@@ -356,7 +352,7 @@ function Header() {
                 <FaBell />
                 {unreadNotificationCount > 0 && <RedDot>{unreadNotificationCount}</RedDot>}
               </NotificationWrapper>
-              <NavItem to="/chat">채팅</NavItem>
+              <NavItem to="/chatpage/:roomId">채팅</NavItem>
               <ProfileWrapper onClick={handleUserMenuClick} ref={profileWrapperRef}>
                 <ProfileImg
                   src={user.img ? `${CLOUDFRONT_URL}${user.img}?v=${Date.now()}` : basicProfile}
@@ -405,6 +401,13 @@ const HeaderComponent = styled.header`
   button {
     outline: none;
   }
+
+  ${media.md`
+    height: 50px;
+  `}
+  ${media.sm`
+    height: 45px;
+  `}
 `;
 
 const HeaderContent = styled.div`
@@ -413,17 +416,48 @@ const HeaderContent = styled.div`
   justify-content: space-between;
   align-items: center;
   position: relative;
+
+  ${media.lg`
+    width: 95%;
+  `}
+  ${media.md`
+    width: 95%;
+    padding: 0 ${({ theme }) => theme.spacing[4]}; // 좌우 패딩 추가
+  `}
+  ${media.sm`
+    width: 100%;
+    padding: 0 ${({ theme }) => theme.spacing[3]}; // 좌우 패딩 추가
+  `}
+  ${media.xs`
+    padding: 0 ${({ theme }) => theme.spacing[2]}; // 더 작은 화면
+  `}
 `;
 
 const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing[10]};
+
+  ${media.md`
+    gap: ${({ theme }) => theme.spacing[6]};
+  `}
+  ${media.sm`
+    gap: ${({ theme }) => theme.spacing[3]}; // 모바일에서 간격 줄이기
+  `}
 `;
 
 const HeaderIcon = styled.img`
   width: 124px;
   height: ${({ theme }) => theme.spacing[6]};
+
+  ${media.md`
+    width: 100px;
+    height: ${({ theme }) => theme.spacing[5]};
+  `}
+  ${media.sm`
+    width: 80px;
+    height: ${({ theme }) => theme.spacing[4]};
+  `}
 `;
 
 const HeaderNavLeft = styled.nav`
@@ -439,6 +473,28 @@ const HeaderNavLeft = styled.nav`
       color: ${({ theme }) => theme.colors.button};
     }
   }
+
+  ${media.md`
+    gap: ${({ theme }) => theme.spacing[3]};
+    font-size: ${({ theme }) => theme.fontSizes.base};
+  `}
+  ${media.sm`
+    /* display: none; // 이 줄을 제거하여 메뉴가 사라지지 않도록 함 */
+    gap: ${({ theme }) => theme.spacing[1]}; /* 간격 더 줄임 */
+    font-size: ${({ theme }) => theme.fontSizes.xs}; /* 폰트 크기 더 줄임 */
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+    overflow-x: auto; /* 가로 스크롤 가능하게 함 (필요시) */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    &::-webkit-scrollbar { // 스크롤바 숨기기 (선택 사항)
+      display: none;
+    }
+  `}
+  ${media.xs` /* 더 작은 화면을 위한 추가 조정 */
+    gap: ${({ theme }) => theme.spacing[0]};
+    font-size: 10px; /* 더 작은 폰트 사이즈 */
+    padding: 0 4px; /* 좌우 패딩도 조금 줄일 수 있음 */
+  `}
 `;
 
 const NavItem = styled(Link)`
@@ -455,6 +511,13 @@ const HeaderRight = styled(Link)`
   display: flex;
   align-items: center;
   position: relative;
+
+  ${media.md`
+    font-size: ${({ theme }) => theme.fontSizes.base};
+  `}
+  ${media.sm`
+    font-size: ${({ theme }) => theme.fontSizes.xs};
+  `}
 `;
 
 const HeaderNavRight = styled.nav`
@@ -471,6 +534,20 @@ const HeaderNavRight = styled.nav`
       color: ${({ theme }) => theme.colors.button};
     }
   }
+
+  ${media.md`
+    gap: ${({ theme }) => theme.spacing[2]};
+    font-size: ${({ theme }) => theme.fontSizes.base};
+  `}
+  ${media.sm`
+    gap: ${({ theme }) => theme.spacing[1]};
+    font-size: ${({ theme }) => theme.fontSizes.sm};
+  `}
+   ${media.xs` /* 더 작은 화면을 위한 추가 조정 */
+    gap: ${({ theme }) => theme.spacing[0]};
+    font-size: 10px; /* 더 작은 폰트 사이즈 */
+    padding: 0 4px; /* 좌우 패딩도 조금 줄일 수 있음 */
+  `}
 `;
 
 const NotificationWrapper = styled.div`
@@ -485,6 +562,13 @@ const NotificationWrapper = styled.div`
   &:hover {
     color: ${({ theme }) => theme.colors.primary};
   }
+
+  ${media.md`
+    font-size: ${({ theme }) => theme.fontSizes.lg};
+  `}
+  ${media.sm`
+    font-size: ${({ theme }) => theme.fontSizes.base};
+  `}
 `;
 
 const RedDot = styled.div`
@@ -499,6 +583,14 @@ const RedDot = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.xs};
   color: ${({ theme }) => theme.colors.white};
   text-align: center;
+
+  ${media.sm`
+    width: 14px;
+    height: 14px;
+    font-size: 8px;
+    top: -5px;
+    right: -5px;
+  `}
 `;
 
 const ProfileWrapper = styled.div`
@@ -512,6 +604,16 @@ const ProfileWrapper = styled.div`
     color: ${({ theme }) => theme.colors.gray[500]};
     font-size: ${({ theme }) => theme.fontSizes.sm};
   }
+
+  ${media.sm`
+    span {
+        display: none; // 모바일에서 사용자 이름 숨기기
+    }
+    & > svg {
+        margin-left: 0;
+        font-size: 12px;
+    }
+  `}
 `;
 
 const ProfileImg = styled.img`
@@ -519,12 +621,21 @@ const ProfileImg = styled.img`
   height: 30px;
   border-radius: ${({ theme }) => theme.borderRadius.full};
   object-fit: cover;
+
+  ${media.md`
+    width: 28px;
+    height: 28px;
+  `}
+  ${media.sm`
+    width: 24px;
+    height: 24px;
+  `}
 `;
 
 const NotificationListContainer = styled.div`
   position: absolute;
   top: 40px;
-  right: -130px;
+  right: -130px; // 기본 위치
   z-index: ${({ theme }) => theme.zIndices.sticky};
   opacity: 0;
   transform: translateY(-10px);
@@ -540,6 +651,29 @@ const NotificationListContainer = styled.div`
       transform: translateY(0);
     }
   }
+
+  ${media.md`
+    right: -100px; // 중간 화면에서 위치 조정
+    top: 35px;
+  `}
+  ${media.sm`
+    right: auto; /* right 속성 해제 */
+    left: 50%; /* 중앙 정렬을 위한 left 설정 */
+    transform: translateX(-50%) translateY(-10px); /* X축 중앙 정렬 및 애니메이션 */
+    top: 30px;
+    width: calc(100vw - ${({ theme }) => theme.spacing[4]} * 2); // 화면 너비에 맞추기
+    max-width: 300px; // 최대 너비 제한
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+  `}
 `;
 
 const UserMenuContainerWrapper = styled.div`
@@ -561,6 +695,15 @@ const UserMenuContainerWrapper = styled.div`
       transform: translateY(0);
     }
   }
+
+  ${media.md`
+    top: 45px;
+  `}
+  ${media.sm`
+    top: 40px;
+    width: 140px; // 모바일에서 너비 조정
+    right: ${({ theme }) => theme.spacing[2]}; // 오른쪽 여백
+  `}
 `;
 
 const NotificationContainer = styled.div`
@@ -574,6 +717,12 @@ const NotificationContainer = styled.div`
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+
+  ${media.sm`
+    width: 100%; // 모바일에서 부모 너비 따르기
+    max-height: 200px; // 모바일에서 최대 높이 줄이기
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+  `}
 `;
 
 // AllClearButton 스타일 추가 및 수정
@@ -589,6 +738,10 @@ const AllClearButton = styled.button`
     color: ${({ theme }) => theme.colors.primary};
     scale: 1.1;
   }
+
+  ${media.sm`
+    font-size: 10px;
+  `}
 `;
 
 const NotificationTitle = styled.div`
@@ -603,6 +756,11 @@ const NotificationTitle = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  ${media.sm`
+    padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]};
+    font-size: ${({ theme }) => theme.fontSizes.xs};
+  `}
 `;
 
 const NotificationItem = styled.div`
@@ -621,6 +779,13 @@ const NotificationItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+
+  ${media.sm`
+    padding: ${({ theme }) => theme.spacing[2]};
+    min-height: ${({ theme }) => theme.spacing[12]};
+    flex-direction: column; // 모바일에서 세로로 정렬
+    align-items: flex-start;
+  `}
 `;
 
 const NoNotificationItem = styled.div`
@@ -628,6 +793,11 @@ const NoNotificationItem = styled.div`
   text-align: center;
   color: ${({ theme }) => theme.colors.gray[500]};
   font-size: ${({ theme }) => theme.fontSizes.sm};
+
+  ${media.sm`
+    padding: ${({ theme }) => theme.spacing[3]};
+    font-size: ${({ theme }) => theme.fontSizes.xs};
+  `}
 `;
 
 const NotificationMessage = styled.div`
@@ -638,6 +808,11 @@ const NotificationMessage = styled.div`
   margin-bottom: 3px;
   word-break: break-word;
   line-height: 1.3;
+
+  ${media.sm`
+    font-size: ${({ theme }) => theme.fontSizes.xs};
+    margin-bottom: ${({ theme }) => theme.spacing[1]};
+  `}
 `;
 
 const NotificationTime = styled.span`
@@ -648,12 +823,24 @@ const NotificationTime = styled.span`
   white-space: nowrap;
   text-align: right;
   margin-top: ${({ theme }) => theme.spacing['8']};
+
+  ${media.sm`
+    margin-left: 0; // 모바일에서는 메시지 아래로
+    margin-top: 0;
+    width: 100%; // 전체 너비 사용
+    text-align: left; // 왼쪽 정렬
+  `}
 `;
 
 const StyledFaSyncAlt = styled(FaSyncAlt)`
   font-size: 14px;
   margin-left: 8px;
   color: ${({ theme }) => theme.colors.gray[600]};
+
+  ${media.sm`
+    font-size: 12px;
+    margin-left: 4px;
+  `}
 `;
 
 const UserMenuContainer = styled.div`
@@ -672,6 +859,12 @@ const UserMenuContainer = styled.div`
   button {
     outline: none;
   }
+
+  ${media.sm`
+    width: 130px;
+    padding: ${({ theme }) => theme.spacing[3]} 0;
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+  `}
 `;
 
 const UserMenuItem = styled.div`
@@ -690,6 +883,11 @@ const UserMenuItem = styled.div`
     background-color: ${({ theme }) => theme.colors.gray[50]};
     color: ${({ theme }) => theme.colors.primary};
   }
+
+  ${media.sm`
+    font-size: ${({ theme }) => theme.fontSizes.sm};
+    padding: ${({ theme }) => theme.spacing[1]} ${({ theme }) => theme.spacing[2]};
+  `}
 `;
 
 export default Header;
