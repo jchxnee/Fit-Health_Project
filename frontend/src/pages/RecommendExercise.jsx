@@ -6,6 +6,7 @@ import TitleBar from '../components/TitleBar.jsx';
 import CategoryMenu from '../components/CategoryMenu.jsx';
 import BMICalculator from '../components/RecommendExercise/BMICalculator.jsx';
 import RecommendRoutine from '../components/RecommendExercise/RecommendRoutine.jsx';
+import RecommendDiet from '../components/RecommendExercise/RecommendDiet.jsx';
 
 const HeaderContainer = styled.div`
   width: 100%;
@@ -47,6 +48,8 @@ function RecommendExercise() {
 
   const [bmi, setBmi] = useState('');
   const [recommendList, setRecommendList] = useState([]);
+  const [goalCategory, setGoalCategory] = useState('');
+  const [dietPlan, setDietPlan] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -58,13 +61,15 @@ function RecommendExercise() {
 
   const handleMainCategorySelect = (category) => {
     setSelectedMainCategory(category);
-
     setRecommendList([]);
+    setDietPlan(null); // 식단 초기화
     setError(null);
 
     if (category === 'AI 추천 운동') {
       setSelectedExerciseSubCategory('헬스');
+      setGoalCategory('');
     } else {
+      setGoalCategory('체지방 감량'); // 기본값 설정
       setSelectedExerciseSubCategory('');
     }
   };
@@ -106,10 +111,16 @@ function RecommendExercise() {
           )}
 
           {selectedMainCategory === 'AI 추천 식단' && (
-            <div>
-              <h2>AI 추천 식단 페이지</h2>
-              <p>여기에 식단 추천 관련 내용을 추가할 예정입니다.</p>
-            </div>
+            <RecommendDiet
+              goalCategory={goalCategory}
+              setGoalCategory={setGoalCategory}
+              dietPlan={dietPlan}
+              setDietPlan={setDietPlan}
+              loading={loading}
+              setLoading={setLoading}
+              error={error}
+              setError={setError}
+            />
           )}
         </ContentWrapper>
       </MainRow>

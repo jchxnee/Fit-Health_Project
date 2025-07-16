@@ -244,6 +244,7 @@ const PopularPosts = ({ boards, isLoading }) => {
       <Wrapper>
         <Container>
           <Title>커뮤니티 인기 글</Title>
+          <div style={{ textAlign: 'center', fontSize: '1.1rem', color: '#999' }}>최근 게시글이 없습니다.</div>
         </Container>
       </Wrapper>
     );
