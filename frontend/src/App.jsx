@@ -1,5 +1,5 @@
 import { ThemeProvider } from 'styled-components';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useMatch } from 'react-router-dom';
 import './App.css';
 import theme from './styles/theme';
 import GlobalStyle from './styles/GlobalStyle';
@@ -55,11 +55,15 @@ import TokenInitializer from './components/TokenInitializer';
 import FindIdPage from './pages/MemberPage/FindIdPage';
 import FindPwdPage from './pages/MemberPage/FindPwdPage';
 import ResetPwdPage from './pages/MemberPage/ResetPwdPage';
+import NotFound from './pages/NotFound';
 
 function AppContent() {
   const location = useLocation();
-  const hideHeader = ['/signup'];
-  const isHeaderHidden = hideHeader.includes(location.pathname);
+  const match404 = useMatch('*'); // 현재 라우트가 catch-all인지 확인
+  const hideHeaderPaths = ['/signup', '*']; // 명시적으로 헤더 숨길 경로
+  const isNotFound = match404?.pathname !== location.pathname; // 존재하지 않는 경로에 매칭된 경우
+  const isHeaderHidden = hideHeaderPaths.includes(location.pathname) || isNotFound;
+
   const { user } = useUserStore();
 
   return (
@@ -122,6 +126,9 @@ function AppContent() {
 
         {/* 카카오 로그인 */}
         <Route path="/oauth/kakao/redirect" element={<KakaoRedirect />} />
+
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
       {!isHeaderHidden && <Footer user={null} />}
     </>

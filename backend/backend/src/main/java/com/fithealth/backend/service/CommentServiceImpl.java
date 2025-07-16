@@ -48,7 +48,7 @@ public class CommentServiceImpl implements CommentService {
             // 게시글 작성자와 댓글 작성자가 동일하지 않을 경우에만 알림 보내기 (옵션)
             // 즉, 자신이 쓴 글에 자신이 댓글을 달았을 때는 알림을 보내지 않음
             if (!boardWriter.getUserEmail().equals(commentWriter.getUserEmail())) {
-                String message = String.format("%s님이 회원님의 게시글에 새로운 댓글을 남겼습니다.",
+                String message = String.format("%s님이 회원님의 게시글에 새로운 댓글을 남겼습니다!",
                         commentWriter.getUserName() != null ? commentWriter.getUserName() : commentWriter.getUserEmail());
                 String notificationType = "NEW_COMMENT_ON_POST";
                 Long relatedId = board.getBoardNo();

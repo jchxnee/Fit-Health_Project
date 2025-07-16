@@ -2,6 +2,7 @@ package com.fithealth.backend.entity;
 
 import com.fithealth.backend.entity.Payment;
 import com.fithealth.backend.enums.CommonEnums;
+import com.fithealth.backend.enums.CommonEnums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.AllArgsConstructor;
@@ -15,11 +16,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "RESERVATION")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
+@Setter
 public class Reservation {
 
     @Id
@@ -61,4 +61,5 @@ public class Reservation {
             payment.getReservations().remove(this);
         }
     }
+
 }

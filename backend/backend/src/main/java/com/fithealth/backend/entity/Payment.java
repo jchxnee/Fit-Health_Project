@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Getter; // Getter 추가
 import lombok.Setter; // Setter 추가
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,5 +124,10 @@ public class Payment {
 
     public void changeUseStatus(CommonEnums.UseStatus status){
         this.useStatus = status;
+    }
+
+    public void putTransactionIdAndPaymentMethod(String transactionId, String paymentMethod) {
+        this.transactionId = transactionId;
+        this.paymentMethod = paymentMethod;
     }
 }
