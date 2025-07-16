@@ -64,12 +64,10 @@ function AppContent() {
   const isNotFound = match404?.pathname !== location.pathname; // 존재하지 않는 경로에 매칭된 경우
   const isHeaderHidden = hideHeaderPaths.includes(location.pathname) || isNotFound;
 
-  const { user } = useUserStore();
-
   return (
     <>
       <TokenInitializer />
-      {!isHeaderHidden && <Header user={user} />}
+      {!isHeaderHidden && <Header />}
       <ScrollToTop />
       <Routes>
         {/* 공통 */}
@@ -130,7 +128,7 @@ function AppContent() {
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {!isHeaderHidden && <Footer user={null} />}
+      {!isHeaderHidden && <Footer />}
     </>
   );
 }
