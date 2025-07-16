@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import basicProfile from '../../../public/img/basicProfile.jpg';
 import { BeatLoader } from 'react-spinners';
+import media from '../../utils/media'; // media 헬퍼 함수 임포트
 
 const Wrapper = styled.section`
   width: 100%;
@@ -10,10 +11,23 @@ const Wrapper = styled.section`
   justify-content: center;
   background: ${({ theme }) => theme.colors.white};
   margin: ${({ theme }) => `${theme.spacing[10]} 0`};
+
+  ${media.md`
+    margin: ${({ theme }) => `${theme.spacing[6]} 0`};
+  `}
 `;
 
 const Container = styled.div`
   width: ${({ theme }) => theme.width.lg};
+  padding: 0 ${({ theme }) => theme.spacing[4]}; // 좌우 패딩 추가
+  box-sizing: border-box; // 패딩 포함 너비 계산
+
+  ${media.lg`
+    width: 90%; // 더 작은 화면에서 너비 조정
+  `}
+  ${media.md`
+    width: 95%;
+  `}
 `;
 
 const TitleRow = styled.div`
@@ -21,6 +35,10 @@ const TitleRow = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: ${({ theme }) => theme.spacing[6]};
+
+  ${media.md`
+    margin-bottom: ${({ theme }) => theme.spacing[4]};
+  `}
 `;
 
 const Title = styled.h2`
@@ -28,6 +46,13 @@ const Title = styled.h2`
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   font-size: ${({ theme }) => theme.fontSizes['2xl']};
   color: ${({ theme }) => theme.colors.primary};
+
+  ${media.md`
+    font-size: ${({ theme }) => theme.fontSizes.xl};
+  `}
+  ${media.sm`
+    font-size: ${({ theme }) => theme.fontSizes.lg};
+  `}
 `;
 
 const NavItem = styled(Link)`
@@ -39,16 +64,35 @@ const ViewAll = styled.span`
   font-size: ${({ theme }) => theme.fontSizes.lg};
   color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
+
+  ${media.md`
+    font-size: ${({ theme }) => theme.fontSizes.base};
+  `}
+  ${media.sm`
+    font-size: ${({ theme }) => theme.fontSizes.sm};
+  `}
 `;
 
 const List = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing[10]};
   justify-content: center;
+  flex-wrap: wrap; // 항목이 많아지면 줄 바꿈
+
+  ${media.lg`
+    gap: ${({ theme }) => theme.spacing[8]};
+  `}
+  ${media.md`
+    gap: ${({ theme }) => theme.spacing[6]};
+  `}
+  ${media.sm`
+    gap: ${({ theme }) => theme.spacing[4]};
+    justify-content: space-around; // 모바일에서 공간 고르게 분배
+  `}
 `;
 
 const TrainerCard = styled.div`
-  width: 250px;
+  width: 250px; // 기본 너비
   height: 250px;
   display: flex;
   flex-direction: column;
@@ -64,6 +108,20 @@ const TrainerCard = styled.div`
   &:hover {
     transform: translateY(-8px);
   }
+
+  ${media.md`
+    width: 200px;
+    height: 200px;
+  `}
+  ${media.sm`
+    width: 150px;
+    height: 150px;
+    border-radius: ${({ theme }) => theme.borderRadius.xl};
+  `}
+  ${media.xs`
+    width: 120px;
+    height: 120px;
+  `}
 `;
 
 const ProfileImg = styled.img`
@@ -73,11 +131,23 @@ const ProfileImg = styled.img`
   object-position: center;
   border-radius: ${({ theme }) => `${theme.borderRadius['2xl']} ${theme.borderRadius['2xl']} 0 0`};
   margin-bottom: ${({ theme }) => theme.spacing[4]};
+
+  ${media.sm`
+    border-radius: ${({ theme }) => `${theme.borderRadius.xl} ${theme.borderRadius.xl} 0 0`};
+    margin-bottom: ${({ theme }) => theme.spacing[2]};
+  `}
 `;
 
 const Name = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.xl};
   color: ${({ theme }) => theme.colors.primary};
+
+  ${media.md`
+    font-size: ${({ theme }) => theme.fontSizes.lg};
+  `}
+  ${media.sm`
+    font-size: ${({ theme }) => theme.fontSizes.base};
+  `}
 `;
 
 const LoaderWrapper = styled.div`

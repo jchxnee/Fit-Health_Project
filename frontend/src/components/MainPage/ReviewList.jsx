@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FiMessageCircle } from 'react-icons/fi';
+import { FiMessageCircle } from 'react-icons/fi'; // 사용되지 않아 제거 고려
 import { FaRegEye, FaStar, FaRegStar, FaStarHalfAlt } from 'react-icons/fa';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import basicProfile from '../../../public/img/basicProfile.jpg';
 import { Link } from 'react-router-dom';
 import { BeatLoader } from 'react-spinners';
+import media from '../../utils/media'; // media 헬퍼 함수 임포트
 
 const Wrapper = styled.section`
   width: 100%;
@@ -14,6 +15,13 @@ const Wrapper = styled.section`
   justify-content: center;
   background: ${({ theme }) => theme.colors.white};
   margin: ${({ theme }) => `${theme.spacing[12]} 0 ${theme.spacing[24]} 0`};
+
+  ${media.md`
+    margin: ${({ theme }) => `${theme.spacing[8]} 0 ${theme.spacing[16]} 0`};
+  `}
+  ${media.sm`
+    margin: ${({ theme }) => `${theme.spacing[6]} 0 ${theme.spacing[12]} 0`};
+  `}
 `;
 
 const Container = styled.div`
@@ -21,6 +29,16 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing[8]};
+  padding: 0 ${({ theme }) => theme.spacing[4]}; // 좌우 패딩 추가
+  box-sizing: border-box;
+
+  ${media.lg`
+    width: 90%;
+  `}
+  ${media.md`
+    width: 95%;
+    gap: ${({ theme }) => theme.spacing[6]};
+  `}
 `;
 
 const Title = styled.h2`
@@ -29,23 +47,63 @@ const Title = styled.h2`
   font-size: ${({ theme }) => theme.fontSizes['2xl']};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing[2]};
+
+  ${media.md`
+    font-size: ${({ theme }) => theme.fontSizes.xl};
+    margin-bottom: ${({ theme }) => theme.spacing[1]};
+  `}
+  ${media.sm`
+    font-size: ${({ theme }) => theme.fontSizes.lg};
+  `}
 `;
 
 const ListRow = styled.div`
   display: flex;
-  gap: ${({ theme }) => theme.spacing[16]};
+  gap: ${({ theme }) => theme.spacing[16]}; // 기존 갭
+  flex-direction: row; // 기본은 가로 정렬
+
+  ${media.md`
+    gap: ${({ theme }) => theme.spacing[8]};
+  `}
+  ${media.sm`
+    flex-direction: column; // 작은 화면에서 세로 정렬
+    gap: ${({ theme }) => theme.spacing[4]};
+  `}
 `;
 
 const PostCol = styled.div`
-  width: 480px;
+  width: 480px; // 기본 너비
   display: flex;
   flex-direction: column;
+
+  ${media.lg`
+    width: 50%; // 큰 화면에서 50%로 유연하게
+  `}
+  ${media.md`
+    width: 50%; // 중간 화면에서 50% 유지
+  `}
+  ${media.sm`
+    width: 100%; // 작은 화면에서 100% 너비
+  `}
 `;
 
 const PostBox = styled(Link)`
   background: ${({ theme }) => theme.colors.white};
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
   padding: ${({ theme }) => `${theme.spacing[4]} 0 ${theme.spacing[1]} 0`};
+  text-decoration: none; // Link 기본 스타일 제거
+  color: inherit; // 텍스트 색상 상속
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  ${media.md`
+    padding: ${({ theme }) => `${theme.spacing[3]} 0 ${theme.spacing[1]} 0`};
+  `}
+  ${media.sm`
+    padding: ${({ theme }) => `${theme.spacing[2]} 0 ${theme.spacing[1]} 0`};
+  `}
 `;
 
 const PostWriter = styled.div`
@@ -56,6 +114,14 @@ const PostWriter = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.lg};
   margin-bottom: ${({ theme }) => theme.spacing[1]};
   text-align: left;
+
+  ${media.md`
+    font-size: ${({ theme }) => theme.fontSizes.base};
+    gap: ${({ theme }) => theme.spacing[1]};
+  `}
+  ${media.sm`
+    font-size: ${({ theme }) => theme.fontSizes.sm};
+  `}
 `;
 
 const ProfileImg = styled.img`
@@ -63,6 +129,15 @@ const ProfileImg = styled.img`
   height: ${({ theme }) => theme.spacing[6]};
   border-radius: 50%;
   object-fit: cover;
+
+  ${media.md`
+    width: ${({ theme }) => theme.spacing[5]};
+    height: ${({ theme }) => theme.spacing[5]};
+  `}
+  ${media.sm`
+    width: ${({ theme }) => theme.spacing[4]};
+    height: ${({ theme }) => theme.spacing[4]};
+  `}
 `;
 
 const PostRate = styled.div``;
@@ -71,6 +146,22 @@ const StarWrapper = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing[1]};
   margin-bottom: ${({ theme }) => theme.spacing[1]};
+
+  svg {
+    font-size: ${({ theme }) => theme.fontSizes.base};
+  }
+
+  ${media.md`
+    margin-bottom: ${({ theme }) => theme.spacing.xs};
+    svg {
+      font-size: ${({ theme }) => theme.fontSizes.sm};
+    }
+  `}
+  ${media.sm`
+    svg {
+      font-size: ${({ theme }) => theme.fontSizes.xs};
+    }
+  `}
 `;
 
 const PostContent = styled.div`
@@ -80,6 +171,21 @@ const PostContent = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing[2]};
   white-space: pre-line;
   text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; // 3줄로 제한
+  -webkit-box-orient: vertical;
+
+  ${media.md`
+    font-size: ${({ theme }) => theme.fontSizes.xs};
+    margin-bottom: ${({ theme }) => theme.spacing[1]};
+    -webkit-line-clamp: 2; // 2줄로 제한
+  `}
+  ${media.sm`
+    font-size: ${({ theme }) => theme.fontSizes.xxs};
+    -webkit-line-clamp: 2;
+  `}
 `;
 
 const StatsTime = styled.div`
@@ -88,14 +194,22 @@ const StatsTime = styled.div`
   justify-content: flex-end;
   color: ${({ theme }) => theme.colors.gray[400]};
   font-size: ${({ theme }) => theme.fontSizes.xs};
+
+  ${media.md`
+    font-size: ${({ theme }) => theme.fontSizes.xxs};
+  `}
 `;
 
 const LoaderWrapper = styled.div`
   width: 100%;
-  min-height: 300px; /* 충분한 높이 확보 */
+  min-height: 300px;
   display: flex;
   justify-content: center;
   align-items: center;
+
+  ${media.md`
+    min-height: 200px;
+  `}
 `;
 
 const StarRating = ({ rating = 0 }) => {
