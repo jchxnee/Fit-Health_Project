@@ -24,6 +24,9 @@ const formatTime = (isoString) => {
   return `${ampm} ${displayHour}:${minutes}`;
 };
 
+// 이메일 정규화 함수 추가
+const normalizeEmail = (email) => (email || '').trim().toLowerCase();
+
 const ChatPage = () => {
   const [chatRooms, setChatRooms] = useState([]); // 채팅방 목록
   const [messages, setMessages] = useState([]);
@@ -62,14 +65,19 @@ const ChatPage = () => {
   useEffect(() => {
     if (!activeChatId) return;
     getChatHistory(activeChatId).then((data) => {
-      const formatted = data.map((msg, idx) => ({
-        id: `m${idx}_${msg.senderEmail}`,
-        text: msg.message,
-        time: formatTime(msg.createdTime), // 시간 포맷 적용
-        isSent: (msg.senderEmail || '').toLowerCase() === (userEmail || '').toLowerCase(),
-        read: msg.read || false
-      }));
-      setMessages(formatted);
+      const messages = data.map((msg, idx) => {
+        const isSent = normalizeEmail(msg.senderEmail) === normalizeEmail(userEmail);
+        // 디버깅용 콘솔 로그 추가
+        console.log('[채팅 히스토리] userEmail(내):', userEmail, 'msg.senderEmail:', msg.senderEmail, 'isSent:', isSent);
+        return {
+          id: `m${idx}_${msg.senderEmail}`,
+          text: msg.message,
+          time: formatTime(msg.createdTime),
+          isSent,
+          read: msg.read || false
+        };
+      });
+      setMessages(messages);
 
       // 읽지 않은 메시지 수 0으로 초기화
       setUnreadCounts((prev) => ({ ...prev, [activeChatId]: 0 }));
@@ -124,7 +132,9 @@ const ChatPage = () => {
     ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
-        const isMe = (msg.senderEmail || '').trim().toLowerCase() === (userEmail || '').trim().toLowerCase();
+        const isMe = normalizeEmail(msg.senderEmail) === normalizeEmail(userEmail);
+        // 디버깅용 콘솔 로그 추가
+        console.log('[WebSocket] userEmail(내):', userEmail, 'msg.senderEmail:', msg.senderEmail, 'isSent:', isMe);
         const isActiveRoom = String(msg.roomId) === String(activeChatId);
         const newMsg = {
           id: `m${Date.now()}`,
