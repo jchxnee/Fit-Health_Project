@@ -46,7 +46,8 @@ public class SecurityConfig {
                                 "/mail/send",
                                 "/mail/check",
                                 "/api/members/exists",
-                                "/api/members/resetPwd"
+                                "/api/members/resetPwd",
+                                "/connect"
                         ).permitAll()
                         .anyRequest().authenticated() // 위의 요청경로를 제외한 나머지 경로는 인증
                 )

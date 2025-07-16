@@ -83,7 +83,7 @@ function AppContent() {
         <Route path="/deleteMemberPage" element={<DeleteMemberPage />} />
         <Route path="/exercise" element={<RecommendExercise />} />
         <Route path="/productList" element={<ProductList />} />
-        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/chatpage/:roomId" element={<ChatPage />} />
         <Route path="/termOfServicePage" element={<TermOfServicePage />} />
         <Route path="/operatingPolicy" element={<OperatingPolicyPage />} />
         <Route path="/privacyPolicy" element={<PrivacyPolicyPage />} />

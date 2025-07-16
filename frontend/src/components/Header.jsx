@@ -240,7 +240,7 @@ function Header() {
           navigate(`/coachReview/${notification.relatedId}`);
           break;
         case 'NEW_CHAT_MESSAGE':
-          navigate(`/chat`);
+          navigate(`/chatpage`);
           break;
         case 'NEW_COMMENT_ON_POST':
           navigate(`/communityDetailPage/${notification.relatedId}`);
@@ -352,7 +352,7 @@ function Header() {
                 <FaBell />
                 {unreadNotificationCount > 0 && <RedDot>{unreadNotificationCount}</RedDot>}
               </NotificationWrapper>
-              <NavItem to="/chat">채팅</NavItem>
+              <NavItem to="/chatpage/:roomId">채팅</NavItem>
               <ProfileWrapper onClick={handleUserMenuClick} ref={profileWrapperRef}>
                 <ProfileImg
                   src={user.img ? `${CLOUDFRONT_URL}${user.img}?v=${Date.now()}` : basicProfile}

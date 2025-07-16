@@ -53,6 +53,7 @@ const TokenInitializer = () => {
         }
 
         // 로그인 상태 저장
+        sessionStorage.setItem('userEmail', memberInfo.user_email); // userEmail 세션 저장 추가
         login({
           useremail: memberInfo.user_email,
           trainerNo: memberInfo.trainer_no,

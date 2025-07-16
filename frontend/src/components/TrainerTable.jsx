@@ -9,6 +9,7 @@ import SalaryModal from './modal/SalaryModal';
 import HealthChartModal from './modal/HealthChartModal';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { startPrivateChat } from '../api/chatApi';
 
 const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onReject }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
@@ -138,10 +139,23 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
     [openMenuId]
   );
 
-  const handleMenuItemClick = (e, action, rowData) => {
+  const handleMenuItemClick = async (e, action, rowData) => {
     e.stopPropagation();
 
-    if (action === '승인') {
+    if (action === '1:1 채팅') {
+      try {
+        const otherMemberEmail = rowData.userEmail;
+        if (!otherMemberEmail) {
+          alert('상대방 이메일 정보가 없습니다.');
+          return;
+        }
+        const roomId = await startPrivateChat(otherMemberEmail);
+        navigate(`/chatpage/${roomId}`); // 실제 채팅 페이지 경로에 맞게 수정
+      } catch (error) {
+        console.error('개인 채팅 시작 실패:', error);
+        alert('채팅 시작에 실패했습니다.');
+      }
+    } else if (action === '승인') {
       if (onApprove) {
         onApprove(rowData);
       }
@@ -155,9 +169,7 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
       setSelectedEmail(rowData.userEmail);
       setHealthModalOpen(true);
     } else if (action === '정산내역') {
-      setSalaryModalData(rowData);
-    } else if (action === '1대1채팅') {
-      navigate('/chat');
+      setSalaryModalData(rowData); // 정산내역도 동일 모달 사용
     }
 
     setOpenMenuId(null);
