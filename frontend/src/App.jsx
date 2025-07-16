@@ -57,6 +57,7 @@ import FindPwdPage from './pages/MemberPage/FindPwdPage';
 import ResetPwdPage from './pages/MemberPage/ResetPwdPage';
 import NotFound from './pages/NotFound';
 import PrivateRoute from './components/PrivateRoute';
+import ChatBot from './components/ChatBot';
 
 function AppContent() {
   const location = useLocation();
@@ -70,7 +71,7 @@ function AppContent() {
       {!isHeaderHidden && <Header user={user} />}
       <ScrollToTop />
       <Routes>
-        {/* ✅ 공개 라우트 */}
+        {/* 공개 라우트 */}
         <Route path="/" element={<MainPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -90,7 +91,7 @@ function AppContent() {
         <Route path="/oauth/kakao/redirect" element={<KakaoRedirect />} />
         <Route path="*" element={<NotFound />} />
 
-        {/* ✅ 인증 필요 라우트 */}
+        {/* 인증 필요 라우트 */}
         <Route element={<PrivateRoute />}>
           {/* 마이페이지 */}
           <Route path="/mypage" element={<MyPage />} />
@@ -140,6 +141,7 @@ function App() {
       <GlobalStyle />
       <Router>
         <AppContent />
+        <ChatBot />
       </Router>
       <ToastContainer autoClose={3000} hideProgressBar={true} pauseOnFocusLoss={false} pauseOnHover={false} />
     </ThemeProvider>

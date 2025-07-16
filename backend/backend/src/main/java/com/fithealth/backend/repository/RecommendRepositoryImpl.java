@@ -19,13 +19,13 @@ public class RecommendRepositoryImpl implements RecommendRepository {
 
     private final RestTemplate restTemplate;
 
-    @Value("${openai.model}")
+    @Value("${spring.ai.openai.model}")
     private String model;
 
-    @Value("${openai.url}")
+    @Value("${spring.ai.openai.base-url}")
     private String openaiUrl;
 
-    @Value("${openai.api-key}")
+    @Value("${spring.ai.openai.api-key}")
     private String openAiApiKey;
 
     private List<String> getExerciseImageNames(String category) {
