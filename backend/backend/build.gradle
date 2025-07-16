@@ -52,6 +52,8 @@ dependencies {
 
 	//WebSocket 기능을 위한 라이브러리
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('test') {
