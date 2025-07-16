@@ -55,19 +55,30 @@ public class ChatService {
                 .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
 
         Member me = getCurrentMember();
-        // 현재 사용자의 읽지 않은 메시지 목록을 미리 조회
-        java.util.Set<Long> unreadMessageIds = new java.util.HashSet<>();
-        readStatusRepository.findByChatRoomAndMemberAndIsReadFalse(chatRoom, me)
-            .forEach(rs -> unreadMessageIds.add(rs.getChatMessage().getId()));
 
         return chatMessageRepository.findByChatRoomOrderByCreatedTimeAsc(chatRoom).stream()
-                .map(c -> ChatMessageDto.builder()
-                        .message(c.getContent())
-                        .senderEmail(c.getMember().getUserEmail())
-                        .roomId(roomId)
-                        .createdTime(c.getCreatedTime())
-                        .read(!unreadMessageIds.contains(c.getId())) // 읽음 여부
-                        .build())
+                .map(c -> {
+                    boolean isMine = c.getMember().getUserEmail().equals(me.getUserEmail());
+                    boolean isRead;
+                    if (isMine) {
+                        // 내가 보낸 메시지: 상대방의 ReadStatus를 확인
+                        Member opponent = chatRoom.getMember1().getUserEmail().equals(me.getUserEmail())
+                                ? chatRoom.getMember2() : chatRoom.getMember1();
+                        java.util.Optional<ReadStatus> rsOpt = readStatusRepository.findByChatRoomAndMemberAndChatMessage(chatRoom, opponent, c);
+                        isRead = rsOpt.map(ReadStatus::getIsRead).orElse(false);
+                    } else {
+                        // 상대방이 보낸 메시지: 내 ReadStatus를 확인
+                        java.util.Optional<ReadStatus> rsOpt = readStatusRepository.findByChatRoomAndMemberAndChatMessage(chatRoom, me, c);
+                        isRead = rsOpt.map(ReadStatus::getIsRead).orElse(false);
+                    }
+                    return ChatMessageDto.builder()
+                            .message(c.getContent())
+                            .senderEmail(c.getMember().getUserEmail())
+                            .roomId(roomId)
+                            .createdTime(c.getCreatedTime())
+                            .read(isRead)
+                            .build();
+                })
                 .collect(java.util.stream.Collectors.toList());
     }
 
