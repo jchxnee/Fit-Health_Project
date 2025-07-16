@@ -129,9 +129,9 @@ const ChatPage = () => {
         const newMsg = {
           id: `m${Date.now()}`,
           text: msg.message,
-          time: formatTime(msg.createdTime || new Date()), // createdTime 없으면 현재 시각 사용
+          time: formatTime(msg.createdTime || new Date()),
           isSent: isMe,
-          read: isMe // 본인이 보낸 건 바로 읽음
+          read: msg.read // 백엔드에서 내려준 값을 그대로 사용
         };
         setMessages((prev) => [...prev, newMsg]);
 

@@ -14,4 +14,5 @@ public class ChatMessageDto {
     private String message;
     private String senderEmail;
     private java.time.LocalDateTime createdTime; // 추가
+    private boolean read; // 추가
 }

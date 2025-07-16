@@ -85,14 +85,30 @@ public class SimpleWebSocketHandler extends TextWebSocketHandler {
 
         chatService.saveMessage(chatMessageDto);
 
-        // 저장 후, DB에서 방금 저장된 메시지의 createdTime을 가져와서 DTO에 세팅
-        chatMessageDto.setCreatedTime(java.time.LocalDateTime.now()); // 임시: 실제로는 saveMessage에서 반환하도록 개선 가능
-
+        // 저장된 ChatMessage, ChatRoom, Member 조회
         Long roomId = chatMessageDto.getRoomId();
+        String senderEmail = chatMessageDto.getSenderEmail();
+        com.fithealth.backend.entity.ChatRoom chatRoom = chatService.getChatRoomById(roomId);
+        com.fithealth.backend.entity.Member member1 = chatRoom.getMember1();
+        com.fithealth.backend.entity.Member member2 = chatRoom.getMember2();
+        com.fithealth.backend.entity.ChatMessage chatMessage = chatService.getLastMessageInRoom(chatRoom); // 방금 저장된 메시지
+
         Set<WebSocketSession> targetSessions = roomSessions.get(roomId);
         if (targetSessions != null) {
-            String sendPayload = objectMapper.writeValueAsString(chatMessageDto);
             for (WebSocketSession s : targetSessions) {
+                String sessionEmail = (String) s.getAttributes().get("userEmail");
+                boolean isMe = senderEmail.equals(sessionEmail);
+                boolean read = true;
+                if (isMe) {
+                    // 내가 보낸 메시지 → 상대방의 ReadStatus를 조회
+                    String opponentEmail = member1.getUserEmail().equals(senderEmail) ? member2.getUserEmail() : member1.getUserEmail();
+                    com.fithealth.backend.entity.Member opponent = member1.getUserEmail().equals(senderEmail) ? member2 : member1;
+                    java.util.Optional<com.fithealth.backend.entity.ReadStatus> rsOpt = chatService.findReadStatus(chatRoom, opponent, chatMessage);
+                    read = rsOpt.isPresent() && rsOpt.get().getIsRead();
+                }
+                // 상대방이 보낸 메시지는 항상 read: true
+                chatMessageDto.setRead(read);
+                String sendPayload = objectMapper.writeValueAsString(chatMessageDto);
                 if (s.isOpen()) {
                     s.sendMessage(new TextMessage(sendPayload));
                 }

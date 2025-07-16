@@ -20,9 +20,8 @@ public class ChatController {
 
     @PostMapping("/room")
     public ResponseEntity<?> getOrCreateRoom(@RequestParam("otherMemberEmail") String otherMemberEmail) {
-        chatService.getOrCreateRoom(otherMemberEmail);
-        return ResponseEntity.ok().build();
-
+        Long roomId = chatService.getOrCreateRoom(otherMemberEmail);
+        return ResponseEntity.ok(roomId); // roomId 반환
     }
 
     //특정 채팅방의 이전 메세지 목록 조회

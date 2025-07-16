@@ -13,4 +13,5 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, Long> {
     Long countByChatRoomAndMemberAndIsReadFalse(ChatRoom chatRoom, Member member);
 
     List<ReadStatus> findByChatRoomAndMemberAndIsReadFalse(ChatRoom chatRoom, Member member);
+    java.util.Optional<ReadStatus> findByChatRoomAndMemberAndChatMessage(ChatRoom chatRoom, Member member, com.fithealth.backend.entity.ChatMessage chatMessage);
 }

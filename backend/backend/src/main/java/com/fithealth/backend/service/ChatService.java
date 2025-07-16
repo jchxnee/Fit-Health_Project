@@ -27,6 +27,11 @@ public class ChatService {
 
     public Long getOrCreateRoom(String otherUserEmail) {
         Member member = getCurrentMember();
+        System.out.println("내 이메일: " + member.getUserEmail());
+        System.out.println("상대방 이메일: " + otherUserEmail);
+        if (member.getUserEmail().equals(otherUserEmail)) {
+            throw new IllegalArgumentException("자기 자신과는 채팅방을 만들 수 없습니다.");
+        }
         Member other = memberRepository.findByUserEmail(otherUserEmail)
                 .orElseThrow(() -> new EntityNotFoundException("상대방이 존재하지 않습니다."));
 
@@ -50,20 +55,21 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("채팅방이 존재하지 않습니다."));
 
-        Member member = getCurrentMember();
-        boolean isParticipant =
-                member.getUserEmail().equals(chatRoom.getMember1().getUserEmail()) ||
-                        member.getUserEmail().equals(chatRoom.getMember2().getUserEmail());
-
-        if (!isParticipant) throw new IllegalArgumentException("해당 채팅방에 참여하고 있지 않습니다.");
+        Member me = getCurrentMember();
+        // 현재 사용자의 읽지 않은 메시지 목록을 미리 조회
+        java.util.Set<Long> unreadMessageIds = new java.util.HashSet<>();
+        readStatusRepository.findByChatRoomAndMemberAndIsReadFalse(chatRoom, me)
+            .forEach(rs -> unreadMessageIds.add(rs.getChatMessage().getId()));
 
         return chatMessageRepository.findByChatRoomOrderByCreatedTimeAsc(chatRoom).stream()
                 .map(c -> ChatMessageDto.builder()
                         .message(c.getContent())
                         .senderEmail(c.getMember().getUserEmail())
                         .roomId(roomId)
+                        .createdTime(c.getCreatedTime())
+                        .read(!unreadMessageIds.contains(c.getId())) // 읽음 여부
                         .build())
-                .collect(Collectors.toList());
+                .collect(java.util.stream.Collectors.toList());
     }
 
     public void saveMessage(ChatMessageDto dto) {
@@ -113,11 +119,31 @@ public class ChatService {
 
     public void messageRead(Long roomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new EntityNotFoundException("채팅방이 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("Room not found"));
 
-        Member member = getCurrentMember();
-        List<ReadStatus> unread = readStatusRepository.findByChatRoomAndMemberAndIsReadFalse(chatRoom, member);
-        unread.forEach(rs -> rs.updateIsRead(true));
+        Member member = memberRepository.findByUserEmail(jwtTokenProvider.getUserEmailFromToken())
+                .orElseThrow(() -> new EntityNotFoundException("Member not found"));
+
+        List<ReadStatus> readStatuses = readStatusRepository.findByChatRoomAndMemberAndIsReadFalse(chatRoom, member);
+        for (ReadStatus r : readStatuses) {
+            r.updateIsRead(true);
+        }
+    }
+
+    // 카카오톡식 WebSocket 읽음 상태 동기화용 유틸 메서드 추가
+    public ChatRoom getChatRoomById(Long roomId) {
+        return chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("채팅방이 존재하지 않습니다."));
+    }
+
+    public ChatMessage getLastMessageInRoom(ChatRoom chatRoom) {
+        List<ChatMessage> messages = chatMessageRepository.findByChatRoomOrderByCreatedTimeAsc(chatRoom);
+        if (messages.isEmpty()) throw new jakarta.persistence.EntityNotFoundException("메시지가 없습니다.");
+        return messages.get(messages.size() - 1);
+    }
+
+    public java.util.Optional<ReadStatus> findReadStatus(ChatRoom chatRoom, Member member, ChatMessage chatMessage) {
+        return readStatusRepository.findByChatRoomAndMemberAndChatMessage(chatRoom, member, chatMessage);
     }
 
     private Member getCurrentMember() {
