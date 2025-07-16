@@ -46,7 +46,15 @@ public class SecurityConfig {
                                 "/mail/send",
                                 "/mail/check",
                                 "/api/members/exists",
-                                "/api/members/resetPwd"
+                                "/api/members/resetPwd",
+                                "/api/chatbot/*",
+                                "/api/trainer/top3",
+                                "/api/board/top5",
+                                "/api/review/top6",
+                                "/oauth2/*",
+                                "/api/trainer",
+                                "/api/board/all",
+                                "/api/notice/all"
                         ).permitAll()
                         .anyRequest().authenticated() // 위의 요청경로를 제외한 나머지 경로는 인증
                 )

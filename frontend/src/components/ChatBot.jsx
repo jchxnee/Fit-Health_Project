@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { TbMessageChatbot } from 'react-icons/tb';
 import { RiRobot2Line } from 'react-icons/ri';
 import { IoIosSend } from 'react-icons/io';
 import { IoClose } from 'react-icons/io5';
 import api from '../api/axios';
-import axios from 'axios';
+import { PulseLoader } from 'react-spinners';
 
 const ChatBotWrapper = styled.div`
   position: fixed;
@@ -71,7 +71,7 @@ const Messages = styled.div`
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 15px;
 `;
 
 const ChatBubble = styled.div`
@@ -115,12 +115,42 @@ const ChatBot = () => {
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 1. 모달 영역 ref
+  const chatWindowRef = useRef(null);
+
+  // 2. 메시지 컨테이너 ref (스크롤 조작용)
+  const messagesEndRef = useRef(null);
+
+  // 외부 클릭 시 모달 닫기 처리
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (open && chatWindowRef.current && !chatWindowRef.current.contains(event.target)) {
+        setOpen(false);
+        setMessages([]);
+        setQuestion('');
+        setIsLoading(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [open]);
+
+  // 메시지 변경 시 자동 스크롤 아래로
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleToggle = () => {
     if (open) {
-      // 창 닫힐 때 초기화
       setMessages([]);
       setQuestion('');
+      setIsLoading(false);
     }
     setOpen(!open);
   };
@@ -129,36 +159,47 @@ const ChatBot = () => {
     if (!question.trim()) return;
 
     setMessages((prev) => [...prev, { type: 'user', text: question }]);
+    setMessages((prev) => [...prev, { type: 'bot', text: '', loading: true }]);
+    setQuestion('');
+    setIsLoading(true);
 
     try {
-      const res = await api.post('api/chatbot/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question }),
+      const res = await api.post('/api/chatbot/ask', { question });
+      const data = res.data;
+
+      setMessages((prev) => {
+        const newMessages = [...prev];
+        const lastIndex = newMessages.findIndex((msg) => msg.loading);
+        if (lastIndex !== -1) {
+          newMessages[lastIndex] = {
+            type: 'bot',
+            text: data.status === 'success' ? data.answer : data.error || '오류가 발생했습니다.',
+            loading: false,
+          };
+        }
+        return newMessages;
       });
-
-      const data = await res.json();
-      if (data.status === 'success') {
-        setMessages((prev) => [...prev, { type: 'bot', text: data.answer }]);
-      } else {
-        setMessages((prev) => [
-          ...prev,
-          { type: 'bot', text: data.error || '오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },
-        ]);
-      }
     } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        { type: 'bot', text: '서버와의 연결 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },
-      ]);
-      console.log(err);
+      setMessages((prev) => {
+        const newMessages = [...prev];
+        const lastIndex = newMessages.findIndex((msg) => msg.loading);
+        if (lastIndex !== -1) {
+          newMessages[lastIndex] = {
+            type: 'bot',
+            text: '서버와의 연결 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+            loading: false,
+          };
+        }
+        return newMessages;
+      });
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
-
-    setQuestion('');
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !isLoading) {
       handleAsk();
     }
   };
@@ -166,24 +207,27 @@ const ChatBot = () => {
   return (
     <ChatBotWrapper>
       {open && (
-        <ChatWindow>
+        <ChatWindow ref={chatWindowRef}>
           <ChatHeader>
             <ChatTitle>AI 챗봇</ChatTitle>
             <CloseButton onClick={handleToggle}>
               <IoClose />
             </CloseButton>
           </ChatHeader>
-          <Messages>
+          {/* Messages에 ref 지정, 스크롤 조작 */}
+          <Messages ref={messagesEndRef}>
             <ChatBubble isUser={false}>
               <RiRobot2Line style={{ marginRight: 4 }} />
               안녕하세요! 무엇을 도와드릴까요?
             </ChatBubble>
+
             {messages.map((msg, idx) => (
               <ChatBubble key={idx} isUser={msg.type === 'user'}>
-                {msg.text}
+                {msg.loading ? <PulseLoader color="#acacac" size={6} /> : msg.text}
               </ChatBubble>
             ))}
           </Messages>
+
           <InputWrapper>
             <Input
               type="text"
@@ -191,8 +235,9 @@ const ChatBot = () => {
               placeholder="궁금한 것을 적어주세요!"
               onChange={(e) => setQuestion(e.target.value)}
               onKeyPress={handleKeyPress}
+              disabled={isLoading}
             />
-            <SendButton onClick={handleAsk}>
+            <SendButton onClick={handleAsk} disabled={isLoading}>
               <IoIosSend size={20} />
             </SendButton>
           </InputWrapper>
