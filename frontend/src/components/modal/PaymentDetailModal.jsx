@@ -186,11 +186,12 @@ const PaymentDetailModal = ({ isOpen, onClose, data: initialData }) => {
               </span>{' '}
             </DetailItem>
             <DetailItem>
-              <span>결제자:</span> <span>{paymentDetail.user_name || paymentDetail.user_email || 'N/A'}</span>{' '}
+              <span>결제자:</span>{' '}
+              <span>{paymentDetail.user_name || paymentDetail.user_email || 'N/A'} 고객님</span>{' '}
             </DetailItem>
             <DetailItem>
               <span>트레이너:</span>{' '}
-              <span>{paymentDetail.trainer_name || paymentDetail.trainer_email || 'N/A'}</span>{' '}
+              <span>{paymentDetail.trainer_name || paymentDetail.trainer_email || 'N/A'} 트레이너</span>{' '}
             </DetailItem>
             <DetailItem>
               <span>총 회차:</span> <span>{paymentDetail.total_count || 'N/A'}</span>

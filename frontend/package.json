@@ -33,6 +33,7 @@
     "react-spinners": "^0.17.0",
     "react-toastify": "^11.0.5",
     "react-transition-group": "^4.4.5",
+    "recharts": "^3.1.0",
     "router-dom": "^3.0.3",
     "sockjs-client": "^1.6.1",
     "styled-components": "^6.1.19",
