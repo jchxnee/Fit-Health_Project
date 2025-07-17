@@ -19,13 +19,15 @@ public class RecommendRepositoryImpl implements RecommendRepository {
 
     private final RestTemplate restTemplate;
 
-    @Value("${openai.model}")
+    @Value("${spring.ai.openai.model}")
     private String model;
 
-    @Value("${openai.url}")
-    private String openaiUrl;
 
-    @Value("${openai.api-key}")
+    // 옵션 1: 새로운 @Value 변수를 추가하여 전체 엔드포인트를 가져옴
+    @Value("${openai.api.chat-completions-url:https://api.openai.com/v1/chat/completions}")
+    private String chatCompletionsUrl; // 새로운 변수명
+
+    @Value("${spring.ai.openai.api-key}")
     private String openAiApiKey;
 
     private List<String> getExerciseImageNames(String category) {
@@ -77,7 +79,14 @@ public class RecommendRepositoryImpl implements RecommendRepository {
         headers.setBearerAuth(openAiApiKey);
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
-        ResponseEntity<Map> response = restTemplate.postForEntity(openaiUrl, entity, Map.class);
+        // <<-- 여기를 수정합니다 -->>
+        // 옵션 1: 새로운 변수 chatCompletionsUrl 사용
+        ResponseEntity<Map> response = restTemplate.postForEntity(chatCompletionsUrl, entity, Map.class);
+
+        // 옵션 2: 기존 openaiUrl 변수를 사용하여 문자열 조합 (만약 application.properties의 base-url이 https://api.openai.com/ 이라면)
+        // String fullUrl = openaiUrl + "v1/chat/completions";
+        // ResponseEntity<Map> response = restTemplate.postForEntity(fullUrl, entity, Map.class);
+
 
         String content = null;
         try {
@@ -89,12 +98,16 @@ public class RecommendRepositoryImpl implements RecommendRepository {
                 }
             }
         } catch (Exception e) {
-            return new ArrayList<>();
+            System.err.println("OpenAI 응답 파싱 오류: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>(); // 오류 발생 시 빈 리스트 반환
         }
 
         if (content == null) return new ArrayList<>();
 
+        // <<-- 여기는 기존 코드와 동일하게 유지 -->>
         List<RecommendExerciseDto> result = new ArrayList<>();
+        // ... (마크다운 파싱 로직) ...
         Pattern rowPattern = Pattern.compile("\\|([^|]+)\\|([^|]+)\\|([^|]+)\\|([^|]+)\\|([^|]+)\\|([^|]+)\\|");
         Matcher matcher = rowPattern.matcher(content);
         int rowIndex = 0;
@@ -132,7 +145,6 @@ public class RecommendRepositoryImpl implements RecommendRepository {
 
             result.add(dto);
         }
-
         return result;
     }
 }

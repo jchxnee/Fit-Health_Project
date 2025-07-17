@@ -29,6 +29,7 @@ const InputRow = styled.div`
   gap: ${({ theme }) => theme.spacing[6]};
   align-items: center;
   margin-bottom: 20px;
+  margin-top: ${({ theme }) => theme.spacing[6]};
 `;
 const Input = styled.input`
   width: 120px;

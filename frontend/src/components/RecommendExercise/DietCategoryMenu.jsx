@@ -37,7 +37,7 @@ const DropdownContent = styled.div`
 
   position: absolute;
   background-color: ${theme.colors.white};
-  min-width: 85px;
+  min-width: 135px;
   box-shadow: ${theme.shadows.md};
   z-index: 1;
   border-radius: ${theme.borderRadius.md};
@@ -58,7 +58,7 @@ const DropdownItem = styled.div`
   }
 `;
 
-function SubCategoryMenu({ categories, selectedSubCategory, onSelectSubCategory }) {
+function DietCategoryMenu({ categories, selectedSubCategory, onSelectSubCategory }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleItemClick = (category) => {
@@ -83,4 +83,4 @@ function SubCategoryMenu({ categories, selectedSubCategory, onSelectSubCategory 
   );
 }
 
-export default SubCategoryMenu;
+export default DietCategoryMenu;

@@ -1,4 +1,4 @@
-const { VITE_API_URL, VITE_API_TIMEOUT = 5000, VITE_API_VERSION = 'v1' } = import.meta.env;
+const { VITE_API_URL, VITE_API_TIMEOUT = 15000, VITE_API_VERSION = 'v1' } = import.meta.env;
 
 export const API_BASE_URL = 'http://localhost:7961';
 

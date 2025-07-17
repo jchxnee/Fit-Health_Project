@@ -1,5 +1,4 @@
-// src/pages/RecommendExercise.jsx
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react'; // <-- useCallback 임포트 추가
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import TitleBar from '../components/TitleBar.jsx';
@@ -7,6 +6,7 @@ import CategoryMenu from '../components/CategoryMenu.jsx';
 import BMICalculator from '../components/RecommendExercise/BMICalculator.jsx';
 import RecommendRoutine from '../components/RecommendExercise/RecommendRoutine.jsx';
 import RecommendDiet from '../components/RecommendExercise/RecommendDiet.jsx';
+import BMRCalculator from '../components/RecommendExercise/BMRCalculator.jsx';
 
 const HeaderContainer = styled.div`
   width: 100%;
@@ -36,17 +36,19 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 59px;
+  gap: 30px;
 `;
 
 function RecommendExercise() {
   const location = useLocation();
 
   const initialMainCategory = location.state?.mainCategory || 'AI 추천 운동';
-
   const initialSubCategory = location.state?.subCategory || '헬스';
 
   const [bmi, setBmi] = useState('');
+
+  const [userDataForDietRecommendation, setUserDataForDietRecommendation] = useState(null);
+
   const [recommendList, setRecommendList] = useState([]);
   const [goalCategory, setGoalCategory] = useState('');
   const [dietPlan, setDietPlan] = useState(null);
@@ -54,7 +56,6 @@ function RecommendExercise() {
   const [error, setError] = useState(null);
 
   const [selectedMainCategory, setSelectedMainCategory] = useState(initialMainCategory);
-
   const [selectedExerciseSubCategory, setSelectedExerciseSubCategory] = useState(initialSubCategory);
 
   const mainCategories = ['AI 추천 운동', 'AI 추천 식단'];
@@ -62,14 +63,15 @@ function RecommendExercise() {
   const handleMainCategorySelect = (category) => {
     setSelectedMainCategory(category);
     setRecommendList([]);
-    setDietPlan(null); // 식단 초기화
+    setDietPlan(null);
+    setUserDataForDietRecommendation(null);
     setError(null);
 
     if (category === 'AI 추천 운동') {
       setSelectedExerciseSubCategory('헬스');
       setGoalCategory('');
     } else {
-      setGoalCategory('체지방 감량'); // 기본값 설정
+      setGoalCategory('체지방 감량');
       setSelectedExerciseSubCategory('');
     }
   };
@@ -79,6 +81,11 @@ function RecommendExercise() {
     setRecommendList([]);
     setError(null);
   };
+
+  const handleBMRDataFromCalculator = useCallback((data) => {
+    setUserDataForDietRecommendation(data);
+    console.log('BMRCalculator에서 받은 모든 데이터:', data);
+  }, []);
 
   return (
     <>
@@ -94,8 +101,8 @@ function RecommendExercise() {
           />
         </CategoryMenuWrapper>
         <ContentWrapper>
-          <BMICalculator bmi={bmi} setBmi={setBmi} />
-
+          {selectedMainCategory === 'AI 추천 운동' && <BMICalculator bmi={bmi} setBmi={setBmi} />}
+          {selectedMainCategory === 'AI 추천 식단' && <BMRCalculator setUserData={handleBMRDataFromCalculator} />}
           {selectedMainCategory === 'AI 추천 운동' && (
             <RecommendRoutine
               bmi={bmi}
@@ -109,7 +116,6 @@ function RecommendExercise() {
               onSelectSubCategory={handleSubCategorySelect}
             />
           )}
-
           {selectedMainCategory === 'AI 추천 식단' && (
             <RecommendDiet
               goalCategory={goalCategory}
@@ -120,6 +126,7 @@ function RecommendExercise() {
               setLoading={setLoading}
               error={error}
               setError={setError}
+              userData={userDataForDietRecommendation}
             />
           )}
         </ContentWrapper>
