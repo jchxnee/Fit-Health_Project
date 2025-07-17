@@ -34,6 +34,7 @@ export const API_ENDPOINTS = {
   PAYMENT: {
     BASE: '/api/payments',
     PAYMENT: '/api/payments/payment',
+    DETAIL: (paymentId) => `/api/payments?paymentId=${paymentId}`,
     REFUND: '/api/payments/refund',
     LIST: '/api/payments/list',
     TRAINERLIST: '/api/payments/trainerlist',
