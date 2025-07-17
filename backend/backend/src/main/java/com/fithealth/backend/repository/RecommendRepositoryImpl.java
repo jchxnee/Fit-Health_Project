@@ -19,7 +19,7 @@ public class RecommendRepositoryImpl implements RecommendRepository {
 
     private final RestTemplate restTemplate;
 
-    @Value("${spring.ai.openai.model}")
+    @Value("${openai.model}")
     private String model;
 
 
@@ -27,7 +27,7 @@ public class RecommendRepositoryImpl implements RecommendRepository {
     @Value("${openai.api.chat-completions-url:https://api.openai.com/v1/chat/completions}")
     private String chatCompletionsUrl; // 새로운 변수명
 
-    @Value("${spring.ai.openai.api-key}")
+    @Value("${openai.api-key}")
     private String openAiApiKey;
 
     private List<String> getExerciseImageNames(String category) {
