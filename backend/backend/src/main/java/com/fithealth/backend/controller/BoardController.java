@@ -3,6 +3,7 @@ package com.fithealth.backend.controller;
 import com.fithealth.backend.dto.Board.BoardCreateDto;
 import com.fithealth.backend.dto.Board.BoardGetDto;
 import com.fithealth.backend.dto.Board.BoardUpdateDto;
+import com.fithealth.backend.dto.Board.MyBoardGetDto;
 import com.fithealth.backend.dto.Board.Top5BoardDto;
 import com.fithealth.backend.dto.PageResponse;
 import com.fithealth.backend.service.BoardService;
@@ -51,20 +52,16 @@ public class BoardController {
     }
 
     @GetMapping("/myposts")
-    public ResponseEntity<PageResponse<BoardGetDto.Response>> getMyPosts(
-            @RequestParam(defaultValue = "all") String category,
-            @RequestParam(required = false) String search,
-            @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+    public ResponseEntity<List<MyBoardGetDto>> getMyPosts(
             @RequestParam("userEmail") String userEmail
     ) {
 
         if (userEmail == null || userEmail.isEmpty() || "anonymousUser".equals(userEmail)) {
-            // 실제 인증이 필요하다면 여기에 SecurityContextHolder를 활용한 인증 로직 추가 필요
             return ResponseEntity.status(401).build(); // 401 Unauthorized
         }
 
-        PageResponse<BoardGetDto.Response> response = boardService.getMyBoardListWithSearch(userEmail, category, search, pageable);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok( boardService.getMyBoards(userEmail));
+
     }
 
     @PutMapping("/{id}")

@@ -47,4 +47,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     //조회순으로 높은 게시글 5개
     List<Board> findTop5ByStatusOrderByCountDesc(CommonEnums.Status status);
+
+    List<Board> findByMemberUserEmail(String userEmail);
 }

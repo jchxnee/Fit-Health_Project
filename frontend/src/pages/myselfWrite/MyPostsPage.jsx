@@ -1,3 +1,5 @@
+// src/pages/MyPostsPage.jsx
+
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import GeneralPostsList from '../../components/GeneralPostsList';
@@ -9,7 +11,7 @@ import api from '../../api/axios';
 import { API_ENDPOINTS } from '../../api/config';
 import useUserStore from '../../store/useUserStore';
 
-// --- 스타일 컴포넌트 ---
+// --- 스타일 컴포넌트 (생략 - 기존과 동일) ---
 const PageContainer = styled.div`
   width: 100%;
   min-height: 100vh;
@@ -63,46 +65,26 @@ const TabButton = styled(Link)`
   cursor: pointer;
   border-bottom: 2px solid ${({ theme, $active }) => ($active ? theme.colors.primary : 'transparent')};
   transition: all 0.2s ease-in-out;
+  text-decoration: none;
 `;
-
-// 디바운싱을 위한 커스텀 훅
-function useDebounce(value, delay) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
 
 function MyPostsPage() {
   const { user, isAuthenticated } = useUserStore();
 
-  const [posts, setPosts] = useState([]); // 필터링된 게시물 목록
+  const [allPosts, setAllPosts] = useState([]);
+  const [filteredAndSortedPosts, setFilteredAndSortedPosts] = useState([]);
+
   const [filters, setFilters] = useState({
     search: '',
     category: 'all',
-    sort: 'latest', // 백엔드 정렬 파라미터와 맞춤
+    sort: 'latest',
   });
 
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [totalPostsCount, setTotalPostsCount] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
 
-  // 검색어 디바운싱 (500ms 지연)
-  const debouncedSearchTerm = useDebounce(filters.search, 500);
-
-  // 필터 옵션
   const filterOptions = [
     {
       label: '전체',
@@ -115,7 +97,7 @@ function MyPostsPage() {
       ],
     },
     {
-      label: '정렬', // 레이블을 '최신순'이 아닌 '정렬'로 변경하거나 첫 번째 옵션으로 '최신순'을 기본 선택되도록 할 수 있음
+      label: '정렬',
       key: 'sort',
       options: [
         { label: '최신순', value: 'latest' },
@@ -125,14 +107,12 @@ function MyPostsPage() {
     },
   ];
 
-  // 백엔드에서 데이터를 가져오는 함수
-  const fetchMyPosts = useCallback(async () => {
+  const fetchAllMyPosts = useCallback(async () => {
     if (!isAuthenticated || !user || !user.email) {
       setLoading(false);
       setError('로그인 정보가 없거나 유효하지 않습니다.');
-      setPosts([]);
-      setTotalPostsCount(0);
-      setTotalPages(0);
+      setAllPosts([]);
+      setFilteredAndSortedPosts([]);
       return;
     }
 
@@ -140,58 +120,86 @@ function MyPostsPage() {
     setError(null);
 
     try {
-      // 백엔드 API 호출 시 필터 및 페이지 정보 전달
       const response = await api.get(API_ENDPOINTS.BOARD.MYPOSTS, {
         params: {
           userEmail: user.email,
-          category: filters.category,
-          search: debouncedSearchTerm,
-          page: currentPage - 1, // 백엔드 페이지는 0부터 시작
-          size: postsPerPage,
-          // 백엔드 sort 파라미터는 '필드명,정렬방식' 형태
-          sort: (() => {
-            switch (filters.sort) {
-              case 'latest':
-                return 'createdDate,desc';
-              case 'oldest':
-                return 'createdDate,asc';
-              case 'views':
-                return 'count,desc';
-              default:
-                return 'createdDate,desc';
-            }
-          })(),
         },
       });
 
-      const fetchedPageResponse = response.data;
-      setPosts(fetchedPageResponse.content || []);
-      setTotalPostsCount(fetchedPageResponse.totalElements || 0);
-      setTotalPages(fetchedPageResponse.totalPages || 0);
+      const fetchedPosts = response.data;
+      setAllPosts(fetchedPosts || []);
+      setFilteredAndSortedPosts(fetchedPosts || []);
     } catch (err) {
       console.error('내 게시물 데이터를 불러오는 중 오류 발생:', err);
       setError(err.response?.data?.message || '내 게시물을 불러오는데 실패했습니다.');
-      setPosts([]);
+      setAllPosts([]);
+      setFilteredAndSortedPosts([]);
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, user, filters, debouncedSearchTerm, currentPage, postsPerPage]);
+  }, [isAuthenticated, user]);
 
-  // 필터, 검색어, 페이지 변경 시 데이터 다시 로딩
   useEffect(() => {
-    fetchMyPosts();
-  }, [fetchMyPosts]);
+    fetchAllMyPosts();
+  }, [fetchAllMyPosts]);
 
-  // 필터 변경 핸들러
+  // **MyBoardGetDto 필드명에 맞춰 필터링 및 정렬 로직 수정**
+  useEffect(() => {
+    if (loading || !allPosts) {
+      return;
+    }
+
+    let tempPosts = [...allPosts];
+
+    // 검색 필터링 (board_title, board_content, user_name, board_category_name)
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      tempPosts = tempPosts.filter(
+        (post) =>
+          (post.board_title && post.board_title.toLowerCase().includes(searchTerm)) ||
+          (post.board_content && post.board_content.toLowerCase().includes(searchTerm)) ||
+          (post.user_name && post.user_name.toLowerCase().includes(searchTerm)) || // 작성자 이름 검색 추가
+          (post.board_category_name && post.board_category_name.toLowerCase().includes(searchTerm))
+      );
+    }
+
+    // 카테고리 필터링 (board_category_name)
+    if (filters.category !== 'all') {
+      tempPosts = tempPosts.filter((post) => post.board_category_name === filters.category);
+    }
+
+    // 정렬 (created_date, count)
+    tempPosts.sort((a, b) => {
+      switch (filters.sort) {
+        case 'latest':
+          // created_date는 LocalDateTime 문자열이므로 Date 객체로 변환하여 비교
+          return new Date(b.created_date) - new Date(a.created_date);
+        case 'oldest':
+          return new Date(a.created_date) - new Date(b.created_date);
+        case 'views':
+          return (b.count || 0) - (a.count || 0); // 조회수는 'count' 필드
+        default:
+          return 0;
+      }
+    });
+
+    setFilteredAndSortedPosts(tempPosts);
+    setCurrentPage(1);
+  }, [filters, allPosts, loading]); // allPosts 의존성 추가 (데이터 로드 후 필터링/정렬)
+
   const handleFilterChange = (key, value) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
       [key]: value,
     }));
-    setCurrentPage(1); // 필터 변경 시 첫 페이지로
   };
 
-  // 페이지 변경 핸들러
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = filteredAndSortedPosts.slice(indexOfFirstPost, indexOfLastPost);
+
+  const totalPages = Math.ceil(filteredAndSortedPosts.length / postsPerPage);
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo(0, 0);
@@ -236,13 +244,13 @@ function MyPostsPage() {
             filterOptions={filterOptions}
             onFilterChange={handleFilterChange}
             currentSearch={filters.search}
-            currentCategory={filters.category} // BasicFilter에 category 값 전달
-            currentSort={filters.sort} // BasicFilter에 sort 값 전달
+            currentCategory={filters.category}
+            currentSort={filters.sort}
           />
         </Container>
 
-        {posts.length > 0 ? (
-          <GeneralPostsList posts={posts} />
+        {currentPosts.length > 0 ? (
+          <GeneralPostsList posts={currentPosts} />
         ) : (
           <div style={{ textAlign: 'center', padding: '50px', color: '#666' }}>
             {filters.search || filters.category !== 'all'

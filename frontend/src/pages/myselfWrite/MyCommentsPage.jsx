@@ -1,5 +1,5 @@
 // src/pages/MyCommentsPage.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import BasicFilter from '../../components/filter/BasicFilter';
 import CommentsList from '../../components/CommentsList';
@@ -8,56 +8,6 @@ import { Link, useLocation } from 'react-router-dom';
 import api from '../../api/axios';
 import { API_ENDPOINTS } from '../../api/config';
 import useUserStore from '../../store/useUserStore';
-
-// --- 임시 데이터는 컴포넌트 외부로 이동 ---
-// 이 데이터는 이제 사용되지 않지만, 컴포넌트 로직에는 영향을 주지 않습니다.
-const MY_COMMENTS_DATA = [
-  {
-    id: 1,
-    postId: 101, // 댓글이 달린 게시글 ID
-    category: '궁금해요~',
-    postTitle: '이거 어떻게 쓰는 거예요?',
-    content: '내 악력기가 있습니다~ 많이 연습하세요~!!',
-    likes: 12,
-    timeAgo: '2025.05.31',
-  },
-  {
-    id: 2,
-    postId: 102,
-    category: '궁금해요~',
-    postTitle: '이거 어떻게 쓰는게 맞는대요?',
-    content: '음... 그렇게 쓰고 싶음 쓰세요~',
-    likes: 5,
-    timeAgo: '2025.05.27',
-  },
-  {
-    id: 3,
-    postId: 103,
-    category: '운동해요~',
-    postTitle: '하체 운동을 해도 살이 안빠져요..',
-    content: '님 먹는걸 보세요 ㅋㅋ;;',
-    likes: 8,
-    timeAgo: '2025.05.21',
-  },
-  {
-    id: 4,
-    postId: 104,
-    category: '운동해요~',
-    postTitle: '요즘 등운동 할때 전완근이 너무 털리네요..',
-    content: '턱걸이 님 힙이 털리는거 보면 낫죠',
-    likes: 3,
-    timeAgo: '2025.05.15',
-  },
-  {
-    id: 5,
-    postId: 105,
-    category: '소통해요~',
-    postTitle: '저녁 7시에 운동가실분 구합니다!!',
-    content: '님 남자 가야돼요 ㅋㅋㅋ',
-    likes: 7,
-    timeAgo: '2025.05.15',
-  },
-];
 
 // --- 스타일 컴포넌트 ---
 const PageContainer = styled.div`
