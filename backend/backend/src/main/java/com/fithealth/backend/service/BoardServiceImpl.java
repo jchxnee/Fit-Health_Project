@@ -4,7 +4,9 @@ import com.fithealth.backend.dto.Board.BoardCreateDto;
 import com.fithealth.backend.dto.Board.BoardGetDto;
 import com.fithealth.backend.dto.Board.BoardGetDto.Response;
 import com.fithealth.backend.dto.Board.BoardUpdateDto;
+import com.fithealth.backend.dto.Board.MyBoardGetDto;
 import com.fithealth.backend.dto.Board.Top5BoardDto;
+import com.fithealth.backend.dto.Comment.MyCommentGetDto;
 import com.fithealth.backend.dto.PageResponse;
 import com.fithealth.backend.entity.Board;
 import com.fithealth.backend.entity.BoardFile;
@@ -213,37 +215,12 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public PageResponse<Response> getMyBoardList(String currentUserEmail, String category, Pageable pageable) {
-        return getMyBoardListWithSearch(currentUserEmail, category, null, pageable);
-    }
-
-    @Override
-    public PageResponse<Response> getMyBoardListWithSearch(String currentUserEmail, String category, String search, Pageable pageable) {
-        Page<Board> boardPage;
-
-        boolean hasSearch = search != null && !search.trim().isEmpty();
-        boolean hasCategory = category != null && !"전체".equals(category) && !category.isEmpty() && !"all".equals(category);
-
-        if (hasSearch && hasCategory) {
-            boardPage = boardRepository.findByMemberUserEmailAndStatusAndCategoryAndSearch(
-                    currentUserEmail, CommonEnums.Status.Y, category, search.trim(), pageable);
-        } else if (hasSearch) {
-            boardPage = boardRepository.findByMemberUserEmailAndStatusAndSearch(
-                    currentUserEmail, CommonEnums.Status.Y, search.trim(), pageable);
-        } else if (hasCategory) {
-            boardPage = boardRepository.findByMemberUserEmailAndBoardCategoryNameAndStatus(
-                    currentUserEmail, category, CommonEnums.Status.Y, pageable);
-        } else {
-            boardPage = boardRepository.findByMemberUserEmailAndStatus(
-                    currentUserEmail, CommonEnums.Status.Y, pageable);
-        }
-
-        Page<BoardGetDto.Response> dtoPage = boardPage.map(board -> {
-            boolean isLikedByCurrentUser = boardLikeRepository.findByBoardAndMemberUserEmail(board, currentUserEmail).isPresent();
-            return BoardGetDto.Response.toDto(board, isLikedByCurrentUser);
-        });
-
-        return new PageResponse<>(dtoPage);
+    @Transactional(readOnly = true)
+    public List<MyBoardGetDto> getMyBoards(String userEmail) {
+        List<Board> boards = boardRepository.findByMemberUserEmail(userEmail);
+        return boards.stream()
+                .map(MyBoardGetDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
     @Override
