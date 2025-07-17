@@ -22,7 +22,7 @@ public class Notice {
     @Column(name = "NOTICE_TITLE", nullable = false)
     private String noticeTitle;
 
-    @Column(name = "NOTICE_CONTENT", nullable = false)
+    @Column(name = "NOTICE_CONTENT", nullable = false, length = 500)
     private String noticeContent;
 
     @Column(name = "NOTICE_CATEGORY_NAME")

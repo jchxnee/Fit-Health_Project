@@ -25,7 +25,7 @@ public class Review {
     private Payment payment;
 
     @Lob
-    @Column(name = "REVIEW_CONTENT", nullable = false)
+    @Column(name = "REVIEW_CONTENT", nullable = false, length = 500)
     private String reviewContent;
 
     @Column(name = "RATING", nullable = false)
