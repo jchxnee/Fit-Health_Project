@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { ResponsiveLine } from '@nivo/line';
+import { ResponsiveBar } from '@nivo/bar';
 import styled from 'styled-components';
 
-// 컴포넌트 안이나 파일 상단에 추가
 const CenteredMessage = styled.div`
-  height: 100%; /* 차트 높이와 동일하게 */
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -12,29 +11,39 @@ const CenteredMessage = styled.div`
   color: ${({ theme }) => theme.colors.gray[700]};
 `;
 
-// raw 데이터 → 차트용 데이터 변환
-const transformHealthData = (rawData) => {
-  console.log(rawData);
-  const weightData = [];
-  const skeletalMuscleData = [];
-  const bodyFatData = [];
-
+const transformHealthDataForBarChart = (rawData) => {
+  const transformedData = [];
   rawData.forEach((item) => {
-    const date = new Date(item.create_date); // 소문자 필드명
-    const formattedDate = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(
-      date.getDate()
-    ).padStart(2, '0')}`;
-
-    weightData.push({ x: formattedDate, y: item.weight });
-    skeletalMuscleData.push({ x: formattedDate, y: item.skeletal_muscle });
-    bodyFatData.push({ x: formattedDate, y: item.body_fat });
+    const date = new Date(item.create_date);
+    const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+    transformedData.push({
+      date: formattedDate,
+      체중: item.weight,
+      골격근량: item.skeletal_muscle,
+      체지방량: item.body_fat,
+    });
   });
+  return transformedData;
+};
 
-  return [
-    { id: '체중 (kg)', data: weightData },
-    { id: '골격근량 (kg)', data: skeletalMuscleData },
-    { id: '체지방량 (kg)', data: bodyFatData },
-  ];
+const CustomTooltip = ({ id, value, color, data }) => {
+  return (
+    <div
+      style={{
+        background: 'white',
+        padding: '10px 12px',
+        border: `2px solid ${color}`,
+        color: '#333',
+        fontSize: '14px',
+        fontWeight: 'bold',
+      }}
+    >
+      <div>날짜: {data.date}</div>
+      <div style={{ color }}>
+        {id}: {value} kg
+      </div>
+    </div>
+  );
 };
 
 const HealthChart = ({ rawData, isLoading }) => {
@@ -42,74 +51,103 @@ const HealthChart = ({ rawData, isLoading }) => {
 
   useEffect(() => {
     if (rawData && rawData.length > 0) {
-      setChartData(transformHealthData(rawData));
+      setChartData(transformHealthDataForBarChart(rawData));
     }
   }, [rawData]);
 
   if (isLoading) return <CenteredMessage>로딩 중입니다...</CenteredMessage>;
   if (!chartData.length) return <CenteredMessage>데이터가 없습니다.</CenteredMessage>;
 
+  const keys = ['체중', '골격근량', '체지방량'];
+  const colors = ['#FF5733', '#3366FF', '#33CC33'];
+
   return (
-    <ResponsiveLine
+    <ResponsiveBar
       data={chartData}
-      margin={{ top: 50, right: 140, bottom: 70, left: 50 }}
-      xScale={{ type: 'point' }}
-      yScale={{
-        type: 'linear',
-        min: 'auto',
-        max: 'auto',
-        stacked: false,
-        reverse: false,
-      }}
-      yFormat=" >-.2f"
+      keys={keys}
+      indexBy="date"
+      margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+      padding={0.3}
+      groupMode="grouped"
+      valueScale={{ type: 'linear' }}
+      indexScale={{ type: 'band', round: true }}
+      colors={colors}
+      borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
       axisTop={null}
       axisRight={null}
       axisBottom={{
         tickSize: 5,
         tickPadding: 5,
-        tickRotation: -45,
+        tickRotation: 0,
         legend: '날짜',
-        legendOffset: 50,
         legendPosition: 'middle',
-        truncateTickAt: 0,
-        format: (value) => {
-          const parts = value.split('.');
-          return parts.length === 3 ? `${parts[1]}.${parts[2]}` : value;
-        },
+        legendOffset: 32,
       }}
       axisLeft={{
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
         legend: '값 (kg)',
-        legendOffset: -40,
         legendPosition: 'middle',
+        legendOffset: -40,
       }}
-      pointSize={10}
-      pointColor={{ theme: 'background' }}
-      pointBorderWidth={2}
-      pointBorderColor={{ from: 'serieColor' }}
-      pointLabelYOffset={-12}
-      useMesh={true}
-      colors={['#FF5733', '#3366FF', '#33CC33']}
+      // ⭐ 막대 위에 숫자 레이블 표시
+      labelSkipWidth={12}
+      labelSkipHeight={12}
+      labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
+      legends={[
+        {
+          dataFrom: 'keys',
+          anchor: 'bottom-right',
+          direction: 'column',
+          justify: false,
+          translateX: 120,
+          translateY: 0,
+          itemsSpacing: 2,
+          itemWidth: 100,
+          itemHeight: 20,
+          itemDirection: 'left-to-right',
+          itemOpacity: 0.85,
+          symbolSize: 12,
+          effects: [
+            {
+              on: 'hover',
+              style: {
+                itemOpacity: 1,
+              },
+            },
+          ],
+        },
+      ]}
+      tooltip={CustomTooltip}
       theme={{
+        // ⭐ 축 글씨 굵기 설정
         axis: {
-          domain: {
-            line: { stroke: '#d4d4d4', strokeWidth: 1 },
-          },
+          domain: { line: { stroke: '#d4d4d4', strokeWidth: 1 } },
           ticks: {
             line: { stroke: '#d4d4d4', strokeWidth: 1 },
-            text: { fontSize: 11, fill: '#333333' },
+            text: { fontSize: 11, fill: '#333333', fontWeight: 'bold' }, // ⭐ fontWeight: 'bold' 추가
           },
           legend: {
-            text: { fontSize: 12, fill: '#333333', fontWeight: 'bold' },
+            text: { fontSize: 12, fill: '#333333', fontWeight: 'bold' }, // ⭐ fontWeight: 'bold' 추가
           },
         },
         grid: {
           line: { stroke: '#e0e0e0', strokeWidth: 1 },
         },
+        // ⭐ 막대 안 레이블 글씨 굵기 설정 (만약 label을 사용할 경우)
+        labels: {
+          text: {
+            fontWeight: 'bold', // ⭐ fontWeight: 'bold' 추가
+          },
+        },
+        // ⭐ 범례 글씨 굵기 설정
         legends: {
-          text: { fontSize: 12, fill: '#333333' },
+          text: {
+            fontSize: 12,
+            fill: '#333333',
+            fontWeight: 'bold', // ⭐ fontWeight: 'bold' 추가
+          },
         },
         tooltip: {
           container: {
@@ -118,35 +156,10 @@ const HealthChart = ({ rawData, isLoading }) => {
             fontSize: 12,
             borderRadius: '4px',
             boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.1)',
+            fontWeight: 'bold',
           },
         },
       }}
-      legends={[
-        {
-          anchor: 'bottom-right',
-          direction: 'column',
-          justify: false,
-          translateX: 120,
-          translateY: 0,
-          itemsSpacing: 0,
-          itemDirection: 'left-to-right',
-          itemWidth: 80,
-          itemHeight: 20,
-          itemOpacity: 0.75,
-          symbolSize: 12,
-          symbolShape: 'circle',
-          symbolBorderColor: 'rgba(0, 0, 0, .5)',
-          effects: [
-            {
-              on: 'hover',
-              style: {
-                itemBackground: 'rgba(0, 0, 0, .03)',
-                itemOpacity: 1,
-              },
-            },
-          ],
-        },
-      ]}
     />
   );
 };
