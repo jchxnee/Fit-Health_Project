@@ -24,7 +24,7 @@ public class Board {
     @Column(name = "BOARD_TITLE", nullable = false)
     private String boardTitle;
 
-    @Column(name = "BOARD_CONTENT", nullable = false)
+    @Column(name = "BOARD_CONTENT", nullable = false, length = 500)
     private String boardContent;
 
     @Column(name = "BOARD_CATEGORY_NAME", nullable = false)
