@@ -288,7 +288,7 @@ const CoachHistoryModal = ({ isOpen, onClose, userName, sessions, history, onUpd
                   <HistoryListItem key={item.reservationNo || index} $isSessionDate={isItemSessionDate}>
                     <HistoryItemTopRow>
                       <HistoryDate>
-                        {index + 1}회차: {item.selectDate.split(' ')[0]}
+                        {index + 1}회차: {item.selectDate} {}
                         {isApproved && <HistorySessionStatus>(승인됨)</HistorySessionStatus>}
                         {isRejected && <HistorySessionStatus>(거절됨)</HistorySessionStatus>}
                         {isPending && <HistorySessionStatus>(승인 대기중)</HistorySessionStatus>}

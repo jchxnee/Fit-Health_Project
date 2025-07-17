@@ -44,7 +44,7 @@ public class Member {
     @Column(length = 11)
     private String phone;
 
-    @Column(name = "ADDRESS",length = 100)
+    @Column(name = "ADDRESS",length = 255)
     private String address;
 
     @Enumerated(EnumType.STRING)

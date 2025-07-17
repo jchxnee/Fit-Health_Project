@@ -1,11 +1,10 @@
-// CommunityPage.jsx
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaPencilAlt, FaThumbsUp, FaEye } from 'react-icons/fa';
 import { RiMessage2Fill } from 'react-icons/ri';
 import CustomCategoryMenu from '../../components/CustomCategoryMenu';
 import GeneralPostsList from '../../components/GeneralPostsList';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Pagination from '../../components/Pagination';
 import api from '../../api/axios';
 import { API_ENDPOINTS } from '../../api/config';
@@ -13,7 +12,7 @@ import { API_ENDPOINTS } from '../../api/config';
 function CommunityPage() {
   const [activeCategory, setActiveCategory] = useState('전체');
   const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage] = useState(10); // postsPerPage를 상수로 만듦
+  const [postsPerPage] = useState(10);
 
   const [generalPosts, setGeneralPosts] = useState([]);
   const [topPosts, setTopPosts] = useState([]);
@@ -22,13 +21,56 @@ function CommunityPage() {
   const [error, setError] = useState(null);
   const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
 
-  // 백엔드에서 받은 전체 페이지 정보 (페이지네이션에 사용)
   const [totalPostsCount, setTotalPostsCount] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  const notices = [{ id: 1, title: '공지: 핏헬스 가이드라인', icon: '>', link: '#' }];
-  const Categories = [{ name: '전체' }, { name: '운동해요!' }, { name: '궁금해요!' }, { name: '소통해요!' }];
+  // --- 공지사항 관련 상태 및 로직 ---
+  const [notices, setNotices] = useState([]);
+  const [currentNoticeIndex, setCurrentNoticeIndex] = useState(0);
+  const navigate = useNavigate();
 
+  // 공지사항 데이터 불러오기: 컴포넌트 마운트 시 한 번 호출
+  useEffect(() => {
+    const fetchNotices = async () => {
+      try {
+        const response = await api.get(API_ENDPOINTS.NOTICE.LIST, {
+          params: {
+            page: 0, // 첫 페이지 (0-based)
+            size: 3, // 최신 공지사항 3개만 가져옴
+            sort: 'createdDate,desc', // 최신순 정렬
+          },
+        });
+        // API 응답의 content 필드에서 공지사항 목록을 가져와 상태에 저장
+        setNotices(response.data.content || []);
+      } catch (err) {
+        console.error('공지사항 데이터를 불러오는 데 실패했습니다:', err);
+      }
+    };
+    fetchNotices();
+  }, []); // 빈 배열은 컴포넌트가 처음 렌더링될 때 한 번만 실행되도록 함
+
+  // 공지사항 로테이션: notices 배열이 업데이트되거나 컴포넌트 마운트 시 인터벌 설정
+  useEffect(() => {
+    if (notices.length > 1) {
+      // 공지사항이 2개 이상일 때만 로테이션
+      const interval = setInterval(() => {
+        // 현재 인덱스를 1 증가시키고 notices 배열의 길이로 나눈 나머지 값을 새로운 인덱스로 설정
+        // 이렇게 하면 인덱스가 배열 길이를 초과하지 않고 처음으로 돌아감
+        setCurrentNoticeIndex((prevIndex) => (prevIndex + 1) % notices.length);
+      }, 5000); // 5초마다 변경
+
+      // 컴포넌트 언마운트 시 또는 notices 배열이 변경되어 useEffect가 다시 실행될 때 기존 인터벌 정리
+      return () => clearInterval(interval);
+    }
+  }, [notices]); // notices 배열이 변경될 때마다 이 이펙트가 다시 실행됨
+
+  // 공지사항 클릭 시 해당 공지사항의 상세 페이지로 이동
+  const handleNoticeClick = (noticeNo) => {
+    navigate(`/NoticeDetailPage/${noticeNo}`);
+  };
+  // --- 공지사항 관련 상태 및 로직 끝 ---
+
+  // 게시글 데이터 불러오기 (기존 코드와 동일)
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
@@ -36,36 +78,30 @@ function CommunityPage() {
       try {
         const response = await api.get(API_ENDPOINTS.BOARD.ALL, {
           params: {
-            category: activeCategory, // 백엔드에서 "전체"를 처리하므로 그대로 전달
-            page: currentPage - 1, // 스프링 Pageable은 0부터 시작
+            category: activeCategory,
+            page: currentPage - 1,
             size: postsPerPage,
-            sort: 'createdDate,desc', // 최신순 정렬 (백엔드 엔티티 필드명 기준)
+            sort: 'createdDate,desc',
           },
         });
 
-        const fetchedPageResponse = response.data; // PageResponse 객체 전체
-        const allPostsContent = fetchedPageResponse.content; // 실제 게시글 배열
+        const fetchedPageResponse = response.data;
+        const allPostsContent = fetchedPageResponse.content;
 
-        // 전체 게시글 수와 전체 페이지 수를 백엔드 응답에서 설정
         setTotalPostsCount(fetchedPageResponse.totalCount);
         setTotalPages(fetchedPageResponse.totalPage);
 
-        // 1. TOP 3 게시글: 조회수(count) 기준으로 내림차순 정렬 후 상위 3개
         const sortedByViews = [...allPostsContent].sort((a, b) => b.count - a.count);
         setTopPosts(sortedByViews.slice(0, 3));
 
-        // 2. 사진 게시글: 파일이 첨부된 게시글 중 최신 4개
         const photoPostsData = [...allPostsContent]
           .filter((post) => post.files && post.files.length > 0)
           .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
         setPhotoPosts(photoPostsData.slice(0, 4));
 
-        // 3. 일반 게시글 (현재 페이지의 데이터만):
-        // 백엔드에서 이미 현재 페이지에 맞는 데이터를 보내주므로 필터링 필요 없음
-        setGeneralPosts(allPostsContent); // 현재 페이지의 게시글만 설정
+        setGeneralPosts(allPostsContent);
       } catch (err) {
         console.error('게시글 데이터를 불러오는 중 오류 발생:', err);
-        // network error가 아닌 경우 err.response.data 등을 통해 상세 에러 메시지를 얻을 수 있음
         setError('게시글을 불러오는데 실패했습니다.');
       } finally {
         setLoading(false);
@@ -73,7 +109,7 @@ function CommunityPage() {
     };
 
     fetchPosts();
-  }, [activeCategory, currentPage, postsPerPage]); // activeCategory, currentPage, postsPerPage 변경 시 다시 불러옴
+  }, [activeCategory, currentPage, postsPerPage]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -102,11 +138,11 @@ function CommunityPage() {
         <MainContentArea>
           <SidebarWrapper>
             <CustomCategoryMenu
-              categories={Categories}
+              categories={[{ name: '전체' }, { name: '운동해요!' }, { name: '궁금해요!' }, { name: '소통해요!' }]}
               selectedCategory={activeCategory}
               onSelectCategory={(category) => {
                 setActiveCategory(category);
-                setCurrentPage(1); // 카테고리 변경 시 1페이지로 초기화
+                setCurrentPage(1);
               }}
             />
           </SidebarWrapper>
@@ -120,18 +156,25 @@ function CommunityPage() {
               </WriteButton>
             </SectionHeader>
 
-            <NoticeSection>
-              {notices.map((notice) => (
-                <NoticeItem key={notice.id}>
+            {notices.length > 0 ? (
+              <NoticeSection>
+                <NoticeItem>
                   <div>
                     <NoticeLabel>공지</NoticeLabel>
-                    <NoticeText>{notice.title}</NoticeText>
+                    {/* 현재 인덱스에 해당하는 공지사항 제목 표시 및 클릭 시 상세 페이지 이동 */}
+                    <NoticeText onClick={() => handleNoticeClick(notices[currentNoticeIndex].notice_no)}>
+                      {notices[currentNoticeIndex].notice_title}
+                    </NoticeText>
                   </div>
-                  <NoticeLink href={notice.link}>{notice.icon}</NoticeLink>
+                  {/* 상세 페이지로 이동하는 링크 아이콘 */}
+                  <NoticeLink onClick={() => handleNoticeClick(notices[currentNoticeIndex].notice_no)}>&gt;</NoticeLink>
                 </NoticeItem>
-              ))}
-            </NoticeSection>
+              </NoticeSection>
+            ) : (
+              <></>
+            )}
 
+            {/* 나머지 커뮤니티 섹션 (기존 코드와 동일) */}
             {activeCategory === '전체' && topPosts.length > 0 && (
               <>
                 <SectionTitleSmall>TOP 3 커뮤니티 글🔥</SectionTitleSmall>
@@ -162,7 +205,12 @@ function CommunityPage() {
                   {photoPosts.map((post) => (
                     <StyledPostLink key={post.board_no} to={`/communityDetailPage/${post.board_no}`}>
                       <PhotoPostCard>
-                        <PhotoPostImage src={`${CLOUDFRONT_URL}${post.files[0].change_name}`} alt={post.board_title} />
+                        {post.files && post.files.length > 0 && (
+                          <PhotoPostImage
+                            src={`${CLOUDFRONT_URL}${post.files[0].change_name}`}
+                            alt={post.board_title}
+                          />
+                        )}
                         <PhotoPostContent>
                           <PhotoPostTitle>{post.board_title}</PhotoPostTitle>
                           <PhotoPostText>{post.board_content}</PhotoPostText>
@@ -182,11 +230,8 @@ function CommunityPage() {
               </>
             )}
 
-            {/* 일반 게시글 목록 */}
-            {/* 백엔드에서 이미 페이지네이션된 데이터를 주므로 generalPosts를 바로 전달 */}
             <GeneralPostsList posts={generalPosts} />
 
-            {/* totalPages를 백엔드에서 받아온 값으로 사용 */}
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
           </MainContentWrapper>
         </MainContentArea>
@@ -289,18 +334,22 @@ const NoticeLabel = styled.span`
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   padding: 2px 8px;
   border-radius: ${({ theme }) => theme.borderRadius.sm};
-  margin-right: ${({ theme }) => theme.spacing[3]};
+  margin-right: ${({ theme }) => theme.spacing[5]};
 `;
 
 const NoticeText = styled.span`
   font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: ${({ theme }) => theme.colors.gray[800]};
-  flex-grow: 1;
+  color: ${({ theme }) => theme.colors.primary};
+  font-weight: ${({ theme }) => theme.fontWeights.semibold};
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 const NoticeLink = styled.a`
   font-size: ${({ theme }) => theme.fontSizes.base};
-  color: ${({ theme }) => theme.colors.gray[600]};
+  color: ${({ theme }) => theme.colors.gray[800]};
   text-decoration: none;
   cursor: pointer;
   margin-left: ${({ theme }) => theme.spacing[3]};

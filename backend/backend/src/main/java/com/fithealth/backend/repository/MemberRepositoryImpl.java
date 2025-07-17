@@ -93,7 +93,7 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
             // 결과가 없는 경우 Optional.empty() 반환
             return Optional.empty();
         } catch (Exception e) {
-            // 다른 예외 처리 (예: NonUniqueResultException 등)
+            // 다른 예외 처리 (예: NonUniqueResultException 등  )
             System.err.println("트레이너 번호로 멤버를 찾을 수 없습니다: " + e.getMessage());
             return Optional.empty();
         }
@@ -131,6 +131,12 @@ public class MemberRepositoryImpl implements MemberRepository { // 올바른 클
         } catch (NoResultException e) {
             return null; // 해당 이메일의 회원이 없으면 null 반환
         }
+    }
+
+    @Override
+    public List<Member> findAll() {
+        return em.createQuery("SELECT m FROM Member m", Member.class)
+                .getResultList();
     }
 
     // findByUserEmail은 기존 findOne과 동일한 기능을 합니다.

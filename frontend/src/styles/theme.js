@@ -60,6 +60,12 @@ const theme = {
     lg: '1008px', // 컨텐츠 크기
     xl: '0 auto', // 헤더, 푸터
   },
+  breakpoints: {
+    xs: '320px',
+    sm: '576px',
+    md: '768px',
+    lg: '1008px',
+  },
   spacing: {
     0: '0px',
     1: '4px',

@@ -33,8 +33,6 @@ function NoticePage() {
           page: currentPage - 1,
           size: ITEMS_PER_PAGE,
           sort: 'createdDate,desc', // 백엔드 @PageableDefault의 sort와 direction에 맞춤
-          // '전체' 카테고리일 경우 category 파라미터를 보내지 않거나, 백엔드에서 '전체'를 처리하도록 해야 합니다.
-          // 백엔드에서 '전체'를 처리하므로, 여기서는 그냥 activeCategory를 보냅니다.
           category: activeCategory,
         };
 

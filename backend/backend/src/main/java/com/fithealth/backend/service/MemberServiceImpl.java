@@ -1,6 +1,7 @@
 package com.fithealth.backend.service;
 
 import com.fithealth.backend.dto.member.LoginDto;
+import com.fithealth.backend.dto.member.ResponseDto;
 import com.fithealth.backend.dto.member.SignupDto;
 import com.fithealth.backend.dto.member.UpdateDto;
 import com.fithealth.backend.entity.Member;
@@ -10,6 +11,7 @@ import com.fithealth.backend.enums.Role;
 import com.fithealth.backend.enums.SocialType;
 import com.fithealth.backend.repository.MemberRepository;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -159,6 +162,19 @@ public class MemberServiceImpl implements MemberService{
         return member;
     }
 
+
+    @Override
+    public List<ResponseDto> findAll() {
+        List<Member> members = memberRepository.findAll();
+
+        List<ResponseDto> dtos = members.stream()
+                .map(ResponseDto::from)
+                .collect(Collectors.toList());
+
+        return dtos;
+    }
+
+
     @Override
     public boolean existsUser(String userName, String userEmail) {
         return memberRepository.findByNameAndEmail(userName, userEmail);
@@ -190,5 +206,6 @@ public class MemberServiceImpl implements MemberService{
         member.updatePwd(encodedPassword);
         memberRepository.save(member);
     }
-    }
+}
+
 

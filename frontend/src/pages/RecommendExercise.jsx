@@ -63,8 +63,7 @@ function RecommendExercise() {
   const handleMainCategorySelect = (category) => {
     setSelectedMainCategory(category);
     setRecommendList([]);
-    setDietPlan(null);
-    setUserDataForDietRecommendation(null);
+    setDietPlan(null); // 식단 초기화
     setError(null);
 
     if (category === 'AI 추천 운동') {

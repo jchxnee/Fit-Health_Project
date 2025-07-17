@@ -1,138 +1,243 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FiPaperclip, FiCamera, FiSmile } from 'react-icons/fi';
 import { MdSend } from 'react-icons/md';
 import styled from 'styled-components';
-import Footer from '../components/Footer';
-import Header from '../components/Header';
 import TitleBar from '../components/TitleBar';
+import {
+  getMyChatRooms,
+  getChatHistory,
+  readChatRoom,
+} from '../api/chatApi.js';
+import api from '../api/axios';
+import { API_ENDPOINTS } from '../api/config';
+// import basicProfile from 'E:\Fit-Health_Project\frontend\public\img\basicProfile.jpg'; // import 구문 제거
+
+const WS_BASE_URL = 'ws://localhost:7961/connect'; // 백엔드 서버 포트로 수정
+const CLOUDFRONT_URL = 'https://ddmqhun0kguvt.cloudfront.net/';
+
+// 시간 포맷 함수 추가
+const formatTime = (isoString) => {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  const hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const ampm = hours < 12 ? '오전' : '오후';
+  const displayHour = hours % 12 === 0 ? 12 : hours % 12;
+  return `${ampm} ${displayHour}:${minutes}`;
+};
+
+// 이메일 정규화 함수 추가
+const normalizeEmail = (email) => (email || '').trim().toLowerCase();
 
 const ChatPage = () => {
-  // 예시 데이터 (실제로는 API에서 가져옴)
-  const chatRooms = [
-    {
-      id: '1',
-      name: '김요가 님',
-      lastMessage: '잘 부탁드립니다!',
-      time: '10분',
-      avatar: 'https://via.placeholder.com/40', // 또는 첫 글자
-      status: 'ongoing', // 'ongoing' 또는 'completed'
-    },
-    {
-      id: '2',
-      name: '박코치 님',
-      lastMessage: '2452',
-      time: '3시간',
-      avatar: null, // 아바타 없음
-      status: 'completed',
-    },
-    {
-      id: '3',
-      name: '전찬영 님',
-      lastMessage: '헬스는?',
-      time: '7일',
-      avatar: null,
-      status: 'ongoing',
-    },
-    {
-      id: '4',
-      name: '고객센터',
-      lastMessage: '문의 요청 드립니다.',
-      time: '10일',
-      avatar: null,
-      status: 'ongoing',
-    },
-    // ... 추가 채팅방
-  ];
-
-  // 메시지 데이터에 'read' 상태 추가
-  const [messages, setMessages] = useState([
-    {
-      id: 'm1',
-      text: '안녕하세요.',
-      time: '오후 3:33',
-      isSent: false, // 받은 메시지
-      read: true, // 읽음
-    },
-    {
-      id: 'm2',
-      text: '안녕하세요.',
-      time: '오후 3:33',
-      isSent: true, // 보낸 메시지
-      read: true, // 읽음
-    },
-    {
-      id: 'm3',
-      text: '잘 부탁드립니다!',
-      time: '오후 3:33',
-      isSent: true,
-      read: false, // 안읽음
-    },
-    {
-      id: 'm4', // 중복 ID 수정
-      text: '잘 부탁드립니다!',
-      time: '오후 3:34',
-      isSent: true,
-      read: false, // 안읽음
-    },
-    {
-      id: 'm5', // 중복 ID 수정
-      text: '잘 부탁드립니다!',
-      time: '오후 3:35',
-      isSent: true,
-      read: false, // 안읽음
-    },
-    {
-      id: 'm6', // 중복 ID 수정
-      text: '잘 부탁드립니다!',
-      time: '오후 3:36',
-      isSent: true,
-      read: false, // 안읽음
-    },
-  ]);
-
-  const [activeChatId, setActiveChatId] = useState('1'); // 현재 활성화된 채팅방
+  const [chatRooms, setChatRooms] = useState([]); // 채팅방 목록
+  const [messages, setMessages] = useState([]);
+  const [unreadCounts, setUnreadCounts] = useState({});
+  const [activeChatId, setActiveChatId] = useState(null); // 현재 활성화된 채팅방
   const [messageInput, setMessageInput] = useState('');
   const [activeTab, setActiveTab] = useState('ongoing'); // 'ongoing', 'completed'
+  const wsRef = useRef(null);
+  const scrollRef = useRef(null);
+  const [userEmail, setUserEmail] = useState('');
+  const [matchingStatusList, setMatchingStatusList] = useState([]);
 
-  const handleSendMessage = () => {
-    if (messageInput.trim() === '') return;
+  // access token 가져오기 (localStorage 기준)
+  const getToken = () => sessionStorage.getItem('token');
 
-    // 새 메시지 객체 생성 (기본적으로 읽지 않은 상태로 전송)
-    const newMessage = {
-      id: `m${Date.now()}`, // 고유 ID 생성
-      text: messageInput,
-      time: new Date().toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true }),
-      isSent: true,
-      read: false, // 보낸 메시지는 처음에는 읽지 않은 상태
+  // 내 정보(이메일) 가져오기 (토큰 decode 또는 별도 API 필요)
+  useEffect(() => {
+    const email = sessionStorage.getItem('userEmail') || localStorage.getItem('userEmail') || '';
+    setUserEmail(email);
+  }, []);
+
+  // MatchingList 상태값 불러오기
+  useEffect(() => {
+    const email = sessionStorage.getItem('userEmail') || localStorage.getItem('userEmail') || '';
+    setUserEmail(email);
+    if (email) {
+      api.get(API_ENDPOINTS.PAYMENT.LIST, { params: { userEmail: email } })
+        .then(res => setMatchingStatusList(res.data))
+        .catch(() => setMatchingStatusList([]));
+    }
+  }, []);
+
+  // 채팅방 목록 불러오기
+  useEffect(() => {
+    getMyChatRooms()
+      .then((data) => {
+        setChatRooms(data);
+        if (data.length > 0 && !activeChatId) {
+          setActiveChatId(String(data[0].roomId));
+        }
+      })
+      .catch((e) => {
+        setChatRooms([]);
+      });
+  }, []);
+
+  // 채팅방 변경 시 메시지 불러오기 및 읽음 처리
+  useEffect(() => {
+    if (!activeChatId) return;
+    getChatHistory(activeChatId).then((data) => {
+      // 읽음 여부 콘솔 출력
+      console.log('채팅 히스토리 read 값:', data.map(msg => ({
+        message: msg.message,
+        sender: msg.senderEmail,
+        read: msg.read
+      })));
+      const messages = data.map((msg, idx) => {
+        const isSent = normalizeEmail(msg.senderEmail) === normalizeEmail(userEmail);
+        // 디버깅용 콘솔 로그 추가
+        return {
+          id: `m${idx}_${msg.senderEmail}`,
+          text: msg.message,
+          time: formatTime(msg.createdTime),
+          isSent,
+          read: msg.read || false
+        };
+      });
+      setMessages(messages);
+
+      // 읽지 않은 메시지 수 0으로 초기화
+      setUnreadCounts((prev) => ({ ...prev, [activeChatId]: 0 }));
+
+      connectWebSocket(activeChatId);
+    });
+  }, [activeChatId, userEmail]);
+
+
+
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+
+  useEffect(() => {
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
+  }, []);
+
+
+  // WebSocket 연결 및 메시지 수신 처리
+  const connectWebSocket = (roomId) => {
+    if (wsRef.current) {
+      wsRef.current.close();
+    }
+    const token = getToken();
+    if (!token) {
+      console.error('토큰이 없습니다.');
+      return;
+    }
+    console.log('roomId:', roomId, 'token:', token);
+    const wsUrl = `${WS_BASE_URL}?roomId=${roomId}&token=${token}`;
+    console.log('WebSocket 연결 시도:', wsUrl);
+    const ws = new window.WebSocket(wsUrl);
+    wsRef.current = ws;
+    ws.onopen = () => {
+      console.log('WebSocket 연결 성공');
+    };
+    ws.onerror = (e) => {
+      console.error('WebSocket 에러:', e);
+    };
+    ws.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        const isMe = normalizeEmail(msg.senderEmail) === normalizeEmail(userEmail);
+        // 디버깅용 콘솔 로그 추가
+        const isActiveRoom = String(msg.roomId) === String(activeChatId);
+        const newMsg = {
+          id: `m${Date.now()}`,
+          text: msg.message,
+          time: formatTime(msg.createdTime || new Date()),
+          isSent: isMe,
+          read: msg.read // 백엔드에서 내려준 값을 그대로 사용
+        };
+        setMessages((prev) => [...prev, newMsg]);
+
+        // 읽지 않은 메시지 수 증가: 현재 활성화된 채팅방이 아닐 때만
+        if (!isMe && !isActiveRoom) {
+          setUnreadCounts((prev) => {
+            const prevCount = prev[msg.roomId] || 0;
+            return { ...prev, [msg.roomId]: prevCount + 1 };
+          });
+        }
+      } catch (e) {
+        console.error('메시지 파싱 오류', e);
+      }
     };
 
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
-    console.log('Sending message:', messageInput);
+    ws.onclose = (e) => {
+      console.log('WebSocket 연결 종료', e);
+    };
+  };
+
+  // 메시지 전송
+  const handleSendMessage = () => {
+    if (messageInput.trim() === '' || !wsRef.current || wsRef.current.readyState !== 1) return;
+    const msgObj = {
+      roomId: Number(activeChatId),
+      message: messageInput,
+    };
+    wsRef.current.send(JSON.stringify(msgObj));
     setMessageInput('');
   };
 
+  // 채팅방 목록에 상태값 매칭
+  const chatRoomsWithStatus = chatRooms.map(room => {
+    // 상대방 이메일로 MatchingList에서 상태 찾기
+    const match = matchingStatusList.find(
+      m => m.trainerEmail === room.opponentEmail || m.userEmail === room.opponentEmail
+    );
+    return {
+      ...room,
+      status: match ? match.status : '진행중', // 기본값 진행중
+    };
+  });
   // 탭에 따라 채팅방 필터링
-  const filteredChatRooms = chatRooms.filter((room) => {
-    if (activeTab === 'all') {
-      return true;
-    }
-    return room.status === activeTab;
+  const filteredChatRooms = chatRoomsWithStatus.filter(room => {
+    if (activeTab === 'ongoing') return room.status === '진행중';
+    if (activeTab === 'completed') return room.status === '완료됨';
+    return true;
   });
 
-  const activeChatRoom = chatRooms.find((chat) => chat.id === activeChatId);
+  const activeChatRoom = filteredChatRooms.find((chat) => String(chat.roomId) === String(activeChatId));
 
   // 메시지 스크롤이 가장 아래로 내려갈 때 메시지를 읽음 처리
-  const handleScrollToBottom = (e) => {
+  const handleScrollToBottom = async (e) => {
     const { scrollHeight, scrollTop, clientHeight } = e.target;
-    // 사용자가 스크롤을 거의 끝까지 내렸을 때 (예: 20px 이내)
     if (scrollHeight - scrollTop - clientHeight < 20) {
       setMessages((prevMessages) =>
-        prevMessages.map((message) =>
-          message.isSent === false && message.read === false ? { ...message, read: true } : message
-        )
+        prevMessages.map((m) => (!m.read && !m.isSent ? { ...m, read: true } : m))
       );
+
+      setUnreadCounts((prev) => ({ ...prev, [activeChatId]: 0 }));
+
+      try {
+        await readChatRoom(activeChatId);
+      } catch (e) {
+        console.error('읽음 처리 실패', e);
+      }
     }
   };
+
+
+  // 채팅방 변경 시 WebSocket 재연결
+  useEffect(() => {
+    return () => {
+      if (wsRef.current) wsRef.current.close();
+    };
+  }, [activeChatId]);
+
+
 
   return (
     <>
@@ -151,40 +256,49 @@ const ChatPage = () => {
               </ChatTab>
             </ChatTabContainer>
             <ChatListScrollContainer>
-              {filteredChatRooms.map((room) => (
-                <ChatListItem
-                  key={room.id}
-                  $isActive={room.id === activeChatId}
-                  onClick={() => setActiveChatId(room.id)}
-                >
-                  <ChatAvatar>{room.avatar ? <img src={room.avatar} alt="아바타" /> : room.name.charAt(0)}</ChatAvatar>
-                  <ChatInfo>
-                    <ChatName>{room.name}</ChatName>
-                    <LastMessage>{room.lastMessage}</LastMessage>
-                  </ChatInfo>
-                  <LastMessageTime>{room.time}</LastMessageTime>
-                </ChatListItem>
-              ))}
+              {filteredChatRooms.map((room) => {
+                const unread = unreadCounts[room.roomId] || 0;
+                return (
+                  <ChatListItem
+                    key={room.roomId}
+                    $isActive={String(room.roomId) === String(activeChatId)}
+                    onClick={() => setActiveChatId(String(room.roomId))}
+                  >
+                    <ChatAvatar>
+                      <img
+                        src={room.profileImage ? CLOUDFRONT_URL + room.profileImage : '/img/basicProfile.jpg'}
+                        alt="프로필"
+                      />
+                    </ChatAvatar>
+                    <ChatInfo>
+                      <ChatName>{room.roomName}</ChatName>
+                      <LastMessage>{room.lastMessage || ''}</LastMessage>
+                    </ChatInfo>
+                    {unread > 0 && <UnreadBadge>{unread}</UnreadBadge>}
+                  </ChatListItem>
+                );
+              })}
+
             </ChatListScrollContainer>
           </ChatListSection>
 
           {/* 오른쪽 채팅창 섹션 */}
           <ChatWindowSection>
             <ChatWindowHeader>
-              <ChatWindowName>{activeChatRoom ? activeChatRoom.name : '채팅방 선택'}</ChatWindowName>
+              <ChatWindowName>{activeChatRoom ? activeChatRoom.roomName : '채팅방 선택'}</ChatWindowName>
               {activeChatRoom && (
-                <ChatStatus $isOngoing={activeChatRoom.status === 'ongoing'}>
-                  {activeChatRoom.status === 'ongoing' ? '진행중' : '완료됨'}
+                <ChatStatus $isOngoing={activeChatRoom.status === '진행중'}>
+                  {activeChatRoom.status}
                 </ChatStatus>
               )}
             </ChatWindowHeader>
 
-            <ChatMessagesContainer onScroll={handleScrollToBottom}>
+            <ChatMessagesContainer onScroll={handleScrollToBottom} ref={scrollRef}>
               {messages.map((message) => (
                 <MessageWrapper key={message.id} $isSent={message.isSent}>
                   {message.isSent ? (
                     <>
-                      {!message.read && <UnreadIndicator>1</UnreadIndicator>} {/* 안읽었으면 '1' 표시 */}
+                      {!message.read && <UnreadIndicator>1</UnreadIndicator>}
                       <MessageTime $isSent={true}>{message.time}</MessageTime>
                       <SentMessageBubble>{message.text}</SentMessageBubble>
                     </>
@@ -192,7 +306,6 @@ const ChatPage = () => {
                     <>
                       <ReceivedMessageBubble>{message.text}</ReceivedMessageBubble>
                       <MessageTime $isSent={false}>{message.time}</MessageTime>
-                      {/* 받은 메시지에 대한 읽음 확인은 보통 보낸 사람이 확인하므로 이 부분은 필요 없을 수 있습니다. */}
                     </>
                   )}
                 </MessageWrapper>
@@ -210,14 +323,13 @@ const ChatPage = () => {
                 onChange={(e) => setMessageInput(e.target.value)}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
-                    // Shift+Enter는 줄바꿈, Enter만은 전송
                     e.preventDefault();
                     handleSendMessage();
                   }
                 }}
               />
               <SendButton onClick={handleSendMessage} disabled={!messageInput.trim()}>
-                <MdSend size={24} /> {/* 전송 아이콘 */}
+                <MdSend size={24} />
               </SendButton>
             </ChatInputArea>
           </ChatWindowSection>
@@ -229,240 +341,231 @@ const ChatPage = () => {
 
 export default ChatPage;
 
+// ========== 스타일 컴포넌트 ==========
+
 // 메인 채팅 컨테이너
 const ChatPageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  min-height: calc(100vh - 120px); /* 헤더/푸터를 제외한 높이 (대략적인 값, 실제 높이에 따라 조절) */
-  box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-height: calc(100vh - 120px);
+    box-sizing: border-box;
 `;
 
-// 채팅 내용이 들어갈 메인 박스 (max-width 적용)
+// 채팅 내용이 들어갈 메인 박스
 const ChatContentBox = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
-  border-radius: ${({ theme }) => theme.borderRadius.base};
-  border: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  width: 100%;
-  max-width: ${({ theme }) => theme.width.lg}; /* 1008px */
-  margin-top: ${({ theme }) => theme.spacing[8]};
-  display: flex;
-  height: 700px; /* 고정 높이 또는 min-height로 조절 */
-  overflow: hidden; /* 내부 스크롤을 위해 */
+    background-color: ${({ theme }) => theme.colors.white};
+    border-radius: ${({ theme }) => theme.borderRadius.base};
+    border: 1px solid ${({ theme }) => theme.colors.gray[200]};
+    width: 100%;
+    max-width: ${({ theme }) => theme.width.lg};
+    margin-top: ${({ theme }) => theme.spacing[8]};
+    display: flex;
+    height: 700px;
+    overflow: hidden;
 `;
 
 // 왼쪽 채팅 목록 섹션
 const ChatListSection = styled.div`
-  flex: 0 0 250px; /* 고정 너비 */
-  border-right: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  display: flex;
-  flex-direction: column;
-  background-color: ${({ theme }) => theme.colors.gray[100]}; /* 배경색 */
+    flex: 0 0 250px;
+    border-right: 1px solid ${({ theme }) => theme.colors.gray[200]};
+    display: flex;
+    flex-direction: column;
+    background-color: ${({ theme }) => theme.colors.gray[100]};
 `;
 
 const ChatTabContainer = styled.div`
-  display: flex;
-  width: 100%;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
 `;
 
 const ChatTab = styled.button`
-  flex: 1;
-  padding: 14px;
-  background-color: ${({ $isActive, theme }) => ($isActive ? theme.colors.white : theme.colors.gray[50])};
-  border: none;
-  border-bottom: ${({ $isActive, theme }) => ($isActive ? `2px solid ${theme.colors.button}` : 'none')};
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  font-weight: ${({ $isActive, theme }) => ($isActive ? theme.fontWeights.semibold : theme.fontWeights.medium)};
-  color: ${({ $isActive, theme }) => ($isActive ? theme.colors.button : theme.colors.primary)};
-  outline: none;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
+    flex: 1;
+    padding: 14px;
+    background-color: ${({ $isActive, theme }) => ($isActive ? theme.colors.white : theme.colors.gray[50])};
+    border: none;
+    border-bottom: ${({ $isActive, theme }) => ($isActive ? `2px solid ${theme.colors.button}` : 'none')};
+    font-size: ${({ theme }) => theme.fontSizes.base};
+    font-weight: ${({ $isActive, theme }) => ($isActive ? theme.fontWeights.semibold : theme.fontWeights.medium)};
+    color: ${({ $isActive, theme }) => ($isActive ? theme.colors.button : theme.colors.primary)};
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
 
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.gray[100]};
-  }
+    &:hover {
+        background-color: ${({ theme }) => theme.colors.gray[100]};
+    }
 `;
 
-// 채팅 목록 (스크롤 가능)
 const ChatListScrollContainer = styled.div`
-  flex-grow: 1;
-  overflow-y: auto;
+    flex-grow: 1;
+    overflow-y: auto;
 `;
 
-// 개별 채팅방 아이템
 const ChatListItem = styled.div`
-  display: flex;
-  align-items: flex-start;
-  padding: ${({ theme }) => theme.spacing[3]};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
-  cursor: pointer;
-  background-color: ${({ $isActive, theme }) => ($isActive ? theme.colors.white : 'transparent')};
+    display: flex;
+    align-items: flex-start;
+    padding: ${({ theme }) => theme.spacing[3]};
+    border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
+    cursor: pointer;
+    background-color: ${({ $isActive, theme }) => ($isActive ? theme.colors.white : 'transparent')};
 
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.gray[50]};
-  }
+    &:hover {
+        background-color: ${({ theme }) => theme.colors.gray[50]};
+    }
 `;
 
 const ChatAvatar = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: ${({ theme }) => theme.borderRadius.full};
-  background-color: ${({ theme }) => theme.colors.gray[300]}; /* 아바타 배경색 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  color: ${({ theme }) => theme.colors.white};
-  margin-right: ${({ theme }) => theme.spacing[2]};
-  overflow: hidden; /* 이미지 오버플로우 방지 */
+    width: 40px;
+    height: 40px;
+    border-radius: ${({ theme }) => theme.borderRadius.full};
+    background-color: ${({ theme }) => theme.colors.gray[300]};
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: ${({ theme }) => theme.fontSizes.base};
+    color: ${({ theme }) => theme.colors.white};
+    margin-right: ${({ theme }) => theme.spacing[2]};
+    overflow: hidden;
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 `;
 
 const ChatInfo = styled.div`
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 `;
 
 const ChatName = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  font-weight: ${({ theme }) => theme.fontWeights.medium};
-  color: ${({ theme }) => theme.colors.primary};
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: left;
+    font-size: ${({ theme }) => theme.fontSizes.base};
+    font-weight: ${({ theme }) => theme.fontWeights.medium};
+    color: ${({ theme }) => theme.colors.primary};
+    white-space: nowrap;
+    overflow: hidden;
+    margin-top: 10px;
+    text-overflow: ellipsis;
+    text-align: left;
 `;
 
 const LastMessage = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: ${({ theme }) => theme.colors.gray[500]};
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: left;
+    font-size: ${({ theme }) => theme.fontSizes.sm};
+    color: ${({ theme }) => theme.colors.gray[500]};
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
 `;
 
 const LastMessageTime = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes.xs};
-  color: ${({ theme }) => theme.colors.gray[400]};
-  margin-left: ${({ theme }) => theme.spacing[2]};
-  flex-shrink: 0;
+    font-size: ${({ theme }) => theme.fontSizes.xs};
+    color: ${({ theme }) => theme.colors.gray[400]};
+    margin-left: ${({ theme }) => theme.spacing[2]};
+    flex-shrink: 0;
 `;
 
 // 오른쪽 채팅 내용 섹션
 const ChatWindowSection = styled.div`
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  background-color: ${({ theme }) => theme.colors.white};
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: ${({ theme }) => theme.colors.white};
 `;
 
 const ChatWindowHeader = styled.div`
-  padding: ${({ theme }) => theme.spacing[3]};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    padding: ${({ theme }) => theme.spacing[3]};
+    border-bottom: 1px solid ${({ theme }) => theme.colors.gray[200]};
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 `;
 
 const ChatWindowName = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes.lg};
-  font-weight: ${({ theme }) => theme.fontWeights.semibold};
-  color: ${({ theme }) => theme.colors.primary};
+    font-size: ${({ theme }) => theme.fontSizes.lg};
+    font-weight: ${({ theme }) => theme.fontWeights.semibold};
+    color: ${({ theme }) => theme.colors.primary};
 `;
 
 const ChatStatus = styled.span`
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  font-weight: ${({ theme }) => theme.fontWeights.medium};
-  padding: ${({ theme }) => theme.spacing[1]} ${({ theme }) => theme.spacing[2]};
-  border-radius: ${({ theme }) => theme.borderRadius.base};
-  background-color: ${({ $isOngoing, theme }) =>
-    $isOngoing ? theme.colors.success : theme.colors.gray[400]}; /* 진행중이면 초록, 완료면 회색 */
-  color: ${({ theme }) => theme.colors.white};
+    font-size: ${({ theme }) => theme.fontSizes.sm};
+    font-weight: ${({ theme }) => theme.fontWeights.medium};
+    padding: ${({ theme }) => theme.spacing[1]} ${({ theme }) => theme.spacing[2]};
+    border-radius: ${({ theme }) => theme.borderRadius.base};
+    background-color: ${({ $isOngoing, theme }) =>
+            $isOngoing ? theme.colors.success : theme.colors.gray[400]};
+    color: ${({ theme }) => theme.colors.white};
 `;
 
 // 메시지 표시 영역
 const ChatMessagesContainer = styled.div`
-  flex-grow: 1;
-  padding: ${({ theme }) => theme.spacing[4]};
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+    flex-grow: 1;
+    padding: ${({ theme }) => theme.spacing[4]};
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+`;
+
+// 수정된 부분: 메시지 정렬 문제 해결
+const MessageWrapper = styled.div`
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: ${({ theme }) => theme.spacing[2]};
+
+    /* 핵심 수정: 조건부 정렬 */
+    justify-content: ${({ $isSent }) => ($isSent ? 'flex-end' : 'flex-start')};
 `;
 
 const MessageBubble = styled.div`
-  max-width: 70%;
-  padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  word-wrap: break-word;
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  color: ${({ theme }) => theme.colors.primary};
+    max-width: 70%;
+    padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]};
+    border-radius: ${({ theme }) => theme.borderRadius.lg};
+    word-wrap: break-word;
+    font-size: ${({ theme }) => theme.fontSizes.base};
+    color: ${({ theme }) => theme.colors.primary};
 `;
 
+// 수정된 부분: align-self 제거
 const SentMessageBubble = styled(MessageBubble)`
-  background-color: #e0f7fa;
-  align-self: flex-end; /* 오른쪽 정렬 */
-  border-bottom-right-radius: ${({ theme }) => theme.borderRadius.sm}; /* 꼬리 부분 */
+    background-color: #e0f7fa;
+    border-bottom-right-radius: ${({ theme }) => theme.borderRadius.sm};
 `;
 
 const ReceivedMessageBubble = styled(MessageBubble)`
-  background-color: ${({ theme }) => theme.colors.gray[200]}; /* 연한 회색 */
-  align-self: flex-start; /* 왼쪽 정렬 */
-  border-bottom-left-radius: ${({ theme }) => theme.borderRadius.sm}; /* 꼬리 부분 */
+    background-color: ${({ theme }) => theme.colors.gray[200]};
+    border-bottom-left-radius: ${({ theme }) => theme.borderRadius.sm};
 `;
 
 const MessageTime = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes.xs};
-  color: ${({ theme }) => theme.colors.gray[500]};
-  margin: 0 ${({ theme }) => theme.spacing[1]};
-  text-align: ${({ $isSent }) => ($isSent ? 'right' : 'left')};
+    font-size: ${({ theme }) => theme.fontSizes.xs};
+    color: ${({ theme }) => theme.colors.gray[500]};
+    margin: 0 ${({ theme }) => theme.spacing[1]};
+    display: flex;
+    align-items: flex-end;
 `;
 
-const MessageWrapper = styled.div`
-  display: flex;
-  align-items: flex-end; /* 버블과 시간을 아래쪽으로 정렬 */
-  margin-bottom: ${({ theme }) => theme.spacing[2]}; /* 각 메시지 그룹 간 간격 */
-
-  ${({ $isSent }) =>
-    $isSent
-      ? `
-    justify-content: flex-end; /* 보낸 메시지는 오른쪽 정렬 */
-    ${MessageBubble} {
-      margin-right: ${({ theme }) => theme.spacing[1]}; /* 버블과 시간 사이 간격 */
-    }
-  `
-      : `
-    justify-content: flex-start; /* 받은 메시지는 왼쪽 정렬 */
-    ${MessageBubble} {
-      margin-left: ${({ theme }) => theme.spacing[1]}; /* 버블과 시간 사이 간격 */
-    }
-  `}
-`;
-
-// 안읽음 표시 '1' 스타일
 const UnreadIndicator = styled.span`
   font-size: ${({ theme }) => theme.fontSizes.xs};
-  color: ${({ theme }) => theme.colors.success}; /* 읽지 않은 메시지 표시 색상 (예: 초록색) */
-  margin-right: 4px; /* 시간과 '1' 사이 간격 */
+  color: ${({ theme }) => theme.colors.success};
+  margin-right: 4px;
   font-weight: ${({ theme }) => theme.fontWeights.semibold};
+  display: flex;
+  align-items: flex-end;
 `;
 
 // 메시지 입력 영역
 const ChatInputArea = styled.div`
-  padding: ${({ theme }) => theme.spacing[3]};
-  border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
-  display: flex;
-  align-items: center;
-  background-color: ${({ theme }) => theme.colors.white};
+    padding: ${({ theme }) => theme.spacing[3]};
+    border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
+    display: flex;
+    align-items: center;
+    background-color: ${({ theme }) => theme.colors.white};
 `;
 
 const InputField = styled.textarea`
@@ -471,7 +574,7 @@ const InputField = styled.textarea`
   border-radius: ${({ theme }) => theme.borderRadius.base};
   padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[3]};
   font-size: ${({ theme }) => theme.fontSizes.base};
-  resize: none; /* 사용자 크기 조절 방지 */
+  resize: none;
   margin-right: ${({ theme }) => theme.spacing[2]};
   outline: none;
   color: ${({ theme }) => theme.colors.primary};
@@ -482,40 +585,50 @@ const InputField = styled.textarea`
 `;
 
 const SendButton = styled.button`
-  background-color: ${({ theme }) => theme.colors.button}; /* 버튼 색상 */
-  color: ${({ theme }) => theme.colors.white};
-  border: none;
-  outline: none;
-  border-radius: ${({ theme }) => theme.borderRadius.base};
-  padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[4]};
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  font-weight: ${({ theme }) => theme.fontWeights.semibold};
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+    background-color: ${({ theme }) => theme.colors.button};
+    color: ${({ theme }) => theme.colors.white};
+    border: none;
+    outline: none;
+    border-radius: ${({ theme }) => theme.borderRadius.base};
+    padding: ${({ theme }) => theme.spacing[2]} ${({ theme }) => theme.spacing[4]};
+    font-size: ${({ theme }) => theme.fontSizes.base};
+    font-weight: ${({ theme }) => theme.fontWeights.semibold};
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
 
-  &:hover {
-    background-color: #153c82; /* hover 색상 */
-  }
+    &:hover {
+        background-color: #153c82;
+    }
 
-  &:disabled {
-    background-color: ${({ theme }) => theme.colors.gray[400]};
-    cursor: not-allowed;
-  }
+    &:disabled {
+        background-color: ${({ theme }) => theme.colors.gray[400]};
+        cursor: not-allowed;
+    }
 `;
 
 const InputIcons = styled.div`
-  display: flex;
-  align-items: center;
-  margin-right: ${({ theme }) => theme.spacing[2]};
+    display: flex;
+    align-items: center;
+    margin-right: ${({ theme }) => theme.spacing[2]};
 
-  svg {
-    font-size: ${({ theme }) => theme.fontSizes['xl']};
-    color: ${({ theme }) => theme.colors.gray[500]};
-    cursor: pointer;
-    margin-right: ${({ theme }) => theme.spacing[1]};
+    svg {
+        font-size: ${({ theme }) => theme.fontSizes['xl']};
+        color: ${({ theme }) => theme.colors.gray[500]};
+        cursor: pointer;
+        margin-right: ${({ theme }) => theme.spacing[1]};
 
-    &:last-child {
-      margin-right: 0;
+        &:last-child {
+            margin-right: 0;
+        }
     }
-  }
+`;
+
+const UnreadBadge = styled.div`
+  background-color: ${({ theme }) => theme.colors.danger || '#f44336'};
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 2px 8px;
+  margin-left: auto;
 `;

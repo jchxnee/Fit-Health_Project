@@ -1,0 +1,18 @@
+package com.fithealth.backend.dto.chat;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ChatMessageDto {
+    private Long roomId;
+    private String message;
+    private String senderEmail;
+    private java.time.LocalDateTime createdTime; // 추가
+    private boolean read; // 추가
+}
