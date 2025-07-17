@@ -24,8 +24,9 @@ public class HealthRepositoryEmpl implements HealthRepository {
     @Override
     public List<Health> findHealth(String userEmail) {
         return em.createQuery(
-                        "SELECT h FROM Health h WHERE h.member.userEmail = :userEmail ORDER BY h.createDate ASC", Health.class)
+                        "SELECT h FROM Health h WHERE h.member.userEmail = :userEmail ORDER BY h.createDate DESC", Health.class)
                 .setParameter("userEmail", userEmail)
+                .setMaxResults(10)
                 .getResultList();
     }
 
