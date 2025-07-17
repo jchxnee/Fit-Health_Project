@@ -8,6 +8,8 @@ import {
   getChatHistory,
   readChatRoom,
 } from '../api/chatApi.js';
+import api from '../api/axios';
+import { API_ENDPOINTS } from '../api/config';
 // import basicProfile from 'E:\Fit-Health_Project\frontend\public\img\basicProfile.jpg'; // import 구문 제거
 
 const WS_BASE_URL = 'ws://localhost:7961/connect'; // 백엔드 서버 포트로 수정
@@ -37,6 +39,7 @@ const ChatPage = () => {
   const wsRef = useRef(null);
   const scrollRef = useRef(null);
   const [userEmail, setUserEmail] = useState('');
+  const [matchingStatusList, setMatchingStatusList] = useState([]);
 
   // access token 가져오기 (localStorage 기준)
   const getToken = () => sessionStorage.getItem('token');
@@ -45,6 +48,17 @@ const ChatPage = () => {
   useEffect(() => {
     const email = sessionStorage.getItem('userEmail') || localStorage.getItem('userEmail') || '';
     setUserEmail(email);
+  }, []);
+
+  // MatchingList 상태값 불러오기
+  useEffect(() => {
+    const email = sessionStorage.getItem('userEmail') || localStorage.getItem('userEmail') || '';
+    setUserEmail(email);
+    if (email) {
+      api.get(API_ENDPOINTS.PAYMENT.LIST, { params: { userEmail: email } })
+        .then(res => setMatchingStatusList(res.data))
+        .catch(() => setMatchingStatusList([]));
+    }
   }, []);
 
   // 채팅방 목록 불러오기
@@ -177,16 +191,25 @@ const ChatPage = () => {
     setMessageInput('');
   };
 
+  // 채팅방 목록에 상태값 매칭
+  const chatRoomsWithStatus = chatRooms.map(room => {
+    // 상대방 이메일로 MatchingList에서 상태 찾기
+    const match = matchingStatusList.find(
+      m => m.trainerEmail === room.opponentEmail || m.userEmail === room.opponentEmail
+    );
+    return {
+      ...room,
+      status: match ? match.status : '진행중', // 기본값 진행중
+    };
+  });
   // 탭에 따라 채팅방 필터링
-  const filteredChatRooms = chatRooms.filter((room) => {
-    if (activeTab === 'all') {
-      return true;
-    }
-    // ongoing/completed 구분은 roomName이나 별도 필드 필요
-    return true; // 임시로 모두 표시
+  const filteredChatRooms = chatRoomsWithStatus.filter(room => {
+    if (activeTab === 'ongoing') return room.status === '진행중';
+    if (activeTab === 'completed') return room.status === '완료됨';
+    return true;
   });
 
-  const activeChatRoom = chatRooms.find((chat) => String(chat.roomId) === String(activeChatId));
+  const activeChatRoom = filteredChatRooms.find((chat) => String(chat.roomId) === String(activeChatId));
 
   // 메시지 스크롤이 가장 아래로 내려갈 때 메시지를 읽음 처리
   const handleScrollToBottom = async (e) => {
@@ -264,8 +287,8 @@ const ChatPage = () => {
             <ChatWindowHeader>
               <ChatWindowName>{activeChatRoom ? activeChatRoom.roomName : '채팅방 선택'}</ChatWindowName>
               {activeChatRoom && (
-                <ChatStatus $isOngoing={true}>
-                  진행중
+                <ChatStatus $isOngoing={activeChatRoom.status === '진행중'}>
+                  {activeChatRoom.status}
                 </ChatStatus>
               )}
             </ChatWindowHeader>

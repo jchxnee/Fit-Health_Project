@@ -13,4 +13,5 @@ public class ChatRoomResponse {
     private Long roomId;
     private String roomName;
     private String profileImage;
+    private String opponentEmail;
 }
