@@ -37,7 +37,7 @@ const DropdownContent = styled.div`
 
   position: absolute;
   background-color: ${theme.colors.white};
-  min-width: 135px;
+  width: 100%; /* 너비를 부모 컨테이너에 맞게 100%로 설정 */
   box-shadow: ${theme.shadows.md};
   z-index: 1;
   border-radius: ${theme.borderRadius.md};
@@ -50,8 +50,9 @@ const DropdownItem = styled.div`
   padding: ${theme.spacing[2]} ${theme.spacing[4]};
   text-decoration: none;
   display: block;
-  font-size: ${theme.fontSizes.md};
+  font-size: ${theme.fontSizes.base};
   transition: background-color 0.3s ease-in-out;
+  white-space: nowrap;
   &:hover {
     background-color: ${theme.colors.gray100};
     cursor: pointer;

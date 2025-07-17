@@ -3,12 +3,11 @@ const { VITE_API_URL, VITE_API_TIMEOUT = 10000, VITE_API_VERSION = 'v1' } = impo
 export const API_BASE_URL = 'http://localhost:7961';
 
 export const API_CONFIG = {
-  // BASE_URL: `${VITE_API_URL}/${VITE_API_VERSION}`, localhost:8001/api/v1
   BASE_URL: `${VITE_API_URL}`,
   TIMEOUT: VITE_API_TIMEOUT,
   HEADERS: {
-    'Content-Type': 'application/json', //내가 서버로 보내는 데이터는 json이야
-    Accept: 'application/json', //json으로 응답해줘.
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
   },
 };
 
