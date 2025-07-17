@@ -26,6 +26,11 @@ const ToggleButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-6px);
+  }
 `;
 
 const ChatWindow = styled.div`
