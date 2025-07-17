@@ -250,7 +250,7 @@ const TrainerTable = ({ data, columns, onRowClick, fetchData, onApprove, onRejec
 
           return (
             <PopupMenu ref={menuRef} $top={menuPosition.top} $left={menuPosition.left}>
-              <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '1대1채팅', rowData)}>1:1 채팅</PopupMenuItem>
+              <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '1:1 채팅', rowData)}>1:1 채팅</PopupMenuItem>
 
               {/* '진행중' 상태일 때만 '고객 건강정보' 메뉴 보이기 */}
               {isInProgress && (
