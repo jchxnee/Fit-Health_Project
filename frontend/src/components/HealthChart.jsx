@@ -1,5 +1,15 @@
 import React from 'react';
 import { ResponsiveContainer, ComposedChart, XAxis, YAxis, Tooltip, Legend, Bar, Line, CartesianGrid } from 'recharts';
+import styled from 'styled-components';
+
+const CenteredMessage = styled.div`
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: ${({ theme }) => theme.fontSizes?.xl || '18px'};
+  color: ${({ theme }) => theme.colors?.gray?.[700] || '#666'};
+`;
 
 const transformData = (rawData) => {
   return rawData.map((item) => {
@@ -17,6 +27,10 @@ const transformData = (rawData) => {
 };
 
 const MixedChart = ({ rawData }) => {
+  if (!rawData || rawData.length === 0) {
+    return <CenteredMessage>건강 데이터가 없습니다.</CenteredMessage>;
+  }
+
   const data = transformData(rawData);
 
   const keys = ['체중', '골격근량', '체지방량'];
