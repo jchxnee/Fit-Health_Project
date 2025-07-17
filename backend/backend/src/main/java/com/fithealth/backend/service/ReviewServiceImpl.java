@@ -71,7 +71,7 @@ public class ReviewServiceImpl implements ReviewService {
             String message = String.format("%s님이 코치님에 대한 리뷰를 작성했습니다. 확인해보세요!",
                     userMember.getUserName() != null ? userMember.getUserName() : userMember.getUserEmail());
             String notificationType = "REVIEW_SUBMITTED";
-            Long relatedId = savedReview.getReviewNo();
+            Long relatedId = savedReview.getPayment().getResponseMember().getTrainer().getTrainerNo();
 
             notificationService.createNotification(trainerMember, message, notificationType, relatedId);
         } else {
