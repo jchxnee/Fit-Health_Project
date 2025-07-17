@@ -165,7 +165,7 @@ const RecommendDiet = ({
   setError,
   userData,
 }) => {
-  const goalOptions = ['체지방 감량', '벌크업', '건강관리', '체중 유지'];
+  const goalOptions = ['체지방 감량', '벌크업', '체중 유지'];
 
   const handleRecommend = async () => {
     if (!goalCategory || goalCategory === '목적 선택') {

@@ -11,10 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -44,11 +40,7 @@ public class RecommendController {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    // The prompt template resource for diet recommendations
-    @Value("classpath:/diet-prompt-template.st")
-    private Resource dietPromptTemplate;
-
+    
     @PostMapping("/exercise")
     public ResponseEntity<List<RecommendExerciseDto>> recommendExercise(@RequestBody BmiRequestDto bmiRequestDto) {
         List<RecommendExerciseDto> result = recommendService.getRecommendExercise(bmiRequestDto);
