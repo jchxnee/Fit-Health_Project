@@ -739,7 +739,7 @@ const AllClearButton = styled.button`
   &:hover {
     text-decoration: none;
     color: ${({ theme }) => theme.colors.primary};
-    scale: 1.1;
+    font-weight: 600;
   }
 
   ${media.sm`
@@ -776,7 +776,7 @@ const NotificationItem = styled.div`
   }
   cursor: pointer;
   &:hover {
-    background-color: ${({ theme }) => theme.colors.gray[50]};
+    background-color: ${({ theme }) => theme.colors.gray[100]};
   }
 
   display: flex;

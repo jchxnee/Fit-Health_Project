@@ -225,7 +225,7 @@ const PaymentDetailModal = ({ isOpen, onClose, data: initialData }) => {
               <span>최초 예약일:</span> <span>{formatDate(paymentDetail.first_reservation)}</span>
             </DetailItem>
             <DetailItem>
-              <span>리뷰 작성 여부:</span> <span>{paymentDetail.has_review ? '작성됨' : '미작성'}</span>{' '}
+              <span>리뷰 작성 여부:</span> <span>{paymentDetail.has_review ? 'O' : 'X'}</span>{' '}
             </DetailItem>
             <DetailItem>
               <span>환불 여부:</span> <span>{paymentDetail.has_refund ? 'O' : 'X'}</span>
