@@ -328,7 +328,7 @@ const HistoryModal = ({ isOpen, onClose, coachName, history }) => {
                   <HistoryListItem key={index} $isSessionDate={isItemSessionDate}>
                     <HistoryItemTopRow>
                       <HistoryDate>
-                        {index + 1}회차: {item.selectDate.split(' ')[0]} {/* 리스트에서도 날짜만 표시 */}
+                        {index + 1}회차: {item.selectDate} {}
                         {item.status === 'Y' && <HistorySessionStatus>(승인됨)</HistorySessionStatus>}
                         {item.status === 'N' && !item.rejectComment && (
                           <HistorySessionStatus>(승인 대기중)</HistorySessionStatus>

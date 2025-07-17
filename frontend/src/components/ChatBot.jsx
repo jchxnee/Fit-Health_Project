@@ -4,7 +4,7 @@ import { TbMessageChatbot } from 'react-icons/tb';
 import { RiRobot2Line } from 'react-icons/ri';
 import { IoIosSend } from 'react-icons/io';
 import { IoClose } from 'react-icons/io5';
-import api from '../api/axios';
+import api from '../api/axios'; // axios 인스턴스를 가져옵니다.
 import { PulseLoader } from 'react-spinners';
 
 const ChatBotWrapper = styled.div`
@@ -169,7 +169,14 @@ const ChatBot = () => {
     setIsLoading(true);
 
     try {
-      const res = await api.post('/api/chatbot/ask', { question });
+      // ⭐ 여기에 timeout 옵션을 추가합니다. ⭐
+      const res = await api.post(
+        '/api/chatbot/ask',
+        { question },
+        {
+          timeout: 10000, // 예시: 10초 (10000ms)로 타임아웃을 늘립니다. 필요에 따라 더 늘릴 수 있습니다.
+        }
+      );
       const data = res.data;
 
       setMessages((prev) => {
