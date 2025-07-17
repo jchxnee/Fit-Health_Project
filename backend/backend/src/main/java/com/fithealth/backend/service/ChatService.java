@@ -24,6 +24,7 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final ReadStatusRepository readStatusRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final NotificationService notificationService;
 
     public Long getOrCreateRoom(String otherUserEmail) {
         Member member = getCurrentMember();
@@ -106,6 +107,31 @@ public class ChatService {
                 .collect(Collectors.toList());
 
         readStatusRepository.saveAll(statuses);
+
+        Member recipient = chatRoom.getMember1().getUserEmail().equals(sender.getUserEmail()) ? chatRoom.getMember2() : chatRoom.getMember1();
+
+        // TODO: 상대방이 해당 채팅방에 접속해 있는지 확인하는 로직 (WebSocket 세션 체크 등)
+
+        // 안 읽은 메시지 총 개수 계산
+        Long unreadCount = chatMessageRepository.countUnreadMessagesForMember(chatRoom, recipient.getUserEmail());
+
+        // 알림 메세지 생성
+        String notificationMessage = "%s 님이 채팅을 보냈습니다. 확인해주세요!";
+
+        if (unreadCount > 1) {
+            // 안 읽은 메시지가 2개 이상일 경우
+            notificationMessage = String.format("%s님이 %d개의 채팅메세지를 보냈습니다. 확인해주세요!",
+                    sender.getUserName(), unreadCount - 1);
+        } else {
+            // 안 읽은 메시지가 1개일 경우 (방금 보낸 메시지)
+            notificationMessage = String.format("%s님이 새로운 채팅메세지를 보냈습니다. 확인해주세요!", sender.getUserName());
+        }
+
+
+        String notificationType = "NEW_CHAT";
+        Long relatedId = chatRoom.getId();
+        notificationService.createNotification(recipient, notificationMessage, notificationType, relatedId);
+
     }
 
     public List<ChatRoomResponse> getMyChatRooms() {
