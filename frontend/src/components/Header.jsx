@@ -245,6 +245,9 @@ function Header() {
         case 'NEW_COMMENT_ON_POST':
           navigate(`/communityDetailPage/${notification.relatedId}`);
           break;
+        case 'NEW_CHAT':
+          navigate(`/chatpage/${notification.relatedId}`);
+          break;
         case 'PT_PAYMENT_COMPLETED':
           navigate(`/coachmatchingList`);
           break;
