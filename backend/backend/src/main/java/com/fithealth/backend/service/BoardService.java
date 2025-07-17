@@ -4,6 +4,7 @@ import com.fithealth.backend.dto.Board.BoardCreateDto;
 import com.fithealth.backend.dto.Board.BoardGetDto;
 import com.fithealth.backend.dto.Board.BoardGetDto.Response;
 import com.fithealth.backend.dto.Board.BoardUpdateDto;
+import com.fithealth.backend.dto.Board.MyBoardGetDto;
 import com.fithealth.backend.dto.Board.Top5BoardDto;
 import com.fithealth.backend.dto.PageResponse;
 import org.springframework.data.domain.Pageable;
@@ -25,8 +26,7 @@ public interface BoardService {
 
     void delete(Long boardNo);
 
-    PageResponse<Response> getMyBoardList(String userEmail, String category, Pageable pageable);
-    PageResponse<Response> getMyBoardListWithSearch(String userEmail, String category, String search, Pageable pageable);
+    List<MyBoardGetDto> getMyBoards(String userEmail);
 
     List<Top5BoardDto.Response> getBoardTop5();
 }
