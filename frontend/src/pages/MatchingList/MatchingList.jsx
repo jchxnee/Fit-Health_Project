@@ -212,10 +212,6 @@ const MatchingList = () => {
               <SearchIcon />
               <SearchInput type="text" placeholder="이름 검색" value={searchTerm} onChange={handleSearchChange} />
             </SearchInputWrapper>
-            {/* 새로고침 버튼 (선택 사항, 필요 시 추가) */}
-            {/* <RefreshButton onClick={fetchMatchingList} disabled={loading}>
-              <FaSyncAlt />
-            </RefreshButton> */}
           </TableWrapper>
           {filteredData.length === 0 ? (
             <NoDataMessage>고객님의 신청 내역이 존재하지 않습니다.</NoDataMessage>

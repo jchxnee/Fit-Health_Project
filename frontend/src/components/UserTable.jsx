@@ -8,6 +8,7 @@ import theme from '../styles/theme'; // theme 파일 경로가 올바른지 확�
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import RefundModal from './modal/RefundModal';
+import PaymentDetailModal from './modal/PaymentDetailModal'; // PaymentDetailModal 추가
 import { startPrivateChat } from '../api/chatApi'; // 추가
 
 const StyledTableContainer = styled.div`
@@ -144,6 +145,11 @@ const UserTable = ({ data, columns, onRowClick }) => {
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
   const [refundRowData, setRefundRowData] = useState(null);
+
+  // ⭐ PaymentDetailModal 관련 상태 추가 ⭐
+  const [isPaymentDetailModalOpen, setIsPaymentDetailModalOpen] = useState(false);
+  const [paymentDetailRowData, setPaymentDetailRowData] = useState(null);
+
   const menuRef = useRef(null);
   const currentMenuButtonRef = useRef(null);
   const tableContainerRef = useRef(null);
@@ -292,7 +298,7 @@ const UserTable = ({ data, columns, onRowClick }) => {
     [openMenuId]
   );
 
-  const handleMenuItemClick = async (e, action, rowData) => { // async 추가
+  const handleMenuItemClick = async (e, action, rowData) => {
     e.stopPropagation();
     setOpenMenuId(null);
     setMenuPosition({ top: 0, left: 0 });
@@ -363,6 +369,9 @@ const UserTable = ({ data, columns, onRowClick }) => {
     } else if (action === '환불내역') {
       setRefundRowData(rowData);
       setIsRefundModalOpen(true);
+    } else if (action === '결제내역') {
+      setPaymentDetailRowData(rowData);
+      setIsPaymentDetailModalOpen(true);
     }
   };
 
@@ -437,6 +446,8 @@ const UserTable = ({ data, columns, onRowClick }) => {
       {openMenuId !== null && selectedRowData && (
         <PopupMenu ref={menuRef} $top={menuPosition.top} $left={menuPosition.left}>
           <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '1:1 채팅', selectedRowData)}>1:1 채팅</PopupMenuItem>
+          <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '결제내역', selectedRowData)}>결제내역</PopupMenuItem>
+
           {selectedRowData.hasReview === false && selectedRowData.status === '완료됨' && (
             <PopupMenuItem onClick={(e) => handleMenuItemClick(e, '후기 남기기', selectedRowData)}>
               후기 남기기
@@ -464,6 +475,14 @@ const UserTable = ({ data, columns, onRowClick }) => {
           setRefundRowData(null);
         }}
         data={refundRowData}
+      />
+      <PaymentDetailModal
+        isOpen={isPaymentDetailModalOpen}
+        onClose={() => {
+          setIsPaymentDetailModalOpen(false);
+          setPaymentDetailRowData(null);
+        }}
+        data={paymentDetailRowData}
       />
     </StyledTableContainer>
   );
