@@ -144,7 +144,7 @@ function RecommendRoutine({
           onClick={handleRecommend}
           disabled={loading || !bmi || !selectedCategory || selectedCategory === '카테고리 선택'}
         >
-          {loading ? '추천 중...' : '루틴 추천받기'}
+          {loading ? '추천 중...' : '운동 추천받기'}
         </RecommendButton>
         {error && <ErrorMessage>{error}</ErrorMessage>}
       </TitleSection>
