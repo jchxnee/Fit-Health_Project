@@ -60,8 +60,6 @@ public class RecommendController {
             System.out.println("bmr: " + dietRequestDto.getBmr());
             System.out.println("goalCategory: " + dietRequestDto.getGoalCategory());
 
-            // 1. 시스템 메시지로 JSON 스키마를 정의합니다.
-            // 이 문자열을 system() 메서드에 직접 전달합니다.
             String systemPromptContent = """
                 당신은 개인 맞춤형 식단을 추천해주는 전문 영양사입니다.
                 사용자가 이해하기 쉽게 **JSON 형식**으로만 출력하세요.
@@ -105,7 +103,7 @@ public class RecommendController {
                 ※ 음식은 한국인이 일반적으로 섭취하는 식품을 기준으로 구성하세요.
                 """;
 
-            // 2. 사용자 메시지로 실제 사용자 정보를 전달합니다.
+            // 2. 사용자 메시지로 실제 사용자 정보를 전달
             String userPromptContent = """
                 다음 사용자 정보를 바탕으로, 아침, 점심, 저녁 식단을 추천해주세요.
                 각 식단은 구체적인 음식 이름 2~3가지로 구성하고, 간단한 설명도 포함해주세요.
