@@ -461,10 +461,11 @@ const PhotoPostContent = styled.div`
 
 const PhotoPostTitle = styled.h3`
   text-align: start;
-  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.gray[800]};
   margin: 0;
+  margin-bottom: ${({ theme }) => theme.spacing[1]};
 `;
 
 const PhotoPostText = styled.p`
