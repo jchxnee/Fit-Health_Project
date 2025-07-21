@@ -1,6 +1,6 @@
 const { VITE_API_URL, VITE_API_TIMEOUT = 10000, VITE_API_VERSION = 'v1' } = import.meta.env;
 
-export const API_BASE_URL = 'http://localhost:7961';
+export const API_BASE_URL = 'https://fit-health.store';
 
 export const API_CONFIG = {
   BASE_URL: `${VITE_API_URL}`,

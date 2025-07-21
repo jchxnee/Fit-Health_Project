@@ -77,7 +77,7 @@ export default function useCoachRegisterForm() {
 
       // 3. 서버로 JSON 데이터 전송
       console.log('[submitForm] Sending POST request to /api/trainer/register...');
-      const response = await api.post('http://localhost:7961/api/trainer/register', requestBody);
+      const response = await api.post('https://fit-health.store/api/trainer/register', requestBody);
 
       setLoading(false);
       console.log('[submitForm] Successfully received response from server.');

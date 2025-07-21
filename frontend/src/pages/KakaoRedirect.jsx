@@ -69,7 +69,7 @@ const KakaoRedirect = () => {
 
   const handleLoginFlow = async (code) => {
     try {
-      const response = await axios.post('http://localhost:7961/api/members/kakao/login', { code });
+      const response = await axios.post('https://fit-health.store/api/members/kakao/login', { code });
       const token = response.data.token;
 
       sessionStorage.setItem('token', token);
@@ -95,7 +95,7 @@ const KakaoRedirect = () => {
 
   const handleDeleteFlow = async (code) => {
     try {
-      const response = await axios.post('http://localhost:7961/api/members/kakao/login', { code });
+      const response = await axios.post('https://fit-health.store/api/members/kakao/login', { code });
 
       if (response) {
         const confirmed = window.confirm('정말 탈퇴하시겠습니까?');

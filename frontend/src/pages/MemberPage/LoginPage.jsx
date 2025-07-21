@@ -14,18 +14,18 @@ function LoginPage() {
     // sessionStorage.setItem('kakaoAction', 'login');
     // const auth_uri = `${kakaoUrl}?client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUrl}&response_type=code`;
     // window.location.href = auth_uri;
-    window.location.href = 'http://localhost:7961/oauth2/authorization/kakao';
+    window.location.href = 'https://fit-health.store/oauth2/authorization/kakao';
   };
 
   // 로그인 버튼 클릭 시
   const googleLogin = () => {
     // /oauth2/authorization/{provider}
-    window.location.href = 'http://localhost:7961/oauth2/authorization/google';
+    window.location.href = 'https://fit-health.store/oauth2/authorization/google';
   };
 
   const naverLogin = () => {
     // /oauth2/authorization/{provider}
-    window.location.href = 'http://localhost:7961/oauth2/authorization/naver';
+    window.location.href = 'https://fit-health.store/oauth2/authorization/naver';
   };
 
   return (

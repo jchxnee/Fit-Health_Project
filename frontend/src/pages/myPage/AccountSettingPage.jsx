@@ -163,11 +163,11 @@ function AccountSettingsPage() {
     sessionStorage.setItem('action', 'delete');
 
     if (user.socialType === 'GOOGLE') {
-      window.location.href = 'http://localhost:7961/oauth2/authorization/google';
+      window.location.href = 'https://fit-health.store/oauth2/authorization/google';
     } else if (user.socialType === 'KAKAO') {
-      window.location.href = 'http://localhost:7961/oauth2/authorization/kakao';
+      window.location.href = 'https://fit-health.store/oauth2/authorization/kakao';
     } else if (user.socialType === 'NAVER') {
-      window.location.href = 'http://localhost:7961/oauth2/authorization/naver';
+      window.location.href = 'https://fit-health.store/authorization/naver';
     } else {
       alert('소셜 로그인 정보가 없습니다.');
     }
