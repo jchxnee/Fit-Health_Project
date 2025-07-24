@@ -19,7 +19,6 @@
 ### DevOps / ETC
 <img src="https://img.shields.io/badge/AWS EC2-232F3E?style=flat-square&logo=Amazon AWS&logoColor=white"/>
 <img src="https://img.shields.io/badge/GitHub Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white"/>
-<img src="https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=nginx&logoColor=white"/>
 
 ---
 
@@ -62,6 +61,6 @@ npm run dev
 | 이름 | 담당 기능 | Contact |
 | --- | --- | --- |
 | 김현아 | 로그인/회원가입/챗봇/예약신청 | haha020911@naver.com |
-| 이주찬 | BE | a1@gmail.com |
+| 이주찬 | 비밀번호 찾기/알림/AI추천식단/신청내역/리뷰/핏코치 리스트 | hyeijoo1234@naver.com |
 | 전진영 | FE | a1@gmail.com |
 | 황인태 | FE | a1@gmail.com |
