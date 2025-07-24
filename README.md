@@ -62,5 +62,5 @@ npm run dev
 | --- | --- | --- |
 | 김현아 | 로그인/회원가입/챗봇/예약신청 | haha020911@naver.com |
 | 이주찬 | 비밀번호 찾기/알림/AI추천식단/신청내역/리뷰/핏코치 리스트 | hyeijoo1234@naver.com |
-| 전진영 | FE | a1@gmail.com |
+| 전진영 | 메인페이지/유저, 코치 전환/캘린더 신청내역/AI 추천 운동  | yaho73m@gmail.com |
 | 황인태 | FE | a1@gmail.com |
