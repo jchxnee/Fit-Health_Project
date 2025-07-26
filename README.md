@@ -12,13 +12,14 @@
 <img src="https://img.shields.io/badge/Styled--Components-DB7093?style=flat-square&logo=styled-components&logoColor=white"/>
 
 ### Backend
-<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=flat-square&logo=Spring Boot&logoColor=white"/>
+<img src="https://img.shields.io/badge/Spring%20Boot-6DB33F?style=flat-square&logo=springboot&logoColor=white" />
 <img src="https://img.shields.io/badge/JPA-007396?style=flat-square"/>
 <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=MySQL&logoColor=white"/>
 
 ### DevOps / ETC
-<img src="https://img.shields.io/badge/AWS EC2-232F3E?style=flat-square&logo=Amazon AWS&logoColor=white"/>
+<img src="https://img.shields.io/badge/AWS%20EC2-232F3E?style=flat-square&logo=amazonaws&logoColor=white" />
 <img src="https://img.shields.io/badge/GitHub Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white"/>
+<img src="https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=nginx&logoColor=white"/>
 
 ---
 
@@ -46,6 +47,7 @@ npm run dev
 
 ## 주요 기능
 - 회원가입 및 로그인 (JWT 기반)
+- 커뮤니티 게시물 기능
 - 트레이너 등록 및 승인 요청
 - 코치-고객 매칭 및 예약 관리
 - 실시간 1:1 채팅 기능
@@ -59,8 +61,8 @@ npm run dev
 ## 팀원 소개
 
 | 이름 | 담당 기능 | Contact |
-| --- | --- | --- |
+| --- | --- | --- 
 | 김현아 | 로그인/회원가입/챗봇/예약신청 | haha020911@naver.com |
 | 이주찬 | 비밀번호 찾기/알림/AI추천식단/신청내역/리뷰/핏코치 리스트 | hyeijoo1234@naver.com |
 | 전진영 | 메인페이지/유저, 코치 전환/캘린더 신청내역/AI 추천 운동  | yaho73m@gmail.com |
-| 황인태 | FE | a1@gmail.com |
+| 황인태 | 커뮤니티/내가 작성한게시글,댓글/공지사항/결제 | int0802@naver.com |
