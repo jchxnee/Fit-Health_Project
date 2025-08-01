@@ -22,8 +22,6 @@ public class RecommendRepositoryImpl implements RecommendRepository {
     @Value("${openai.model}")
     private String model;
 
-
-    // 옵션 1: 새로운 @Value 변수를 추가하여 전체 엔드포인트를 가져옴
     @Value("${openai.api.chat-completions-url:https://api.openai.com/v1/chat/completions}")
     private String chatCompletionsUrl; // 새로운 변수명
 
@@ -34,7 +32,7 @@ public class RecommendRepositoryImpl implements RecommendRepository {
         String folderName = switch (category) {
             case "헬스" -> "Health";
             case "요가" -> "Yoga";
-            default -> "Health"; // 기본값
+            default -> "Health";
         };
 
         File eximgDir = new File("../frontend/public/Eximg/" + folderName);
